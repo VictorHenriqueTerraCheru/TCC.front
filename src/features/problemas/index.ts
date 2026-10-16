@@ -1,1 +1,7 @@
+export { problemasNaAreaQuery, useProblemasNaArea } from './api/use-problemas-na-area'
+export type { FiltroProblemasNaArea } from './api/use-problemas-na-area'
+export { CamadaProblemas } from './components/camada-problemas'
+export { MarcadorProblema } from './components/marcador-problema'
+export { PINO } from './models/marcador'
+export type { FaixaConfianca, ProblemaNaArea, StatusProblema } from './models/problema'
 export { RecentesPage } from './pages/recentes-page'

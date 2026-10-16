@@ -1,0 +1,5 @@
+export { calorIncidentesQuery, useCalorIncidentes } from './api/use-calor-incidentes'
+export type { FiltroCalorIncidentes } from './api/use-calor-incidentes'
+export { CamadaCalor } from './components/camada-calor'
+export { gradienteCalorCss } from './models/calor'
+export type { CelulaCalor } from './models/incidente'

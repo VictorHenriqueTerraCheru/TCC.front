@@ -137,3 +137,22 @@
     @apply bg-background font-sans text-foreground antialiased;
   }
 }
+
+/* Mapa (Leaflet) */
+@layer components {
+  .leaflet-container {
+    @apply bg-muted font-sans;
+  }
+  /* Tiles do OSM em tons de cinza, como o mapa do protótipo; marcadores e calor mantêm a cor. */
+  .mapa-tiles {
+    filter: grayscale(1) contrast(0.85) brightness(1.08);
+  }
+  /* divIcon sem a caixa branca padrão do Leaflet. */
+  .marcador-problema-icone {
+    background: none;
+    border: none;
+  }
+  .leaflet-control-attribution {
+    @apply rounded-tl-md text-[10px];
+  }
+}
