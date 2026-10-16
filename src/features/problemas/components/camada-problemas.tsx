@@ -1,44 +1,9 @@
-import L from 'leaflet'
-import { renderToStaticMarkup } from 'react-dom/server'
 import { Marker } from 'react-leaflet'
 
-import { aparenciaDoGrupo, grupoDe, iconeDe, type Categoria } from '@/features/categorias'
+import type { Categoria } from '@/features/categorias'
 
-import type { FaixaConfianca, ProblemaNaArea, StatusProblema } from '../models/problema'
-import { dimensoesMarcador } from '../models/marcador'
-import { MarcadorProblema } from './marcador-problema'
-
-// Um divIcon por combinação (categoria, status, faixa): o mapa pode ter até 500 marcadores.
-const icones = new Map<string, L.DivIcon>()
-
-function iconeDoMarcador(
-  categoria: Categoria,
-  status: StatusProblema,
-  faixa: FaixaConfianca | null,
-  selecionado: boolean,
-) {
-  const chave = `${categoria.id}|${status}|${faixa}|${selecionado}`
-  let icone = icones.get(chave)
-  if (!icone) {
-    const { largura, altura } = dimensoesMarcador(status, faixa)
-    icone = L.divIcon({
-      className: 'marcador-problema-icone',
-      html: renderToStaticMarkup(
-        <MarcadorProblema
-          cor={aparenciaDoGrupo[grupoDe(categoria)].corForte}
-          icone={iconeDe(categoria)}
-          status={status}
-          faixa={faixa}
-          selecionado={selecionado}
-        />,
-      ),
-      iconSize: [largura, altura],
-      iconAnchor: [largura / 2, altura],
-    })
-    icones.set(chave, icone)
-  }
-  return icone
-}
+import { iconeMarcadorProblema } from '../lib/icone-marcador'
+import type { ProblemaNaArea } from '../models/problema'
 
 // Mais confiáveis por cima.
 const camadaZ: Record<string, number> = { alta: 300, media: 200, baixa: 100 }
@@ -64,7 +29,7 @@ export function CamadaProblemas({
       <Marker
         key={problema.id}
         position={[problema.lat, problema.lng]}
-        icon={iconeDoMarcador(categoria, problema.status, problema.faixa, selecionado)}
+        icon={iconeMarcadorProblema(categoria, problema.status, problema.faixa, selecionado)}
         zIndexOffset={
           selecionado
             ? 1000

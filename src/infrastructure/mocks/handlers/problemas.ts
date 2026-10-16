@@ -1,8 +1,9 @@
 import { http, HttpResponse } from 'msw'
 
+import type { Schema } from '../../api'
+
 import { banco } from '../banco'
 import { categorias } from '../fixtures/categorias'
-import { problemasNaArea } from '../fixtures/problemas'
 import { rota } from '../rota'
 import { erroDeRegra, lista, noRetangulo, retanguloDaUrl } from './comum'
 
@@ -39,13 +40,44 @@ export const problemasHandlers = [
     const grupoDe = (categoriaId: number) => categorias.find((c) => c.id === categoriaId)?.grupo
 
     return HttpResponse.json(
-      problemasNaArea.filter(
-        (p) =>
-          noRetangulo(p, retangulo) &&
-          (!grupos.length || grupos.includes(grupoDe(p.categoriaId) ?? '')) &&
-          (!status.length || status.includes(p.status)),
-      ),
+      banco
+        .problemas()
+        .filter(
+          (p) =>
+            noRetangulo(p, retangulo) &&
+            (!grupos.length || grupos.includes(grupoDe(p.categoriaId) ?? '')) &&
+            (!status.length || status.includes(p.status)),
+        ),
     )
+  }),
+  http.get(rota('/problemas/duplicatas'), ({ request }) => {
+    if (!autenticado(request)) return new HttpResponse(null, { status: 401 })
+    const url = new URL(request.url)
+    const ponto = {
+      lat: Number(url.searchParams.get('lat')),
+      lng: Number(url.searchParams.get('lng')),
+    }
+    return HttpResponse.json(banco.duplicatas(Number(url.searchParams.get('categoriaId')), ponto))
+  }),
+  http.post<never, Schema<'RegistrarProblemaRequest'>>(rota('/problemas'), async ({ request }) => {
+    if (!autenticado(request)) return new HttpResponse(null, { status: 401 })
+    const { categoriaId, lat, lng, descricao } = await request.json()
+    const categoria = categorias.find((c) => c.id === categoriaId)
+    if (!categoria) {
+      return HttpResponse.json(
+        {
+          title: 'Erro de validação.',
+          status: 400,
+          errors: { categoriaId: ['Categoria inexistente.'] },
+        },
+        { status: 400 },
+      )
+    }
+    if (categoria.tipo !== 'problema') {
+      return erroDeRegra(422, 'categoria-nao-e-problema', 'A categoria não é de problema.')
+    }
+    const detalhe = banco.registrarProblema(categoriaId, lat, lng, descricao ?? null)
+    return HttpResponse.json(detalhe, { status: 201 })
   }),
   http.get<{ id: string }>(rota('/problemas/:id'), ({ request, params }) => {
     const detalhe = banco.detalhe(params.id, autenticado(request))

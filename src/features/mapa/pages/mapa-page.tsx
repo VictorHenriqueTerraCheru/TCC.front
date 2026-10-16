@@ -32,7 +32,7 @@ import { useFiltrosMapa } from '../hooks/use-filtros-mapa'
 import { useNavegacaoMapa } from '../hooks/use-navegacao-mapa'
 import type { ContextoMapa } from '../models/contexto'
 import { filtrosDasCamadas, mostraCalor } from '../models/filtros'
-import { CENTRO_PADRAO, ZOOM_PADRAO } from '../models/mapa'
+import { CENTRO_PADRAO, ZOOM_PADRAO } from '@/common/lib/mapa'
 import type { Retangulo } from '../models/retangulo'
 
 const CHAVE_LEGENDA_VISTA = 'ocorrencias.legendaVista'
