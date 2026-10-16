@@ -1,12 +1,19 @@
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 
+import { provedorAutenticacao } from '@/features/auth'
+import { registrarAutenticacao } from '@/infrastructure/api'
+import { banco } from '@/infrastructure/mocks/banco'
 import { server } from '@/infrastructure/mocks/server'
+
+// Mesma composição do main.tsx.
+registrarAutenticacao(provedorAutenticacao)
 
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }))
 afterEach(() => {
   cleanup()
   server.resetHandlers()
+  banco.reiniciar()
   localStorage.clear()
 })
 afterAll(() => server.close())

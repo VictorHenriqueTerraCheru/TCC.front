@@ -26,8 +26,8 @@ export function CamadaCalor({ celulas }: CamadaCalorProps) {
 
   useEffect(() => {
     const camada = L.heatLayer([], {
-      radius: 40,
-      blur: 32,
+      radius: 30,
+      blur: 24,
       // O plugin divide a intensidade por 2 a cada nível abaixo de maxZoom; 12 = cheia nos bairros.
       maxZoom: 12,
       minOpacity: 0.3,

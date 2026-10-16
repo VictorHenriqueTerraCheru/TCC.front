@@ -15,8 +15,9 @@ function iconeDoMarcador(
   categoria: Categoria,
   status: StatusProblema,
   faixa: FaixaConfianca | null,
+  selecionado: boolean,
 ) {
-  const chave = `${categoria.id}|${status}|${faixa}`
+  const chave = `${categoria.id}|${status}|${faixa}|${selecionado}`
   let icone = icones.get(chave)
   if (!icone) {
     const { largura, altura } = dimensoesMarcador(status, faixa)
@@ -28,6 +29,7 @@ function iconeDoMarcador(
           icone={iconeDe(categoria)}
           status={status}
           faixa={faixa}
+          selecionado={selecionado}
         />,
       ),
       iconSize: [largura, altura],
@@ -44,18 +46,33 @@ const camadaZ: Record<string, number> = { alta: 300, media: 200, baixa: 100 }
 interface CamadaProblemasProps {
   problemas: ProblemaNaArea[]
   categorias: Map<number, Categoria>
+  selecionadoId?: string
+  aoSelecionar(id: string): void
 }
 
-export function CamadaProblemas({ problemas, categorias }: CamadaProblemasProps) {
+export function CamadaProblemas({
+  problemas,
+  categorias,
+  selecionadoId,
+  aoSelecionar,
+}: CamadaProblemasProps) {
   return problemas.map((problema) => {
     const categoria = categorias.get(problema.categoriaId)
     if (!categoria) return null
+    const selecionado = problema.id === selecionadoId
     return (
       <Marker
         key={problema.id}
         position={[problema.lat, problema.lng]}
-        icon={iconeDoMarcador(categoria, problema.status, problema.faixa)}
-        zIndexOffset={problema.status === 'nova' ? 0 : (camadaZ[problema.faixa ?? 'baixa'] ?? 0)}
+        icon={iconeDoMarcador(categoria, problema.status, problema.faixa, selecionado)}
+        zIndexOffset={
+          selecionado
+            ? 1000
+            : problema.status === 'nova'
+              ? 0
+              : (camadaZ[problema.faixa ?? 'baixa'] ?? 0)
+        }
+        eventHandlers={{ click: () => aoSelecionar(problema.id) }}
         title={categoria.nome}
         alt={categoria.nome}
       />

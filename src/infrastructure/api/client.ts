@@ -31,20 +31,29 @@ const autenticacao: Middleware = {
 export const api = createClient<paths>({ baseUrl, fetch: (request) => globalThis.fetch(request) })
 api.use(autenticacao)
 
-type Resultado<T> =
-  | { data: T; error?: never; response: Response }
-  | { data?: never; error: unknown; response: Response }
+interface Resultado {
+  data?: unknown
+  error?: unknown
+  response: Response
+}
 
 /**
  * Devolve o corpo de sucesso ou lança ApiError. Os hooks de api/ das features usam assim:
  * `queryFn: () => api.GET('/categorias').then(dados)`.
+ * Para respostas 204 (sem corpo), use `semConteudo`.
  */
-export function dados<T>(resultado: Resultado<T>): T {
-  if (resultado.error !== undefined || !resultado.response.ok) {
-    throw new ApiError(
-      resultado.response.status,
-      resultado.error as ConstructorParameters<typeof ApiError>[1],
-    )
+export function dados<R extends Resultado>(resultado: R): Exclude<R['data'], undefined> {
+  verificar(resultado)
+  return resultado.data as Exclude<R['data'], undefined>
+}
+
+/** Para endpoints 204: lança ApiError em falha e não devolve nada. */
+export function semConteudo(resultado: Resultado): void {
+  verificar(resultado)
+}
+
+function verificar({ error, response }: Resultado) {
+  if (error !== undefined || !response.ok) {
+    throw new ApiError(response.status, error as ConstructorParameters<typeof ApiError>[1])
   }
-  return resultado.data as T
 }

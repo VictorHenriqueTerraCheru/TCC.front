@@ -1,3 +1,5 @@
 export { AjudaLocalizacaoDialog } from './components/ajuda-localizacao-dialog'
+export { useAtivarLocalizacao } from './hooks/use-ativar-localizacao'
 export { useLocalizacao, useMonitorarLocalizacao } from './hooks/use-localizacao'
+export { distanciaMetros } from './lib/distancia'
 export type { EstadoLocalizacao, Posicao } from './stores/localizacao-store'

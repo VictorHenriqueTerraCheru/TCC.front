@@ -1,2 +1,6 @@
+export { EntreParaContinuar } from './components/entre-para-continuar'
+export { useExigirConta } from './hooks/use-exigir-conta'
 export type { RespostaAuth, Sessao } from './models/sessao'
+export { EntrarPage } from './pages/entrar-page'
+export type { MotivoConta } from './stores/guarda-store'
 export { provedorAutenticacao, useAutenticado, useSessaoStore } from './stores/sessao-store'

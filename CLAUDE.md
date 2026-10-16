@@ -60,9 +60,13 @@ src/
   test/                   # setup do Vitest (MSW, matchMedia) e helpers de render
 ```
 
-Features (mesmas áreas do back, mais as de tela): `auth`, `usuarios` (perfil, histórico, configurações), `categorias`, `problemas` (marcadores, detalhe, recentes), `votos`, `incidentes`, `registro`, `verificacao`, `admin`, `geocodificacao`, `localizacao`, `mapa` (compõe problemas + incidentes).
+Features (mesmas áreas do back, mais as de tela): `auth`, `usuarios` (perfil, histórico, configurações), `categorias`, `problemas` (marcadores, detalhe, votos, recentes), `incidentes`, `registro`, `verificacao`, `admin`, `geocodificacao`, `localizacao`, `mapa` (compõe problemas + incidentes e é dono das rotas `/mapa/*`).
 
-Fluxo: **page** (borda) → **hook de `api/`** (o "service" do front) → cliente tipado `api` → API. O hook usa `api.GET('/rota', …).then(dados)`: `dados()` devolve o corpo ou lança `ApiError`.
+Votos ficam em `problemas/` (são `/problemas/{id}/votos/*` e mexem no cache do detalhe): uma feature `votos` separada criaria dependência circular com `problemas`. Quando duas features precisariam uma da outra, quem compõe é a de tela (`mapa`) ou o `app/`.
+
+Fluxo: **page** (borda) → **hook de `api/`** (o "service" do front) → cliente tipado `api` → API. O hook usa `api.GET('/rota', …).then(dados)`: `dados()` devolve o corpo ou lança `ApiError`; para respostas 204, `.then(semConteudo)`.
+
+Componentes de layout compartilhados (`common/components/`): `Pagina` (páginas sem mapa), `PainelResponsivo` (detalhe/área sobre o mapa: vaul não modal no celular, painel de 420 px no desktop) e `FolhaResponsiva` (folhas modais como "Entre para votar": Drawer no celular, Dialog no desktop). A folha "Entre para…" é única, montada no layout e aberta por `useExigirConta()` da feature `auth`.
 
 Fronteiras (o ESLint barra com `no-restricted-imports`):
 

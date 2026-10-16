@@ -1,4 +1,4 @@
-export { api, dados } from './client'
+export { api, dados, semConteudo } from './client'
 export { ApiError, isApiError, isErroDeRede } from './api-error'
 export { registrarAutenticacao, type ProvedorAutenticacao } from './autenticacao'
 export type { components, paths } from './schema'

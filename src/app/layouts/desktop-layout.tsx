@@ -1,12 +1,15 @@
-import { Link, NavLink, Outlet } from 'react-router'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router'
 
 import { Icone } from '@/common/components/icone'
 import { cn } from '@/common/lib/utils'
+import { useExigirConta } from '@/features/auth'
 
 import { itensNavegacao } from './navegacao'
 
 /** ≥ 1024 px: trilho de navegação de 72 px à esquerda + conteúdo (mapa em tela cheia ou página centralizada). */
 export function DesktopLayout() {
+  const exigirConta = useExigirConta()
+  const navigate = useNavigate()
   return (
     <div className="flex h-dvh">
       <nav
@@ -15,6 +18,10 @@ export function DesktopLayout() {
       >
         <Link
           to="/registrar"
+          onClick={(evento) => {
+            evento.preventDefault()
+            exigirConta('registrar', () => navigate('/registrar'))
+          }}
           aria-label="Registrar ocorrência"
           className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-mint text-mint-foreground shadow-md transition-shadow hover:shadow-lg focus-visible:outline-2"
         >
