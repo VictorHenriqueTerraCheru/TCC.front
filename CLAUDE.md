@@ -66,7 +66,13 @@ Votos ficam em `problemas/` (são `/problemas/{id}/votos/*` e mexem no cache do 
 
 Fluxo: **page** (borda) → **hook de `api/`** (o "service" do front) → cliente tipado `api` → API. O hook usa `api.GET('/rota', …).then(dados)`: `dados()` devolve o corpo ou lança `ApiError`; para respostas 204, `.then(semConteudo)`.
 
-Componentes de layout compartilhados (`common/components/`): `Pagina` (páginas sem mapa), `PainelResponsivo` (detalhe/área sobre o mapa: vaul não modal no celular, painel de 420 px no desktop) e `FolhaResponsiva` (folhas modais como "Entre para votar": Drawer no celular, Dialog no desktop). A folha "Entre para…" é única, montada no layout e aberta por `useExigirConta()` da feature `auth`.
+Componentes de layout compartilhados (`common/components/`): `Pagina` (páginas sem mapa), `PainelResponsivo` (detalhe/área sobre o mapa: vaul não modal no celular, painel de 420 px no desktop) e `FolhaResponsiva` (folhas modais como "Entre para votar": Drawer no celular, Dialog no desktop). A folha "Entre para…" é única, montada no `RaizLayout` e aberta por `useExigirConta()` da feature `auth`.
+
+### Guarda e ação pendente (regras 1 e 13)
+
+`exigirConta(motivo, acao, { pendente, retorno })` executa `acao` se há sessão; senão guarda `{ retorno, acao: pendente }` em `sessionStorage` (`ocorrencias.pendencia`) e abre a folha. Login/cadastro chamam `concluirLogin()` e navegam para `retorno`; **a tela de destino executa a ação** com `useConsumirAcaoPendente()` (ex.: `problemas/hooks/use-votos.ts`), porque só ela sabe como. "Agora não" e "← Voltar" no login descartam a pendência. Num `401`, o middleware limpa a sessão e marca `expirou`; o `onError` da chamada passa de novo pela guarda, que agora vê o visitante e guarda a ação. Ao entrar/sair, `useSincronizarCacheComSessao` invalida o cache do TanStack Query (meusVotos, souAutor, /me).
+
+Layouts de rota: `RaizLayout` (monitor de localização, redirecionamento da pré-permissão, sincronização do cache, folha da guarda) → `AppLayout` (com navegação) ou `TelaCheiaLayout` (login, cadastro, pré-permissão; cartão centralizado no desktop).
 
 Fronteiras (o ESLint barra com `no-restricted-imports`):
 

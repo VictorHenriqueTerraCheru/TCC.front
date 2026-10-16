@@ -35,3 +35,8 @@ Object.defineProperty(window, 'matchMedia', {
     }
   },
 })
+
+// vaul (Drawer) usa pointer capture, que o jsdom não implementa.
+Element.prototype.setPointerCapture ??= () => {}
+Element.prototype.releasePointerCapture ??= () => {}
+Element.prototype.hasPointerCapture ??= () => false

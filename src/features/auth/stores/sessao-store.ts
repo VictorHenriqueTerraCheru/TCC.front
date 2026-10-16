@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import type { ProvedorAutenticacao } from '@/infrastructure/api'
 
 import type { RespostaAuth, Sessao } from '../models/sessao'
+import { useGuardaStore } from './guarda-store'
 
 interface SessaoState {
   sessao: Sessao | null
@@ -39,8 +40,10 @@ export const provedorAutenticacao: ProvedorAutenticacao = {
     return sessao.token
   },
   aoExpirarSessao() {
-    // Etapa 3: guardar a ação pendente e abrir o login (mesma guarda da regra 1).
+    // Regra 13: limpa a sessão e marca a expiração. Quem fez a chamada (ex.: o voto) passa de
+    // novo pela guarda, que agora vê o visitante, guarda a ação e abre a folha.
     useSessaoStore.getState().sair()
+    useGuardaStore.setState({ expirou: true })
   },
 }
 

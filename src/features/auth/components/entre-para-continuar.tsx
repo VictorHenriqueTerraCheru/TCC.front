@@ -6,6 +6,7 @@ import { Icone } from '@/common/components/icone'
 import { Button } from '@/common/ui/button'
 
 import { useGuardaStore, type MotivoConta } from '../stores/guarda-store'
+import { AvisoExpirou } from './aviso-expirou'
 
 interface Conteudo {
   icone: MaterialSymbol
@@ -43,19 +44,22 @@ const conteudos: Record<MotivoConta, Conteudo> = {
 /** Folha única do app, aberta por useExigirConta(). Fica montada no layout. */
 export function EntreParaContinuar() {
   const motivo = useGuardaStore((s) => s.motivo)
-  const fechar = useGuardaStore((s) => s.fechar)
+  const expirou = useGuardaStore((s) => s.expirou)
+  const fecharFolha = useGuardaStore((s) => s.fecharFolha)
+  const descartar = useGuardaStore((s) => s.descartar)
   const navigate = useNavigate()
   const conteudo = conteudos[motivo ?? 'votar']
 
+  // A pendência fica guardada: depois do login a tela de origem retoma a ação.
   function irPara(rota: string) {
-    fechar()
+    fecharFolha()
     navigate(rota)
   }
 
   return (
     <FolhaResponsiva
       aberto={motivo !== null}
-      aoMudarAberto={(aberto) => !aberto && fechar()}
+      aoMudarAberto={(aberto) => !aberto && descartar()}
       titulo={conteudo.titulo}
       icone={
         <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-mint text-mint-foreground">
@@ -63,6 +67,7 @@ export function EntreParaContinuar() {
         </span>
       }
     >
+      {expirou && <AvisoExpirou />}
       <p className="mb-4 text-sm text-muted-foreground">{conteudo.texto}</p>
       <ul className="mb-6 space-y-3">
         {conteudo.itens.map(([icone, texto]) => (
@@ -77,7 +82,7 @@ export function EntreParaContinuar() {
         <Button variant="outline" onClick={() => irPara('/login')}>
           Já tenho conta
         </Button>
-        <Button variant="ghost" onClick={fechar}>
+        <Button variant="ghost" onClick={descartar}>
           Agora não
         </Button>
       </div>
