@@ -1,0 +1,2331 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Ocorrencias.Api | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5080/"
+    }
+  ],
+  "paths": {
+    "/api/v1/auth/cadastro": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CadastrarRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespostaAuth"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntrarRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespostaAuth"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObterMeResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Usuários"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarMeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObterMeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/me/historico": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "parameters": [
+          {
+            "name": "filtro",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "tudo"
+            }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "tamanho",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginadoObterHistoricoItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/categorias": {
+      "get": {
+        "tags": [
+          "Categorias"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListarCategoriasResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/geocodificacao/reversa": {
+      "get": {
+        "tags": [
+          "Geocodificação"
+        ],
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "lng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReversaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/problemas": {
+      "get": {
+        "tags": [
+          "Problemas"
+        ],
+        "parameters": [
+          {
+            "name": "minLat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "minLng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "maxLat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "maxLng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "grupos",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListarProblemasNaAreaResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Problemas"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrarProblemaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObterDetalheProblemaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/problemas/recentes": {
+      "get": {
+        "tags": [
+          "Problemas"
+        ],
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "lng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "raioKm",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "default": 10
+            }
+          },
+          {
+            "name": "grupos",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "tamanho",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginadoListarProblemasRecentesItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/problemas/duplicatas": {
+      "get": {
+        "tags": [
+          "Problemas"
+        ],
+        "parameters": [
+          {
+            "name": "categoriaId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int16"
+            }
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "lng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BuscarDuplicatasResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/problemas/{id}": {
+      "get": {
+        "tags": [
+          "Problemas"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObterDetalheProblemaResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/problemas/{id}/votos/existencia": {
+      "put": {
+        "tags": [
+          "Votos"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VotarExistenciaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObterDetalheProblemaResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/problemas/{id}/votos/persistencia": {
+      "put": {
+        "tags": [
+          "Votos"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VotarPersistenciaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObterDetalheProblemaResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/incidentes": {
+      "post": {
+        "tags": [
+          "Incidentes"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrarIncidenteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObterAreaIncidentesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/incidentes/calor": {
+      "get": {
+        "tags": [
+          "Incidentes"
+        ],
+        "parameters": [
+          {
+            "name": "minLat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "minLng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "maxLat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "maxLng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "dias",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 7
+            }
+          },
+          {
+            "name": "grupos",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ObterCalorIncidentesResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/incidentes/area": {
+      "get": {
+        "tags": [
+          "Incidentes"
+        ],
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "lng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObterAreaIncidentesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/verificacoes": {
+      "post": {
+        "tags": [
+          "Verificação"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SolicitarVerificacaoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolicitarVerificacaoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/verificacoes": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "tamanho",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginadoListarVerificacoesItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/verificacoes/{id}/aprovar": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/verificacoes/{id}/recusar": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecusarVerificacaoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AtualizarMeRequest": {
+        "required": [
+          "nome"
+        ],
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string"
+          }
+        }
+      },
+      "BuscarDuplicatasResponse": {
+        "required": [
+          "id",
+          "categoria",
+          "endereco",
+          "criadoEm",
+          "distanciaMetros",
+          "faixa",
+          "confirmacoes"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoria": {
+            "$ref": "#/components/schemas/CategoriaResumo"
+          },
+          "endereco": {
+            "type": "string"
+          },
+          "criadoEm": {
+            "format": "date-time"
+          },
+          "distanciaMetros": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "faixa": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FaixaConfianca"
+              }
+            ]
+          },
+          "confirmacoes": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CadastrarRequest": {
+        "required": [
+          "nome",
+          "email",
+          "senha",
+          "aceitouTermos"
+        ],
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "senha": {
+            "type": "string"
+          },
+          "aceitouTermos": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CategoriaResumo": {
+        "required": [
+          "id",
+          "nome",
+          "grupo",
+          "icone"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int16"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "grupo": {
+            "type": "string"
+          },
+          "icone": {
+            "type": "string"
+          }
+        }
+      },
+      "EntrarRequest": {
+        "required": [
+          "email",
+          "senha"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "senha": {
+            "type": "string"
+          }
+        }
+      },
+      "FaixaConfianca": {
+        "enum": [
+          "baixa",
+          "media",
+          "alta"
+        ]
+      },
+      "HttpValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ListarCategoriasResponse": {
+        "required": [
+          "id",
+          "nome",
+          "grupo",
+          "tipo",
+          "icone"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int16"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "grupo": {
+            "type": "string"
+          },
+          "tipo": {
+            "$ref": "#/components/schemas/TipoOcorrencia"
+          },
+          "icone": {
+            "type": "string"
+          }
+        }
+      },
+      "ListarProblemasNaAreaResponse": {
+        "required": [
+          "id",
+          "categoriaId",
+          "lat",
+          "lng",
+          "status",
+          "confianca",
+          "faixa"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoriaId": {
+            "type": "integer",
+            "format": "int16"
+          },
+          "lat": {
+            "type": "number",
+            "format": "double"
+          },
+          "lng": {
+            "type": "number",
+            "format": "double"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusProblema"
+          },
+          "confianca": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "faixa": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FaixaConfianca"
+              }
+            ]
+          }
+        }
+      },
+      "ListarProblemasRecentesItem": {
+        "required": [
+          "id",
+          "categoria",
+          "endereco",
+          "criadoEm",
+          "status",
+          "faixa"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoria": {
+            "$ref": "#/components/schemas/CategoriaResumo"
+          },
+          "endereco": {
+            "type": "string"
+          },
+          "criadoEm": {
+            "format": "date-time"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusProblema"
+          },
+          "faixa": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FaixaConfianca"
+              }
+            ]
+          }
+        }
+      },
+      "ListarVerificacoesItem": {
+        "required": [
+          "id",
+          "usuario",
+          "tipoVinculo",
+          "justificativa",
+          "status",
+          "criadaEm",
+          "motivoRecusa"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "usuario": {
+            "$ref": "#/components/schemas/ListarVerificacoesUsuarioResumo"
+          },
+          "tipoVinculo": {
+            "$ref": "#/components/schemas/TipoVinculo"
+          },
+          "justificativa": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusVerificacao"
+          },
+          "criadaEm": {
+            "format": "date-time"
+          },
+          "motivoRecusa": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ListarVerificacoesUsuarioResumo": {
+        "required": [
+          "id",
+          "nome",
+          "iniciais"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "iniciais": {
+            "type": "string"
+          }
+        }
+      },
+      "NivelConcentracao": {
+        "enum": [
+          "baixa",
+          "media",
+          "alta"
+        ]
+      },
+      "ObterAreaIncidentesContagem": {
+        "required": [
+          "categoriaId",
+          "nome",
+          "dias7",
+          "dias30"
+        ],
+        "type": "object",
+        "properties": {
+          "categoriaId": {
+            "type": "integer",
+            "format": "int16"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "dias7": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dias30": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ObterAreaIncidentesResponse": {
+        "required": [
+          "raioMetros",
+          "atualizadoEm",
+          "nivel",
+          "contagens"
+        ],
+        "type": "object",
+        "properties": {
+          "raioMetros": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "atualizadoEm": {
+            "format": "date-time"
+          },
+          "nivel": {
+            "$ref": "#/components/schemas/NivelConcentracao"
+          },
+          "contagens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObterAreaIncidentesContagem"
+            }
+          }
+        }
+      },
+      "ObterCalorIncidentesResponse": {
+        "required": [
+          "lat",
+          "lng",
+          "quantidade"
+        ],
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "format": "double"
+          },
+          "lng": {
+            "type": "number",
+            "format": "double"
+          },
+          "quantidade": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ObterDetalheProblemaAvaliacao": {
+        "required": [
+          "votantes",
+          "necessarios",
+          "encerraEm"
+        ],
+        "type": "object",
+        "properties": {
+          "votantes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "necessarios": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "encerraEm": {
+            "format": "date-time"
+          }
+        }
+      },
+      "ObterDetalheProblemaContagemExistencia": {
+        "required": [
+          "confirmacoes",
+          "naoVi"
+        ],
+        "type": "object",
+        "properties": {
+          "confirmacoes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "naoVi": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ObterDetalheProblemaContagemPersistencia": {
+        "required": [
+          "continua",
+          "resolvido",
+          "resolvidoUltimas24h"
+        ],
+        "type": "object",
+        "properties": {
+          "continua": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "resolvido": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "resolvidoUltimas24h": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ObterDetalheProblemaMeusVotos": {
+        "required": [
+          "existencia",
+          "persistencia"
+        ],
+        "type": "object",
+        "properties": {
+          "existencia": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ValorExistencia"
+              }
+            ]
+          },
+          "persistencia": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ValorPersistencia"
+              }
+            ]
+          }
+        }
+      },
+      "ObterDetalheProblemaResponse": {
+        "required": [
+          "id",
+          "categoria",
+          "descricao",
+          "lat",
+          "lng",
+          "endereco",
+          "criadoEm",
+          "status",
+          "confianca",
+          "faixa",
+          "avaliacao",
+          "existencia",
+          "persistencia",
+          "meusVotos",
+          "souAutor"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoria": {
+            "$ref": "#/components/schemas/CategoriaResumo"
+          },
+          "descricao": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lat": {
+            "type": "number",
+            "format": "double"
+          },
+          "lng": {
+            "type": "number",
+            "format": "double"
+          },
+          "endereco": {
+            "type": "string"
+          },
+          "criadoEm": {
+            "format": "date-time"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusProblema"
+          },
+          "confianca": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "faixa": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FaixaConfianca"
+              }
+            ]
+          },
+          "avaliacao": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ObterDetalheProblemaAvaliacao"
+              }
+            ]
+          },
+          "existencia": {
+            "$ref": "#/components/schemas/ObterDetalheProblemaContagemExistencia"
+          },
+          "persistencia": {
+            "$ref": "#/components/schemas/ObterDetalheProblemaContagemPersistencia"
+          },
+          "meusVotos": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ObterDetalheProblemaMeusVotos"
+              }
+            ]
+          },
+          "souAutor": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ObterHistoricoItem": {
+        "required": [
+          "tipo",
+          "ocorrenciaId",
+          "categoria",
+          "endereco",
+          "valor",
+          "statusProblema",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "$ref": "#/components/schemas/ObterHistoricoTipoItem"
+          },
+          "ocorrenciaId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "categoria": {
+            "$ref": "#/components/schemas/CategoriaResumo"
+          },
+          "endereco": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "valor": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ObterHistoricoValorItem"
+              }
+            ]
+          },
+          "statusProblema": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/StatusProblema"
+              }
+            ]
+          },
+          "data": {
+            "format": "date-time"
+          }
+        }
+      },
+      "ObterHistoricoTipoItem": {
+        "enum": [
+          "registroProblema",
+          "registroIncidente",
+          "votoExistencia",
+          "votoPersistencia"
+        ]
+      },
+      "ObterHistoricoValorItem": {
+        "enum": [
+          "confirma",
+          "naoVi",
+          "continua",
+          "resolvido"
+        ]
+      },
+      "ObterMeResponse": {
+        "required": [
+          "id",
+          "nome",
+          "email",
+          "perfil",
+          "criadoEm",
+          "verificadoEm",
+          "totalRegistros",
+          "totalVotos",
+          "verificacao"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "perfil": {
+            "$ref": "#/components/schemas/Perfil"
+          },
+          "criadoEm": {
+            "format": "date-time"
+          },
+          "verificadoEm": {
+            "format": "date-time"
+          },
+          "totalRegistros": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalVotos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "verificacao": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ObterMeVerificacaoResumo"
+              }
+            ]
+          }
+        }
+      },
+      "ObterMeVerificacaoResumo": {
+        "required": [
+          "status",
+          "tipoVinculo",
+          "motivoRecusa",
+          "criadaEm"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/StatusVerificacao"
+          },
+          "tipoVinculo": {
+            "$ref": "#/components/schemas/TipoVinculo"
+          },
+          "motivoRecusa": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "criadaEm": {
+            "format": "date-time"
+          }
+        }
+      },
+      "PaginadoListarProblemasRecentesItem": {
+        "required": [
+          "itens",
+          "pagina",
+          "tamanho",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "itens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListarProblemasRecentesItem"
+            }
+          },
+          "pagina": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tamanho": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PaginadoListarVerificacoesItem": {
+        "required": [
+          "itens",
+          "pagina",
+          "tamanho",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "itens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ListarVerificacoesItem"
+            }
+          },
+          "pagina": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tamanho": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PaginadoObterHistoricoItem": {
+        "required": [
+          "itens",
+          "pagina",
+          "tamanho",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "itens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObterHistoricoItem"
+            }
+          },
+          "pagina": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tamanho": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Perfil": {
+        "enum": [
+          "cidadao",
+          "cidadaoVerificado",
+          "administrador"
+        ]
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RecusarVerificacaoRequest": {
+        "required": [
+          "motivo"
+        ],
+        "type": "object",
+        "properties": {
+          "motivo": {
+            "type": "string"
+          }
+        }
+      },
+      "RegistrarIncidenteRequest": {
+        "required": [
+          "categoriaId",
+          "lat",
+          "lng",
+          "ocorridoEm"
+        ],
+        "type": "object",
+        "properties": {
+          "categoriaId": {
+            "type": "integer",
+            "format": "int16"
+          },
+          "lat": {
+            "type": "number",
+            "format": "double"
+          },
+          "lng": {
+            "type": "number",
+            "format": "double"
+          },
+          "ocorridoEm": {
+            "format": "date-time"
+          }
+        }
+      },
+      "RegistrarProblemaRequest": {
+        "required": [
+          "categoriaId",
+          "lat",
+          "lng",
+          "descricao"
+        ],
+        "type": "object",
+        "properties": {
+          "categoriaId": {
+            "type": "integer",
+            "format": "int16"
+          },
+          "lat": {
+            "type": "number",
+            "format": "double"
+          },
+          "lng": {
+            "type": "number",
+            "format": "double"
+          },
+          "descricao": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RespostaAuth": {
+        "required": [
+          "token",
+          "expiraEm",
+          "usuario"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "expiraEm": {
+            "format": "date-time"
+          },
+          "usuario": {
+            "$ref": "#/components/schemas/RespostaAuthUsuarioResumo"
+          }
+        }
+      },
+      "RespostaAuthUsuarioResumo": {
+        "required": [
+          "id",
+          "nome",
+          "email",
+          "perfil"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "perfil": {
+            "$ref": "#/components/schemas/Perfil"
+          }
+        }
+      },
+      "ReversaResponse": {
+        "required": [
+          "disponivel",
+          "endereco",
+          "logradouro",
+          "numero",
+          "bairro",
+          "cidade",
+          "uf",
+          "rotuloArea"
+        ],
+        "type": "object",
+        "properties": {
+          "disponivel": {
+            "type": "boolean"
+          },
+          "endereco": {
+            "type": "string"
+          },
+          "logradouro": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "numero": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bairro": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cidade": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "uf": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "rotuloArea": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SolicitarVerificacaoRequest": {
+        "required": [
+          "tipoVinculo",
+          "justificativa"
+        ],
+        "type": "object",
+        "properties": {
+          "tipoVinculo": {
+            "$ref": "#/components/schemas/TipoVinculo"
+          },
+          "justificativa": {
+            "type": "string"
+          }
+        }
+      },
+      "SolicitarVerificacaoResponse": {
+        "required": [
+          "id",
+          "tipoVinculo",
+          "justificativa",
+          "status",
+          "criadaEm"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tipoVinculo": {
+            "$ref": "#/components/schemas/TipoVinculo"
+          },
+          "justificativa": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StatusVerificacao"
+          },
+          "criadaEm": {
+            "format": "date-time"
+          }
+        }
+      },
+      "StatusProblema": {
+        "enum": [
+          "nova",
+          "ativa",
+          "possivelmenteResolvida",
+          "resolvida"
+        ]
+      },
+      "StatusVerificacao": {
+        "enum": [
+          "pendente",
+          "aprovada",
+          "recusada"
+        ]
+      },
+      "TipoOcorrencia": {
+        "enum": [
+          "problema",
+          "incidente"
+        ]
+      },
+      "TipoVinculo": {
+        "enum": [
+          "moradorRegiao",
+          "trabalhaRegiao",
+          "servidorPublico",
+          "outro"
+        ]
+      },
+      "ValorExistencia": {
+        "enum": [
+          "confirma",
+          "naoVi"
+        ]
+      },
+      "ValorPersistencia": {
+        "enum": [
+          "continua",
+          "resolvido"
+        ]
+      },
+      "VotarExistenciaRequest": {
+        "required": [
+          "valor",
+          "lat",
+          "lng"
+        ],
+        "type": "object",
+        "properties": {
+          "valor": {
+            "$ref": "#/components/schemas/ValorExistencia"
+          },
+          "lat": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "lng": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "VotarPersistenciaRequest": {
+        "required": [
+          "valor",
+          "lat",
+          "lng"
+        ],
+        "type": "object",
+        "properties": {
+          "valor": {
+            "$ref": "#/components/schemas/ValorPersistencia"
+          },
+          "lat": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "lng": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Usuários"
+    },
+    {
+      "name": "Categorias"
+    },
+    {
+      "name": "Geocodificação"
+    },
+    {
+      "name": "Problemas"
+    },
+    {
+      "name": "Votos"
+    },
+    {
+      "name": "Incidentes"
+    },
+    {
+      "name": "Verificação"
+    },
+    {
+      "name": "Admin"
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+# CLAUDE.md — Front web de Ocorrências Urbanas (TCC)
+
+Aplicação web em **React + TypeScript** do TCC "Sistema colaborativo de registro e validação de ocorrências urbanas" (Gustavo Brandão e Victor Henrique Terra Cherú — Unilasalle-RJ). É **mobile-first e responsiva**: no celular segue o protótipo; no computador, o mapa ocupa a tela e os detalhes viram um painel lateral. Consome a API .NET do repositório `TCC.back` (`../TCC.back`), **já implementada** (etapas 0–7; até o merge dos PRs, o código mais recente está na branch `etapa-7`).
+
+**O front não calcula confiança, não decide ciclo de vida e não geocodifica.** Isso é da API. O front exibe, coleta votos e envia a posição do navegador.
+
+## Documentos deste repo (leia antes de codar)
+
+- `docs/API.md` — contrato HTTP (normativo; idêntico ao do repo da API, incluindo limites de validação e regras de borda)
+- `docs/openapi.json` — snapshot do OpenAPI da API (fonte dos tipos gerados; atualize com `npm run gen:api` quando a API mudar)
+- `docs/TELAS.md` — as 29 telas do protótipo + a variação desktop, com rota, dados e comportamento
+- `docs/PLAN.md` — plano por etapas com critérios de aceite
+- `docs/design/*.jpg` — prints do protótipo feito no Claude Design. **São a referência visual da versão mobile. Abra a imagem correspondente antes de implementar cada tela.**
+
+Se a implementação exigir mudar o contrato da API, **pare e pergunte**.
+
+## Stack
+
+- **Vite + React 19 + TypeScript** (`strict: true`, `noUncheckedIndexedAccess: true`)
+- Rotas: **React Router** (`createBrowserRouter`)
+- Estado do servidor: **TanStack Query**. Estado do cliente: **Zustand** (sessão; rascunho do fluxo de registro com `persist` em `sessionStorage`)
+- Cliente HTTP tipado: **openapi-typescript** (gera `src/api/schema.d.ts` a partir de `docs/openapi.json` ou da API rodando em `http://localhost:5080/openapi/v1.json`) + **openapi-fetch**, com middleware de JWT e conversão do ProblemDetails em `ApiError { type, status, title, errors }`. Não escreva tipos da API à mão: os schemas têm nomes estáveis (`ObterDetalheProblemaResponse`, `PaginadoListarProblemasRecentesItem`, `RegistrarProblemaRequest`…), enums como uniões de string e campos anuláveis como `T | null`.
+- Formulários: **React Hook Form + Zod**
+- UI: **Tailwind CSS v4** + **shadcn/ui** (Radix). Folha inferior no mobile: **vaul** (Drawer com *snap points*). Painel lateral no desktop: `Sheet` do shadcn ou um painel fixo.
+- Ícones: **Material Symbols Rounded** (pacote `material-symbols`), os mesmos do protótipo. Fonte: Roboto.
+- Mapa: **Leaflet + react-leaflet**, tiles do OpenStreetMap com atribuição visível. Mapa de calor: **leaflet.heat** envolvido num componente que usa `useMap()`. Marcadores: `L.divIcon` com HTML gerado a partir de um componente (`renderToStaticMarkup`).
+- Datas: **date-fns** com `ptBR` ("há 2 dias", "ontem, 19:40")
+- Testes: **Vitest + Testing Library + MSW**. Os handlers do MSW também servem de **API falsa** (`VITE_USE_MOCKS=true`) para trabalhar sem o back e para fixtures que imitam os prints; o desenvolvimento normal é contra a API real.
+- Prints para o TCC: **Playwright** (só o script de captura; não é suíte de testes)
+- Qualidade: ESLint (typescript-eslint, react-hooks) + Prettier
+
+Antes de adicionar um pacote, confira a versão atual e a compatibilidade (ex.: react-leaflet × React 19) no npm; não fixe versões de memória.
+
+## Estrutura
+
+```
+src/
+  main.tsx, App.tsx
+  app/            # router, providers (QueryClient, tema), layouts (MobileLayout, DesktopLayout)
+  api/            # schema.d.ts (gerado), client.ts, hooks de query/mutation por recurso
+  mocks/          # MSW: handlers + fixtures (Botafogo/Niterói)
+  core/
+    auth/         # store de sessão, guarda "Entre para votar/registrar", retomada da ação após login
+    location/     # hook useLocalizacao (Permissions API + watchPosition), distância (haversine)
+    ui/           # componentes compartilhados: CategoriaIcone, MarcadorProblema, BarraConfianca, SeloNova, BottomSheet/Painel responsivo
+    theme/        # tokens de cor (CSS variables), cores por categoria
+  features/
+    mapa/ problema/ incidente/ registro/ recentes/ perfil/ verificacao/ admin/ auth/ configuracoes/
+  lib/            # utilitários (formatação, datas)
+```
+
+## Regras
+
+1. **Visitante vê, conta age.** Registrar ou votar sem token abre a folha "Entre para registrar/votar" (telas 14 e 27); após login ou cadastro, a ação pendente é retomada e o usuário volta para onde estava.
+2. **Localização é opcional e exige HTTPS.** Sem permissão, tudo funciona; os votos vão sem `lat/lng` e a interface mostra os avisos das telas 18 e 19. O navegador **não** reabre o pedido depois de negado: nesse caso, "Ativar" abre a ajuda "Como liberar a localização no navegador" (cadeado na barra de endereço → Permissões → Localização). Em dev, `localhost` conta como contexto seguro.
+3. **Distância "você está a X m"** é calculada no front (haversine) com a última posição conhecida.
+4. **Endereços vêm da API** (`GET /geocodificacao/reversa`). Nunca chame o Nominatim direto do navegador. No passo "Onde fica?", consulte com *debounce* de ~600 ms quando o mapa parar de mover.
+5. **Falha de envio não perde dados** (tela 26): o rascunho do registro vive no store persistido; o diálogo oferece "Tentar novamente".
+6. **Marcadores**: Alta = cheio, opaco, com sombra; Média = intermediário; Baixa = menor e translúcido; `nova` = selo "Nova"; `possivelmenteResolvida` = contorno tracejado com selo de check (tela 24). `resolvida` nunca aparece no mapa.
+7. **Incidentes não têm marcador nem votos.** No modo Incidentes ou Ambos, um toque no mapa fora de marcadores consulta `GET /incidentes/area` naquele ponto e abre o resumo (tela 4) se houver ao menos um incidente no raio.
+8. **Responsivo** com um único breakpoint principal, `lg` (≥ 1024 px): abaixo, barra inferior Mapa / Recentes / Perfil + folhas inferiores (vaul) + FAB "Registrar"; acima, trilho de navegação à esquerda, mapa em tela cheia e painel lateral de 420 px para detalhe, área e fluxo de registro. Recentes e Perfil no desktop são páginas centralizadas (`max-w-3xl`). Use um componente `PainelResponsivo` que renderiza Drawer ou painel conforme a largura; não duplique telas.
+9. Recarregue os marcadores ao mover o mapa (`moveend`) com *debounce* de ~400 ms, enviando o bbox visível; use a chave do bbox arredondado no TanStack Query.
+10. Textos da interface em **português do Brasil**, iguais aos do protótipo. Identificadores do domínio em português sem acento (`Problema`, `votarExistencia`); termos técnicos do React em inglês.
+11. Token JWT em `localStorage` (aceitável no escopo do TCC; registrado como limitação). Nunca logue token nem posição.
+12. Acessibilidade básica: botões com `aria-label`, foco visível, Drawer/Dialog do Radix (foco preso), contraste AA.
+13. **Sessão expirada:** o JWT vale 7 dias e não há refresh. `401` numa chamada autenticada → limpa a sessão, guarda a ação pendente e abre o login (mesma guarda da regra 1).
+14. **Perfil atual vem de `GET /me`**, não da claim do token (que fica com o perfil do momento do login). Use `GET /me` para "Perfil verificado", item de admin etc.; após uma aprovação, invalide a query de `/me`.
+15. **Limite o retângulo do mapa** antes de chamar `GET /problemas` e `GET /incidentes/calor`: `lat` em [−90, 90], `lng` em [−180, 180] e `min < max`. O `getBounds()` do Leaflet passa de ±180 ao afastar o zoom; a API responde `400` nesse caso.
+16. **Horário do incidente:** a API recusa `ocorridoEm` no futuro, sem tolerância. "Agora" envia o instante atual menos 1 minuto; "Outro horário" vai até 23 h 45 atrás (não 24 h, porque a janela anda enquanto o usuário preenche).
+17. **Geocodificação com `429 limite-requisicoes`** (30/min por IP): trate como endereço indisponível (mostre o fallback e permita continuar), nunca como erro bloqueante.
+
+## Tema
+
+Inspirado no Material 3 do protótipo. Defina os tokens como CSS variables no tema do Tailwind e amostre as cores exatas nos prints de `docs/design/`:
+- primário (botões cheios, barra de confiança): verde-escuro ≈ `#046D4E`; superfície clara esverdeada
+- FAB "Registrar": verde-menta claro com ícone e texto escuros
+- Categorias: Via pública = laranja-tijolo; Elétrica = oliva/amarelo; Limpeza = marrom; Segurança = vermelho; Trânsito = vermelho-alaranjado. Cada categoria tem uma cor forte (pino/ícone) e uma clara (fundo do ícone circular).
+- Selo "Nova": azul-ardósia escuro com texto branco; chip "Possivelmente resolvida": azul-claro.
+- Cantos bem arredondados (cards ~16 px, botões em pílula), como no protótipo.
+
+## API local (repo `../TCC.back`)
+
+```bash
+cd ../TCC.back
+docker compose up -d db                    # PostGIS
+dotnet run --project src/Ocorrencias.Api   # http://localhost:5080 (Scalar em /scalar); aplica migrations e o seed
+```
+
+Usuários do seed (senha `tcc12345`): `admin@tcc.local` (administrador), `verificado@tcc.local`, `cidadao1@tcc.local`, `cidadao2@tcc.local`, `cidadao3@tcc.local`. A API já libera CORS para `http://localhost:5173`.
+
+**Use o proxy do Vite em dev:** `server.proxy` com `'/api' → 'http://localhost:5080'` e `VITE_API_URL=/api/v1`. Assim front e API ficam na mesma origem (sem CORS) e o teste no celular por túnel HTTPS precisa expor só a porta do Vite: o celular não alcança `localhost:5080`. Em produção, `VITE_API_URL` aponta para a URL pública da API.
+
+## Comandos
+
+```bash
+npm install
+npm run gen:api            # openapi-typescript docs/openapi.json → src/api/schema.d.ts (ou a URL da API rodando)
+npm run dev                # http://localhost:5173  (VITE_API_URL=/api/v1, proxy para :5080)
+VITE_USE_MOCKS=true npm run dev   # sem API, com MSW
+npm test                   # Vitest
+npm run build && npm run preview
+npm run prints             # Playwright: capturas mobile (390×844) e desktop (1440×900) para o TCC
+```
+
+Para testar a localização no celular durante o desenvolvimento é preciso HTTPS: use o deploy de preview (Vercel/Netlify) ou um túnel HTTPS para o `npm run dev` (com o proxy do Vite, o túnel cobre também a API). Se o túnel usar outro host, adicione-o em `server.allowedHosts` do Vite.
