@@ -5,9 +5,12 @@ import react from '@vitejs/plugin-react'
 import { msw } from 'msw/vite'
 import { defineConfig } from 'vite'
 
+import pacote from './package.json' with { type: 'json' }
+
 export default defineConfig(({ command }) => ({
   // msw/vite só serve o mockServiceWorker.js em dev (VITE_USE_MOCKS=true); o build não leva o worker.
   plugins: [react(), tailwindcss(), command === 'serve' && msw({ mode: 'worker-only' })],
+  define: { __VERSAO_APP__: JSON.stringify(pacote.version) },
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },

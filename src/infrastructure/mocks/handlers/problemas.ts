@@ -2,10 +2,10 @@ import { http, HttpResponse } from 'msw'
 
 import type { Schema } from '../../api'
 
-import { banco } from '../banco'
+import { banco, metrosEntre } from '../banco'
 import { categorias } from '../fixtures/categorias'
 import { rota } from '../rota'
-import { erroDeRegra, lista, noRetangulo, retanguloDaUrl } from './comum'
+import { erroDeRegra, lista, noRetangulo, paginar, retanguloDaUrl } from './comum'
 
 const autenticado = (request: Request) => request.headers.has('Authorization')
 
@@ -49,6 +49,30 @@ export const problemasHandlers = [
             (!status.length || status.includes(p.status)),
         ),
     )
+  }),
+  http.get(rota('/problemas/recentes'), ({ request }) => {
+    const url = new URL(request.url)
+    const centro = {
+      lat: Number(url.searchParams.get('lat')),
+      lng: Number(url.searchParams.get('lng')),
+    }
+    const raioM = Number(url.searchParams.get('raioKm') ?? 10) * 1000
+    const grupos = lista(url, 'grupos')
+    const recentes = banco
+      .problemas()
+      .filter((p) => metrosEntre(centro, p) <= raioM)
+      .map((p) => banco.detalhe(p.id, false)!)
+      .filter((d) => !grupos.length || grupos.includes(d.categoria.grupo))
+      .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm))
+      .map(({ id, categoria, endereco, criadoEm, status, faixa }) => ({
+        id,
+        categoria,
+        endereco,
+        criadoEm,
+        status,
+        faixa,
+      }))
+    return HttpResponse.json(paginar(recentes, url))
   }),
   http.get(rota('/problemas/duplicatas'), ({ request }) => {
     if (!autenticado(request)) return new HttpResponse(null, { status: 401 })

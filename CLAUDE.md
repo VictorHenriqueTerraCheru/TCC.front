@@ -60,7 +60,7 @@ src/
   test/                   # setup do Vitest (MSW, matchMedia) e helpers de render
 ```
 
-Features (mesmas áreas do back, mais as de tela): `auth`, `usuarios` (perfil, histórico, configurações), `categorias`, `problemas` (marcadores, detalhe, votos, recentes), `incidentes`, `registro`, `verificacao`, `admin`, `geocodificacao`, `localizacao`, `mapa` (compõe problemas + incidentes e é dono das rotas `/mapa/*`).
+Features (mesmas áreas do back, mais as de tela): `auth`, `usuarios` (dados de `/me` e do histórico), `categorias`, `problemas` (marcadores, detalhe, votos, recentes), `incidentes`, `registro`, `verificacao` (pedido e cartão do perfil; depende de `usuarios`), `admin` (fila; depende de `verificacao`), `geocodificacao`, `localizacao`, e as de tela `mapa` (compõe problemas + incidentes, dona de `/mapa/*`) e `perfil` (compõe usuarios + verificacao: perfil, histórico, configurações).
 
 Votos ficam em `problemas/` (são `/problemas/{id}/votos/*` e mexem no cache do detalhe): uma feature `votos` separada criaria dependência circular com `problemas`. Quando duas features precisariam uma da outra, quem compõe é a de tela (`mapa`) ou o `app/`.
 
@@ -95,6 +95,14 @@ Nomes de arquivo em kebab-case (`categoria-icone.tsx`); componentes e hooks em p
 - A página do mapa usa `isolate`: os z-index do Leaflet (até 1000) ficam presos nela e não cobrem `Dialog`/Drawer, que usam `z-50`. Controles sobre o mapa usam `z-[1000]`.
 - `leaflet.heat` procura `L` no escopo global: importe-o só por `features/incidentes/lib/leaflet-heat.ts`. A camada protege o `_redraw` (o plugin redesenha num `requestAnimationFrame` mesmo depois de removido) e usa `maxZoom: 12` (o plugin corta a intensidade pela metade a cada nível abaixo dele).
 - Marcadores: `L.divIcon` com `renderToStaticMarkup(<MarcadorProblema/>)`, cacheado por (categoria, status, faixa); só estilos inline e tokens CSS (`var(--cat-*)`).
+
+### CSS dos ícones
+
+`material-symbols/rounded.css` é importado com `layer(base)` em `src/index.css`. Fora de layer, o `font-size: 24px` do pacote vence qualquer utilitário do Tailwind (`text-[18px]` não teria efeito).
+
+### Barra inferior (celular)
+
+Some no fluxo de registro e nas subpáginas com "←" (`/perfil/*`, `/admin/*`), como nos prints 5–8, 11, 13, 28 e 29 (`MobileLayout`).
 
 ### shadcn
 

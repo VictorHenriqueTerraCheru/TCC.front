@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useMatch } from 'react-router'
+import { NavLink, Outlet, useLocation } from 'react-router'
 
 import { Icone } from '@/common/components/icone'
 import { cn } from '@/common/lib/utils'
@@ -7,14 +7,16 @@ import { itensNavegacao } from './navegacao'
 
 /** < 1024 px: conteúdo + barra inferior Mapa / Recentes / Perfil. */
 export function MobileLayout() {
-  // O fluxo de registro ocupa a tela inteira, como no protótipo.
-  const noRegistro = useMatch('/registrar/*') !== null
+  // Registro e subpáginas com "←" (verificação, histórico, configurações, fila do admin) ocupam a
+  // tela inteira, como nos prints 5–8, 11, 13, 28 e 29.
+  const { pathname } = useLocation()
+  const telaCheia = /^\/(registrar|admin)(\/|$)|^\/perfil\/.+/.test(pathname)
   return (
     <div className="flex h-dvh flex-col">
       <main className="relative min-h-0 flex-1 overflow-y-auto">
         <Outlet />
       </main>
-      {!noRegistro && <BarraInferior />}
+      {!telaCheia && <BarraInferior />}
     </div>
   )
 }
