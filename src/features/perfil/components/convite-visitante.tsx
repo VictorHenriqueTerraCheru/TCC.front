@@ -6,8 +6,8 @@ import { Button } from '@/common/ui/button'
 /** Perfil para visitante: o mesmo convite das folhas "Entre para…". */
 export function ConviteVisitante() {
   return (
-    <section className="rounded-2xl bg-surface-container p-6">
-      <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-mint text-mint-foreground">
+    <section className="rounded-2xl bg-card p-6">
+      <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-primario-suave text-primario">
         <Icone nome="person_add" className="text-[28px]" />
       </span>
       <h2 className="mb-2 text-2xl">Entre para acompanhar sua participação</h2>

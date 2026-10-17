@@ -19,7 +19,7 @@ function LinkDocumento({ titulo, children }: { titulo: string; children: ReactNo
     <AvisoDialog
       titulo={titulo}
       gatilho={
-        <button type="button" className="text-primary underline underline-offset-2">
+        <button type="button" className="text-primario underline underline-offset-2">
           {titulo}
         </button>
       }
@@ -94,7 +94,7 @@ export function CadastroPage() {
             type="checkbox"
             aria-invalid={erroTermos ? true : undefined}
             aria-describedby={erroTermos ? 'aceitou-termos-erro' : undefined}
-            className="mt-0.5 size-5 shrink-0 accent-primary"
+            className="mt-0.5 size-5 shrink-0 accent-primario"
             {...register('aceitouTermos')}
           />
           <div>
@@ -133,7 +133,7 @@ export function CadastroPage() {
           </Button>
           <p className="mt-4 text-center text-sm text-muted-foreground">
             Já tem conta?{' '}
-            <Link to="/login" replace className="font-medium text-primary hover:underline">
+            <Link to="/login" replace className="font-medium text-primario hover:underline">
               Entrar
             </Link>
           </p>

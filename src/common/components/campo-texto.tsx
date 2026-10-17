@@ -25,16 +25,16 @@ export function CampoTexto({ rotulo, erro, ajuda, className, id, ...props }: Cam
           aria-invalid={erro ? true : undefined}
           aria-describedby={descricao ? idDescricao : undefined}
           className={cn(
-            'h-14 w-full rounded-md border border-input bg-background px-4 text-base transition-colors outline-none',
-            'focus:border-2 focus:border-primary focus:px-[15px]',
-            erro && 'border-destructive focus:border-destructive',
+            'h-14 w-full rounded-2xl border border-input bg-superficie-2 px-4 pt-5 pb-1 text-base transition-colors outline-none',
+            'focus:border-ring focus:ring-2 focus:ring-ring/40',
+            erro && 'border-destructive focus:border-destructive focus:ring-destructive/40',
           )}
           {...props}
         />
         <label
           htmlFor={idCampo}
           className={cn(
-            'pointer-events-none absolute -top-2 left-3 bg-background px-1 text-xs text-muted-foreground',
+            'pointer-events-none absolute top-2 left-4 text-[11px] font-medium text-muted-foreground',
             erro && 'text-destructive',
           )}
         >
@@ -109,16 +109,16 @@ export function CampoAreaTexto({
           aria-invalid={erro ? true : undefined}
           aria-describedby={idDescricao}
           className={cn(
-            'w-full resize-none rounded-md border border-input bg-background px-4 py-4 text-base transition-colors outline-none',
-            'focus:border-2 focus:border-primary focus:px-[15px]',
-            erro && 'border-destructive focus:border-destructive',
+            'w-full resize-none rounded-2xl border border-input bg-superficie-2 px-4 pt-7 pb-3 text-base transition-colors outline-none',
+            'focus:border-ring focus:ring-2 focus:ring-ring/40',
+            erro && 'border-destructive focus:border-destructive focus:ring-destructive/40',
           )}
           {...props}
         />
         <label
           htmlFor={idCampo}
           className={cn(
-            'pointer-events-none absolute -top-2 left-3 bg-background px-1 text-xs text-muted-foreground',
+            'pointer-events-none absolute top-2 left-4 text-[11px] font-medium text-muted-foreground',
             erro && 'text-destructive',
           )}
         >
@@ -167,7 +167,7 @@ export function CampoSelecao({
           aria-invalid={erro ? true : undefined}
           className={cn(
             'h-14 w-full appearance-none rounded-md border border-input bg-background pr-12 pl-4 text-base outline-none',
-            'focus:border-2 focus:border-primary focus:pl-[15px]',
+            'focus:border-2 focus:border-primario focus:pl-[15px]',
             erro && 'border-destructive',
           )}
           {...props}

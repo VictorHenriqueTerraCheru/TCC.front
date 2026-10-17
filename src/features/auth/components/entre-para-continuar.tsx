@@ -62,7 +62,7 @@ export function EntreParaContinuar() {
       aoMudarAberto={(aberto) => !aberto && descartar()}
       titulo={conteudo.titulo}
       icone={
-        <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-mint text-mint-foreground">
+        <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-primario-suave text-primario">
           <Icone nome={conteudo.icone} className="text-[28px]" />
         </span>
       }
@@ -72,7 +72,7 @@ export function EntreParaContinuar() {
       <ul className="mb-6 space-y-3">
         {conteudo.itens.map(([icone, texto]) => (
           <li key={texto} className="flex items-center gap-3 text-sm">
-            <Icone nome={icone} className="text-[22px] text-primary" />
+            <Icone nome={icone} className="text-[22px] text-primario" />
             {texto}
           </li>
         ))}

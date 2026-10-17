@@ -104,6 +104,20 @@ describe('DetalheProblema', () => {
     expect(screen.getByRole('button', { name: 'Não, foi resolvido' })).toBeDisabled()
   })
 
+  it('voto pendente no card rápido desabilita os botões do detalhe (um voto por vez)', async () => {
+    entrarComoCidadao()
+    server.use(
+      http.put(rota('/problemas/:id/votos/persistencia'), async () => {
+        await delay('infinite')
+      }),
+    )
+    renderizar(ATIVA)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Voto rápido: Sim, continua' }))
+    expect(screen.getByRole('button', { name: 'Confirmar que existe' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Não, foi resolvido' })).toBeDisabled()
+  })
+
   it('souAutor: "Confirmar que existe" desabilitado com a dica', async () => {
     entrarComoCidadao()
     renderizar(ID_DO_AUTOR)

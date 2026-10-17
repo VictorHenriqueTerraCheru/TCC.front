@@ -1,6 +1,6 @@
 import type { MaterialSymbol } from 'material-symbols'
 
-import { dimensoesMarcador, PINO, varianteDo } from '../models/marcador'
+import { dimensoesMarcador, PONTA, varianteDo } from '../models/marcador'
 import type { FaixaConfianca, StatusProblema } from '../models/problema'
 
 interface MarcadorProblemaProps {
@@ -9,14 +9,15 @@ interface MarcadorProblemaProps {
   icone: MaterialSymbol
   status: StatusProblema
   faixa: FaixaConfianca | null
-  /** Problema aberto no painel: sombra elíptica no chão (tela 3). */
+  /** Problema aberto no painel: maior e com sombra no chão. */
   selecionado?: boolean
 }
 
 /**
- * Pino do problema no mapa. Vira HTML estático (renderToStaticMarkup) dentro de um L.divIcon,
- * por isso só usa estilos inline e classes globais. Tela 24: possivelmenteResolvida = contorno
- * tracejado + selo de check. `resolvida` nunca chega aqui (a API não devolve).
+ * Alerta do problema no mapa, em balão estilo Waze: círculo na cor da categoria, ícone branco,
+ * borda branca e ponta embaixo. Filho do <Marker> do MapLibre (camada de problemas e mapa do
+ * registro). Tela 24: possivelmenteResolvida = borda tracejada + selo de check. `resolvida`
+ * nunca chega aqui (a API não devolve).
  */
 export function MarcadorProblema({
   cor,
@@ -25,67 +26,89 @@ export function MarcadorProblema({
   faixa,
   selecionado = false,
 }: MarcadorProblemaProps) {
-  const variante = varianteDo(status, faixa)
-  const { largura, altura } = dimensoesMarcador(status, faixa)
+  const { opacidade } = varianteDo(status, faixa)
+  const { largura: d, altura } = dimensoesMarcador(status, faixa)
   const tracejado = status === 'possivelmenteResolvida'
+  const pulsa = faixa === 'alta' && status !== 'nova'
 
   return (
     <div
       className="marcador-problema"
       data-status={status}
       data-faixa={faixa ?? 'nenhuma'}
-      style={{ position: 'relative', width: largura, height: altura }}
+      style={{
+        position: 'relative',
+        width: d,
+        height: altura,
+        transform: selecionado ? 'scale(1.15)' : undefined,
+        transformOrigin: '50% 100%',
+      }}
     >
       {selecionado && (
         <span
           style={{
             position: 'absolute',
             left: '50%',
-            bottom: -5,
-            width: largura * 0.9,
-            height: 10,
+            bottom: -4,
+            width: d * 0.8,
+            height: 8,
             transform: 'translateX(-50%)',
             borderRadius: '50%',
-            background: 'rgb(0 0 0 / 0.22)',
+            background: 'rgb(0 0 0 / 0.35)',
           }}
         />
       )}
-      <svg
-        viewBox="0 0 40 50"
-        width={largura}
-        height={altura}
-        style={{
-          display: 'block',
-          opacity: variante.opacidade,
-          filter: variante.sombra,
-          overflow: 'visible',
-        }}
-        aria-hidden="true"
-      >
-        <path
-          d={PINO}
-          fill={tracejado ? '#ffffff' : cor}
-          stroke={tracejado ? cor : '#ffffff'}
-          strokeWidth={tracejado ? 2.5 : 1.5}
-          strokeDasharray={tracejado ? '4 3' : undefined}
+      {pulsa && (
+        <span
+          className="pulso-alerta"
+          aria-hidden="true"
+          style={{ position: 'absolute', left: 0, top: 0, width: d, height: d, background: cor }}
         />
-      </svg>
+      )}
+      {/* Ponta: triângulo branco embaixo do círculo. */}
       <span
-        className="material-symbols-rounded"
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: d - 2,
+          transform: 'translateX(-50%)',
+          borderLeft: '6px solid transparent',
+          borderRight: '6px solid transparent',
+          borderTop: `${PONTA + 2}px solid #ffffff`,
+          opacity: opacidade,
+        }}
+      />
+      <span
         aria-hidden="true"
         style={{
           position: 'absolute',
           left: 0,
-          top: largura * 0.48 - largura * 0.25,
-          width: largura,
-          textAlign: 'center',
-          fontSize: largura * 0.5,
-          color: tracejado ? cor : '#ffffff',
-          opacity: tracejado ? 1 : Math.max(variante.opacidade, 0.9),
-          fontVariationSettings: "'FILL' 1",
+          top: 0,
+          width: d,
+          height: d,
+          boxSizing: 'border-box',
+          borderRadius: '50%',
+          background: cor,
+          border: '2.5px solid #ffffff',
+          borderStyle: tracejado ? 'dashed' : 'solid',
+          boxShadow: '0 4px 10px rgba(0,0,0,.28)',
+          opacity: opacidade,
+          display: 'grid',
+          placeItems: 'center',
         }}
       >
-        {icone}
+        <span
+          className="material-symbols-rounded"
+          style={{
+            fontSize: Math.round(d * 0.56),
+            lineHeight: 1,
+            color: '#ffffff',
+            fontVariationSettings: "'FILL' 1",
+          }}
+        >
+          {icone}
+        </span>
       </span>
       {tracejado && (
         <span
@@ -98,8 +121,8 @@ export function MarcadorProblema({
             width: 16,
             height: 16,
             borderRadius: 999,
-            background: 'var(--nova)',
-            color: 'var(--nova-foreground)',
+            background: 'var(--primario-cheio)',
+            color: '#ffffff',
             border: '1.5px solid #fff',
             fontSize: 12,
             lineHeight: '13px',
@@ -113,15 +136,16 @@ export function MarcadorProblema({
         <span
           style={{
             position: 'absolute',
-            top: -10,
-            left: largura * 0.55,
-            padding: '1px 6px',
+            top: -8,
+            left: d * 0.6,
+            padding: '1px 5px',
             borderRadius: 6,
-            background: 'var(--nova)',
-            color: 'var(--nova-foreground)',
-            fontSize: 11,
-            fontWeight: 500,
-            lineHeight: '16px',
+            background: 'var(--primario-cheio)',
+            color: '#ffffff',
+            border: '1.5px solid #ffffff',
+            fontSize: 10,
+            fontWeight: 700,
+            lineHeight: '14px',
             whiteSpace: 'nowrap',
           }}
         >

@@ -34,7 +34,7 @@ export function PermissaoLocalizacaoPage() {
 
   return (
     <div className="flex min-h-full flex-col px-6 pt-20 pb-6 lg:pt-12">
-      <span className="mb-8 flex size-[72px] items-center justify-center rounded-full bg-mint text-mint-foreground">
+      <span className="mb-8 flex size-[72px] items-center justify-center rounded-full bg-primario-suave text-primario">
         <Icone nome="my_location" className="text-[36px]" />
       </span>
       <h1 className="mb-6 text-[28px] leading-9">Permitir acesso à sua localização?</h1>
@@ -45,7 +45,7 @@ export function PermissaoLocalizacaoPage() {
       <ul className="space-y-4 text-sm">
         {itens.map(([icone, texto]) => (
           <li key={texto} className="flex gap-4">
-            <Icone nome={icone} className="text-[22px] text-primary" />
+            <Icone nome={icone} className="text-[22px] text-primario" />
             {texto}
           </li>
         ))}

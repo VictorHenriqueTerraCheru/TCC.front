@@ -50,7 +50,7 @@ export function SeletorHorario({ horario, aoMudar }: SeletorHorarioProps) {
               className={cn(
                 'flex h-8 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium focus-visible:outline-2',
                 selecionado
-                  ? 'border-transparent bg-secondary text-secondary-foreground'
+                  ? 'border-transparent bg-primario-suave text-primario'
                   : 'border-input hover:bg-foreground/5',
               )}
             >
@@ -63,8 +63,8 @@ export function SeletorHorario({ horario, aoMudar }: SeletorHorarioProps) {
 
       {horario.modo === 'outro' && (
         <div className="mt-4">
-          <div className="relative flex h-14 items-center rounded-md border-2 border-primary pr-2 pl-4">
-            <span className="absolute -top-2 left-3 bg-surface-container px-1 text-xs text-primary">
+          <div className="relative flex h-14 items-center rounded-md border-2 border-primario pr-2 pl-4">
+            <span className="absolute -top-2 left-3 bg-card px-1 text-xs text-primario">
               Hora aproximada
             </span>
             <output aria-live="polite" className="flex-1">

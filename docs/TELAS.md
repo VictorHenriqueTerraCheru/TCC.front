@@ -1,6 +1,6 @@
 # Telas da aplicação
 
-Numeração igual à do protótipo (`docs/design/`), que mostra a versão **mobile**. Rotas são sugestões para o React Router. A variação desktop está no fim deste arquivo.
+Numeração igual à do protótipo (`docs/design/`), que mostra a versão **mobile**. Os prints continuam valendo para **conteúdo e fluxo**; o visual (tema escuro, vidro, mapa vetorial, alertas em balão e o card rápido do detalhe) segue `docs/superpowers/specs/2026-10-17-redesign-mapa-vetorial-design.md`. Rotas são sugestões para o React Router. A variação desktop está no fim deste arquivo.
 
 | # | Tela | Rota | Print | Endpoints |
 |---|---|---|---|---|

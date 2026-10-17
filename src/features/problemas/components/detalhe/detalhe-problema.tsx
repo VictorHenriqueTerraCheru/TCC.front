@@ -5,13 +5,13 @@ import { horaCurta, tempoRelativo } from '@/common/lib/formatacao'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { aparenciaDoGrupo, CategoriaIcone, grupoDe } from '@/features/categorias'
 import { isApiError } from '@/infrastructure/api'
 
 import { useDetalheProblema } from '../../api/use-detalhe-problema'
 import type { DetalheProblema as Detalhe, StatusProblema } from '../../models/problema'
 import { BarraAvaliacao, BarraConfianca } from './barras'
 import { CartaoAindaEstaLa, CartaoAvaliarNova, CartoesAtiva } from './cartoes-voto'
+import { ResumoAlerta } from './resumo-alerta'
 import { RodapeLocalizacao } from './rodape-localizacao'
 
 const chipStatus: Record<
@@ -23,14 +23,14 @@ const chipStatus: Record<
   possivelmenteResolvida: {
     rotulo: 'Possivelmente resolvida',
     icone: 'help',
-    classe: 'bg-info text-info-foreground',
+    classe: 'bg-primario-suave text-primario',
   },
 }
 
 function ChipStatus({ status }: { status: StatusProblema }) {
   if (status === 'resolvida') {
     return (
-      <span className="rounded-lg bg-mint px-2 py-1 text-xs font-medium text-mint-foreground">
+      <span className="rounded-lg bg-primario-suave px-2 py-1 text-xs font-medium text-primario">
         Resolvida
       </span>
     )
@@ -46,19 +46,6 @@ function ChipStatus({ status }: { status: StatusProblema }) {
       <Icone nome={chip.icone} preenchido className="text-[16px]" />
       {chip.rotulo}
     </span>
-  )
-}
-
-function Cabecalho({ problema }: { problema: Detalhe }) {
-  const aparencia = aparenciaDoGrupo[grupoDe(problema.categoria)]
-  return (
-    <header className="mb-4 flex items-center gap-3 pr-10">
-      <CategoriaIcone categoria={problema.categoria} tamanho="lg" />
-      <div className="min-w-0">
-        <p className={cn('text-xs font-medium', aparencia.forte)}>{aparencia.rotulo}</p>
-        <h2 className="text-[22px] leading-7">{problema.categoria.nome}</h2>
-      </div>
-    </header>
   )
 }
 
@@ -96,8 +83,8 @@ function Corpo({ problema }: { problema: Detalhe }) {
   if (problema.status === 'resolvida') {
     const { resolvido } = problema.persistencia
     return (
-      <p className="flex items-start gap-3 rounded-2xl bg-mint/40 p-4 text-sm">
-        <Icone nome="check_circle" preenchido className="text-[20px] text-primary" />
+      <p className="flex items-start gap-3 rounded-2xl bg-primario-suave p-4 text-sm">
+        <Icone nome="check_circle" preenchido className="text-[20px] text-primario" />
         <span>
           A comunidade confirmou que este problema foi resolvido
           {resolvido > 0 && ` (${resolvido} ${resolvido === 1 ? 'voto' : 'votos'})`}. Ele não
@@ -195,10 +182,9 @@ export function DetalheProblema({ id }: { id: string }) {
 
   return (
     <article className="space-y-4">
-      <div>
-        <Cabecalho problema={problema} />
-        <Informacoes problema={problema} />
-      </div>
+      {/* No celular, a folha abre só com o resumo (ALTURA_RESUMO); arrastar mostra o resto. */}
+      <ResumoAlerta problema={problema} />
+      <Informacoes problema={problema} />
       <Corpo problema={problema} />
     </article>
   )

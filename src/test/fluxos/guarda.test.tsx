@@ -53,6 +53,23 @@ describe('guarda "visitante vê, conta age"', () => {
     expect(within(cartaoExistencia()).getByText('16')).toBeInTheDocument()
   })
 
+  it('card rápido: visitante toca no polegar → login → o voto é retomado (regra 1)', async () => {
+    const usuario = userEvent.setup()
+    const { router } = abrir(`/mapa/problema/${ATIVA}`)
+
+    await usuario.click(await screen.findByRole('button', { name: 'Voto rápido: Sim, continua' }))
+    await usuario.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
+    await entrarComo(usuario, 'cidadao1@tcc.local')
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Voto rápido: Sim, continua' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      ),
+    )
+    expect(router.state.location.pathname).toBe(`/mapa/problema/${ATIVA}`)
+  })
+
   it('"Agora não" esquece o voto: um login depois não vota sozinho', async () => {
     const usuario = userEvent.setup()
     const { router } = abrir(`/mapa/problema/${ATIVA}`)

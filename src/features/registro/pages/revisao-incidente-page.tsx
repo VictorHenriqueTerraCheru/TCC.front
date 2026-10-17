@@ -55,7 +55,7 @@ export function RevisaoIncidentePage() {
       }
     >
       <div className="space-y-6 pt-2">
-        <section className="flex gap-3 rounded-2xl bg-info p-4 text-info-foreground">
+        <section className="flex gap-3 rounded-2xl bg-primario-suave p-4 text-primario">
           <Icone nome="visibility_off" className="text-[22px]" />
           <div>
             <h2 className="font-medium">Registro anônimo e agregado</h2>

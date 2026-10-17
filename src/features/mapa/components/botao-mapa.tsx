@@ -2,13 +2,13 @@ import type { ComponentProps } from 'react'
 
 import { cn } from '@/common/lib/utils'
 
-/** Botão quadrado arredondado sobre o mapa (GPS, legenda). */
+/** Botão do grupo de vidro sobre o mapa (legenda, GPS); o grupo dá o fundo e o raio. */
 export function BotaoMapa({ className, ...props }: ComponentProps<'button'>) {
   return (
     <button
       type="button"
       className={cn(
-        'pointer-events-auto flex size-11 items-center justify-center rounded-xl bg-surface-container-high text-foreground shadow-md transition-colors hover:bg-surface-container focus-visible:outline-2',
+        'flex size-11 items-center justify-center text-primario transition-colors hover:bg-foreground/5 focus-visible:outline-2 focus-visible:-outline-offset-2',
         className,
       )}
       {...props}

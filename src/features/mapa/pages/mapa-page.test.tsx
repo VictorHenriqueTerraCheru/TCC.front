@@ -1,10 +1,11 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 
 import { useMonitorarLocalizacao } from '@/features/localizacao'
 import { rota } from '@/infrastructure/mocks/rota'
 import { server } from '@/infrastructure/mocks/server'
+import { mapaFalso } from '@/test/maplibre-falso'
 import { definirLargura, renderizarRotas } from '@/test/render'
 
 import { MapaPage } from './mapa-page'
@@ -56,13 +57,69 @@ describe('MapaPage', () => {
 
   it('aviso de área vazia some ao mexer no mapa e não volta a cada área vazia', async () => {
     server.use(http.get(rota('/problemas'), () => HttpResponse.json([])))
-    const { container } = renderizarMapa()
+    renderizarMapa()
 
     expect(await screen.findByText('Nenhuma ocorrência nesta área')).toBeInTheDocument()
 
-    fireEvent.pointerDown(container.querySelector('.leaflet-container')!)
+    fireEvent.pointerDown(screen.getByTestId('mapa'))
 
     expect(screen.queryByText('Nenhuma ocorrência nesta área')).not.toBeInTheDocument()
+  })
+
+  it('X do aviso de área vazia fecha de vez', async () => {
+    const usuario = userEvent.setup()
+    let consultas = 0
+    server.use(
+      http.get(rota('/problemas'), () => {
+        consultas++
+        return HttpResponse.json([])
+      }),
+    )
+    const { unmount } = renderizarMapa()
+
+    await usuario.click(await screen.findByRole('button', { name: 'Fechar aviso' }))
+
+    expect(screen.queryByText('Nenhuma ocorrência nesta área')).not.toBeInTheDocument()
+    expect(localStorage.getItem('ocorrencias.avisoVazioFechado')).toBe('1')
+
+    unmount()
+    const antes = consultas
+    renderizarMapa()
+    await waitFor(() => expect(consultas).toBeGreaterThan(antes))
+    await new Promise((resolver) => setTimeout(resolver, 50))
+    expect(screen.queryByText('Nenhuma ocorrência nesta área')).not.toBeInTheDocument()
+  })
+
+  it('toque no mapa no modo Ambos sem incidentes mostra o aviso e não abre a área', async () => {
+    server.use(http.get(rota('/incidentes/area'), () => HttpResponse.json({ contagens: [] })))
+    const { router } = renderizarMapa('/mapa?modo=ambos')
+    await screen.findByTestId('mapa')
+
+    act(() => mapaFalso.tocar(-22.95, -43.18))
+
+    expect(
+      await screen.findByText('Sem incidentes por aqui nos últimos 7 dias'),
+    ).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/mapa')
+  })
+
+  it('retângulo enviado à API fica dentro de ±180 mesmo com o mapa afastado (regra 15)', async () => {
+    const pedidos: URL[] = []
+    server.use(
+      http.get(rota('/problemas'), ({ request }) => {
+        pedidos.push(new URL(request.url))
+        return HttpResponse.json([])
+      }),
+    )
+    renderizarMapa()
+    await screen.findByTestId('mapa')
+
+    act(() => mapaFalso.mover({ lat: 0, lng: 0 }, { sul: -80, oeste: -200, norte: 80, leste: 200 }))
+
+    await waitFor(() => expect(pedidos.at(-1)?.searchParams.get('minLng')).toBe('-180'), {
+      timeout: 2000,
+    })
+    expect(pedidos.at(-1)!.searchParams.get('maxLng')).toBe('180')
   })
 
   it('marca chips de filtro na URL e limpa os que não existem no novo modo', async () => {

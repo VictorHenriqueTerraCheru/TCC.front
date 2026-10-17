@@ -24,9 +24,9 @@ export function BarraConfianca({
     <section aria-label="Confiança">
       <div className="mb-2 flex items-center gap-2">
         {faixa === 'alta' && (
-          <Icone nome="check_circle" preenchido className="text-[20px] text-primary" />
+          <Icone nome="check_circle" preenchido className="text-[20px] text-primario" />
         )}
-        <span className={cn('font-medium', faixa === 'alta' && 'text-primary')}>
+        <span className={cn('font-medium', faixa === 'alta' && 'text-primario')}>
           {rotuloFaixa[faixa]}
         </span>
         <span className="ml-auto text-sm">{valor} / 100</span>
@@ -39,7 +39,7 @@ export function BarraConfianca({
         aria-valuenow={valor}
         className="h-1.5 overflow-hidden rounded-full bg-muted"
       >
-        <div className="h-full rounded-full bg-primary" style={{ width: `${valor}%` }} />
+        <div className="h-full rounded-full bg-primario" style={{ width: `${valor}%` }} />
       </div>
       <p className="mt-2 text-xs text-muted-foreground">{legenda}</p>
     </section>

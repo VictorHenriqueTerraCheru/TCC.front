@@ -89,7 +89,7 @@ export function EntrarPage() {
 
         <p className="mt-auto pt-10 text-center text-sm text-muted-foreground">
           Ainda não tem conta?{' '}
-          <Link to="/cadastro" replace className="font-medium text-primary hover:underline">
+          <Link to="/cadastro" replace className="font-medium text-primario hover:underline">
             Criar conta
           </Link>
         </p>

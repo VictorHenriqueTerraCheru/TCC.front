@@ -14,7 +14,7 @@ const data = (iso: string) => format(new Date(iso), 'd MMM. yyyy', { locale: ptB
 export function CartaoVerificacao({ me }: { me: Me }) {
   if (me.perfil === 'cidadaoVerificado') {
     return (
-      <section className="rounded-2xl bg-mint p-4 text-mint-foreground">
+      <section className="rounded-2xl bg-primario-suave p-4 text-primario">
         <h2 className="mb-1 flex items-center gap-2 font-medium">
           <Icone nome="how_to_reg" className="text-[22px]" />
           Seu voto tem peso maior
@@ -23,7 +23,7 @@ export function CartaoVerificacao({ me }: { me: Me }) {
           Suas confirmações e respostas de “Ainda está lá?” contam mais no cálculo de confiança das
           ocorrências — ainda mais perto de onde você mora.
         </p>
-        <p className="mt-3 border-t border-mint-foreground/15 pt-3 text-xs">
+        <p className="mt-3 border-t border-primario/15 pt-3 text-xs">
           {me.verificadoEm ? `Verificado em ${data(me.verificadoEm)}` : 'Perfil verificado'}
           {me.verificacao && ` · ${rotuloVinculo[me.verificacao.tipoVinculo]}`}
         </p>
@@ -35,7 +35,7 @@ export function CartaoVerificacao({ me }: { me: Me }) {
 
   if (me.verificacao?.status === 'pendente') {
     return (
-      <section className="rounded-2xl bg-surface-container p-4">
+      <section className="rounded-[20px] border border-border bg-card p-4">
         <h2 className="mb-1 flex items-center gap-2 font-medium">
           <Icone nome="hourglass_top" className="text-[22px] text-nova" />
           Pedido em análise
@@ -49,9 +49,9 @@ export function CartaoVerificacao({ me }: { me: Me }) {
   }
 
   return (
-    <section className="rounded-2xl bg-surface-container p-4">
+    <section className="rounded-[20px] border border-border bg-card p-4">
       <h2 className="mb-1 flex items-center gap-2 font-medium">
-        <Icone nome="verified_user" className="text-[22px] text-primary" />
+        <Icone nome="verified_user" className="text-[22px] text-primario" />
         Verifique seu perfil
       </h2>
       <p className="mb-3 text-sm text-muted-foreground">

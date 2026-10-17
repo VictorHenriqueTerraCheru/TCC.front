@@ -14,7 +14,7 @@ export function DesktopLayout() {
     <div className="flex h-dvh">
       <nav
         aria-label="Navegação principal"
-        className="flex w-[72px] shrink-0 flex-col items-center gap-3 bg-surface-container py-4"
+        className="z-[1002] flex w-[72px] shrink-0 flex-col items-center gap-3 border-y-0 border-l-0 py-4 vidro"
       >
         <Link
           to="/registrar"
@@ -23,7 +23,7 @@ export function DesktopLayout() {
             exigirConta('registrar', () => navigate('/registrar'), { retorno: '/registrar' })
           }}
           aria-label="Registrar ocorrência"
-          className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-mint text-mint-foreground shadow-md transition-shadow hover:shadow-lg focus-visible:outline-2"
+          className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-[0_8px_22px_rgba(59,158,255,.45)] transition hover:brightness-110 focus-visible:outline-2"
         >
           <Icone nome="add_location_alt" />
         </Link>
@@ -38,12 +38,14 @@ export function DesktopLayout() {
                 <span
                   className={cn(
                     'flex h-8 w-14 items-center justify-center rounded-full transition-colors',
-                    isActive ? 'bg-nav-indicator' : 'group-hover:bg-foreground/5',
+                    isActive ? 'bg-primario-suave text-primario' : 'group-hover:bg-foreground/5',
                   )}
                 >
                   <Icone nome={item.icone} preenchido={isActive} />
                 </span>
-                <span className={cn(isActive ? 'font-bold' : 'text-muted-foreground')}>
+                <span
+                  className={cn(isActive ? 'font-semibold text-primario' : 'text-muted-foreground')}
+                >
                   {item.rotulo}
                 </span>
               </>

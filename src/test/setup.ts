@@ -6,6 +6,9 @@ import { registrarAutenticacao } from '@/infrastructure/api'
 import { banco } from '@/infrastructure/mocks/banco'
 import { server } from '@/infrastructure/mocks/server'
 
+// jsdom não tem WebGL: o mapa vira um falso que imita a API usada pelo app.
+vi.mock('@vis.gl/react-maplibre', () => import('./maplibre-falso'))
+
 // Mesma composição do main.tsx.
 registrarAutenticacao(provedorAutenticacao)
 
