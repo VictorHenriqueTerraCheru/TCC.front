@@ -15,7 +15,7 @@ export function SeletorModo({ modo, aoMudar }: SeletorModoProps) {
       opcoes={modosMapa}
       valor={modo}
       aoMudar={aoMudar}
-      className="pointer-events-auto shadow-sm"
+      className="pointer-events-auto shadow-sm lg:max-w-[440px]"
     />
   )
 }

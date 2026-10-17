@@ -70,6 +70,30 @@ describe('fluxo de registro', () => {
     ).toBeNull()
   })
 
+  it('sessão expirada no envio (401): login e o registro é enviado ao voltar', async () => {
+    server.use(
+      http.post(rota('/problemas'), () => new HttpResponse(null, { status: 401 }), {
+        once: true,
+      }),
+    )
+    const usuario = userEvent.setup()
+    const { router } = abrir()
+
+    await escolher(usuario, 'Buraco na via')
+    await confirmarLocal(usuario)
+    await usuario.click(await screen.findByRole('button', { name: 'Não, é outro' }))
+    await usuario.click(await screen.findByRole('button', { name: /Enviar registro/ }))
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
+    await usuario.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
+    await usuario.type(await screen.findByLabelText('E-mail'), 'cidadao1@tcc.local')
+    await usuario.type(screen.getByLabelText('Senha'), 'tcc12345')
+    await usuario.click(screen.getByRole('button', { name: 'Entrar' }))
+
+    expect(await screen.findByRole('heading', { name: 'Registro enviado' })).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/registrar/sucesso')
+  })
+
   it('"Sim, confirmar esse" vota no existente e mostra a confirmação', async () => {
     const usuario = userEvent.setup()
     abrir()

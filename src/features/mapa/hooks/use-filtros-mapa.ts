@@ -12,9 +12,16 @@ function lerModo(valor: string | null): ModoMapa {
 export function useFiltrosMapa() {
   const [params, setParams] = useSearchParams()
 
+  const modo = lerModo(params.get('modo'))
+  // Link com chip de outro modo (`?grupos=seguranca` sem modo): ignorado. Sem isso, as duas
+  // camadas desligariam e o mapa ficaria vazio sem nenhum chip marcado para desfazer.
+  const disponiveis = gruposDoModo(modo)
   const filtros: FiltrosMapa = {
-    modo: lerModo(params.get('modo')),
-    grupos: (params.get('grupos') ?? '').split(',').filter(isGrupoCategoria),
+    modo,
+    grupos: (params.get('grupos') ?? '')
+      .split(',')
+      .filter(isGrupoCategoria)
+      .filter((g) => disponiveis.includes(g)),
     somenteNovas: params.get('nova') === '1',
   }
 

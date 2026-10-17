@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router'
 
 import { useGuardaStore, type AcaoPendente, type MotivoConta } from '../stores/guarda-store'
-import { useSessaoStore } from '../stores/sessao-store'
+import { sessaoAtual } from '../stores/sessao-store'
 
 interface OpcoesGuarda {
   /** Ação a retomar depois do login (votos). */
@@ -13,13 +13,13 @@ interface OpcoesGuarda {
 /**
  * Regra 1 — visitante vê, conta age. Com sessão, executa a ação; sem sessão, guarda a ação
  * pendente e abre a folha "Entre para votar/registrar". Lê a sessão no momento da chamada:
- * se um 401 acabou de limpá-la (regra 13), a mesma chamada abre a folha.
+ * se um 401 acabou de limpá-la (regra 13) ou se ela expirou, a mesma chamada abre a folha.
  */
 export function useExigirConta() {
   const location = useLocation()
 
   return (motivo: MotivoConta, acao: () => void, opcoes: OpcoesGuarda = {}) => {
-    if (useSessaoStore.getState().sessao) {
+    if (sessaoAtual()) {
       acao()
       return
     }

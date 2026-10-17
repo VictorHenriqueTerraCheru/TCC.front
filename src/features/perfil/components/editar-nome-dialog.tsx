@@ -14,51 +14,53 @@ interface EditarNomeDialogProps {
 
 /** PATCH /me: nome de 1 a 120 caracteres (espaços nas pontas são removidos pela API). */
 export function EditarNomeDialog({ nomeAtual, aberto, aoMudarAberto }: EditarNomeDialogProps) {
+  return (
+    <Dialog open={aberto} onOpenChange={aoMudarAberto}>
+      <DialogContent showCloseButton={false}>
+        {/* O conteúdo só existe com o diálogo aberto: cada abertura começa do nome atual, sem o
+            rascunho nem o erro da vez anterior (inclusive depois de "Cancelar"). */}
+        <FormularioNome nomeAtual={nomeAtual} aoFechar={() => aoMudarAberto(false)} />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function FormularioNome({ nomeAtual, aoFechar }: { nomeAtual: string; aoFechar(): void }) {
   const [nome, setNome] = useState(nomeAtual)
   const atualizar = useAtualizarNome()
   const invalido = nome.trim().length === 0 || nome.trim().length > 120
   const erroApi = isApiError(atualizar.error) ? atualizar.error.erroDoCampo('nome') : undefined
 
   return (
-    <Dialog
-      open={aberto}
-      onOpenChange={(abrir) => {
-        if (abrir) setNome(nomeAtual)
-        aoMudarAberto(abrir)
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (!invalido) atualizar.mutate(nome.trim(), { onSuccess: aoFechar })
       }}
+      className="space-y-6"
     >
-      <DialogContent showCloseButton={false}>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (!invalido) atualizar.mutate(nome.trim(), { onSuccess: () => aoMudarAberto(false) })
-          }}
-          className="space-y-6"
-        >
-          <DialogHeader>
-            <DialogTitle>Editar nome</DialogTitle>
-          </DialogHeader>
-          <CampoTexto
-            rotulo="Nome"
-            value={nome}
-            maxLength={120}
-            autoComplete="name"
-            onChange={(e) => setNome(e.target.value)}
-            erro={
-              erroApi ?? (atualizar.isError ? 'Não foi possível salvar. Tente de novo.' : undefined)
-            }
-            autoFocus
-          />
-          <DialogFooter className="flex-row justify-end">
-            <Button type="button" variant="ghost" onClick={() => aoMudarAberto(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={invalido || atualizar.isPending}>
-              Salvar
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <DialogHeader>
+        <DialogTitle>Editar nome</DialogTitle>
+      </DialogHeader>
+      <CampoTexto
+        rotulo="Nome"
+        value={nome}
+        maxLength={120}
+        autoComplete="name"
+        onChange={(e) => setNome(e.target.value)}
+        erro={
+          erroApi ?? (atualizar.isError ? 'Não foi possível salvar. Tente de novo.' : undefined)
+        }
+        autoFocus
+      />
+      <DialogFooter className="flex-row justify-end">
+        <Button type="button" variant="ghost" onClick={aoFechar}>
+          Cancelar
+        </Button>
+        <Button type="submit" disabled={invalido || atualizar.isPending}>
+          Salvar
+        </Button>
+      </DialogFooter>
+    </form>
   )
 }

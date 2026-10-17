@@ -12,6 +12,7 @@ import { FalhaEnvioDialog } from '../components/falha-envio-dialog'
 import { PassoRegistro } from '../components/passo-registro'
 import { LinhaResumo, Resumo } from '../components/resumo'
 import { useEnvio } from '../hooks/use-envio'
+import { useRetomarRegistro } from '../hooks/use-retomar-registro'
 import { useEnderecoDoRascunho, useExigirPasso, useRascunho } from '../hooks/use-rascunho'
 
 const LIMITE_DESCRICAO = 280
@@ -26,7 +27,7 @@ export function RevisaoProblemaPage() {
   useExigirPasso(categoriaId !== null && local !== null, '/registrar/local')
 
   // Sucesso: a tela de sucesso recebe o problema criado (e limpa o rascunho ao abrir).
-  const envio = useEnvio(registrar.mutate, (problema) => {
+  const envio = useEnvio(registrar.mutateAsync, (problema) => {
     navigate('/registrar/sucesso', { replace: true, state: { problema } })
   })
 
@@ -34,6 +35,7 @@ export function RevisaoProblemaPage() {
     if (categoriaId === null || !local) return
     envio.enviar({ categoriaId, ...local, descricao })
   }
+  useRetomarRegistro('enviar', enviar)
 
   return (
     <PassoRegistro

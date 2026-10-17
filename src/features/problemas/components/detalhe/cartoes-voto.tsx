@@ -24,7 +24,8 @@ function ErroVoto({ erro }: { erro: unknown }) {
 
 /** Tela 3: os dois cartões lado a lado (Ativa). */
 export function CartoesAtiva({ problema }: CartaoProps) {
-  const { existencia, persistencia, votarExistencia, votarPersistencia, meus } = useVotos(problema)
+  const { existencia, persistencia, votarExistencia, votarPersistencia, meus, votando } =
+    useVotos(problema)
   const { confirmacoes } = problema.existencia
   const { continua, resolvido } = problema.persistencia
 
@@ -43,7 +44,7 @@ export function CartoesAtiva({ problema }: CartaoProps) {
           className="mt-auto"
           variante="tonal"
           selecionado={meus.existencia === 'confirma'}
-          disabled={problema.souAutor || existencia.isPending}
+          disabled={problema.souAutor || votando}
           title={problema.souAutor ? DICA_AUTOR : undefined}
           onClick={() => votarExistencia('confirma')}
         >
@@ -65,7 +66,7 @@ export function CartoesAtiva({ problema }: CartaoProps) {
           <BotaoVoto
             variante="tonal"
             selecionado={meus.persistencia === 'continua'}
-            disabled={persistencia.isPending}
+            disabled={votando}
             onClick={() => votarPersistencia('continua')}
           >
             Sim, continua
@@ -73,7 +74,7 @@ export function CartoesAtiva({ problema }: CartaoProps) {
           <BotaoVoto
             variante="outline"
             selecionado={meus.persistencia === 'resolvido'}
-            disabled={persistencia.isPending}
+            disabled={votando}
             onClick={() => votarPersistencia('resolvido')}
           >
             Não, foi resolvido
@@ -97,7 +98,7 @@ const substantivo: Record<string, string> = {
 
 /** Tela 22: cartão azul convidando a confirmar um registro novo. */
 export function CartaoAvaliarNova({ problema }: CartaoProps) {
-  const { existencia, votarExistencia, meus } = useVotos(problema)
+  const { existencia, votarExistencia, meus, votando } = useVotos(problema)
   const distancia = useDistanciaAte(problema)
   const pergunta = `Viu este ${substantivo[problema.categoria.icone] ?? 'problema'}?`
 
@@ -119,7 +120,7 @@ export function CartaoAvaliarNova({ problema }: CartaoProps) {
           className="flex-1"
           variante="default"
           selecionado={meus.existencia === 'confirma'}
-          disabled={problema.souAutor || existencia.isPending}
+          disabled={problema.souAutor || votando}
           onClick={() => votarExistencia('confirma')}
         >
           Confirmar que existe
@@ -128,7 +129,7 @@ export function CartaoAvaliarNova({ problema }: CartaoProps) {
           variante="outline"
           className="border-info-foreground/40 text-info-foreground"
           selecionado={meus.existencia === 'naoVi'}
-          disabled={problema.souAutor || existencia.isPending}
+          disabled={problema.souAutor || votando}
           onClick={() => votarExistencia('naoVi')}
         >
           Não vi
@@ -142,7 +143,7 @@ export function CartaoAvaliarNova({ problema }: CartaoProps) {
 
 /** Tela 23: "Ainda está lá?" em destaque, com os votos de resolvido nas últimas 24 h. */
 export function CartaoAindaEstaLa({ problema }: CartaoProps) {
-  const { persistencia, votarPersistencia, meus } = useVotos(problema)
+  const { persistencia, votarPersistencia, meus, votando } = useVotos(problema)
   const { continua, resolvido, resolvidoUltimas24h } = problema.persistencia
 
   return (
@@ -162,7 +163,7 @@ export function CartaoAindaEstaLa({ problema }: CartaoProps) {
           className="flex-1"
           variante="default"
           selecionado={meus.persistencia === 'continua'}
-          disabled={persistencia.isPending}
+          disabled={votando}
           onClick={() => votarPersistencia('continua')}
         >
           Sim, continua
@@ -171,7 +172,7 @@ export function CartaoAindaEstaLa({ problema }: CartaoProps) {
           className="flex-1 border-info-foreground/40 text-info-foreground"
           variante="outline"
           selecionado={meus.persistencia === 'resolvido'}
-          disabled={persistencia.isPending}
+          disabled={votando}
           onClick={() => votarPersistencia('resolvido')}
         >
           Não, foi resolvido

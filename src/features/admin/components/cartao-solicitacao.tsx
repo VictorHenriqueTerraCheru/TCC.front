@@ -27,7 +27,7 @@ export function CartaoSolicitacao({ solicitacao }: { solicitacao: Solicitacao })
       <header className="mb-3 flex items-center gap-3">
         <Avatar nome={usuario.nome} />
         <div className="min-w-0">
-          <h3 className="font-medium">{usuario.nome}</h3>
+          <h2 className="font-medium">{usuario.nome}</h2>
           <p className="text-xs text-muted-foreground">
             {format(new Date(criadaEm), 'd MMM., HH:mm', { locale: ptBR })} ·{' '}
             {rotuloVinculo[tipoVinculo]}

@@ -1,5 +1,5 @@
 import { latLngBounds } from 'leaflet'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Circle,
   CircleMarker,
@@ -120,19 +120,47 @@ function EnquadrarConferencia({ novo, existente }: { novo: Ponto; existente: Pon
   return null
 }
 
-/** Ponto inicial: o já escolhido, senão a posição atual, senão Botafogo. */
-function useCentroInicial(): [number, number] {
+interface CentroInicial {
+  centro: [number, number]
+  /** Abriu em Botafogo só porque a posição ainda não tinha chegado. */
+  provisorio: boolean
+}
+
+/** Ponto inicial: o já escolhido, senão a posição atual, senão Botafogo (provisório). */
+function useCentroInicial(): CentroInicial {
   const local = useRascunhoStore((s) => s.local)
   const { posicao } = useLocalizacao()
-  const [centro] = useState<[number, number]>(() => {
+  const [inicial] = useState<CentroInicial>(() => {
     const ponto = local ?? posicao
-    return ponto ? [ponto.lat, ponto.lng] : CENTRO_PADRAO
+    return ponto
+      ? { centro: [ponto.lat, ponto.lng], provisorio: false }
+      : { centro: CENTRO_PADRAO, provisorio: true }
   })
-  return centro
+  return inicial
+}
+
+/**
+ * A primeira posição do GPS costuma chegar depois de o mapa abrir: centraliza nela uma vez, para
+ * o local não ficar em Botafogo sem a pessoa perceber. Se ela já arrastou o mapa, não mexe.
+ */
+function CentrarNaPrimeiraPosicao() {
+  const { posicao } = useLocalizacao()
+  const resolvidoRef = useRef(false)
+  const mapa = useMapEvents({
+    dragstart: () => {
+      resolvidoRef.current = true
+    },
+  })
+  useEffect(() => {
+    if (resolvidoRef.current || !posicao) return
+    resolvidoRef.current = true
+    mapa.setView([posicao.lat, posicao.lng], mapa.getZoom())
+  }, [mapa, posicao])
+  return null
 }
 
 export function MapaRegistro(props: MapaRegistroProps) {
-  const centro = useCentroInicial()
+  const { centro, provisorio } = useCentroInicial()
   const local = useRascunhoStore((s) => s.local)
 
   if (props.modo === 'conferencia') {
@@ -190,6 +218,7 @@ export function MapaRegistro(props: MapaRegistroProps) {
       <>
         <MapaOsm centro={centro} zoom={16}>
           <AreaNoCentro inicial={{ lat: centro[0], lng: centro[1] }} />
+          {provisorio && <CentrarNaPrimeiraPosicao />}
           <BotaoGps />
         </MapaOsm>
         <DicaArrastar texto="Arraste o mapa para ajustar a área" />
@@ -202,6 +231,7 @@ export function MapaRegistro(props: MapaRegistroProps) {
     <>
       <MapaOsm centro={centro} zoom={17}>
         <OuvinteCentro />
+        {provisorio && <CentrarNaPrimeiraPosicao />}
         <BotaoGps />
       </MapaOsm>
       <DicaArrastar texto="Arraste o mapa para ajustar" />

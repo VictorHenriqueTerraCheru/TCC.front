@@ -70,6 +70,37 @@ describe('guarda "visitante vê, conta age"', () => {
     expect(within(cartaoExistencia()).getByText('15')).toBeInTheDocument()
   })
 
+  it('"voltar" do navegador no login também esquece o voto', async () => {
+    const usuario = userEvent.setup()
+    const { router } = abrir(`/mapa/problema/${ATIVA}`)
+
+    await usuario.click(await screen.findByRole('button', { name: 'Confirmar que existe' }))
+    await usuario.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
+    expect(router.state.location.pathname).toBe('/login')
+    await router.navigate(-1)
+
+    await waitFor(() =>
+      expect(
+        JSON.parse(sessionStorage.getItem('ocorrencias.pendencia')!).state.pendencia,
+      ).toBeNull(),
+    )
+  })
+
+  it('sessão vencida (expiraEm no passado) conta como visitante na guarda', async () => {
+    entrarComoCidadao()
+    const { sessao } = useSessaoStore.getState()
+    useSessaoStore.setState({ sessao: { ...sessao!, expiraEm: '2020-01-01T00:00:00Z' } })
+    const usuario = userEvent.setup()
+    const { router } = abrir('/mapa')
+
+    await usuario.click(await screen.findByRole('link', { name: /Registrar/ }))
+
+    expect(await screen.findByRole('heading', { name: 'Entre para registrar' })).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe('/mapa')
+    expect(useSessaoStore.getState().sessao).toBeNull()
+    await usuario.click(screen.getByRole('button', { name: 'Agora não' }))
+  })
+
   it('visitante em "Registrar" → cadastro → cai no fluxo de registro', async () => {
     const usuario = userEvent.setup()
     const { router } = abrir('/mapa')

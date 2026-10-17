@@ -37,7 +37,7 @@ export function useVotos(problema: DetalheProblema) {
   const mutarPersistencia = persistencia.mutate
   useEffect(() => {
     if (!autenticado) return
-    const acao = consumirAcao((a) => a.problemaId === problema.id)
+    const acao = consumirAcao((a) => 'problemaId' in a && a.problemaId === problema.id)
     if (acao?.tipo === 'votarExistencia') mutarExistencia(acao.valor)
     if (acao?.tipo === 'votarPersistencia') mutarPersistencia(acao.valor)
   }, [autenticado, consumirAcao, problema.id, mutarExistencia, mutarPersistencia])
@@ -45,6 +45,9 @@ export function useVotos(problema: DetalheProblema) {
   return {
     existencia,
     persistencia,
+    // Um voto por vez: cada resposta substitui o detalhe inteiro no cache, e a resposta mais
+    // antiga chegando por último apagaria o outro voto da tela.
+    votando: existencia.isPending || persistencia.isPending,
     meus: problema.meusVotos ?? { existencia: null, persistencia: null },
     votarExistencia: (valor: ValorExistencia) =>
       comGuarda({ tipo: 'votarExistencia', problemaId: problema.id, valor }, (opcoes) =>
