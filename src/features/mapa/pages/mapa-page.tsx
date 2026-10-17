@@ -1,13 +1,22 @@
-import type { Map as MapaLeaflet } from 'leaflet'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router'
+import { useQueryClient } from '@tanstack/react-query'
+import { point, type Map as MapaLeaflet } from 'leaflet'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Link, Outlet, useMatch, useNavigate, useSearchParams } from 'react-router'
+import { Circle } from 'react-leaflet'
 
 import { Icone } from '@/common/components/icone'
 import { useDesktop } from '@/common/hooks/use-media-query'
+import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
+import { useExigirConta } from '@/features/auth'
 import { useCategorias } from '@/features/categorias'
-import { CamadaCalor, useCalorIncidentes } from '@/features/incidentes'
-import { AjudaLocalizacaoDialog, useLocalizacao } from '@/features/localizacao'
+import {
+  areaIncidentesQuery,
+  CamadaCalor,
+  totalSeteDias,
+  useCalorIncidentes,
+} from '@/features/incidentes'
+import { useAtivarLocalizacao, useLocalizacao } from '@/features/localizacao'
 import { CamadaProblemas, useProblemasNaArea } from '@/features/problemas'
 
 import { BannerLocalizacao } from '../components/banner-localizacao'
@@ -17,13 +26,17 @@ import { EstadoVazio } from '../components/estado-vazio'
 import { LegendaMapa } from '../components/legenda-mapa'
 import { MapaBase } from '../components/mapa-base'
 import { MarcadorUsuario } from '../components/marcador-usuario'
+import { OuvinteToque } from '../components/ouvinte-toque'
 import { SeletorModo } from '../components/seletor-modo'
 import { useFiltrosMapa } from '../hooks/use-filtros-mapa'
-import { filtrosDasCamadas } from '../models/filtros'
+import { useNavegacaoMapa } from '../hooks/use-navegacao-mapa'
+import type { ContextoMapa } from '../models/contexto'
+import { filtrosDasCamadas, mostraCalor } from '../models/filtros'
 import { CENTRO_PADRAO, ZOOM_PADRAO } from '../models/mapa'
 import type { Retangulo } from '../models/retangulo'
 
 const CHAVE_LEGENDA_VISTA = 'ocorrencias.legendaVista'
+const LARGURA_PAINEL = 420
 
 function legendaJaVista(): boolean {
   try {
@@ -41,17 +54,27 @@ function marcarLegendaVista() {
   }
 }
 
-/** Telas 1, 2, 18, 24 e 25. */
+/** Telas 1, 2, 18, 24 e 25; as rotas filhas (detalhe, área) abrem no painel por cima. */
 export function MapaPage() {
   const desktop = useDesktop()
   const filtros = useFiltrosMapa()
   const camadas = filtrosDasCamadas(filtros)
   const localizacao = useLocalizacao()
+  const ativarLocalizacao = useAtivarLocalizacao()
+  const navegacao = useNavegacaoMapa()
+  const exigirConta = useExigirConta()
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  const rotaProblema = useMatch('/mapa/problema/:id')
+  const rotaArea = useMatch('/mapa/area')
+  const [params] = useSearchParams()
+  const painelAberto = rotaProblema !== null || rotaArea !== null
 
   const [mapa, setMapa] = useState<MapaLeaflet | null>(null)
   const [retangulo, setRetangulo] = useState<Retangulo | null>(null)
   const [legendaAberta, setLegendaAberta] = useState(() => !legendaJaVista())
-  const [ajudaAberta, setAjudaAberta] = useState(false)
+  const [aviso, setAviso] = useState<string | null>(null)
 
   const { data: categorias } = useCategorias()
   const categoriasPorId = useMemo(
@@ -73,17 +96,45 @@ export function MapaPage() {
   )
   const centralizouRef = useRef(localizacao.posicao !== null)
   useEffect(() => {
-    if (!mapa || !localizacao.posicao || centralizouRef.current) return
+    if (!mapa || !localizacao.posicao || centralizouRef.current || painelAberto) return
     centralizouRef.current = true
     mapa.setView([localizacao.posicao.lat, localizacao.posicao.lng], ZOOM_PADRAO)
-  }, [mapa, localizacao.posicao])
+  }, [mapa, localizacao.posicao, painelAberto])
+
+  useEffect(() => {
+    if (!aviso) return
+    const timer = setTimeout(() => setAviso(null), 3500)
+    return () => clearTimeout(timer)
+  }, [aviso])
+
+  const focar = useCallback<ContextoMapa['focar']>(
+    ({ lat, lng }) => {
+      if (!mapa) return
+      centralizouRef.current = true
+      const tamanho = mapa.getSize()
+      // Celular: o ponto fica no quarto de cima, acima da folha. Desktop: no centro da área livre.
+      const alvo = desktop
+        ? point(LARGURA_PAINEL + (tamanho.x - LARGURA_PAINEL) / 2, tamanho.y / 2)
+        : point(tamanho.x / 2, tamanho.y * 0.25)
+      mapa.panBy(mapa.latLngToContainerPoint([lat, lng]).subtract(alvo))
+    },
+    [mapa, desktop],
+  )
+  const contexto = useMemo<ContextoMapa>(() => ({ focar }), [focar])
+
+  /** Regra 7: toque fora dos marcadores, nos modos com calor, abre a área se houver incidentes. */
+  async function aoTocarMapa(lat: number, lng: number) {
+    try {
+      const area = await queryClient.fetchQuery(areaIncidentesQuery(lat, lng))
+      if (totalSeteDias(area) > 0) navegacao.abrirArea(lat, lng)
+      else setAviso('Sem incidentes por aqui nos últimos 7 dias')
+    } catch {
+      setAviso('Não foi possível consultar os incidentes desta área')
+    }
+  }
 
   async function aoClicarGps() {
-    if (localizacao.estado === 'denied' || localizacao.estado === 'indisponivel') {
-      setAjudaAberta(true)
-      return
-    }
-    const posicao = localizacao.posicao ?? (await localizacao.solicitar())
+    const posicao = localizacao.posicao ?? (await ativarLocalizacao.ativar())
     centralizouRef.current = true
     if (posicao) mapa?.flyTo([posicao.lat, posicao.lng], Math.max(mapa.getZoom(), ZOOM_PADRAO))
   }
@@ -101,6 +152,10 @@ export function MapaPage() {
   const vazio = carregou && consultas.every((c) => c.data?.length === 0)
   const falhou = consultas.some((c) => c.isError)
   const semLocalizacao = localizacao.estado === 'prompt' || localizacao.estado === 'denied'
+  const centroArea =
+    rotaArea && params.has('lat') && params.has('lng')
+      ? ([Number(params.get('lat')), Number(params.get('lng'))] as [number, number])
+      : null
 
   return (
     // isolate: os z-index do Leaflet (até 1000) ficam presos aqui e não cobrem diálogos e folhas.
@@ -113,26 +168,41 @@ export function MapaPage() {
       >
         {camadas.calor && calor.data && <CamadaCalor celulas={calor.data} />}
         {camadas.problemas && problemas.data && (
-          <CamadaProblemas problemas={problemas.data} categorias={categoriasPorId} />
+          <CamadaProblemas
+            problemas={problemas.data}
+            categorias={categoriasPorId}
+            selecionadoId={rotaProblema?.params.id}
+            aoSelecionar={navegacao.abrirProblema}
+          />
+        )}
+        {centroArea && (
+          <Circle
+            center={centroArea}
+            radius={400}
+            interactive={false}
+            pathOptions={{ color: '#171d1a', weight: 1.5, dashArray: '4 5', fillOpacity: 0 }}
+          />
         )}
         {localizacao.posicao && <MarcadorUsuario posicao={localizacao.posicao} />}
+        {mostraCalor(filtros.modo) && (
+          <OuvinteToque aoTocar={(lat, lng) => void aoTocarMapa(lat, lng)} />
+        )}
       </MapaBase>
 
-      {/* Controles sobre o mapa: no desktop ficam à esquerda, onde o painel lateral vai abrir. */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-[1000] space-y-2 p-3 lg:right-auto lg:w-[460px] lg:p-4">
+      {/* Controles sobre o mapa: no desktop ficam à direita do painel lateral. */}
+      <div
+        className={cn(
+          'pointer-events-none absolute inset-x-0 top-0 z-[1000] space-y-2 p-3 lg:right-auto lg:w-[460px] lg:p-4',
+          painelAberto && 'lg:left-[420px]',
+        )}
+      >
         <SeletorModo modo={filtros.modo} aoMudar={filtros.alterarModo} />
         <ChipsFiltro
           {...filtros}
           aoAlternarGrupo={filtros.alternarGrupo}
           aoAlternarNovas={filtros.alternarNovas}
         />
-        {semLocalizacao && (
-          <BannerLocalizacao
-            aoAtivar={() =>
-              localizacao.estado === 'denied' ? setAjudaAberta(true) : void localizacao.solicitar()
-            }
-          />
-        )}
+        {semLocalizacao && <BannerLocalizacao aoAtivar={() => void ativarLocalizacao.ativar()} />}
         {falhou && (
           <div
             role="alert"
@@ -150,15 +220,29 @@ export function MapaPage() {
         )}
       </div>
 
-      {vazio && !falhou && (
+      {vazio && !falhou && !painelAberto && (
         <div className="pointer-events-none absolute inset-x-6 top-1/2 z-[1000] -translate-y-1/2">
           <EstadoVazio aoVerAreaMaior={() => mapa?.zoomOut(2)} />
         </div>
       )}
 
       {legendaAberta && (
-        <div className="pointer-events-none absolute bottom-6 left-3 z-[1000] lg:left-4">
+        <div
+          className={cn(
+            'pointer-events-none absolute bottom-6 left-3 z-[1000] lg:left-4',
+            painelAberto && 'lg:left-[436px]',
+          )}
+        >
           <LegendaMapa modo={filtros.modo} aoFechar={alternarLegenda} />
+        </div>
+      )}
+
+      {aviso && (
+        <div
+          role="status"
+          className="pointer-events-none absolute inset-x-0 bottom-28 z-[1000] mx-auto w-fit max-w-[90%] rounded-lg bg-foreground px-4 py-2.5 text-sm text-background shadow-lg lg:bottom-8"
+        >
+          {aviso}
         </div>
       )}
 
@@ -172,9 +256,9 @@ export function MapaPage() {
         </BotaoMapa>
         <BotaoMapa
           aria-label={
-            semLocalizacao || localizacao.estado === 'indisponivel'
-              ? 'Ativar localização'
-              : 'Centralizar na minha localização'
+            localizacao.estado === 'granted'
+              ? 'Centralizar na minha localização'
+              : 'Ativar localização'
           }
           onClick={() => void aoClicarGps()}
         >
@@ -189,6 +273,11 @@ export function MapaPage() {
         {!desktop && (
           <Link
             to="/registrar"
+            onClick={(evento) => {
+              // Regra 1: visitante vê a folha "Entre para registrar" em vez do fluxo.
+              evento.preventDefault()
+              exigirConta('registrar', () => navigate('/registrar'))
+            }}
             className="pointer-events-auto flex h-14 items-center gap-2 rounded-2xl bg-mint px-5 font-medium text-mint-foreground shadow-md transition-shadow hover:shadow-lg focus-visible:outline-2"
           >
             <Icone nome="add_location_alt" />
@@ -197,11 +286,8 @@ export function MapaPage() {
         )}
       </div>
 
-      <AjudaLocalizacaoDialog
-        aberto={ajudaAberta}
-        aoMudarAberto={setAjudaAberta}
-        estado={localizacao.estado}
-      />
+      {ativarLocalizacao.dialogo}
+      <Outlet context={contexto} />
     </div>
   )
 }

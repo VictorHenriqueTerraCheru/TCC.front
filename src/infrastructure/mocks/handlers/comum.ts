@@ -1,3 +1,5 @@
+import { HttpResponse } from 'msw'
+
 interface Retangulo {
   minLat: number
   minLng: number
@@ -26,4 +28,12 @@ export function noRetangulo(ponto: { lat: number; lng: number }, r: Retangulo) {
 
 export function lista(url: URL, nome: string): string[] {
   return (url.searchParams.get(nome) ?? '').split(',').filter(Boolean)
+}
+
+/** ProblemDetails de regra de negócio (409/422/429), com o type estável de docs/API.md. */
+export function erroDeRegra(status: number, type: string, title: string) {
+  return HttpResponse.json(
+    { type, title, status },
+    { status, headers: { 'Content-Type': 'application/problem+json' } },
+  )
 }

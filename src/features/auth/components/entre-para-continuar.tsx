@@ -1,0 +1,86 @@
+import type { MaterialSymbol } from 'material-symbols'
+import { useNavigate } from 'react-router'
+
+import { FolhaResponsiva } from '@/common/components/folha-responsiva'
+import { Icone } from '@/common/components/icone'
+import { Button } from '@/common/ui/button'
+
+import { useGuardaStore, type MotivoConta } from '../stores/guarda-store'
+
+interface Conteudo {
+  icone: MaterialSymbol
+  titulo: string
+  texto: string
+  itens: [MaterialSymbol, string][]
+}
+
+// Textos das telas 14 e 27.
+const conteudos: Record<MotivoConta, Conteudo> = {
+  votar: {
+    icone: 'how_to_vote',
+    titulo: 'Entre para votar',
+    texto:
+      'Seu voto ajuda a mostrar o que é confiável no mapa. Para evitar votos repetidos, cada voto fica ligado a uma conta.',
+    itens: [
+      ['verified', 'Confirmar que um problema existe'],
+      ['autorenew', 'Dizer se ele ainda está lá'],
+      ['near_me', 'Ter mais peso quando estiver perto'],
+    ],
+  },
+  registrar: {
+    icone: 'person_add',
+    titulo: 'Entre para registrar',
+    texto:
+      'Cada registro fica ligado a uma conta — é isso que permite medir a confiança do que aparece no mapa. Sem conta, você continua vendo o mapa normalmente.',
+    itens: [
+      ['add_location_alt', 'Registrar problemas e incidentes'],
+      ['how_to_vote', 'Confirmar e avaliar ocorrências perto de você'],
+      ['history', 'Acompanhar o andamento dos seus registros'],
+    ],
+  },
+}
+
+/** Folha única do app, aberta por useExigirConta(). Fica montada no layout. */
+export function EntreParaContinuar() {
+  const motivo = useGuardaStore((s) => s.motivo)
+  const fechar = useGuardaStore((s) => s.fechar)
+  const navigate = useNavigate()
+  const conteudo = conteudos[motivo ?? 'votar']
+
+  function irPara(rota: string) {
+    fechar()
+    navigate(rota)
+  }
+
+  return (
+    <FolhaResponsiva
+      aberto={motivo !== null}
+      aoMudarAberto={(aberto) => !aberto && fechar()}
+      titulo={conteudo.titulo}
+      icone={
+        <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-mint text-mint-foreground">
+          <Icone nome={conteudo.icone} className="text-[28px]" />
+        </span>
+      }
+    >
+      <p className="mb-4 text-sm text-muted-foreground">{conteudo.texto}</p>
+      <ul className="mb-6 space-y-3">
+        {conteudo.itens.map(([icone, texto]) => (
+          <li key={texto} className="flex items-center gap-3 text-sm">
+            <Icone nome={icone} className="text-[22px] text-primary" />
+            {texto}
+          </li>
+        ))}
+      </ul>
+      <div className="flex flex-col gap-2">
+        <Button onClick={() => irPara('/cadastro')}>Criar conta</Button>
+        <Button variant="outline" onClick={() => irPara('/login')}>
+          Já tenho conta
+        </Button>
+        <Button variant="ghost" onClick={fechar}>
+          Agora não
+        </Button>
+      </div>
+    </FolhaResponsiva>
+  )
+}

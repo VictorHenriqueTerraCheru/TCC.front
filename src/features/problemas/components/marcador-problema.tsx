@@ -9,6 +9,8 @@ interface MarcadorProblemaProps {
   icone: MaterialSymbol
   status: StatusProblema
   faixa: FaixaConfianca | null
+  /** Problema aberto no painel: sombra elíptica no chão (tela 3). */
+  selecionado?: boolean
 }
 
 /**
@@ -16,7 +18,13 @@ interface MarcadorProblemaProps {
  * por isso só usa estilos inline e classes globais. Tela 24: possivelmenteResolvida = contorno
  * tracejado + selo de check. `resolvida` nunca chega aqui (a API não devolve).
  */
-export function MarcadorProblema({ cor, icone, status, faixa }: MarcadorProblemaProps) {
+export function MarcadorProblema({
+  cor,
+  icone,
+  status,
+  faixa,
+  selecionado = false,
+}: MarcadorProblemaProps) {
   const variante = varianteDo(status, faixa)
   const { largura, altura } = dimensoesMarcador(status, faixa)
   const tracejado = status === 'possivelmenteResolvida'
@@ -28,6 +36,20 @@ export function MarcadorProblema({ cor, icone, status, faixa }: MarcadorProblema
       data-faixa={faixa ?? 'nenhuma'}
       style={{ position: 'relative', width: largura, height: altura }}
     >
+      {selecionado && (
+        <span
+          style={{
+            position: 'absolute',
+            left: '50%',
+            bottom: -5,
+            width: largura * 0.9,
+            height: 10,
+            transform: 'translateX(-50%)',
+            borderRadius: '50%',
+            background: 'rgb(0 0 0 / 0.22)',
+          }}
+        />
+      )}
       <svg
         viewBox="0 0 40 50"
         width={largura}
