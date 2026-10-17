@@ -1,4 +1,5 @@
 export { EntreParaContinuar } from './components/entre-para-continuar'
+export { useDescartarPendenciaAoSairDoLogin } from './hooks/use-descartar-pendencia'
 export { useConsumirAcaoPendente, useExigirConta } from './hooks/use-exigir-conta'
 export { useSincronizarCacheComSessao } from './hooks/use-sincronizar-cache'
 export type { RespostaAuth, Sessao } from './models/sessao'
