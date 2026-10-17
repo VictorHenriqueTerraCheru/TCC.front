@@ -192,7 +192,7 @@ export function MapaPage() {
       {/* Controles sobre o mapa: no desktop ficam à direita do painel lateral. */}
       <div
         className={cn(
-          'pointer-events-none absolute inset-x-0 top-0 z-[1000] space-y-2 p-3 lg:right-auto lg:w-[460px] lg:p-4',
+          'pointer-events-none absolute inset-x-0 top-0 z-[1000] space-y-2 p-3 lg:right-auto lg:w-[620px] lg:p-4',
           painelAberto && 'lg:left-[420px]',
         )}
       >

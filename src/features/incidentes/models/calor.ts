@@ -7,4 +7,9 @@ export const gradienteCalor: Record<number, string> = {
   1: '#c8372d',
 }
 
-export const gradienteCalorCss = `linear-gradient(to right, ${Object.values(gradienteCalor).join(', ')})`
+// Ordena pelas paradas: em objetos, a chave inteira "1" vem antes de "0.2", "0.4"…
+const paradas = Object.entries(gradienteCalor).sort(([a], [b]) => Number(a) - Number(b))
+
+export const gradienteCalorCss = `linear-gradient(to right, ${paradas
+  .map(([parada, cor]) => `${cor} ${Number(parada) * 100}%`)
+  .join(', ')})`

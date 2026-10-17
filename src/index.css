@@ -3,8 +3,11 @@
 @import '@fontsource/roboto/400.css';
 @import '@fontsource/roboto/500.css';
 @import '@fontsource/roboto/700.css';
-/* Em layer: sem isso o font-size: 24px do pacote vence os utilitários text-[..] do Tailwind. */
-@import 'material-symbols/rounded.css' layer(base);
+/*
+ * Ícones: subset só com os usados no app (npm run gen:icones).
+ * Em layer: sem isso o font-size: 24px do pacote vence os utilitários text-[..] do Tailwind.
+ */
+@import './assets/material-symbols/rounded.css' layer(base);
 
 /*
  * Tokens amostrados nos prints de docs/design (Material 3 do protótipo).

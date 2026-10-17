@@ -98,7 +98,9 @@ Nomes de arquivo em kebab-case (`categoria-icone.tsx`); componentes e hooks em p
 
 ### CSS dos ícones
 
-`material-symbols/rounded.css` é importado com `layer(base)` em `src/index.css`. Fora de layer, o `font-size: 24px` do pacote vence qualquer utilitário do Tailwind (`text-[18px]` não teria efeito).
+A fonte é um **subset** com só os ícones usados (~12 KB; a do pacote tem ~5 MB): `npm run gen:icones` varre os literais de string de `src/`, pede o subset ao Google Fonts (`icon_names`) e grava `src/assets/material-symbols/` (woff2 + `icones.json`), que vai no repo; o app não depende do Google em tempo de execução. **Ao usar um ícone novo, rode `npm run gen:icones`** — o teste `scripts/icones.test.mjs` falha se faltar algum (sem ele, o ícone aparece como texto). O pacote `material-symbols` continua como fonte do tipo `MaterialSymbol` e da lista de nomes.
+
+`src/assets/material-symbols/rounded.css` é importado com `layer(base)` em `src/index.css`. Fora de layer, o `font-size: 24px` vence qualquer utilitário do Tailwind (`text-[18px]` não teria efeito).
 
 ### Barra inferior (celular)
 
@@ -167,7 +169,12 @@ npm run dev                # http://localhost:5173  (VITE_API_URL=/api/v1, proxy
 VITE_USE_MOCKS=true npm run dev   # sem API, com MSW
 npm test                   # Vitest
 npm run build && npm run preview
+npm run gen:icones         # subset da fonte de ícones (rode ao usar um ícone novo)
 npm run prints             # Playwright: capturas mobile (390×844) e desktop (1440×900) para o TCC
 ```
+
+`npm run prints` (`scripts/prints.mjs`) sobe sozinho um Vite com a API falsa (MSW, porta 5199) e grava em `prints/` (fora do git): as fixtures imitam os prints do protótipo e não dependem do banco local. Para o ambiente publicado: `PRINTS_URL=https://… PRINTS_API=<VITE_API_URL> npm run prints` (usa os usuários do seed; a fila do admin só aparece cheia se houver pedidos pendentes). Usa o Google Chrome instalado (`PRINTS_NAVEGADOR=chromium` depois de `npx playwright install chromium`). No modo com mocks, chamadas feitas pelo script só funcionam depois de o app renderizar: antes disso o MSW não subiu e o fetch cai no proxy (API real).
+
+PWA: `public/manifest.webmanifest` + ícones (`icon-192/512`, `icon-maskable-512`, `apple-touch-icon`) para "Adicionar à tela inicial"; sem service worker (offline fora do escopo).
 
 Para testar a localização no celular durante o desenvolvimento é preciso HTTPS: use o deploy de preview (Vercel/Netlify) ou um túnel HTTPS para o `npm run dev` (com o proxy do Vite, o túnel cobre também a API). Se o túnel usar outro host, adicione-o em `server.allowedHosts` do Vite.
