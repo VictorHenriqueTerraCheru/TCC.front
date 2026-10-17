@@ -9,6 +9,7 @@ import { FalhaEnvioDialog } from '../components/falha-envio-dialog'
 import { PassoRegistro } from '../components/passo-registro'
 import { LinhaResumo, Resumo } from '../components/resumo'
 import { useEnvio } from '../hooks/use-envio'
+import { useRetomarRegistro } from '../hooks/use-retomar-registro'
 import { useEnderecoDoRascunho, useExigirPasso, useRascunho } from '../hooks/use-rascunho'
 import { descreverHorario, ocorridoEm } from '../models/horario'
 
@@ -20,7 +21,7 @@ export function RevisaoIncidentePage() {
   const registrar = useRegistrarIncidente()
   useExigirPasso(categoriaId !== null && local !== null, '/registrar/incidente/local')
 
-  const envio = useEnvio(registrar.mutate, (area, { categoriaId: idCategoria, lat, lng }) => {
+  const envio = useEnvio(registrar.mutateAsync, (area, { categoriaId: idCategoria, lat, lng }) => {
     navigate('/registrar/incidente/sucesso', {
       replace: true,
       state: {
@@ -38,6 +39,7 @@ export function RevisaoIncidentePage() {
     // O instante é calculado agora, no envio (regra 16).
     envio.enviar({ categoriaId, ...local, ocorridoEm: ocorridoEm(horario) })
   }
+  useRetomarRegistro('enviar', enviar)
 
   return (
     <PassoRegistro

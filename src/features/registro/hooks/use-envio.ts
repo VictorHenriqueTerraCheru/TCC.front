@@ -6,17 +6,14 @@ import { isApiError, isErroDeRede } from '@/infrastructure/api'
 
 import { mensagemErroRegistro } from '../errors'
 
-interface OpcoesEnvio<Resultado> {
-  onError(erro: unknown): void
-  onSuccess(resultado: Resultado): void
-}
-
 /**
  * Trata o erro do envio como a tela 26 pede: rede/timeout → diálogo "Tentar novamente";
- * 401 → guarda (o rascunho fica salvo); regra de negócio → mensagem.
+ * 401 → guarda com o envio guardado para depois do login; regra de negócio → mensagem.
  */
 export function useEnvio<Variaveis, Resultado>(
-  executar: (variaveis: Variaveis, opcoes: OpcoesEnvio<Resultado>) => void,
+  // mutateAsync, não mutate: num 401 o RegistroLayout já manda ao login e desmonta a página, e
+  // os callbacks do mutate() não rodam depois disso. A promise resolve mesmo assim.
+  executar: (variaveis: Variaveis) => Promise<Resultado>,
   aoSucesso: (resultado: Resultado, variaveis: Variaveis) => void,
 ) {
   const exigirConta = useExigirConta()
@@ -29,15 +26,19 @@ export function useEnvio<Variaveis, Resultado>(
     setErroRegra(null)
     setFalhaAberta(false)
     setUltimas(variaveis)
-    executar(variaveis, {
-      onSuccess: (resultado) => aoSucesso(resultado, variaveis),
-      onError: (erro) => {
+    executar(variaveis).then(
+      (resultado) => aoSucesso(resultado, variaveis),
+      (erro: unknown) => {
         if (isErroDeRede(erro)) setFalhaAberta(true)
         else if (isApiError(erro) && erro.status === 401)
-          exigirConta('registrar', () => {}, { retorno: pathname })
+          // Depois do login, a revisão envia de novo com o rascunho (useRetomarRegistro).
+          exigirConta('registrar', () => {}, {
+            retorno: pathname,
+            pendente: { tipo: 'continuarRegistro', passo: 'enviar' },
+          })
         else setErroRegra(mensagemErroRegistro(erro))
       },
-    })
+    )
   }
 
   return {
