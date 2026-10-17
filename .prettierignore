@@ -1,0 +1,7 @@
+dist
+coverage
+node_modules
+docs
+src/infrastructure/api/schema.d.ts
+public/mockServiceWorker.js
+package-lock.json
