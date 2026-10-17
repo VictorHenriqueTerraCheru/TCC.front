@@ -160,6 +160,7 @@ export function MapaPage() {
   return (
     // isolate: os z-index do Leaflet (até 1000) ficam presos aqui e não cobrem diálogos e folhas.
     <div className="relative isolate size-full">
+      <h1 className="sr-only">Mapa de ocorrências</h1>
       <MapaBase
         ref={setMapa}
         centroInicial={centroInicial}
