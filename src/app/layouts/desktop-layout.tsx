@@ -20,7 +20,7 @@ export function DesktopLayout() {
           to="/registrar"
           onClick={(evento) => {
             evento.preventDefault()
-            exigirConta('registrar', () => navigate('/registrar'))
+            exigirConta('registrar', () => navigate('/registrar'), { retorno: '/registrar' })
           }}
           aria-label="Registrar ocorrência"
           className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-mint text-mint-foreground shadow-md transition-shadow hover:shadow-lg focus-visible:outline-2"

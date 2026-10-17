@@ -1,10 +1,9 @@
 import { Icone } from '@/common/components/icone'
 import { distanciaTexto } from '@/common/lib/formatacao'
-import { useExigirConta } from '@/features/auth'
 
-import { useVotarExistencia, useVotarPersistencia } from '../../api/use-votar'
 import { mensagemErroVoto } from '../../errors'
 import { useDistanciaAte } from '../../hooks/use-distancia-ate'
+import { useVotos } from '../../hooks/use-votos'
 import type { DetalheProblema } from '../../models/problema'
 import { BotaoVoto } from './botao-voto'
 
@@ -21,21 +20,6 @@ function ErroVoto({ erro }: { erro: unknown }) {
       {mensagemErroVoto(erro)}
     </p>
   )
-}
-
-function useVotos(problema: DetalheProblema) {
-  const exigirConta = useExigirConta()
-  const existencia = useVotarExistencia(problema.id)
-  const persistencia = useVotarPersistencia(problema.id)
-  return {
-    existencia,
-    persistencia,
-    votarExistencia: (valor: 'confirma' | 'naoVi') =>
-      exigirConta('votar', () => existencia.mutate(valor)),
-    votarPersistencia: (valor: 'continua' | 'resolvido') =>
-      exigirConta('votar', () => persistencia.mutate(valor)),
-    meus: problema.meusVotos ?? { existencia: null, persistencia: null },
-  }
 }
 
 /** Tela 3: os dois cartões lado a lado (Ativa). */

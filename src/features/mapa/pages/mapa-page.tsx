@@ -276,7 +276,7 @@ export function MapaPage() {
             onClick={(evento) => {
               // Regra 1: visitante vê a folha "Entre para registrar" em vez do fluxo.
               evento.preventDefault()
-              exigirConta('registrar', () => navigate('/registrar'))
+              exigirConta('registrar', () => navigate('/registrar'), { retorno: '/registrar' })
             }}
             className="pointer-events-auto flex h-14 items-center gap-2 rounded-2xl bg-mint px-5 font-medium text-mint-foreground shadow-md transition-shadow hover:shadow-lg focus-visible:outline-2"
           >

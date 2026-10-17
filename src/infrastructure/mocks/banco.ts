@@ -1,13 +1,29 @@
 import type { Schema } from '../api'
 import { criarDetalhes, ID_DO_AUTOR } from './fixtures/detalhes'
+import { usuariosIniciais } from './fixtures/usuarios'
 
 type MeusVotos = Schema<'ObterDetalheProblemaMeusVotos'>
 
 /** Estado em memória da API falsa: votos do usuário logado no mock. Reiniciado a cada teste. */
 let detalhes = criarDetalhes()
 let votos = new Map<string, MeusVotos>()
+let usuarios = [...usuariosIniciais]
 
 export const banco = {
+  usuarioPorEmail(email: string) {
+    return usuarios.find((u) => u.email.toLowerCase() === email.toLowerCase()) ?? null
+  },
+  cadastrar(nome: string, email: string, senha: string) {
+    const usuario = {
+      id: `u-${usuarios.length + 1}`,
+      nome,
+      email,
+      senha,
+      perfil: 'cidadao' as const,
+    }
+    usuarios = [...usuarios, usuario]
+    return usuario
+  },
   detalhe(id: string, autenticado: boolean) {
     const detalhe = detalhes.get(id)
     if (!detalhe) return null
@@ -34,5 +50,6 @@ export const banco = {
   reiniciar() {
     detalhes = criarDetalhes()
     votos = new Map()
+    usuarios = [...usuariosIniciais]
   },
 }
