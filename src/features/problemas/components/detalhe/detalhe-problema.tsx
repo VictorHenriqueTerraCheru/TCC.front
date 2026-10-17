@@ -89,8 +89,24 @@ function legendaConfianca({ existencia }: Detalhe) {
   return `Calculada com ${votos} ${votos === 1 ? 'voto' : 'votos'}, ponderados por proximidade e histórico de quem votou.`
 }
 
-/** Corpo por status: Ativa (tela 3), Nova (22) e Possivelmente resolvida (23). */
+/** Corpo por status: Ativa (tela 3), Nova (22), Possivelmente resolvida (23) e Resolvida. */
 function Corpo({ problema }: { problema: Detalhe }) {
+  // Resolvida sai do mapa, mas o detalhe ainda abre por link salvo ou logo após o voto que a
+  // resolveu. A API recusa votos nesse estado (problema-resolvido): só leitura.
+  if (problema.status === 'resolvida') {
+    const { resolvido } = problema.persistencia
+    return (
+      <p className="flex items-start gap-3 rounded-2xl bg-mint/40 p-4 text-sm">
+        <Icone nome="check_circle" preenchido className="text-[20px] text-primary" />
+        <span>
+          A comunidade confirmou que este problema foi resolvido
+          {resolvido > 0 && ` (${resolvido} ${resolvido === 1 ? 'voto' : 'votos'})`}. Ele não
+          aparece mais no mapa nem recebe votos.
+        </span>
+      </p>
+    )
+  }
+
   if (problema.status === 'nova') {
     const { confirmacoes } = problema.existencia
     return (

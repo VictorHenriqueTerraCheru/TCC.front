@@ -1,10 +1,10 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { http } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 
 import { EntreParaContinuar } from '@/features/auth'
 import { problemasNaArea } from '@/infrastructure/mocks/fixtures/problemas'
-import { ID_DO_AUTOR } from '@/infrastructure/mocks/fixtures/detalhes'
+import { criarDetalhes, ID_DO_AUTOR } from '@/infrastructure/mocks/fixtures/detalhes'
 import { erroDeRegra } from '@/infrastructure/mocks/handlers/comum'
 import { rota } from '@/infrastructure/mocks/rota'
 import { server } from '@/infrastructure/mocks/server'
@@ -73,6 +73,35 @@ describe('DetalheProblema', () => {
     expect(screen.getByText('Confiança média')).toBeInTheDocument()
     expect(screen.getByText('58 / 100')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Confirmar que existe' })).not.toBeInTheDocument()
+  })
+
+  it('Resolvida (link salvo): só leitura, sem botões de voto', async () => {
+    const detalhe = criarDetalhes().get(ATIVA)!
+    server.use(
+      http.get(rota('/problemas/:id'), () =>
+        HttpResponse.json({ ...detalhe, status: 'resolvida', confianca: null, faixa: null }),
+      ),
+    )
+    renderizar(ATIVA)
+
+    expect(await screen.findByText(/confirmou que este problema foi resolvido/)).toBeInTheDocument()
+    expect(screen.getByText('Resolvida')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Confirmar que existe' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Sim, continua' })).not.toBeInTheDocument()
+  })
+
+  it('enquanto um voto está em andamento, os outros botões ficam desabilitados', async () => {
+    entrarComoCidadao()
+    server.use(
+      http.put(rota('/problemas/:id/votos/persistencia'), async () => {
+        await delay('infinite')
+      }),
+    )
+    renderizar(ATIVA)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Sim, continua' }))
+    expect(screen.getByRole('button', { name: 'Confirmar que existe' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Não, foi resolvido' })).toBeDisabled()
   })
 
   it('souAutor: "Confirmar que existe" desabilitado com a dica', async () => {
