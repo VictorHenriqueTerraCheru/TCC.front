@@ -32,6 +32,7 @@ import { useFiltrosMapa } from '../hooks/use-filtros-mapa'
 import { useNavegacaoMapa } from '../hooks/use-navegacao-mapa'
 import type { ContextoMapa } from '../models/contexto'
 import { filtrosDasCamadas, mostraCalor } from '../models/filtros'
+import { pontoDaUrl } from '../models/ponto'
 import { CENTRO_PADRAO, ZOOM_PADRAO } from '@/common/lib/mapa'
 import type { Retangulo } from '../models/retangulo'
 
@@ -76,7 +77,8 @@ export function MapaPage() {
   const [legendaAberta, setLegendaAberta] = useState(() => !legendaJaVista())
   const [aviso, setAviso] = useState<string | null>(null)
 
-  const { data: categorias } = useCategorias()
+  const categoriasQuery = useCategorias()
+  const categorias = categoriasQuery.data
   const categoriasPorId = useMemo(
     () => new Map((categorias ?? []).map((c) => [c.id, c])),
     [categorias],
@@ -147,15 +149,14 @@ export function MapaPage() {
   const consultas = [camadas.problemas && problemas, camadas.calor && calor].filter(
     (consulta) => !!consulta,
   )
+  // Sem categorias os marcadores não têm ícone nem cor (e não aparecem): conta como falha do mapa.
+  const falhouCategorias = camadas.problemas !== null && categoriasQuery.isError
   const carregou =
     consultas.length > 0 && consultas.every((c) => c.isSuccess && !c.isPlaceholderData)
   const vazio = carregou && consultas.every((c) => c.data?.length === 0)
-  const falhou = consultas.some((c) => c.isError)
+  const falhou = falhouCategorias || consultas.some((c) => c.isError)
   const semLocalizacao = localizacao.estado === 'prompt' || localizacao.estado === 'denied'
-  const centroArea =
-    rotaArea && params.has('lat') && params.has('lng')
-      ? ([Number(params.get('lat')), Number(params.get('lng'))] as [number, number])
-      : null
+  const pontoArea = rotaArea ? pontoDaUrl(params) : null
 
   return (
     // isolate: os z-index do Leaflet (até 1000) ficam presos aqui e não cobrem diálogos e folhas.
@@ -176,9 +177,9 @@ export function MapaPage() {
             aoSelecionar={navegacao.abrirProblema}
           />
         )}
-        {centroArea && (
+        {pontoArea && (
           <Circle
-            center={centroArea}
+            center={[pontoArea.lat, pontoArea.lng]}
             radius={400}
             interactive={false}
             pathOptions={{ color: '#171d1a', weight: 1.5, dashArray: '4 5', fillOpacity: 0 }}
@@ -213,7 +214,10 @@ export function MapaPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => consultas.forEach((c) => void c.refetch())}
+              onClick={() => {
+                if (falhouCategorias) void categoriasQuery.refetch()
+                consultas.forEach((c) => void c.refetch())
+              }}
             >
               Tentar novamente
             </Button>
