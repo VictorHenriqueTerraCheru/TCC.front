@@ -53,6 +53,8 @@ src/
     errors.ts             # ≈ Errors/: type da API → mensagem em português
     components/           # UI só desta feature
     pages/                # ≈ Modules/: entrada de rota (a borda da feature)
+    hooks/                # hooks de UI que não chamam a API (ex.: filtros do mapa na URL)
+    lib/                  # utilitários internos da feature (ex.: integração com plugin do Leaflet)
     stores/               # Zustand, quando houver
     index.ts              # API pública da feature (o que outras features e o app podem usar)
   test/                   # setup do Vitest (MSW, matchMedia) e helpers de render
@@ -69,6 +71,16 @@ Fronteiras (o ESLint barra com `no-restricted-imports`):
 - `common/` e `infrastructure/` não importam `features/` nem `app/`. Quando a infraestrutura precisa de algo de uma feature (ex.: o token da sessão), ela expõe um ponto de registro (`registrarAutenticacao`) e o `main.tsx` liga as duas, como a injeção de dependência do back.
 
 Nomes de arquivo em kebab-case (`categoria-icone.tsx`); componentes e hooks em português quando são do domínio (`CategoriaIcone`, `useCategorias`).
+
+### Mapa (Leaflet)
+
+- A página do mapa usa `isolate`: os z-index do Leaflet (até 1000) ficam presos nela e não cobrem `Dialog`/Drawer, que usam `z-50`. Controles sobre o mapa usam `z-[1000]`.
+- `leaflet.heat` procura `L` no escopo global: importe-o só por `features/incidentes/lib/leaflet-heat.ts`. A camada protege o `_redraw` (o plugin redesenha num `requestAnimationFrame` mesmo depois de removido) e usa `maxZoom: 12` (o plugin corta a intensidade pela metade a cada nível abaixo dele).
+- Marcadores: `L.divIcon` com `renderToStaticMarkup(<MarcadorProblema/>)`, cacheado por (categoria, status, faixa); só estilos inline e tokens CSS (`var(--cat-*)`).
+
+### shadcn
+
+`npx shadcn add <componente>` gera `import { cn } from "cn"` e ícones do lucide: troque por `@/common/lib/utils` e `<Icone>` (Material Symbols), e traduza os textos ("Close" → "Fechar").
 
 ### Tipos gerados
 

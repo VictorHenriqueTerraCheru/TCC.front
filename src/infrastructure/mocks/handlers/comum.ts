@@ -1,0 +1,29 @@
+interface Retangulo {
+  minLat: number
+  minLng: number
+  maxLat: number
+  maxLng: number
+}
+
+/** Lê e valida o retângulo como a API (docs/API.md, GET /problemas). */
+export function retanguloDaUrl(url: URL): Retangulo | null {
+  const [minLat, minLng, maxLat, maxLng] = ['minLat', 'minLng', 'maxLat', 'maxLng'].map((nome) =>
+    Number(url.searchParams.get(nome)),
+  ) as [number, number, number, number]
+  const valido =
+    [minLat, maxLat].every((v) => v >= -90 && v <= 90) &&
+    [minLng, maxLng].every((v) => v >= -180 && v <= 180) &&
+    minLat < maxLat &&
+    minLng < maxLng
+  return valido ? { minLat, minLng, maxLat, maxLng } : null
+}
+
+export function noRetangulo(ponto: { lat: number; lng: number }, r: Retangulo) {
+  return (
+    ponto.lat >= r.minLat && ponto.lat <= r.maxLat && ponto.lng >= r.minLng && ponto.lng <= r.maxLng
+  )
+}
+
+export function lista(url: URL, nome: string): string[] {
+  return (url.searchParams.get(nome) ?? '').split(',').filter(Boolean)
+}
