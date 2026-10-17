@@ -102,7 +102,7 @@ export function FilaVerificacaoPage() {
                   className={cn(
                     '-mb-px flex-1 border-b-2 py-3 text-sm font-medium focus-visible:outline-2',
                     aba === status
-                      ? 'border-primary text-primary'
+                      ? 'border-primario text-primario'
                       : 'border-transparent text-muted-foreground',
                   )}
                 >

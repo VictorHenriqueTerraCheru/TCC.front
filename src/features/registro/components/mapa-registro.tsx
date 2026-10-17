@@ -1,22 +1,15 @@
-import { latLngBounds } from 'leaflet'
-import { useEffect, useRef, useState } from 'react'
-import {
-  Circle,
-  CircleMarker,
-  Marker,
-  Polyline,
-  Tooltip,
-  useMap,
-  useMapEvents,
-} from 'react-leaflet'
+import { Layer, Marker, Source, useMap } from '@vis.gl/react-maplibre'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { BotaoBussola } from '@/common/components/botao-bussola'
 import { Icone } from '@/common/components/icone'
-import { MapaOsm } from '@/common/components/mapa-osm'
-import { CENTRO_PADRAO } from '@/common/lib/mapa'
+import { MapaVetorial } from '@/common/components/mapa-vetorial'
 import { distanciaTexto } from '@/common/lib/formatacao'
+import { circuloGeoJson, linhaGeoJson } from '@/common/lib/geo'
+import { CENTRO_PADRAO } from '@/common/lib/mapa'
 import { aparenciaDoGrupo, grupoDe, iconeDe, type CategoriaResumo } from '@/features/categorias'
 import { useAtivarLocalizacao, useLocalizacao } from '@/features/localizacao'
-import { iconeMarcadorProblema, MarcadorProblema } from '@/features/problemas'
+import { MarcadorProblema } from '@/features/problemas'
 
 import { useRascunhoStore, type Ponto } from '../stores/rascunho-store'
 
@@ -36,28 +29,36 @@ type MapaRegistroProps =
 /** O centro do mapa é o local do rascunho: grava ao parar de mover (e ao abrir). */
 function OuvinteCentro({ aoMover }: { aoMover?(centro: Ponto): void }) {
   const definirLocal = useRascunhoStore((s) => s.definirLocal)
-  const mapa = useMapEvents({
-    move: () => aoMover?.(mapa.getCenter()),
-    moveend: () => {
-      const { lat, lng } = mapa.getCenter()
-      definirLocal({ lat, lng })
-    },
-  })
+  const { current: mapa } = useMap()
   useEffect(() => {
-    const { lat, lng } = mapa.getCenter()
-    definirLocal({ lat, lng })
-  }, [mapa, definirLocal])
+    if (!mapa) return
+    const centro = () => {
+      const { lat, lng } = mapa.getCenter()
+      return { lat, lng }
+    }
+    const mover = () => aoMover?.(centro())
+    const parar = () => definirLocal(centro())
+    parar()
+    mapa.on('move', mover)
+    mapa.on('moveend', parar)
+    return () => {
+      mapa.off('move', mover)
+      mapa.off('moveend', parar)
+    }
+  }, [mapa, aoMover, definirLocal])
   return null
 }
 
 function BotaoGps() {
-  const mapa = useMap()
+  const { current: mapa } = useMap()
   const { posicao } = useLocalizacao()
   const { ativar, dialogo } = useAtivarLocalizacao()
 
   async function centralizar() {
     const destino = posicao ?? (await ativar())
-    if (destino) mapa.flyTo([destino.lat, destino.lng], Math.max(mapa.getZoom(), 17))
+    if (destino && mapa) {
+      mapa.flyTo({ center: [destino.lng, destino.lat], zoom: Math.max(mapa.getZoom(), 16) })
+    }
   }
 
   return (
@@ -66,7 +67,7 @@ function BotaoGps() {
         type="button"
         onClick={() => void centralizar()}
         aria-label="Usar minha localização"
-        className="absolute right-3 bottom-10 z-[1000] flex size-11 items-center justify-center rounded-xl bg-surface-container-high shadow-md focus-visible:outline-2"
+        className="absolute right-3 bottom-10 z-[1000] flex size-11 items-center justify-center rounded-xl bg-superficie-2 shadow-md focus-visible:outline-2"
       >
         <Icone nome="my_location" />
       </button>
@@ -86,36 +87,50 @@ function DicaArrastar({ texto }: { texto: string }) {
 
 function AreaNoCentro({ inicial }: { inicial: Ponto }) {
   const [centro, setCentro] = useState(inicial)
+  const area = useMemo(() => circuloGeoJson(centro, RAIO_AREA_INCIDENTE_M), [centro])
   return (
     <>
       <OuvinteCentro aoMover={setCentro} />
-      <Circle
-        center={centro}
-        radius={RAIO_AREA_INCIDENTE_M}
-        interactive={false}
-        pathOptions={{
-          color: '#171d1a',
-          weight: 1.5,
-          dashArray: '4 5',
-          fillColor: '#e4844c',
-          fillOpacity: 0.28,
-        }}
-      />
-      <CircleMarker
-        center={centro}
-        radius={5}
-        interactive={false}
-        pathOptions={{ color: '#ffffff', weight: 2, fillColor: '#171d1a', fillOpacity: 1 }}
-      />
+      <Source id="registro-area" type="geojson" data={area}>
+        <Layer
+          id="registro-area"
+          type="fill"
+          paint={{ 'fill-color': '#e4844c', 'fill-opacity': 0.28 }}
+        />
+        <Layer
+          id="registro-area-borda"
+          type="line"
+          paint={{ 'line-color': '#eef3fa', 'line-width': 1.5, 'line-dasharray': [2, 2.5] }}
+        />
+      </Source>
+      <Marker latitude={centro.lat} longitude={centro.lng} anchor="center">
+        <PontoCentral cor="var(--background)" tamanho={10} />
+      </Marker>
     </>
   )
 }
 
+function PontoCentral({ cor, tamanho }: { cor: string; tamanho: number }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="block rounded-full border-2 border-white shadow"
+      style={{ width: tamanho, height: tamanho, background: cor }}
+    />
+  )
+}
+
 function EnquadrarConferencia({ novo, existente }: { novo: Ponto; existente: Ponto }) {
-  const mapa = useMap()
+  const { current: mapa } = useMap()
   useEffect(() => {
     // Vizinhos a poucos metros: zoom alto para os dois pinos não se sobreporem.
-    mapa.fitBounds(latLngBounds([novo, existente]), { padding: [90, 90], maxZoom: 19 })
+    mapa?.fitBounds(
+      [
+        [Math.min(novo.lng, existente.lng), Math.min(novo.lat, existente.lat)],
+        [Math.max(novo.lng, existente.lng), Math.max(novo.lat, existente.lat)],
+      ],
+      { padding: 90, maxZoom: 18, duration: 0 },
+    )
   }, [mapa, novo, existente])
   return null
 }
@@ -146,15 +161,21 @@ function useCentroInicial(): CentroInicial {
 function CentrarNaPrimeiraPosicao() {
   const { posicao } = useLocalizacao()
   const resolvidoRef = useRef(false)
-  const mapa = useMapEvents({
-    dragstart: () => {
-      resolvidoRef.current = true
-    },
-  })
+  const { current: mapa } = useMap()
   useEffect(() => {
-    if (resolvidoRef.current || !posicao) return
+    if (!mapa) return
+    const arrastou = () => {
+      resolvidoRef.current = true
+    }
+    mapa.on('dragstart', arrastou)
+    return () => {
+      mapa.off('dragstart', arrastou)
+    }
+  }, [mapa])
+  useEffect(() => {
+    if (resolvidoRef.current || !posicao || !mapa) return
     resolvidoRef.current = true
-    mapa.setView([posicao.lat, posicao.lng], mapa.getZoom())
+    mapa.jumpTo({ center: [posicao.lng, posicao.lat] })
   }, [mapa, posicao])
   return null
 }
@@ -165,62 +186,57 @@ export function MapaRegistro(props: MapaRegistroProps) {
 
   if (props.modo === 'conferencia') {
     const { novo, existente } = props
+    const cor = aparenciaDoGrupo[grupoDe(existente.categoria)].corForte
+    const icone = iconeDe(existente.categoria)
+    const meio = { lat: (novo.lat + existente.lat) / 2, lng: (novo.lng + existente.lng) / 2 }
     return (
-      <MapaOsm
-        centro={[novo.lat, novo.lng]}
-        zoom={18}
-        dragging={false}
-        scrollWheelZoom={false}
-        doubleClickZoom={false}
-        touchZoom={false}
-        keyboard={false}
-      >
+      <MapaVetorial centro={[novo.lat, novo.lng]} zoom={17} interativo={false}>
         <EnquadrarConferencia novo={novo} existente={existente} />
-        <Polyline
-          positions={[novo, existente]}
-          interactive={false}
-          pathOptions={{ color: '#171d1a', weight: 2, dashArray: '4 4' }}
-        >
-          <Tooltip permanent direction="center" className="tooltip-distancia">
+        <Source id="registro-linha" type="geojson" data={linhaGeoJson(novo, existente)}>
+          <Layer
+            id="registro-linha"
+            type="line"
+            paint={{ 'line-color': '#eef3fa', 'line-width': 2, 'line-dasharray': [2, 2] }}
+          />
+        </Source>
+        <Marker latitude={existente.lat} longitude={existente.lng} anchor="bottom">
+          <MarcadorProblema cor={cor} icone={icone} status="ativa" faixa="alta" />
+        </Marker>
+        <Marker latitude={novo.lat} longitude={novo.lng} anchor="bottom">
+          <MarcadorProblema cor={cor} icone={icone} status="ativa" faixa="alta" selecionado />
+        </Marker>
+        <Marker latitude={meio.lat} longitude={meio.lng} anchor="center">
+          {/* Etiqueta "30 m" sobre a linha da conferência (tela 7), por cima dos pinos. */}
+          <span className="rounded-md bg-foreground px-1.5 py-0.5 text-[11px] font-medium text-background">
             {distanciaTexto(existente.distanciaMetros)}
-          </Tooltip>
-        </Polyline>
-        <Marker
-          position={existente}
-          icon={iconeMarcadorProblema(existente.categoria, 'ativa', 'alta')}
-          interactive={false}
-        />
-        <Marker
-          position={novo}
-          icon={iconeMarcadorProblema(existente.categoria, 'ativa', 'alta', true)}
-          interactive={false}
-        />
-      </MapaOsm>
+          </span>
+        </Marker>
+      </MapaVetorial>
     )
   }
 
   if (props.modo === 'estatico') {
+    const ponto = local ?? { lat: centro[0], lng: centro[1] }
     return (
-      <MapaOsm centro={local ? [local.lat, local.lng] : centro}>
+      <MapaVetorial centro={[ponto.lat, ponto.lng]} interativo={false}>
         {local && (
-          <CircleMarker
-            center={local}
-            radius={7}
-            pathOptions={{ color: '#ffffff', weight: 3, fillColor: '#046d4e', fillOpacity: 1 }}
-          />
+          <Marker latitude={local.lat} longitude={local.lng} anchor="center">
+            <PontoCentral cor="var(--primario)" tamanho={14} />
+          </Marker>
         )}
-      </MapaOsm>
+      </MapaVetorial>
     )
   }
 
   if (props.modo === 'area') {
     return (
       <>
-        <MapaOsm centro={centro} zoom={16}>
+        <MapaVetorial centro={centro} zoom={15}>
           <AreaNoCentro inicial={{ lat: centro[0], lng: centro[1] }} />
           {provisorio && <CentrarNaPrimeiraPosicao />}
           <BotaoGps />
-        </MapaOsm>
+          <BotaoBussola className="right-3 bottom-[92px]" />
+        </MapaVetorial>
         <DicaArrastar texto="Arraste o mapa para ajustar a área" />
       </>
     )
@@ -229,11 +245,12 @@ export function MapaRegistro(props: MapaRegistroProps) {
   const categoria = props.categoria
   return (
     <>
-      <MapaOsm centro={centro} zoom={17}>
+      <MapaVetorial centro={centro} zoom={16}>
         <OuvinteCentro />
         {provisorio && <CentrarNaPrimeiraPosicao />}
         <BotaoGps />
-      </MapaOsm>
+        <BotaoBussola className="right-3 bottom-[92px]" />
+      </MapaVetorial>
       <DicaArrastar texto="Arraste o mapa para ajustar" />
       {/* Pino fixo no centro: quem se move é o mapa. A ponta do pino marca o ponto. */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 z-[1000] -translate-x-1/2 -translate-y-full">

@@ -103,7 +103,7 @@ export function CartaoAvaliarNova({ problema }: CartaoProps) {
   const pergunta = `Viu este ${substantivo[problema.categoria.icone] ?? 'problema'}?`
 
   return (
-    <section className="rounded-2xl bg-info p-4 text-info-foreground">
+    <section className="rounded-2xl bg-primario-suave p-4 text-primario">
       <div className="mb-1 flex items-start gap-3">
         <Icone nome="near_me" preenchido className="mt-0.5 text-[20px]" />
         <div>
@@ -127,7 +127,7 @@ export function CartaoAvaliarNova({ problema }: CartaoProps) {
         </BotaoVoto>
         <BotaoVoto
           variante="outline"
-          className="border-info-foreground/40 text-info-foreground"
+          className="border-primario/40 text-primario"
           selecionado={meus.existencia === 'naoVi'}
           disabled={problema.souAutor || votando}
           onClick={() => votarExistencia('naoVi')}
@@ -147,7 +147,7 @@ export function CartaoAindaEstaLa({ problema }: CartaoProps) {
   const { continua, resolvido, resolvidoUltimas24h } = problema.persistencia
 
   return (
-    <section className="rounded-2xl bg-info p-4 text-info-foreground">
+    <section className="rounded-2xl bg-primario-suave p-4 text-primario">
       <h3 className="mb-2 text-2xl">Ainda está lá?</h3>
       <p className="text-sm">
         {resolvidoUltimas24h === 1
@@ -169,7 +169,7 @@ export function CartaoAindaEstaLa({ problema }: CartaoProps) {
           Sim, continua
         </BotaoVoto>
         <BotaoVoto
-          className="flex-1 border-info-foreground/40 text-info-foreground"
+          className="flex-1 border-primario/40 text-primario"
           variante="outline"
           selecionado={meus.persistencia === 'resolvido'}
           disabled={votando}

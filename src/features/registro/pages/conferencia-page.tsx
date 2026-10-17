@@ -38,7 +38,7 @@ function CartaoDuplicata({
       disabled={!aoEscolher}
       className={cn(
         'flex w-full gap-3 rounded-2xl border bg-card p-3 text-left disabled:opacity-100',
-        selecionada ? 'border-primary' : 'border-border/60',
+        selecionada ? 'border-primario' : 'border-border/60',
       )}
     >
       <CategoriaIcone categoria={duplicata.categoria} tamanho="sm" />
@@ -47,7 +47,7 @@ function CartaoDuplicata({
         <p className="text-xs text-muted-foreground">
           {duplicata.endereco} · {tempoRelativo(duplicata.criadoEm)}
         </p>
-        <p className="mt-1 flex items-center gap-1 text-xs font-medium text-primary">
+        <p className="mt-1 flex items-center gap-1 text-xs font-medium text-primario">
           <Icone
             nome={duplicata.faixa ? 'check_circle' : 'hourglass_top'}
             preenchido
@@ -125,7 +125,7 @@ export function ConferenciaPage() {
         <Skeleton className="h-40 rounded-2xl bg-muted" />
       ) : (
         <div className="space-y-3">
-          <span className="flex size-10 items-center justify-center rounded-full bg-info text-info-foreground">
+          <span className="flex size-10 items-center justify-center rounded-full bg-primario-suave text-primario">
             <Icone nome="content_copy" className="text-[20px]" />
           </span>
           <h2 className="text-[22px] leading-7">

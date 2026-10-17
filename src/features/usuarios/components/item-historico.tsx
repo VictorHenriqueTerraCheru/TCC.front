@@ -10,13 +10,13 @@ import { tituloItem, type ItemHistorico } from '../models/historico'
 const chips: Partial<
   Record<NonNullable<ItemHistorico['statusProblema']>, { rotulo: string; classe: string }>
 > = {
-  nova: { rotulo: 'Nova', classe: 'bg-info text-info-foreground' },
+  nova: { rotulo: 'Nova', classe: 'bg-primario-suave text-primario' },
   ativa: { rotulo: 'Ativa', classe: 'bg-muted text-foreground' },
   possivelmenteResolvida: {
     rotulo: 'Possivelmente resolvida',
-    classe: 'bg-info text-info-foreground',
+    classe: 'bg-primario-suave text-primario',
   },
-  resolvida: { rotulo: 'Resolvida', classe: 'bg-mint text-mint-foreground' },
+  resolvida: { rotulo: 'Resolvida', classe: 'bg-primario-suave text-primario' },
 }
 
 function IconeItem({ item }: { item: ItemHistorico }) {
@@ -60,10 +60,7 @@ export function ItemHistoricoLinha({ item, quando }: { item: ItemHistorico; quan
   return item.ocorrenciaId ? (
     <Link
       to={`/mapa/problema/${item.ocorrenciaId}`}
-      className={cn(
-        classe,
-        '-mx-2 rounded-xl px-2 hover:bg-surface-container focus-visible:outline-2',
-      )}
+      className={cn(classe, '-mx-2 rounded-xl px-2 hover:bg-card focus-visible:outline-2')}
     >
       {conteudo}
     </Link>

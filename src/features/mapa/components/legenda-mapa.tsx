@@ -2,28 +2,45 @@ import type { ReactNode } from 'react'
 
 import { Icone } from '@/common/components/icone'
 import { gradienteCalorCss } from '@/features/incidentes'
-import { PINO } from '@/features/problemas'
+import { dimensoesMarcador, MarcadorProblema } from '@/features/problemas'
 
 import type { ModoMapa } from '../models/filtros'
 
-function Pino({ tracejado = false, className }: { tracejado?: boolean; className?: string }) {
+/** Balão em miniatura (o mesmo do mapa) para os itens da legenda. */
+function Balao({
+  status = 'ativa',
+  faixa = 'alta',
+  escala = 0.72,
+}: {
+  status?: 'ativa' | 'possivelmenteResolvida'
+  faixa?: 'alta' | 'baixa'
+  escala?: number
+}) {
+  const { largura, altura } = dimensoesMarcador(status, faixa)
   return (
-    <svg viewBox="0 0 40 50" className={className} aria-hidden="true">
-      <path
-        d={PINO}
-        fill={tracejado ? '#fff' : 'var(--cat-via-publica)'}
-        stroke={tracejado ? 'var(--cat-via-publica)' : 'none'}
-        strokeWidth={3}
-        strokeDasharray={tracejado ? '5 4' : undefined}
-      />
-    </svg>
+    <span
+      className="pointer-events-none block"
+      style={{ width: largura * escala, height: altura * escala }}
+    >
+      <span
+        className="block origin-top-left [&_.pulso-alerta]:hidden"
+        style={{ transform: `scale(${escala})` }}
+      >
+        <MarcadorProblema
+          cor="var(--cat-via-publica)"
+          icone="edit_road"
+          status={status}
+          faixa={faixa}
+        />
+      </span>
+    </span>
   )
 }
 
 function Item({ simbolo, titulo, texto }: { simbolo: ReactNode; titulo: string; texto?: string }) {
   return (
     <li className="flex gap-2.5">
-      <span className="flex w-5 shrink-0 items-start justify-center pt-0.5">{simbolo}</span>
+      <span className="flex w-7 shrink-0 items-start justify-center pt-0.5">{simbolo}</span>
       <span>
         <span className="block text-[13px] font-medium">{titulo}</span>
         {texto && <span className="block text-xs text-muted-foreground">{texto}</span>}
@@ -42,7 +59,7 @@ export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): vo
   return (
     <section
       aria-label={titulo}
-      className="pointer-events-auto w-60 rounded-2xl bg-surface-container-high p-4 shadow-lg"
+      className="pointer-events-auto w-60 rounded-[22px] p-4 shadow-lg vidro"
     >
       <header className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-medium">{titulo}</h2>
@@ -59,7 +76,7 @@ export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): vo
         <ul className="space-y-3">
           {modo === 'ambos' && (
             <Item
-              simbolo={<Pino className="h-5" />}
+              simbolo={<Balao />}
               titulo="Problema · marcador"
               texto="Fica no mapa até ser resolvido"
             />
@@ -80,8 +97,8 @@ export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): vo
             <Item
               simbolo={
                 <span className="flex items-end gap-0.5">
-                  <Pino className="h-3 opacity-50" />
-                  <Pino className="h-5" />
+                  <Balao faixa="baixa" escala={0.5} />
+                  <Balao faixa="alta" escala={0.55} />
                 </span>
               }
               titulo="Maior e mais cheio = mais confiável"
@@ -90,8 +107,11 @@ export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): vo
         </ul>
       ) : (
         <ul className="space-y-3">
-          <Item simbolo={<Pino className="h-5" />} titulo="Ativa" />
-          <Item simbolo={<Pino tracejado className="h-5" />} titulo="Possivelmente resolvida" />
+          <Item simbolo={<Balao />} titulo="Ativa" />
+          <Item
+            simbolo={<Balao status="possivelmenteResolvida" />}
+            titulo="Possivelmente resolvida"
+          />
           <Item
             simbolo={<Icone nome="history" className="text-[18px] text-muted-foreground" />}
             titulo="Resolvidas saem do mapa e ficam só no histórico"

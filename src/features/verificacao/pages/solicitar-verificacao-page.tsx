@@ -51,7 +51,7 @@ export function SolicitarVerificacaoPage() {
             {recusa && (
               <div
                 role="status"
-                className="mb-4 flex gap-3 rounded-2xl bg-error-container p-4 text-error-container-foreground"
+                className="mb-4 flex gap-3 rounded-2xl bg-destructive/15 p-4 text-destructive"
               >
                 <Icone nome="cancel" preenchido className="text-[22px] text-destructive" />
                 <div className="text-sm">
@@ -68,7 +68,7 @@ export function SolicitarVerificacaoPage() {
             </p>
 
             {pendente ? (
-              <p className="rounded-2xl bg-surface-container p-4 text-sm">
+              <p className="rounded-2xl bg-card p-4 text-sm">
                 Você já tem um pedido em análise. Assim que a moderação responder, o resultado
                 aparece no seu perfil.
               </p>

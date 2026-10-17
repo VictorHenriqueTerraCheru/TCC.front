@@ -36,7 +36,7 @@ function Cartao({ item }: { item: ItemRecente }) {
   return (
     <Link
       to={`/mapa/problema/${item.id}`}
-      className="flex gap-3 rounded-2xl border border-border/60 bg-card p-3 hover:bg-surface-container focus-visible:outline-2"
+      className="flex gap-3 rounded-[20px] border border-border bg-card p-3 hover:bg-superficie-2 focus-visible:outline-2"
     >
       <CategoriaIcone categoria={item.categoria} />
       <div className="min-w-0 flex-1">
@@ -49,7 +49,7 @@ function Cartao({ item }: { item: ItemRecente }) {
           )}
           {item.faixa && (
             <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-              <Icone nome={faixa[item.faixa].icone} className="text-[16px] text-primary" />
+              <Icone nome={faixa[item.faixa].icone} className="text-[16px] text-primario" />
               {faixa[item.faixa].rotulo}
             </span>
           )}
@@ -63,7 +63,7 @@ function Cartao({ item }: { item: ItemRecente }) {
           <span
             className={cn(
               'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-medium',
-              possivel ? 'bg-info text-info-foreground' : 'bg-muted',
+              possivel ? 'bg-primario-suave text-primario' : 'bg-muted',
             )}
           >
             <Icone

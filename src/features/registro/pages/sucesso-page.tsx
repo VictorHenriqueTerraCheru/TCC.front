@@ -25,7 +25,7 @@ export function TelaSucesso({ titulo, texto, cartao, verNoMapa }: TelaSucessoPro
 
   return (
     <div className="mx-auto flex h-full max-w-md flex-col px-6 pt-20 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:pt-16">
-      <span className="mb-8 flex size-16 items-center justify-center rounded-full bg-mint text-mint-foreground">
+      <span className="mb-8 flex size-16 items-center justify-center rounded-full bg-primario-suave text-primario">
         <Icone nome="check_circle" preenchido className="text-[32px]" />
       </span>
       <h1 className="mb-4 text-[28px] leading-9">{titulo}</h1>

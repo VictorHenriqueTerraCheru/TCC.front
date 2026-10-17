@@ -25,8 +25,8 @@ import { useMe } from '@/features/usuarios'
 import { EditarNomeDialog } from '../components/editar-nome-dialog'
 
 const permissao: Record<EstadoLocalizacao, { rotulo: string; classe: string }> = {
-  granted: { rotulo: 'Permitida', classe: 'bg-mint text-mint-foreground' },
-  denied: { rotulo: 'Negada', classe: 'bg-error-container text-error-container-foreground' },
+  granted: { rotulo: 'Permitida', classe: 'bg-primario-suave text-primario' },
+  denied: { rotulo: 'Negada', classe: 'bg-destructive/15 text-destructive' },
   prompt: { rotulo: 'Não definida', classe: 'bg-muted text-foreground' },
   verificando: { rotulo: 'Verificando', classe: 'bg-muted text-foreground' },
   indisponivel: { rotulo: 'Indisponível', classe: 'bg-muted text-foreground' },
@@ -34,9 +34,14 @@ const permissao: Record<EstadoLocalizacao, { rotulo: string; classe: string }> =
 
 function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
-    <section className="border-b border-border py-3 last:border-b-0">
-      <h2 className="px-1 pb-1 text-sm font-medium text-primary">{titulo}</h2>
-      {children}
+    // Grupo em cartão, como nos Ajustes do iOS.
+    <section className="py-2">
+      <h2 className="px-4 pb-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+        {titulo}
+      </h2>
+      <div className="divide-y divide-border overflow-hidden rounded-[20px] bg-card">
+        {children}
+      </div>
     </section>
   )
 }
@@ -56,7 +61,7 @@ function Linha({
 }) {
   const conteudo = (
     <>
-      <Icone nome={icone} className="text-muted-foreground" />
+      <Icone nome={icone} className="text-primario" />
       <span className="min-w-0 flex-1 text-left">
         <span className="block">{titulo}</span>
         {subtitulo && (
@@ -66,7 +71,7 @@ function Linha({
       {aoClicar && seta && <Icone nome="chevron_right" className="text-muted-foreground" />}
     </>
   )
-  const classe = 'flex w-full items-center gap-4 rounded-xl px-1 py-3'
+  const classe = 'flex w-full items-center gap-4 px-4 py-3'
   return aoClicar ? (
     <button
       type="button"
@@ -117,8 +122,8 @@ export function ConfiguracoesPage() {
         </Secao>
 
         <Secao titulo="Localização">
-          <div className="flex gap-4 px-1 py-3">
-            <Icone nome="my_location" className="text-muted-foreground" />
+          <div className="flex gap-4 px-4 py-3">
+            <Icone nome="my_location" className="text-primario" />
             <div className="flex-1">
               <div className="flex items-center justify-between gap-2">
                 <span>Permissão de localização</span>

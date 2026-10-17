@@ -1,8 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import '@fontsource/roboto/400.css';
-@import '@fontsource/roboto/500.css';
-@import '@fontsource/roboto/700.css';
+@import '@fontsource-variable/inter';
 /*
  * Ícones: subset só com os usados no app (npm run gen:icones).
  * Em layer: sem isso o font-size: 24px do pacote vence os utilitários text-[..] do Tailwind.
@@ -10,72 +8,65 @@
 @import './assets/material-symbols/rounded.css' layer(base);
 
 /*
- * Tokens amostrados nos prints de docs/design (Material 3 do protótipo).
- * Nomes do shadcn (background, primary…) + tokens próprios do domínio (categorias, selos).
- * O protótipo só tem tema claro.
+ * Tema escuro único (docs/superpowers/specs/2026-10-17-redesign-mapa-vetorial-design.md).
+ * Nomes do shadcn (background, primary…) + tokens próprios: azul em dois tons (o cheio passa no
+ * contraste AA com texto branco), vidro sobre o mapa, superfícies e categorias.
  */
 :root {
+  color-scheme: dark;
   --radius: 1rem;
 
-  --background: #f4fbf7;
-  --foreground: #171d1a;
-  --card: #f4fbf7;
-  --card-foreground: #171d1a;
-  --popover: #f4fbf7;
-  --popover-foreground: #171d1a;
+  --background: #121a24;
+  --foreground: #eef3fa;
+  --card: #1a2431;
+  --card-foreground: #eef3fa;
+  --popover: #1a2431;
+  --popover-foreground: #eef3fa;
 
-  --primary: #046d4e;
+  /* Azul: --primario em texto/ícones sobre o escuro; --primario-cheio no fundo de botões. */
+  --primario: #3b9eff;
+  --primario-cheio: #1f74db;
+  --primario-suave: rgba(59, 158, 255, 0.18);
+  --primary: #1f74db;
   --primary-foreground: #ffffff;
-  --secondary: #cee8d9;
-  --secondary-foreground: #0a2018;
-  --muted: #dee5e1;
-  --muted-foreground: #404944;
-  --accent: #cee8d9;
-  --accent-foreground: #0a2018;
-  --destructive: #ba1a1a;
-  --destructive-foreground: #ffffff;
-  --border: #bfc9c3;
-  --input: #707973;
-  --ring: #046d4e;
+  --muted: #223041;
+  --muted-foreground: #9fb0c3;
+  --accent: #1e3550;
+  --accent-foreground: #cfe3ff;
+  --destructive: #ff5a52;
+  --destructive-foreground: #2a0a08;
+  --border: rgba(160, 190, 230, 0.14);
+  --input: #33445a;
+  --ring: #3b9eff;
 
-  /* Superfícies M3: folhas, barra inferior, cartões. */
-  --surface-container: #e9f0ec;
-  --surface-container-high: #e3eae6;
-  --nav-indicator: #bdd5ca;
-
-  /* FAB "Registrar", ícones de sucesso, "Perfil verificado". */
-  --mint: #8ff6c5;
-  --mint-foreground: #002114;
+  /* Superfícies sólidas (telas sem mapa) e vidro (só sobre o mapa). */
+  --superficie-1: #1a2431;
+  --superficie-2: #223041;
+  --vidro: rgba(26, 34, 46, 0.62);
+  --vidro-borda: rgba(160, 190, 230, 0.12);
 
   /* Selo "Nova" e barra "Em avaliação". */
-  --nova: #3c647c;
+  --nova: #1f74db;
   --nova-foreground: #ffffff;
 
-  /* Cartão "Ainda está lá?" e chip "Possivelmente resolvida". */
-  --info: #c4ecfc;
-  --info-foreground: #062230;
+  /* Calor dos incidentes (amostra da legenda). */
+  --calor: #ff3b30;
 
-  --error-container: #ffdad6;
-  --error-container-foreground: #410002;
-
-  /* Calor dos incidentes. */
-  --calor: #e4844c;
-
-  /* Categorias: forte (pino/ícone) e clara (fundo do ícone circular). */
-  --cat-via-publica: #b45c04;
-  --cat-via-publica-claro: #fcdcc4;
-  --cat-eletrica: #8c6c04;
-  --cat-eletrica-claro: #fde08c;
-  --cat-limpeza: #7c4c2c;
-  --cat-limpeza-claro: #f6dccb;
-  --cat-seguranca: #b3261e;
-  --cat-seguranca-claro: #f9dedc;
-  --cat-transito: #c4501c;
-  --cat-transito-claro: #ffdbcc;
+  /* Categorias: forte (balão/ícone) e clara (fundo translúcido do ícone). */
+  --cat-via-publica: #ff7a1a;
+  --cat-via-publica-claro: rgba(255, 122, 26, 0.18);
+  --cat-eletrica: #f5b800;
+  --cat-eletrica-claro: rgba(245, 184, 0, 0.18);
+  --cat-limpeza: #c08552;
+  --cat-limpeza-claro: rgba(192, 133, 82, 0.2);
+  --cat-seguranca: #ff3b30;
+  --cat-seguranca-claro: rgba(255, 59, 48, 0.18);
+  --cat-transito: #ff5e3a;
+  --cat-transito-claro: rgba(255, 94, 58, 0.18);
 }
 
 @theme inline {
-  --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 8px);
   --radius-md: calc(var(--radius) - 4px);
@@ -91,8 +82,6 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -103,17 +92,16 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --color-surface-container: var(--surface-container);
-  --color-surface-container-high: var(--surface-container-high);
-  --color-nav-indicator: var(--nav-indicator);
-  --color-mint: var(--mint);
-  --color-mint-foreground: var(--mint-foreground);
+  --color-primario: var(--primario);
+  --color-primario-cheio: var(--primario-cheio);
+  --color-primario-suave: var(--primario-suave);
+  --color-superficie-1: var(--superficie-1);
+  --color-superficie-2: var(--superficie-2);
+  --color-vidro: var(--vidro);
+  --color-vidro-borda: var(--vidro-borda);
+
   --color-nova: var(--nova);
   --color-nova-foreground: var(--nova-foreground);
-  --color-info: var(--info);
-  --color-info-foreground: var(--info-foreground);
-  --color-error-container: var(--error-container);
-  --color-error-container-foreground: var(--error-container-foreground);
   --color-calor: var(--calor);
 
   --color-cat-via-publica: var(--cat-via-publica);
@@ -128,6 +116,70 @@
   --color-cat-transito-claro: var(--cat-transito-claro);
 }
 
+/* Vidro escuro azulado sobre o mapa (seletor, chips, botões, barra de abas, painel). */
+@utility vidro {
+  background: var(--vidro);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--vidro-borda);
+}
+
+/* Controles nativos do MapLibre (zoom, atribuição) no vidro escuro. */
+.maplibregl-ctrl-group,
+.maplibregl-ctrl-attrib {
+  background: var(--vidro) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--vidro-borda);
+  color: var(--muted-foreground);
+}
+.maplibregl-ctrl-group {
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-group button + button {
+  border-top-color: var(--vidro-borda) !important;
+}
+.maplibregl-ctrl-icon,
+.maplibregl-ctrl-attrib-button {
+  filter: invert(1) brightness(1.4);
+}
+.maplibregl-ctrl-attrib-inner,
+.maplibregl-ctrl-attrib-inner * {
+  color: var(--muted-foreground) !important;
+}
+.maplibregl-ctrl-attrib-inner a {
+  color: var(--foreground) !important;
+}
+
+/* Celular: o ⓘ da atribuição fica acima da barra de abas flutuante. */
+@media (max-width: 1023px) {
+  .mapa-principal .maplibregl-ctrl-bottom-right {
+    bottom: 76px;
+  }
+}
+
+/* Pulso dos alertas de confiança alta (balão estilo Waze). */
+@keyframes pulso-alerta {
+  from {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+.pulso-alerta {
+  border-radius: 50%;
+  animation: pulso-alerta 1.8s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulso-alerta {
+    display: none;
+    animation: none;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -139,34 +191,5 @@
   }
   body {
     @apply bg-background font-sans text-foreground antialiased;
-  }
-}
-
-/* Mapa (Leaflet) */
-@layer components {
-  .leaflet-container {
-    @apply bg-muted font-sans;
-  }
-  /* Tiles do OSM em tons de cinza, como o mapa do protótipo; marcadores e calor mantêm a cor. */
-  .mapa-tiles {
-    filter: grayscale(1) contrast(0.85) brightness(1.08);
-  }
-  /* divIcon sem a caixa branca padrão do Leaflet. */
-  .marcador-problema-icone {
-    background: none;
-    border: none;
-  }
-  .leaflet-control-attribution {
-    @apply rounded-tl-md text-[10px];
-  }
-}
-
-@layer components {
-  /* Etiqueta "30 m" sobre a linha da conferência (tela 7). */
-  .tooltip-distancia {
-    @apply rounded-md border-none bg-foreground px-1.5 py-0.5 text-[11px] font-medium text-background shadow-none;
-  }
-  .tooltip-distancia::before {
-    display: none;
   }
 }

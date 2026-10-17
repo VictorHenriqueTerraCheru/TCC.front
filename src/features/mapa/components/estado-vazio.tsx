@@ -1,14 +1,28 @@
 import { Icone } from '@/common/components/icone'
 import { Button } from '@/common/ui/button'
 
+interface EstadoVazioProps {
+  aoVerAreaMaior(): void
+  /** X do card: fecha de vez (a página guarda a escolha). */
+  aoFechar(): void
+}
+
 /** Tela 25: nada na área visível. */
-export function EstadoVazio({ aoVerAreaMaior }: { aoVerAreaMaior(): void }) {
+export function EstadoVazio({ aoVerAreaMaior, aoFechar }: EstadoVazioProps) {
   return (
     <div
       role="status"
-      className="pointer-events-auto mx-auto w-full max-w-sm rounded-[28px] bg-surface-container-high p-6 text-center shadow-lg"
+      className="pointer-events-auto relative mx-auto w-full max-w-sm rounded-[28px] p-6 text-center shadow-lg vidro"
     >
-      <span className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
+      <button
+        type="button"
+        onClick={aoFechar}
+        aria-label="Fechar aviso"
+        className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-2"
+      >
+        <Icone nome="close" className="text-[20px]" />
+      </button>
+      <span className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-primario-suave text-primario">
         <Icone nome="travel_explore" />
       </span>
       <h2 className="mb-1 font-medium">Nenhuma ocorrência nesta área</h2>

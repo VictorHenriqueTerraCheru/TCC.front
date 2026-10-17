@@ -24,7 +24,7 @@ export function TelaComVoltar({ titulo, aoVoltar, children }: TelaComVoltarProps
         >
           <Icone nome="arrow_back" />
         </button>
-        <h1 className="text-[22px] leading-7">{titulo}</h1>
+        <h1 className="text-[20px] leading-7 font-semibold">{titulo}</h1>
       </header>
       <div className="flex flex-1 flex-col px-4 pb-6">{children}</div>
     </div>

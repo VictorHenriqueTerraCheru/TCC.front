@@ -5,9 +5,9 @@ export { useVotarExistencia, useVotarPersistencia } from './api/use-votar'
 export type { FiltroProblemasNaArea } from './api/use-problemas-na-area'
 export { CamadaProblemas } from './components/camada-problemas'
 export { DetalheProblema } from './components/detalhe/detalhe-problema'
+export { ALTURA_RESUMO } from './components/detalhe/resumo-alerta'
 export { MarcadorProblema } from './components/marcador-problema'
-export { iconeMarcadorProblema } from './lib/icone-marcador'
-export { PINO } from './models/marcador'
+export { dimensoesMarcador } from './models/marcador'
 export type {
   DetalheProblema as DetalheProblemaDados,
   FaixaConfianca,

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useOutletContext, useParams } from 'react-router'
 
 import { PainelResponsivo } from '@/common/components/painel-responsivo'
-import { DetalheProblema, useDetalheProblema } from '@/features/problemas'
+import { ALTURA_RESUMO, DetalheProblema, useDetalheProblema } from '@/features/problemas'
 
 import { useNavegacaoMapa } from '../hooks/use-navegacao-mapa'
 import type { ContextoMapa } from '../models/contexto'
@@ -21,7 +21,7 @@ export function DetalheProblemaPage() {
   }, [id, lat, lng, focar])
 
   return (
-    <PainelResponsivo titulo="Detalhe do problema" aoFechar={fechar}>
+    <PainelResponsivo titulo="Detalhe do problema" aoFechar={fechar} alturaResumo={ALTURA_RESUMO}>
       <DetalheProblema id={id} />
     </PainelResponsivo>
   )

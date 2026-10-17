@@ -16,6 +16,9 @@ function useCoordenadasDoVoto() {
       : { lat: null, lng: null }
 }
 
+/** Todas as mutações de voto de um problema: o card rápido e o detalhe compartilham o bloqueio. */
+export const chaveVotos = (id: string) => ['votos', id] as const
+
 function useMutacaoVoto<Valor>(
   id: string,
   enviar: (valor: Valor) => Promise<DetalheProblema>,
@@ -25,6 +28,7 @@ function useMutacaoVoto<Valor>(
   const { queryKey } = detalheProblemaQuery(id)
 
   return useMutation({
+    mutationKey: chaveVotos(id),
     mutationFn: enviar,
     onMutate: async (valor) => {
       await queryClient.cancelQueries({ queryKey })

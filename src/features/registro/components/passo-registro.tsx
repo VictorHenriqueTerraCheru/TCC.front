@@ -43,7 +43,7 @@ function Cabecalho({
           aria-valuemax={passo.total}
           aria-valuenow={passo.atual}
           aria-label={`Passo ${passo.atual} de ${passo.total}`}
-          className="h-1 overflow-hidden rounded-full bg-secondary"
+          className="h-1 overflow-hidden rounded-full bg-primario-suave"
         >
           <div
             className="h-full rounded-full bg-primary"
@@ -68,7 +68,7 @@ export function PassoRegistro({ mapa, rodape, children, ...cabecalho }: PassoReg
   if (desktop) {
     return (
       <div className="grid h-full grid-cols-[420px_1fr]">
-        <section className="flex min-h-0 flex-col bg-surface-container shadow-xl">
+        <section className="flex min-h-0 flex-col bg-card shadow-xl">
           <Cabecalho {...cabecalho} />
           <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">{children}</div>
           <div className="p-4">{rodape}</div>
@@ -83,7 +83,7 @@ export function PassoRegistro({ mapa, rodape, children, ...cabecalho }: PassoReg
       <div className="flex h-full flex-col">
         <Cabecalho {...cabecalho} />
         <div className="relative isolate min-h-0 flex-1">{mapa}</div>
-        <section className="relative z-10 -mt-6 shrink-0 rounded-t-[28px] bg-surface-container px-4 pt-5 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-2px_12px_rgb(0_0_0/0.12)]">
+        <section className="relative z-10 -mt-6 shrink-0 rounded-t-[28px] bg-card px-4 pt-5 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-2px_12px_rgb(0_0_0/0.12)]">
           {children}
           <div className="mt-4">{rodape}</div>
         </section>

@@ -1,3 +1,4 @@
+import { useIsMutating } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
 import {
@@ -8,7 +9,7 @@ import {
 } from '@/features/auth'
 import { isApiError } from '@/infrastructure/api'
 
-import { useVotarExistencia, useVotarPersistencia } from '../api/use-votar'
+import { chaveVotos, useVotarExistencia, useVotarPersistencia } from '../api/use-votar'
 import type { DetalheProblema, ValorExistencia, ValorPersistencia } from '../models/problema'
 
 /**
@@ -22,6 +23,7 @@ export function useVotos(problema: DetalheProblema) {
   const autenticado = useAutenticado()
   const existencia = useVotarExistencia(problema.id)
   const persistencia = useVotarPersistencia(problema.id)
+  const votosEmAndamento = useIsMutating({ mutationKey: chaveVotos(problema.id) })
 
   function comGuarda(
     pendente: AcaoPendente,
@@ -46,8 +48,9 @@ export function useVotos(problema: DetalheProblema) {
     existencia,
     persistencia,
     // Um voto por vez: cada resposta substitui o detalhe inteiro no cache, e a resposta mais
-    // antiga chegando por último apagaria o outro voto da tela.
-    votando: existencia.isPending || persistencia.isPending,
+    // antiga chegando por último apagaria o outro voto da tela. Conta as mutações de todas as
+    // instâncias (card rápido e detalhe usam useVotos separados).
+    votando: votosEmAndamento > 0,
     meus: problema.meusVotos ?? { existencia: null, persistencia: null },
     votarExistencia: (valor: ValorExistencia) =>
       comGuarda({ tipo: 'votarExistencia', problemaId: problema.id, valor }, (opcoes) =>

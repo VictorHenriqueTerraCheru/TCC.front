@@ -60,7 +60,7 @@ export function RevisaoProblemaPage() {
               onChange={(e) => definirDescricao(e.target.value)}
               rows={4}
               aria-describedby={`${idDescricao}-ajuda`}
-              className="w-full resize-none rounded-md border border-input bg-background px-4 py-4 text-base outline-none focus:border-2 focus:border-primary focus:px-[15px]"
+              className="w-full resize-none rounded-md border border-input bg-background px-4 py-4 text-base outline-none focus:border-2 focus:border-primario focus:px-[15px]"
             />
             <label
               htmlFor={idDescricao}

@@ -1,4 +1,3 @@
-import { Icone } from '@/common/components/icone'
 import { cn } from '@/common/lib/utils'
 
 interface SegmentadoProps<T extends string> {
@@ -9,7 +8,7 @@ interface SegmentadoProps<T extends string> {
   className?: string
 }
 
-/** Botões segmentados do Material 3 (seletor de modo do mapa, abas do histórico). */
+/** Controle segmentado de vidro (seletor de modo do mapa, abas do histórico). */
 export function Segmentado<T extends string>({
   rotulo,
   opcoes,
@@ -21,13 +20,10 @@ export function Segmentado<T extends string>({
     <div
       role="radiogroup"
       aria-label={rotulo}
-      className={cn(
-        'grid h-10 overflow-hidden rounded-full border border-input bg-background',
-        className,
-      )}
+      className={cn('grid h-10 gap-[3px] rounded-[14px] p-[3px] vidro', className)}
       style={{ gridTemplateColumns: `repeat(${opcoes.length}, minmax(0, 1fr))` }}
     >
-      {opcoes.map((opcao, i) => {
+      {opcoes.map((opcao) => {
         const selecionado = opcao.valor === valor
         return (
           <button
@@ -37,12 +33,12 @@ export function Segmentado<T extends string>({
             aria-checked={selecionado}
             onClick={() => aoMudar(opcao.valor)}
             className={cn(
-              'flex items-center justify-center gap-1.5 text-sm font-medium transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2',
-              i > 0 && 'border-l border-input',
-              selecionado ? 'bg-secondary text-secondary-foreground' : 'hover:bg-foreground/5',
+              'flex items-center justify-center rounded-[11px] text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2',
+              selecionado
+                ? 'bg-primario-suave text-primario'
+                : 'text-muted-foreground hover:bg-foreground/5',
             )}
           >
-            {selecionado && <Icone nome="check" className="text-[18px]" />}
             {opcao.rotulo}
           </button>
         )

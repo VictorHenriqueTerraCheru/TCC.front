@@ -53,7 +53,7 @@ function Totais({ me }: { me: Me }) {
         ['Registros', me.totalRegistros],
         ['Votos', me.totalVotos],
       ].map(([rotulo, valor]) => (
-        <div key={rotulo} className="rounded-2xl border border-border/60 bg-card p-4">
+        <div key={rotulo} className="rounded-[20px] border border-border bg-card p-4">
           <p className="text-xs text-muted-foreground">{rotulo}</p>
           <p className="text-3xl">{valor}</p>
         </div>
@@ -137,9 +137,9 @@ export function PerfilPage() {
           {me.perfil === 'administrador' && (
             <Link
               to="/admin/verificacoes"
-              className="flex items-center gap-3 rounded-2xl bg-surface-container p-4 hover:bg-surface-container-high focus-visible:outline-2"
+              className="flex items-center gap-3 rounded-[20px] bg-card p-4 hover:bg-superficie-2 focus-visible:outline-2"
             >
-              <Icone nome="admin_panel_settings" className="text-primary" />
+              <Icone nome="admin_panel_settings" className="text-primario" />
               <span className="flex-1">
                 <span className="block font-medium">Fila de verificação</span>
                 <span className="text-xs text-muted-foreground">

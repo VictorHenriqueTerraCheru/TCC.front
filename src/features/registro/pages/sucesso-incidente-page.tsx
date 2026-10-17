@@ -34,7 +34,8 @@ export function SucessoIncidentePage() {
               aria-hidden="true"
               className="size-10 shrink-0 rounded-full blur-[1px]"
               style={{
-                backgroundImage: 'radial-gradient(circle, #c8372d, #f08d52 45%, #fde4b8 75%)',
+                backgroundImage:
+                  'radial-gradient(circle, #ffd60a, #ff3b30 35%, #c026d3 60%, #5b2bff 85%)',
               }}
             />
             <div className="min-w-0">

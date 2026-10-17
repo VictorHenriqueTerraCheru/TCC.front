@@ -30,8 +30,8 @@ function Grade({
             className={cn(
               'flex min-h-16 items-center gap-3 rounded-xl border p-2 text-left text-sm font-medium transition-colors focus-visible:outline-2',
               ativa
-                ? 'border-primary bg-secondary'
-                : 'border-border bg-card hover:bg-surface-container-high',
+                ? 'border-primario bg-primario-suave'
+                : 'border-border bg-card hover:bg-superficie-2',
             )}
           >
             <CategoriaIcone categoria={categoria} tamanho="sm" />

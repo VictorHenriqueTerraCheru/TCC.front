@@ -10,7 +10,7 @@ Aplicação web em **React + TypeScript** do TCC "Sistema colaborativo de regist
 - `docs/openapi.json` — snapshot do OpenAPI da API (fonte dos tipos gerados; atualize com `npm run gen:api` quando a API mudar)
 - `docs/TELAS.md` — as 29 telas do protótipo + a variação desktop, com rota, dados e comportamento
 - `docs/PLAN.md` — plano por etapas com critérios de aceite
-- `docs/design/*.jpg` — prints do protótipo feito no Claude Design. **São a referência visual da versão mobile. Abra a imagem correspondente antes de implementar cada tela.**
+- `docs/design/*.jpg` — prints do protótipo feito no Claude Design. **São a referência de conteúdo e fluxo de cada tela (textos, campos, ordem).** O visual segue o redesign escuro (`docs/superpowers/specs/2026-10-17-redesign-mapa-vetorial-design.md`), não o Material 3 dos prints.
 
 Se a implementação exigir mudar o contrato da API, **pare e pergunte**.
 
@@ -22,14 +22,14 @@ Se a implementação exigir mudar o contrato da API, **pare e pergunte**.
 - Cliente HTTP tipado: **openapi-typescript** (gera `src/infrastructure/api/schema.d.ts` a partir de `docs/openapi.json` ou da API rodando em `http://localhost:5080/openapi/v1.json`) + **openapi-fetch**, com middleware de JWT e conversão do ProblemDetails em `ApiError { type, status, title, errors }`. Não escreva tipos da API à mão: os schemas têm nomes estáveis (`ObterDetalheProblemaResponse`, `PaginadoListarProblemasRecentesItem`, `RegistrarProblemaRequest`…), enums como uniões de string e campos anuláveis como `T | null`.
 - Formulários: **React Hook Form + Zod**
 - UI: **Tailwind CSS v4** + **shadcn/ui** (Radix). Folha inferior no mobile: **vaul** (Drawer com _snap points_). Painel lateral no desktop: `Sheet` do shadcn ou um painel fixo.
-- Ícones: **Material Symbols Rounded** (pacote `material-symbols`), os mesmos do protótipo. Fonte: Roboto.
-- Mapa: **Leaflet + react-leaflet**, tiles do OpenStreetMap com atribuição visível. Mapa de calor: **leaflet.heat** envolvido num componente que usa `useMap()`. Marcadores: `L.divIcon` com HTML gerado a partir de um componente (`renderToStaticMarkup`).
+- Ícones: **Material Symbols Rounded** (pacote `material-symbols`), os mesmos do protótipo. Fonte: Inter (`@fontsource-variable/inter`).
+- Mapa: **MapLibre GL** (`maplibre-gl`) + **`@vis.gl/react-maplibre`** (o react-map-gl só para MapLibre), mapa vetorial com tiles do **OpenFreeMap** (gratuito, sem chave, dados do OpenStreetMap) e atribuição visível. Estilo "M2" versionado em `src/assets/mapa/estilo.json` (`npm run gen:estilo-mapa`). Mapa de calor: camada `heatmap` nativa. Marcadores: `<Marker>` com o componente React como filho.
 - Datas: **date-fns** com `ptBR` ("há 2 dias", "ontem, 19:40")
 - Testes: **Vitest + Testing Library + MSW**. Os handlers do MSW também servem de **API falsa** (`VITE_USE_MOCKS=true`) para trabalhar sem o back e para fixtures que imitam os prints; o desenvolvimento normal é contra a API real.
 - Prints para o TCC: **Playwright** (só o script de captura; não é suíte de testes)
 - Qualidade: ESLint (typescript-eslint, react-hooks) + Prettier
 
-Antes de adicionar um pacote, confira a versão atual e a compatibilidade (ex.: react-leaflet × React 19) no npm; não fixe versões de memória.
+Antes de adicionar um pacote, confira a versão atual e a compatibilidade (ex.: @vis.gl/react-maplibre × React 19 e maplibre-gl) no npm; não fixe versões de memória.
 
 ## Arquitetura: vertical slice por feature (espelha o `TCC.back`)
 
@@ -54,7 +54,7 @@ src/
     components/           # UI só desta feature
     pages/                # ≈ Modules/: entrada de rota (a borda da feature)
     hooks/                # hooks de UI que não chamam a API (ex.: filtros do mapa na URL)
-    lib/                  # utilitários internos da feature (ex.: integração com plugin do Leaflet)
+    lib/                  # utilitários internos da feature (ex.: integração com uma biblioteca externa)
     stores/               # Zustand, quando houver
     index.ts              # API pública da feature (o que outras features e o app podem usar)
   test/                   # setup do Vitest (MSW, matchMedia) e helpers de render
@@ -66,7 +66,7 @@ Votos ficam em `problemas/` (são `/problemas/{id}/votos/*` e mexem no cache do 
 
 Fluxo: **page** (borda) → **hook de `api/`** (o "service" do front) → cliente tipado `api` → API. O hook usa `api.GET('/rota', …).then(dados)`: `dados()` devolve o corpo ou lança `ApiError`; para respostas 204, `.then(semConteudo)`.
 
-Componentes de layout compartilhados (`common/components/`): `MapaOsm` (MapContainer + tiles OSM com atribuição), `CampoTexto`/`CampoSenha`, `TelaComVoltar`, `Pagina` (páginas sem mapa), `PainelResponsivo` (detalhe/área sobre o mapa: vaul não modal no celular, painel de 420 px no desktop) e `FolhaResponsiva` (folhas modais como "Entre para votar": Drawer no celular, Dialog no desktop). A folha "Entre para…" é única, montada no `RaizLayout` e aberta por `useExigirConta()` da feature `auth`.
+Componentes de layout compartilhados (`common/components/`): `MapaVetorial` (MapLibre com o estilo M2 e a atribuição), `CampoTexto`/`CampoSenha`, `TelaComVoltar`, `Pagina` (páginas sem mapa), `PainelResponsivo` (detalhe/área sobre o mapa: vaul não modal no celular, painel de 420 px de vidro no desktop; com `alturaResumo` a folha abre só no card rápido — estágios `[Npx, 0.85]` com a folha em `h-dvh`, porque o vaul calcula px supondo a altura da tela — e o foco do teclado abaixo da borda a expande) e `FolhaResponsiva` (folhas modais como "Entre para votar": Drawer no celular, Dialog no desktop). A folha "Entre para…" é única, montada no `RaizLayout` e aberta por `useExigirConta()` da feature `auth`.
 
 ### Guarda e ação pendente (regras 1 e 13)
 
@@ -90,11 +90,14 @@ Nomes de arquivo em kebab-case (`categoria-icone.tsx`); componentes e hooks em p
 - `GET /problemas/duplicatas` não traz coordenadas: a conferência pega o ponto do vizinho em `GET /problemas/{id}`.
 - Envio: `useEnvio` → rede/timeout (20 s) abre a tela 26; `401` passa pela guarda; erro de regra vira mensagem. O QueryClient usa `networkMode: 'always'`: no modo padrão, offline, o TanStack Query **pausa** a mutação em vez de falhar, e a tela 26 nunca apareceria.
 
-### Mapa (Leaflet)
+### Mapa (MapLibre)
 
-- A página do mapa usa `isolate`: os z-index do Leaflet (até 1000) ficam presos nela e não cobrem `Dialog`/Drawer, que usam `z-50`. Controles sobre o mapa usam `z-[1000]`.
-- `leaflet.heat` procura `L` no escopo global: importe-o só por `features/incidentes/lib/leaflet-heat.ts`. A camada protege o `_redraw` (o plugin redesenha num `requestAnimationFrame` mesmo depois de removido) e usa `maxZoom: 12` (o plugin corta a intensidade pela metade a cada nível abaixo dele).
-- Marcadores: `L.divIcon` com `renderToStaticMarkup(<MarcadorProblema/>)`, cacheado por (categoria, status, faixa); só estilos inline e tokens CSS (`var(--cat-*)`).
+- O app usa `[lat, lng]` (`CENTRO_PADRAO`, `Ponto`). A conversão para `[lng, lat]` do MapLibre fica só no `MapaVetorial` e nos helpers de GeoJSON de `common/lib/geo.ts` (`circuloGeoJson`: o MapLibre não tem círculo em metros; `linhaGeoJson`).
+- Estilo: `scripts/gen-estilo-mapa.mjs` baixa o `fiord` do OpenFreeMap e aplica a receita M2 (`scripts/estilo-mapa.mjs`: cores com luminosidade × 0,66 e saturação × 0,9, sem prédios nem POIs, vias × 1,7). O JSON gerado fica no repo; tiles, glyphs e sprite vêm do OpenFreeMap.
+- O worker do MapLibre é apontado no `main.tsx` (`setWorkerUrl` + `?url`): o MapLibre o acha com `new URL(variável, import.meta.url)`, que o Vite não resolve.
+- Clique no marcador: `e.originalEvent.stopPropagation()` no `onClick` do `<Marker>`, senão o `click` do mapa também dispara e abre a área de incidentes (regra 7).
+- A página do mapa usa `isolate`: os controles sobre o mapa (`z-[1000]`) ficam presos nela e não cobrem `Dialog`/Drawer (`z-50`).
+- Testes: o jsdom não tem WebGL. O `src/test/setup.ts` troca `@vis.gl/react-maplibre` por `src/test/maplibre-falso.tsx`, que imita `<Map>` (ref, `useMap`, eventos), `<Marker>`, `<Source>` (`data-testid="fonte-{id}"`) e `<Layer>` (`camada-{id}`). Os testes mexem no mapa com `mapaFalso.tocar()` e `mapaFalso.mover()`. A renderização real é conferida no `npm run prints`.
 
 ### CSS dos ícones
 
@@ -104,7 +107,7 @@ A fonte é um **subset** com só os ícones usados (~12 KB; a do pacote tem ~5 M
 
 ### Barra inferior (celular)
 
-Some no fluxo de registro e nas subpáginas com "←" (`/perfil/*`, `/admin/*`), como nos prints 5–8, 11, 13, 28 e 29 (`MobileLayout`).
+Barra de abas **flutuante de vidro** (`MobileLayout`): passa por cima do mapa; nas outras páginas o `main` ganha `pb-24` para o conteúdo terminar acima dela. Os controles do mapa ficam acima dela (Registrar em `bottom-[92px]`, GPS/legenda em `bottom-[168px]`). Some no fluxo de registro e nas subpáginas com "←" (`/perfil/*`, `/admin/*`), como nos prints 5–8, 11, 13, 28 e 29.
 
 ### shadcn
 
@@ -133,19 +136,21 @@ Some no fluxo de registro e nas subpáginas com "←" (`/perfil/*`, `/admin/*`),
 12. Acessibilidade básica: botões com `aria-label`, foco visível, Drawer/Dialog do Radix (foco preso), contraste AA.
 13. **Sessão expirada:** o JWT vale 7 dias e não há refresh. `401` numa chamada autenticada → limpa a sessão, guarda a ação pendente e abre o login (mesma guarda da regra 1).
 14. **Perfil atual vem de `GET /me`**, não da claim do token (que fica com o perfil do momento do login). Use `GET /me` para "Perfil verificado", item de admin etc.; após uma aprovação, invalide a query de `/me`.
-15. **Limite o retângulo do mapa** antes de chamar `GET /problemas` e `GET /incidentes/calor`: `lat` em [−90, 90], `lng` em [−180, 180] e `min < max`. O `getBounds()` do Leaflet passa de ±180 ao afastar o zoom; a API responde `400` nesse caso.
+15. **Limite o retângulo do mapa** antes de chamar `GET /problemas` e `GET /incidentes/calor`: `lat` em [−90, 90], `lng` em [−180, 180] e `min < max`. O `getBounds()` do mapa passa de ±180 ao afastar o zoom; a API responde `400` nesse caso.
 16. **Horário do incidente:** a API recusa `ocorridoEm` no futuro, sem tolerância. "Agora" envia o instante atual menos 1 minuto; "Outro horário" vai até 23 h 45 atrás (não 24 h, porque a janela anda enquanto o usuário preenche).
 17. **Geocodificação com `429 limite-requisicoes`** (30/min por IP): trate como endereço indisponível (mostre o fallback e permita continuar), nunca como erro bloqueante.
 
 ## Tema
 
-Inspirado no Material 3 do protótipo. Defina os tokens como CSS variables no tema do Tailwind e amostre as cores exatas nos prints de `docs/design/`:
+**Só escuro** (sem modo claro). Tokens em `src/index.css` (`:root` + `@theme inline`); o teste `scripts/contraste.test.mjs` garante contraste AA nos pares principais.
 
-- primário (botões cheios, barra de confiança): verde-escuro ≈ `#046D4E`; superfície clara esverdeada
-- FAB "Registrar": verde-menta claro com ícone e texto escuros
-- Categorias: Via pública = laranja-tijolo; Elétrica = oliva/amarelo; Limpeza = marrom; Segurança = vermelho; Trânsito = vermelho-alaranjado. Cada categoria tem uma cor forte (pino/ícone) e uma clara (fundo do ícone circular).
-- Selo "Nova": azul-ardósia escuro com texto branco; chip "Possivelmente resolvida": azul-claro.
-- Cantos bem arredondados (cards ~16 px, botões em pílula), como no protótipo.
+- Fundo `#121a24`, cartões `--card`/`--superficie-1` `#1a2431`, `--superficie-2` `#223041`, texto `#eef3fa`, secundário `#9fb0c3`.
+- **Azul em dois tons:** `--primario` `#3b9eff` para texto, ícones, aba ativa, barra de confiança e chaves (`text-primario`, `bg-primario-suave`); `--primary`/`--primario-cheio` `#1f74db` só como **fundo** de botão cheio com texto branco. O `#3b9eff` com texto branco daria 2,8:1, e o `#1f74db` como texto fica abaixo de 4,5:1 — por isso nunca use `text-primary`.
+- **Vidro** só sobre o mapa: utilitário `vidro` (`rgba(26,34,46,.62)` + `blur(20px) saturate(180%)` + borda `--vidro-borda`). Telas sem mapa usam cartões sólidos (`bg-card`, raio 20 px).
+- Categorias vivas para o fundo escuro: via `#ff7a1a`, elétrica `#f5b800`, limpeza `#c08552`, segurança `#ff3b30`, trânsito `#ff5e3a`; a versão `-claro` é a mesma cor com alfa ~0,18.
+- Alertas em balão estilo Waze (`MarcadorProblema`): alta 38 px e pulsa (`.pulso-alerta`, desligado com `prefers-reduced-motion`), média 31, baixa 25 e translúcida; selo "Nova" e check de "possivelmente resolvida" em `--primario-cheio`.
+- Calor: roxo `#5b2bff` → magenta `#c026d3` → vermelho `#ff3b30` → amarelo `#ffd60a` (`gradienteCalor`, usado no heatmap e na legenda).
+- Controles nativos do MapLibre (zoom, atribuição) estilizados em vidro no `index.css`.
 
 ## API local (repo `../TCC.back`)
 
@@ -170,8 +175,12 @@ VITE_USE_MOCKS=true npm run dev   # sem API, com MSW
 npm test                   # Vitest
 npm run build && npm run preview
 npm run gen:icones         # subset da fonte de ícones (rode ao usar um ícone novo)
+npm run gen:estilo-mapa    # estilo M2 do mapa a partir do fiord do OpenFreeMap
 npm run prints             # Playwright: capturas mobile (390×844) e desktop (1440×900) para o TCC
+npm run e2e                # Playwright: roteiro de usuário contra a API real e o banco (front e API rodando)
 ```
+
+`npm run e2e` (`scripts/e2e.mjs`) usa o app no Chrome como um usuário — visitante, cadastro pela folha "Entre para votar" com o voto retomado, registro de problema (com a falha offline da tela 26) e de incidente, área de incidentes, perfil, edição do nome, pedido de verificação aprovado pelo admin, voto de outro cidadão, recentes, bússola, token inválido, sair e o painel do desktop — e confere cada escrita no PostgreSQL (`docker exec tccback-db-1 psql`). Cria dados reais no banco local (uma conta `e2e-<horário>@tcc.local` por execução). `E2E_VISIVEL=1` abre o navegador na tela para acompanhar.
 
 `npm run prints` (`scripts/prints.mjs`) sobe sozinho um Vite com a API falsa (MSW, porta 5199) e grava em `prints/` (fora do git): as fixtures imitam os prints do protótipo e não dependem do banco local. Para o ambiente publicado: `PRINTS_URL=https://… PRINTS_API=<VITE_API_URL> npm run prints` (usa os usuários do seed; a fila do admin só aparece cheia se houver pedidos pendentes). Usa o Google Chrome instalado (`PRINTS_NAVEGADOR=chromium` depois de `npx playwright install chromium`). No modo com mocks, chamadas feitas pelo script só funcionam depois de o app renderizar: antes disso o MSW não subiu e o fetch cai no proxy (API real).
 

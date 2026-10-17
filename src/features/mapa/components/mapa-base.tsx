@@ -1,16 +1,35 @@
-import type { Map as MapaLeaflet } from 'leaflet'
-import { useEffect, type ReactNode, type Ref } from 'react'
-import { useMapEvents } from 'react-leaflet'
+import type { MapRef } from '@vis.gl/react-maplibre'
+import { useRef, type ReactNode, type Ref } from 'react'
 
-import { MapaOsm } from '@/common/components/mapa-osm'
+import { MapaVetorial } from '@/common/components/mapa-vetorial'
 import { useDebouncedCallback } from '@/common/hooks/use-debounced-callback'
 
 import { retanguloDaApi, type Retangulo } from '../models/retangulo'
 
-function OuvinteRetangulo({ aoMudar }: { aoMudar(retangulo: Retangulo | null): void }) {
-  const avisar = useDebouncedCallback((mapa: MapaLeaflet) => {
-    const limites = mapa.getBounds()
-    aoMudar(
+interface MapaBaseProps {
+  centroInicial: [number, number]
+  mostrarZoom: boolean
+  aoMudarRetangulo(retangulo: Retangulo | null): void
+  aoTocar?(ponto: { lat: number; lng: number }): void
+  ref?: Ref<MapRef>
+  children?: ReactNode
+}
+
+/** Mapa principal: estilo M2 + retângulo visível com debounce (regras 9 e 15). */
+export function MapaBase({
+  centroInicial,
+  mostrarZoom,
+  aoMudarRetangulo,
+  aoTocar,
+  ref,
+  children,
+}: MapaBaseProps) {
+  const mapaRef = useRef<MapRef | null>(null)
+
+  const avisar = useDebouncedCallback(() => {
+    const limites = mapaRef.current?.getBounds()
+    if (!limites) return
+    aoMudarRetangulo(
       retanguloDaApi({
         sul: limites.getSouth(),
         oeste: limites.getWest(),
@@ -20,32 +39,21 @@ function OuvinteRetangulo({ aoMudar }: { aoMudar(retangulo: Retangulo | null): v
     )
   }, 400)
 
-  const mapa = useMapEvents({ moveend: () => avisar(mapa) })
-  // Primeiro retângulo: o mapa já nasce posicionado, sem moveend.
-  useEffect(() => avisar(mapa), [mapa, avisar])
-  return null
-}
-
-interface MapaBaseProps {
-  centroInicial: [number, number]
-  mostrarZoom: boolean
-  aoMudarRetangulo(retangulo: Retangulo | null): void
-  ref?: Ref<MapaLeaflet>
-  children?: ReactNode
-}
-
-/** Mapa principal: tiles OSM + retângulo visível com debounce (regra 9). */
-export function MapaBase({
-  centroInicial,
-  mostrarZoom,
-  aoMudarRetangulo,
-  ref,
-  children,
-}: MapaBaseProps) {
   return (
-    <MapaOsm ref={ref} centro={centroInicial} mostrarZoom={mostrarZoom}>
-      <OuvinteRetangulo aoMudar={aoMudarRetangulo} />
+    <MapaVetorial
+      ref={(instancia) => {
+        mapaRef.current = instancia
+        if (typeof ref === 'function') ref(instancia)
+        else if (ref) ref.current = instancia
+      }}
+      centro={centroInicial}
+      mostrarZoom={mostrarZoom}
+      // Primeiro retângulo: o mapa já nasce posicionado, sem moveend.
+      aoCarregar={avisar}
+      aoParar={avisar}
+      aoTocar={aoTocar}
+    >
       {children}
-    </MapaOsm>
+    </MapaVetorial>
   )
 }
