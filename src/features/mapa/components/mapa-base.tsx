@@ -1,12 +1,10 @@
-import 'leaflet/dist/leaflet.css'
-
 import type { Map as MapaLeaflet } from 'leaflet'
 import { useEffect, type ReactNode, type Ref } from 'react'
-import { MapContainer, TileLayer, useMapEvents, ZoomControl } from 'react-leaflet'
+import { useMapEvents } from 'react-leaflet'
 
+import { MapaOsm } from '@/common/components/mapa-osm'
 import { useDebouncedCallback } from '@/common/hooks/use-debounced-callback'
 
-import { ZOOM_PADRAO } from '../models/mapa'
 import { retanguloDaApi, type Retangulo } from '../models/retangulo'
 
 function OuvinteRetangulo({ aoMudar }: { aoMudar(retangulo: Retangulo | null): void }) {
@@ -36,7 +34,7 @@ interface MapaBaseProps {
   children?: ReactNode
 }
 
-/** Mapa Leaflet com tiles do OpenStreetMap (atribuição visível) e o retângulo visível com debounce (regra 9). */
+/** Mapa principal: tiles OSM + retângulo visível com debounce (regra 9). */
 export function MapaBase({
   centroInicial,
   mostrarZoom,
@@ -45,24 +43,9 @@ export function MapaBase({
   children,
 }: MapaBaseProps) {
   return (
-    <MapContainer
-      ref={ref}
-      center={centroInicial}
-      zoom={ZOOM_PADRAO}
-      minZoom={3}
-      zoomControl={false}
-      worldCopyJump
-      className="size-full"
-    >
-      <TileLayer
-        className="mapa-tiles"
-        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        maxZoom={19}
-      />
-      {mostrarZoom && <ZoomControl position="topright" />}
+    <MapaOsm ref={ref} centro={centroInicial} mostrarZoom={mostrarZoom}>
       <OuvinteRetangulo aoMudar={aoMudarRetangulo} />
       {children}
-    </MapContainer>
+    </MapaOsm>
   )
 }

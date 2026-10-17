@@ -33,5 +33,8 @@ export function isApiError(erro: unknown): erro is ApiError {
 }
 
 export function isErroDeRede(erro: unknown): boolean {
-  return erro instanceof TypeError || (erro instanceof DOMException && erro.name === 'AbortError')
+  return (
+    erro instanceof TypeError ||
+    (erro instanceof DOMException && (erro.name === 'AbortError' || erro.name === 'TimeoutError'))
+  )
 }

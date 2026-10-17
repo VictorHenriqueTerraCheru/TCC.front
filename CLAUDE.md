@@ -66,7 +66,7 @@ Votos ficam em `problemas/` (são `/problemas/{id}/votos/*` e mexem no cache do 
 
 Fluxo: **page** (borda) → **hook de `api/`** (o "service" do front) → cliente tipado `api` → API. O hook usa `api.GET('/rota', …).then(dados)`: `dados()` devolve o corpo ou lança `ApiError`; para respostas 204, `.then(semConteudo)`.
 
-Componentes de layout compartilhados (`common/components/`): `Pagina` (páginas sem mapa), `PainelResponsivo` (detalhe/área sobre o mapa: vaul não modal no celular, painel de 420 px no desktop) e `FolhaResponsiva` (folhas modais como "Entre para votar": Drawer no celular, Dialog no desktop). A folha "Entre para…" é única, montada no `RaizLayout` e aberta por `useExigirConta()` da feature `auth`.
+Componentes de layout compartilhados (`common/components/`): `MapaOsm` (MapContainer + tiles OSM com atribuição), `CampoTexto`/`CampoSenha`, `TelaComVoltar`, `Pagina` (páginas sem mapa), `PainelResponsivo` (detalhe/área sobre o mapa: vaul não modal no celular, painel de 420 px no desktop) e `FolhaResponsiva` (folhas modais como "Entre para votar": Drawer no celular, Dialog no desktop). A folha "Entre para…" é única, montada no `RaizLayout` e aberta por `useExigirConta()` da feature `auth`.
 
 ### Guarda e ação pendente (regras 1 e 13)
 
@@ -81,6 +81,14 @@ Fronteiras (o ESLint barra com `no-restricted-imports`):
 - `common/` e `infrastructure/` não importam `features/` nem `app/`. Quando a infraestrutura precisa de algo de uma feature (ex.: o token da sessão), ela expõe um ponto de registro (`registrarAutenticacao`) e o `main.tsx` liga as duas, como a injeção de dependência do back.
 
 Nomes de arquivo em kebab-case (`categoria-icone.tsx`); componentes e hooks em português quando são do domínio (`CategoriaIcone`, `useCategorias`).
+
+### Fluxo de registro
+
+- Rotas `/registrar/*` sob `RegistroLayout` (exige conta; visitante vai ao login e volta). Cada passo usa `PassoRegistro`: no celular é tela cheia (a barra inferior some) com o mapa em cima nos passos de local; no desktop, painel de 420 px + mapa à direita.
+- O rascunho (`useRascunhoStore`, `sessionStorage`) é a fonte de verdade de categoria, local, descrição e horário. Ele **só é limpo na tela de sucesso** (ou no X do passo 1): limpar antes de navegar faz a guarda de passo (`useExigirPasso`) da página ainda montada redirecionar para trás.
+- O centro do mapa é o local; o endereço é consultado com o valor estabilizado por 600 ms (`useEnderecoDoRascunho`).
+- `GET /problemas/duplicatas` não traz coordenadas: a conferência pega o ponto do vizinho em `GET /problemas/{id}`.
+- Envio: `useEnvio` → rede/timeout (20 s) abre a tela 26; `401` passa pela guarda; erro de regra vira mensagem. O QueryClient usa `networkMode: 'always'`: no modo padrão, offline, o TanStack Query **pausa** a mutação em vez de falhar, e a tela 26 nunca apareceria.
 
 ### Mapa (Leaflet)
 

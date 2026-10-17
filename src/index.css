@@ -156,3 +156,13 @@
     @apply rounded-tl-md text-[10px];
   }
 }
+
+@layer components {
+  /* Etiqueta "30 m" sobre a linha da conferência (tela 7). */
+  .tooltip-distancia {
+    @apply rounded-md border-none bg-foreground px-1.5 py-0.5 text-[11px] font-medium text-background shadow-none;
+  }
+  .tooltip-distancia::before {
+    display: none;
+  }
+}
