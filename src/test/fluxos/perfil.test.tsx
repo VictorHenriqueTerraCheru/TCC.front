@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 
 import { rotas } from '@/app/router'
+import { banco } from '@/infrastructure/mocks/banco'
 import { rota } from '@/infrastructure/mocks/rota'
 import { server } from '@/infrastructure/mocks/server'
 import { definirLargura, renderizarRotas } from '@/test/render'
@@ -135,6 +136,14 @@ describe('perfil, verificação e fila do admin', () => {
   })
 
   it('histórico agrupa por período e filtra por votos', async () => {
+    // A fixture usa horários relativos ("30 min atrás"): perto da meia-noite eles cairiam em
+    // "Ontem". Relógio fixo à tarde, só para Date (timers reais, por causa do userEvent).
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 9, 14, 15, 0))
+    onTestFinished(() => {
+      vi.useRealTimers()
+    })
+    banco.reiniciar()
     const usuario = userEvent.setup()
     entrarComoCidadao()
     abrir('/perfil/historico')
