@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 
+import { useTemaStore } from '@/common/hooks/use-tema'
 import { provedorAutenticacao } from '@/features/auth'
 import { registrarAutenticacao } from '@/infrastructure/api'
 import { banco } from '@/infrastructure/mocks/banco'
@@ -13,6 +14,9 @@ vi.mock('@vis.gl/react-maplibre', () => import('./maplibre-falso'))
 registrarAutenticacao(provedorAutenticacao)
 
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }))
+// A escolha do tema da primeira abertura tem teste próprio (fluxos/aparencia.test.tsx); nos
+// outros, o tema já foi escolhido.
+beforeEach(() => useTemaStore.setState({ preferencia: 'automatico', escolhido: true }))
 afterEach(() => {
   cleanup()
   server.resetHandlers()

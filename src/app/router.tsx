@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 
+import { EscolherTemaPage } from '@/features/aparencia'
 import { CadastroPage, EntrarPage } from '@/features/auth'
 import { PermissaoLocalizacaoPage } from '@/features/localizacao'
 import { AreaIncidentesPage, DetalheProblemaPage, MapaPage } from '@/features/mapa'
@@ -69,6 +70,7 @@ export const rotas: RouteObject[] = [
         children: [
           { path: 'login', element: <EntrarPage /> },
           { path: 'cadastro', element: <CadastroPage /> },
+          { path: 'aparencia', element: <EscolherTemaPage /> },
           { path: 'permissao-localizacao', element: <PermissaoLocalizacaoPage /> },
         ],
       },

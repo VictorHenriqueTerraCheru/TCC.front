@@ -4,9 +4,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { BotaoBussola } from '@/common/components/botao-bussola'
 import { Icone } from '@/common/components/icone'
 import { MapaVetorial } from '@/common/components/mapa-vetorial'
+import { useTema } from '@/common/hooks/use-tema'
 import { distanciaTexto } from '@/common/lib/formatacao'
 import { circuloGeoJson, linhaGeoJson } from '@/common/lib/geo'
-import { CENTRO_PADRAO } from '@/common/lib/mapa'
+import { CENTRO_PADRAO, COR_TRACEJADO } from '@/common/lib/mapa'
 import { aparenciaDoGrupo, grupoDe, iconeDe, type CategoriaResumo } from '@/features/categorias'
 import { useAtivarLocalizacao, useLocalizacao } from '@/features/localizacao'
 import { MarcadorProblema } from '@/features/problemas'
@@ -87,6 +88,7 @@ function DicaArrastar({ texto }: { texto: string }) {
 
 function AreaNoCentro({ inicial }: { inicial: Ponto }) {
   const [centro, setCentro] = useState(inicial)
+  const tema = useTema()
   const area = useMemo(() => circuloGeoJson(centro, RAIO_AREA_INCIDENTE_M), [centro])
   return (
     <>
@@ -100,7 +102,11 @@ function AreaNoCentro({ inicial }: { inicial: Ponto }) {
         <Layer
           id="registro-area-borda"
           type="line"
-          paint={{ 'line-color': '#eef3fa', 'line-width': 1.5, 'line-dasharray': [2, 2.5] }}
+          paint={{
+            'line-color': COR_TRACEJADO[tema],
+            'line-width': 1.5,
+            'line-dasharray': [2, 2.5],
+          }}
         />
       </Source>
       <Marker latitude={centro.lat} longitude={centro.lng} anchor="center">
@@ -183,6 +189,7 @@ function CentrarNaPrimeiraPosicao() {
 export function MapaRegistro(props: MapaRegistroProps) {
   const { centro, provisorio } = useCentroInicial()
   const local = useRascunhoStore((s) => s.local)
+  const tema = useTema()
 
   if (props.modo === 'conferencia') {
     const { novo, existente } = props
@@ -196,7 +203,7 @@ export function MapaRegistro(props: MapaRegistroProps) {
           <Layer
             id="registro-linha"
             type="line"
-            paint={{ 'line-color': '#eef3fa', 'line-width': 2, 'line-dasharray': [2, 2] }}
+            paint={{ 'line-color': COR_TRACEJADO[tema], 'line-width': 2, 'line-dasharray': [2, 2] }}
           />
         </Source>
         <Marker latitude={existente.lat} longitude={existente.lng} anchor="bottom">

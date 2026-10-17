@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/common/ui/dialog'
+import { SeletorTema } from '@/features/aparencia'
 import { useAutenticado, useSessaoStore } from '@/features/auth'
 import {
   useAtivarLocalizacao,
@@ -119,6 +120,10 @@ export function ConfiguracoesPage() {
             aoClicar={me ? () => setEditandoNome(true) : undefined}
           />
           <Linha icone="mail" titulo="E-mail" subtitulo={me?.email ?? '…'} />
+        </Secao>
+
+        <Secao titulo="Aparência">
+          <SeletorTema className="px-2 py-1" />
         </Secao>
 
         <Secao titulo="Localização">

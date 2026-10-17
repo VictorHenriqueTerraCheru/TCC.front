@@ -8,8 +8,15 @@ import {
 } from '@vis.gl/react-maplibre'
 import type { ReactNode, Ref } from 'react'
 
-import estiloMapa from '@/assets/mapa/estilo.json'
+import estiloClaro from '@/assets/mapa/estilo-claro.json'
+import estiloEscuro from '@/assets/mapa/estilo-escuro.json'
+import { useTema, type Tema } from '@/common/hooks/use-tema'
 import { ZOOM_PADRAO } from '@/common/lib/mapa'
+
+const ESTILOS: Record<Tema, StyleSpecification> = {
+  claro: estiloClaro as StyleSpecification,
+  escuro: estiloEscuro as StyleSpecification,
+}
 
 interface MapaVetorialProps {
   /** [lat, lng]; só vale na criação. */
@@ -29,8 +36,9 @@ interface MapaVetorialProps {
 }
 
 /**
- * Mapa vetorial (MapLibre) com o estilo M2 versionado (npm run gen:estilo-mapa) e a atribuição
- * do OpenFreeMap/OpenStreetMap. O app usa [lat, lng]; a conversão para [lng, lat] fica aqui.
+ * Mapa vetorial (MapLibre) com o estilo do tema (claro ou escuro, versionados por
+ * npm run gen:estilo-mapa) e a atribuição do OpenFreeMap/OpenStreetMap. O app usa [lat, lng]; a
+ * conversão para [lng, lat] fica aqui.
  */
 export function MapaVetorial({
   centro,
@@ -45,12 +53,13 @@ export function MapaVetorial({
   className = 'size-full',
   children,
 }: MapaVetorialProps) {
+  const tema = useTema()
   return (
     <div className={className}>
       <Map
         ref={ref}
         initialViewState={{ latitude: centro[0], longitude: centro[1], zoom }}
-        mapStyle={estiloMapa as StyleSpecification}
+        mapStyle={ESTILOS[tema]}
         minZoom={3}
         maxZoom={18}
         interactive={interativo}
