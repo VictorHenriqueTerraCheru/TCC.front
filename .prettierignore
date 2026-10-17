@@ -5,4 +5,4 @@ docs
 src/infrastructure/api/schema.d.ts
 public/mockServiceWorker.js
 package-lock.json
-src/assets/mapa/estilo.json
+src/assets/mapa/estilo-*.json

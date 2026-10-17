@@ -1,14 +1,19 @@
 import { readFile } from 'node:fs/promises'
 
-// Contraste AA (WCAG 2.x) dos pares de tokens do tema escuro (src/index.css, :root).
-// Texto normal ≥ 4,5:1. Tokens com alfa (vidro, suaves) ficam de fora: dependem do fundo.
+// Contraste AA (WCAG 2.x) dos pares de tokens dos dois temas (src/index.css): o claro no :root e
+// o escuro em :root[data-tema='escuro'], que só sobrescreve. Texto normal ≥ 4,5:1. Tokens com
+// alfa (vidro, suaves) ficam de fora: dependem do fundo.
 
-async function tokens() {
+async function tokens(tema) {
   const css = await readFile('src/index.css', 'utf8')
-  const raiz = css.match(/:root\s*{([^}]*)}/)?.[1] ?? ''
-  return Object.fromEntries(
-    [...raiz.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(([, nome, valor]) => [nome, valor.trim()]),
-  )
+  const bloco = (seletor) => {
+    const corpo = css.match(new RegExp(`${seletor}\\s*{([^}]*)}`))?.[1] ?? ''
+    return Object.fromEntries(
+      [...corpo.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(([, nome, valor]) => [nome, valor.trim()]),
+    )
+  }
+  const claro = bloco(':root')
+  return tema === 'claro' ? claro : { ...claro, ...bloco(":root\\[data-tema='escuro'\\]") }
 }
 
 function luminancia(hex) {
@@ -22,13 +27,13 @@ function contraste(a, b) {
   return (maior + 0.05) / (menor + 0.05)
 }
 
-async function token(nome) {
-  const valor = (await tokens())[nome]
-  expect(valor, `${nome} precisa ser #rrggbb`).toMatch(/^#[0-9a-f]{6}$/i)
+async function token(tema, nome) {
+  const valor = (await tokens(tema))[nome]
+  expect(valor, `${nome} (${tema}) precisa ser #rrggbb`).toMatch(/^#[0-9a-f]{6}$/i)
   return valor
 }
 
-test.each([
+const PARES = [
   ['--foreground', '--background'],
   ['--muted-foreground', '--background'],
   ['--muted-foreground', '--card'],
@@ -37,6 +42,18 @@ test.each([
   ['--primario', '--card'],
   ['--destructive', '--background'],
   ['--foreground', '--superficie-2'],
-])('%s sobre %s tem contraste ≥ 4,5', async (texto, fundo) => {
-  expect(contraste(await token(texto), await token(fundo))).toBeGreaterThanOrEqual(4.5)
+  // Rótulo da categoria em texto (chips, card rápido, histórico).
+  ['--cat-via-publica', '--card'],
+  ['--cat-eletrica', '--card'],
+  ['--cat-limpeza', '--card'],
+  ['--cat-seguranca', '--card'],
+  ['--cat-transito', '--card'],
+]
+
+describe.each(['claro', 'escuro'])('tema %s', (tema) => {
+  test.each(PARES)('%s sobre %s tem contraste ≥ 4,5', async (texto, fundo) => {
+    expect(contraste(await token(tema, texto), await token(tema, fundo))).toBeGreaterThanOrEqual(
+      4.5,
+    )
+  })
 })

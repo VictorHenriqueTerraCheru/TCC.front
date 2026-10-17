@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 
+import { useTemaStore } from '@/common/hooks/use-tema'
 import { mapaFalso } from '@/test/maplibre-falso'
 
 import { MapaVetorial } from './mapa-vetorial'
@@ -14,6 +15,15 @@ describe('MapaVetorial', () => {
 
     mapaFalso.tocar(-22.9, -43.1)
     expect(aoTocar).toHaveBeenCalledWith({ lat: -22.9, lng: -43.1 })
+  })
+
+  it('usa o estilo do tema atual e troca junto com ele', () => {
+    useTemaStore.setState({ preferencia: 'claro' })
+    render(<MapaVetorial centro={[0, 0]} />)
+    expect(screen.getByTestId('mapa')).toHaveAttribute('data-estilo', 'ocorrencias-claro')
+
+    act(() => useTemaStore.getState().definirPreferencia('escuro'))
+    expect(screen.getByTestId('mapa')).toHaveAttribute('data-estilo', 'ocorrencias-escuro')
   })
 
   it('avisa ao parar de mover', () => {

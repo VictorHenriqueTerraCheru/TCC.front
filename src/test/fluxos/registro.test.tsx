@@ -65,9 +65,13 @@ describe('fluxo de registro', () => {
 
     expect(await screen.findByRole('heading', { name: 'Registro enviado' })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/registrar/sucesso')
-    expect(
-      JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro')!).state.categoriaId,
-    ).toBeNull()
+    // A tela de sucesso limpa o rascunho num efeito, que pode rodar depois de o título aparecer
+    // (no CI, mais lento, a conferência chegava antes do efeito).
+    await waitFor(() =>
+      expect(
+        JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro')!).state.categoriaId,
+      ).toBeNull(),
+    )
   })
 
   it('sessão expirada no envio (401): login e o registro é enviado ao voltar', async () => {

@@ -10,7 +10,7 @@
 //   PRINTS_NAVEGADOR  canal do Playwright (padrão: chrome, o Google Chrome instalado;
 //                     use "chromium" depois de `npx playwright install chromium`)
 //
-// Saída: prints/ (fora do git). Usa só os usuários e dados do seed, sem dados pessoais reais.
+// Saída: prints/claro/ e prints/escuro/ (fora do git), uma volta por tema. Usa só os usuários e dados do seed, sem dados pessoais reais.
 import { spawn } from 'node:child_process'
 import { mkdir } from 'node:fs/promises'
 import { setTimeout as esperar } from 'node:timers/promises'
@@ -30,13 +30,30 @@ const DESKTOP = { width: 1440, height: 900 }
 const servidor = process.env.PRINTS_URL ? null : await subirViteComMocks()
 const BASE = process.env.PRINTS_URL ?? servidor.url
 
-await mkdir(SAIDA, { recursive: true })
+await mkdir(`${SAIDA}/claro`, { recursive: true })
+await mkdir(`${SAIDA}/escuro`, { recursive: true })
 const navegador = await chromium.launch(NAVEGADOR === 'chromium' ? {} : { channel: NAVEGADOR })
 const erros = []
 
 try {
   const dados = await descobrirDados()
 
+  await capturar('00-escolha-tema', '/mapa', { primeiraVez: true })
+  for (const tema of ['claro', 'escuro']) {
+    await capturarTudo(dados, tema)
+  }
+
+  if (erros.length) console.warn('\nErros no console do navegador:\n' + erros.join('\n'))
+  console.log(`\nPrints em ${SAIDA}/`)
+} finally {
+  await navegador.close()
+  servidor?.parar()
+}
+
+/** As telas do TCC num tema; os arquivos vão para prints/<tema>/. */
+async function capturarTudo(dados, tema) {
+  const capturar = (nome, rota, opcoes = {}) =>
+    capturarTela(`${tema}/${nome}`, rota, { ...opcoes, tema })
   await capturar('01-mapa-ambos-legenda', '/mapa?modo=ambos', { legenda: true })
   await capturar('02-detalhe-alta', `/mapa/problema/${dados.alta.id}`)
   await capturar('03-detalhe-nova', `/mapa/problema/${dados.nova.id}`)
@@ -69,21 +86,29 @@ try {
   await capturar('11-desktop-mapa-painel', `/mapa/problema/${dados.alta.id}?modo=ambos`, {
     tela: DESKTOP,
   })
-
-  if (erros.length) console.warn('\nErros no console do navegador:\n' + erros.join('\n'))
-  console.log(`\nPrints em ${SAIDA}/`)
-} finally {
-  await navegador.close()
-  servidor?.parar()
 }
 
-/** Abre uma rota com sessão, posição e rascunho prontos e salva o print. */
-async function capturar(nome, rota, { usuario, rascunho, legenda = false, tela = CELULAR } = {}) {
+/** Primeira abertura (escolha do tema), fora das voltas por tema. */
+function capturar(nome, rota, opcoes) {
+  return capturarTela(nome, rota, opcoes)
+}
+
+/** Abre uma rota com sessão, posição, rascunho e tema prontos e salva o print. */
+async function capturarTela(
+  nome,
+  rota,
+  { usuario, rascunho, legenda = false, tela = CELULAR, tema = 'claro', primeiraVez = false } = {},
+) {
   const contexto = await novoContexto(tela)
   const sessao = usuario ? await entrar(contexto, usuario) : null
   await contexto.addInitScript(
-    ({ sessao, rascunho, legenda }) => {
+    ({ sessao, rascunho, legenda, tema, primeiraVez }) => {
       if (!legenda) localStorage.setItem('ocorrencias.legendaVista', '1')
+      if (!primeiraVez)
+        localStorage.setItem(
+          'ocorrencias.tema',
+          JSON.stringify({ state: { preferencia: tema, escolhido: true }, version: 0 }),
+        )
       if (sessao)
         localStorage.setItem(
           'ocorrencias.sessao',
@@ -97,7 +122,7 @@ async function capturar(nome, rota, { usuario, rascunho, legenda = false, tela =
         )
       }
     },
-    { sessao, rascunho, legenda },
+    { sessao, rascunho, legenda, tema, primeiraVez },
   )
   const pagina = await contexto.newPage()
   pagina.on('pageerror', (erro) => erros.push(`${nome}: ${erro.message}`))

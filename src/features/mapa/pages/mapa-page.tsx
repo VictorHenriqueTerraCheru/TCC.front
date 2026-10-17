@@ -6,6 +6,7 @@ import { Layer, Source, type MapRef } from '@vis.gl/react-maplibre'
 import { BotaoBussola } from '@/common/components/botao-bussola'
 import { Icone } from '@/common/components/icone'
 import { useDesktop } from '@/common/hooks/use-media-query'
+import { useTema } from '@/common/hooks/use-tema'
 import { circuloGeoJson } from '@/common/lib/geo'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
@@ -33,7 +34,7 @@ import { useNavegacaoMapa } from '../hooks/use-navegacao-mapa'
 import type { ContextoMapa } from '../models/contexto'
 import { filtrosDasCamadas, mostraCalor } from '../models/filtros'
 import { pontoDaUrl } from '../models/ponto'
-import { CENTRO_PADRAO, ZOOM_PADRAO } from '@/common/lib/mapa'
+import { CENTRO_PADRAO, COR_TRACEJADO, ZOOM_PADRAO } from '@/common/lib/mapa'
 import type { Retangulo } from '../models/retangulo'
 
 const CHAVE_LEGENDA_VISTA = 'ocorrencias.legendaVista'
@@ -60,6 +61,7 @@ function marcar(chave: string) {
 /** Telas 1, 2, 18, 24 e 25; as rotas filhas (detalhe, área) abrem no painel por cima. */
 export function MapaPage() {
   const desktop = useDesktop()
+  const tema = useTema()
   const filtros = useFiltrosMapa()
   const camadas = filtrosDasCamadas(filtros)
   const localizacao = useLocalizacao()
@@ -220,7 +222,11 @@ export function MapaPage() {
             <Layer
               id="area-incidentes"
               type="line"
-              paint={{ 'line-color': '#eef3fa', 'line-width': 1.5, 'line-dasharray': [2, 2.5] }}
+              paint={{
+                'line-color': COR_TRACEJADO[tema],
+                'line-width': 1.5,
+                'line-dasharray': [2, 2.5],
+              }}
             />
           </Source>
         )}

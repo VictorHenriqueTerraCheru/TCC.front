@@ -193,6 +193,7 @@ export function Map({
   onMoveEnd,
   onClick,
   onLoad,
+  mapStyle,
 }: MapProps) {
   const [instancia] = useState(() => {
     const nova = new InstanciaFalsa()
@@ -228,6 +229,7 @@ export function Map({
       <div
         ref={divRef}
         data-testid="mapa"
+        data-estilo={(mapStyle as { name?: string } | undefined)?.name}
         className="maplibregl-map"
         // Como no MapLibre de verdade: clique num marcador também chega ao mapa, a não ser que o
         // marcador pare a propagação.

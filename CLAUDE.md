@@ -10,7 +10,7 @@ Aplicação web em **React + TypeScript** do TCC "Sistema colaborativo de regist
 - `docs/openapi.json` — snapshot do OpenAPI da API (fonte dos tipos gerados; atualize com `npm run gen:api` quando a API mudar)
 - `docs/TELAS.md` — as 29 telas do protótipo + a variação desktop, com rota, dados e comportamento
 - `docs/PLAN.md` — plano por etapas com critérios de aceite
-- `docs/design/*.jpg` — prints do protótipo feito no Claude Design. **São a referência de conteúdo e fluxo de cada tela (textos, campos, ordem).** O visual segue o redesign escuro (`docs/superpowers/specs/2026-10-17-redesign-mapa-vetorial-design.md`), não o Material 3 dos prints.
+- `docs/design/*.jpg` — prints do protótipo feito no Claude Design. **São a referência de conteúdo e fluxo de cada tela (textos, campos, ordem).** O visual segue o redesign (`docs/superpowers/specs/2026-10-17-redesign-mapa-vetorial-design.md`), não o Material 3 dos prints.
 
 Se a implementação exigir mudar o contrato da API, **pare e pergunte**.
 
@@ -23,7 +23,7 @@ Se a implementação exigir mudar o contrato da API, **pare e pergunte**.
 - Formulários: **React Hook Form + Zod**
 - UI: **Tailwind CSS v4** + **shadcn/ui** (Radix). Folha inferior no mobile: **vaul** (Drawer com _snap points_). Painel lateral no desktop: `Sheet` do shadcn ou um painel fixo.
 - Ícones: **Material Symbols Rounded** (pacote `material-symbols`), os mesmos do protótipo. Fonte: Inter (`@fontsource-variable/inter`).
-- Mapa: **MapLibre GL** (`maplibre-gl`) + **`@vis.gl/react-maplibre`** (o react-map-gl só para MapLibre), mapa vetorial com tiles do **OpenFreeMap** (gratuito, sem chave, dados do OpenStreetMap) e atribuição visível. Estilo "M2" versionado em `src/assets/mapa/estilo.json` (`npm run gen:estilo-mapa`). Mapa de calor: camada `heatmap` nativa. Marcadores: `<Marker>` com o componente React como filho.
+- Mapa: **MapLibre GL** (`maplibre-gl`) + **`@vis.gl/react-maplibre`** (o react-map-gl só para MapLibre), mapa vetorial com tiles do **OpenFreeMap** (gratuito, sem chave, dados do OpenStreetMap) e atribuição visível. Estilos versionados em `src/assets/mapa/estilo-claro.json` e `estilo-escuro.json` (`npm run gen:estilo-mapa`); o `MapaVetorial` troca conforme o tema. Mapa de calor: camada `heatmap` nativa. Marcadores: `<Marker>` com o componente React como filho.
 - Datas: **date-fns** com `ptBR` ("há 2 dias", "ontem, 19:40")
 - Testes: **Vitest + Testing Library + MSW**. Os handlers do MSW também servem de **API falsa** (`VITE_USE_MOCKS=true`) para trabalhar sem o back e para fixtures que imitam os prints; o desenvolvimento normal é contra a API real.
 - Prints para o TCC: **Playwright** (só o script de captura; não é suíte de testes)
@@ -60,7 +60,7 @@ src/
   test/                   # setup do Vitest (MSW, matchMedia) e helpers de render
 ```
 
-Features (mesmas áreas do back, mais as de tela): `auth`, `usuarios` (dados de `/me` e do histórico), `categorias`, `problemas` (marcadores, detalhe, votos, recentes), `incidentes`, `registro`, `verificacao` (pedido e cartão do perfil; depende de `usuarios`), `admin` (fila; depende de `verificacao`), `geocodificacao`, `localizacao`, e as de tela `mapa` (compõe problemas + incidentes, dona de `/mapa/*`) e `perfil` (compõe usuarios + verificacao: perfil, histórico, configurações).
+Features (mesmas áreas do back, mais as de tela): `auth`, `usuarios` (dados de `/me` e do histórico), `categorias`, `problemas` (marcadores, detalhe, votos, recentes), `incidentes`, `registro`, `verificacao` (pedido e cartão do perfil; depende de `usuarios`), `admin` (fila; depende de `verificacao`), `geocodificacao`, `localizacao`, `aparencia` (escolha do tema na primeira abertura e o seletor de Configurações), e as de tela `mapa` (compõe problemas + incidentes, dona de `/mapa/*`) e `perfil` (compõe usuarios + verificacao: perfil, histórico, configurações).
 
 Votos ficam em `problemas/` (são `/problemas/{id}/votos/*` e mexem no cache do detalhe): uma feature `votos` separada criaria dependência circular com `problemas`. Quando duas features precisariam uma da outra, quem compõe é a de tela (`mapa`) ou o `app/`.
 
@@ -93,7 +93,7 @@ Nomes de arquivo em kebab-case (`categoria-icone.tsx`); componentes e hooks em p
 ### Mapa (MapLibre)
 
 - O app usa `[lat, lng]` (`CENTRO_PADRAO`, `Ponto`). A conversão para `[lng, lat]` do MapLibre fica só no `MapaVetorial` e nos helpers de GeoJSON de `common/lib/geo.ts` (`circuloGeoJson`: o MapLibre não tem círculo em metros; `linhaGeoJson`).
-- Estilo: `scripts/gen-estilo-mapa.mjs` baixa o `fiord` do OpenFreeMap e aplica a receita M2 (`scripts/estilo-mapa.mjs`: cores com luminosidade × 0,66 e saturação × 0,9, sem prédios nem POIs, vias × 1,7). O JSON gerado fica no repo; tiles, glyphs e sprite vêm do OpenFreeMap.
+- Estilos: `scripts/gen-estilo-mapa.mjs` baixa do OpenFreeMap o `fiord` (escuro, receita M2: cores com luminosidade × 0,66 e saturação × 0,9) e o `liberty` (claro, estilo Apple Maps: vias com saturação × 0,7 e bordas quase brancas) e aplica `scripts/estilo-mapa.mjs` (sem prédios nem POIs, vias × 1,7). Os JSONs gerados ficam no repo; tiles, glyphs e sprite vêm do OpenFreeMap. Cores desenhadas sobre o mapa por paint do MapLibre não aceitam variável CSS: dependem de `useTema()` (ex.: `COR_TRACEJADO`).
 - O worker do MapLibre é apontado no `main.tsx` (`setWorkerUrl` + `?url`): o MapLibre o acha com `new URL(variável, import.meta.url)`, que o Vite não resolve.
 - Clique no marcador: `e.originalEvent.stopPropagation()` no `onClick` do `<Marker>`, senão o `click` do mapa também dispara e abre a área de incidentes (regra 7).
 - A página do mapa usa `isolate`: os controles sobre o mapa (`z-[1000]`) ficam presos nela e não cobrem `Dialog`/Drawer (`z-50`).
@@ -142,12 +142,18 @@ Barra de abas **flutuante de vidro** (`MobileLayout`): passa por cima do mapa; n
 
 ## Tema
 
-**Só escuro** (sem modo claro). Tokens em `src/index.css` (`:root` + `@theme inline`); o teste `scripts/contraste.test.mjs` garante contraste AA nos pares principais.
+**Claro, escuro ou automático** (segue o `prefers-color-scheme` do celular/computador, inclusive a troca por horário do iPhone). Na primeira abertura do mapa, `/aparencia` pede a escolha (Automático vem marcado), antes da pré-permissão de localização; depois, Configurações > Aparência. A preferência fica em `useTemaStore` (`common/hooks/use-tema.ts`, `localStorage` `ocorrencias.tema`); `useAplicarTema` (no `RaizLayout`) põe `data-tema` no `<html>` e a cor da barra (`meta theme-color`); um script no `index.html` faz o mesmo antes da primeira pintura, para não piscar. Nos testes, o `setup.ts` marca o tema como já escolhido.
+
+Tokens em `src/index.css`: o claro no `:root`, o escuro em `:root[data-tema='escuro']` (só sobrescreve), + `@theme inline`. O teste `scripts/contraste.test.mjs` garante contraste AA nos pares principais dos dois temas, incluindo o rótulo de cada categoria sobre o cartão.
+
+- Claro (estilo Apple Maps): fundo `#f2f2f7`, cartões brancos, texto `#111827`, secundário `#5c6878`, azul de texto `#0b67c6`, vidro branco `rgba(255,255,255,.74)`; categorias mais fechadas (via `#c24e00`, elétrica `#946300`, limpeza `#8b5a2b`, segurança `#d70015`, trânsito `#c2380f`) para o rótulo passar no AA.
+
+Escuro:
 
 - Fundo `#121a24`, cartões `--card`/`--superficie-1` `#1a2431`, `--superficie-2` `#223041`, texto `#eef3fa`, secundário `#9fb0c3`.
 - **Azul em dois tons:** `--primario` `#3b9eff` para texto, ícones, aba ativa, barra de confiança e chaves (`text-primario`, `bg-primario-suave`); `--primary`/`--primario-cheio` `#1f74db` só como **fundo** de botão cheio com texto branco. O `#3b9eff` com texto branco daria 2,8:1, e o `#1f74db` como texto fica abaixo de 4,5:1 — por isso nunca use `text-primary`.
 - **Vidro** só sobre o mapa: utilitário `vidro` (`rgba(26,34,46,.62)` + `blur(20px) saturate(180%)` + borda `--vidro-borda`). Telas sem mapa usam cartões sólidos (`bg-card`, raio 20 px).
-- Categorias vivas para o fundo escuro: via `#ff7a1a`, elétrica `#f5b800`, limpeza `#c08552`, segurança `#ff3b30`, trânsito `#ff5e3a`; a versão `-claro` é a mesma cor com alfa ~0,18.
+- Categorias vivas para o fundo escuro: via `#ff7a1a`, elétrica `#f5b800`, limpeza `#c08552`, segurança `#ff4d42`, trânsito `#ff5e3a`; a versão `-claro` é a mesma cor com alfa ~0,18.
 - Alertas em balão estilo Waze (`MarcadorProblema`): alta 38 px e pulsa (`.pulso-alerta`, desligado com `prefers-reduced-motion`), média 31, baixa 25 e translúcida; selo "Nova" e check de "possivelmente resolvida" em `--primario-cheio`.
 - Calor: roxo `#5b2bff` → magenta `#c026d3` → vermelho `#ff3b30` → amarelo `#ffd60a` (`gradienteCalor`, usado no heatmap e na legenda).
 - Controles nativos do MapLibre (zoom, atribuição) estilizados em vidro no `index.css`.
@@ -175,7 +181,7 @@ VITE_USE_MOCKS=true npm run dev   # sem API, com MSW
 npm test                   # Vitest
 npm run build && npm run preview
 npm run gen:icones         # subset da fonte de ícones (rode ao usar um ícone novo)
-npm run gen:estilo-mapa    # estilo M2 do mapa a partir do fiord do OpenFreeMap
+npm run gen:estilo-mapa    # estilos claro (liberty) e escuro (fiord, M2) do mapa a partir do OpenFreeMap
 npm run prints             # Playwright: capturas mobile (390×844) e desktop (1440×900) para o TCC
 npm run e2e                # Playwright: roteiro de usuário contra a API real e o banco (front e API rodando)
 ```

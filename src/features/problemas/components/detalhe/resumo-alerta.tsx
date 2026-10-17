@@ -60,14 +60,14 @@ export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
       {
         rotulo: 'Confirmar que existe',
         icone: 'thumb_up',
-        cor: '#34c759',
+        cor: 'var(--voto-sim)',
         marcado: meus.existencia === 'confirma',
         votar: () => votarExistencia('confirma'),
       },
       {
         rotulo: 'Não vi',
         icone: 'thumb_down',
-        cor: '#ff5a52',
+        cor: 'var(--voto-nao)',
         marcado: meus.existencia === 'naoVi',
         votar: () => votarExistencia('naoVi'),
       },
@@ -77,14 +77,14 @@ export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
       {
         rotulo: 'Sim, continua',
         icone: 'thumb_up',
-        cor: '#34c759',
+        cor: 'var(--voto-sim)',
         marcado: meus.persistencia === 'continua',
         votar: () => votarPersistencia('continua'),
       },
       {
         rotulo: 'Não, foi resolvido',
         icone: 'thumb_down',
-        cor: '#ff5a52',
+        cor: 'var(--voto-nao)',
         marcado: meus.persistencia === 'resolvido',
         votar: () => votarPersistencia('resolvido'),
       },

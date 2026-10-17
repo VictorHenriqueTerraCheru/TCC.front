@@ -1,17 +1,26 @@
 import { readFile } from 'node:fs/promises'
 
-import { aplicarReceita, escalarLargura, escurecerCor, RECEITA_M2 } from './estilo-mapa.mjs'
+import {
+  ajustarCor,
+  aplicarReceita,
+  escalarLargura,
+  RECEITA_CLARA,
+  RECEITA_M2,
+} from './estilo-mapa.mjs'
 
-test('escurecerCor mantém o matiz e aplica luminosidade e saturação', () => {
-  expect(escurecerCor('hsl(210, 40%, 50%)', { escala: 0.66, saturacao: 0.9 })).toBe(
+test('ajustarCor mantém o matiz e aplica luminosidade e saturação (limitadas a 100%)', () => {
+  expect(ajustarCor('hsl(40, 50%, 95%)', { escala: 1.1, saturacao: 0.5 })).toBe(
+    'hsla(40, 25%, 100%, 1)',
+  )
+  expect(ajustarCor('hsl(210, 40%, 50%)', { escala: 0.66, saturacao: 0.9 })).toBe(
     'hsla(210, 36%, 33%, 1)',
   )
-  expect(escurecerCor('#ffffff', { escala: 0.66, saturacao: 0.9 })).toBe('hsla(0, 0%, 66%, 1)')
-  expect(escurecerCor('rgba(0,0,255,0.5)', { escala: 0.5, saturacao: 1 })).toBe(
+  expect(ajustarCor('#ffffff', { escala: 0.66, saturacao: 0.9 })).toBe('hsla(0, 0%, 66%, 1)')
+  expect(ajustarCor('rgba(0,0,255,0.5)', { escala: 0.5, saturacao: 1 })).toBe(
     'hsla(240, 100%, 25%, 0.5)',
   )
-  expect(escurecerCor('hsl(210,40,50)', { escala: 1, saturacao: 1 })).toBe('hsla(210, 40%, 50%, 1)')
-  expect(escurecerCor('transparent', RECEITA_M2)).toBe('transparent')
+  expect(ajustarCor('hsl(210,40,50)', { escala: 1, saturacao: 1 })).toBe('hsla(210, 40%, 50%, 1)')
+  expect(ajustarCor('transparent', RECEITA_M2)).toBe('transparent')
 })
 
 test('escalarLargura escala números, stops, interpolate e step sem mexer nos zooms', () => {
@@ -74,8 +83,30 @@ test('aplicarReceita remove prédios e POIs, engrossa vias e escurece cores, inc
   expect(estilo.layers).toHaveLength(4) // não muta a entrada
 })
 
-test('o estilo versionado não tem prédios nem cores fora do padrão hsla', async () => {
-  const estilo = JSON.parse(await readFile('src/assets/mapa/estilo.json', 'utf8'))
+test('a receita clara deixa as vias suaves e as bordas quase brancas, sem mexer no resto', () => {
+  const estilo = {
+    layers: [
+      { id: 'road_trunk_primary', type: 'line', paint: { 'line-color': 'hsl(50, 100%, 80%)' } },
+      {
+        id: 'road_trunk_primary_casing',
+        type: 'line',
+        paint: { 'line-color': 'hsl(30, 80%, 70%)' },
+      },
+      { id: 'park', type: 'fill', paint: { 'fill-color': 'hsl(90, 40%, 85%)' } },
+    ],
+  }
+  const [via, borda, parque] = aplicarReceita(estilo, RECEITA_CLARA).layers
+  expect(via.paint['line-color']).toBe('hsla(50, 70%, 80%, 1)')
+  expect(borda.paint['line-color']).toBe('hsla(30, 12%, 77%, 1)')
+  expect(parque.paint['fill-color']).toBe('hsla(90, 40%, 85%, 1)')
+})
+
+test.each([
+  ['src/assets/mapa/estilo-escuro.json', 'ocorrencias-escuro'],
+  ['src/assets/mapa/estilo-claro.json', 'ocorrencias-claro'],
+])('%s não tem prédios nem cores fora do padrão hsla', async (arquivo, nome) => {
+  const estilo = JSON.parse(await readFile(arquivo, 'utf8'))
+  expect(estilo.name).toBe(nome)
   expect(estilo.layers.some((c) => /building|poi|housenumber|aeroway/.test(c.id))).toBe(false)
   const cores = JSON.stringify(estilo.layers.map((c) => c.paint ?? {})).match(
     /"(#[0-9a-f]{3,6}|rgba?\([^)]*\))"/gi,

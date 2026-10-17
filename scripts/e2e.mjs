@@ -58,17 +58,31 @@ const navegador = await chromium.launch({
 
 try {
   // ---------------------------------------------------------------- visitante → cadastro
-  const visitante = await novaPagina('visitante')
+  const visitante = await novaPagina('visitante', CELULAR, { primeiraVez: true })
   const p = visitante.pagina
 
-  await passo('Visitante abre o app e passa pela pré-permissão de localização', p, async () => {
-    await p.goto(BASE + '/mapa')
-    await p.waitForURL(/permissao|mapa/)
-    if (p.url().includes('permissao')) {
+  await passo(
+    'Visitante abre o app, escolhe o tema escuro e passa pela pré-permissão',
+    p,
+    async () => {
+      await p.goto(BASE + '/mapa')
+      await p.getByRole('heading', { name: 'Escolha a aparência' }).waitFor()
+      const automatico = p.getByRole('radio', { name: /Automático/ })
+      confere(
+        (await automatico.getAttribute('aria-checked')) === 'true',
+        'Automático não veio marcado',
+      )
+      await p.getByRole('radio', { name: /Escuro/ }).click()
+      const tema = await p.evaluate(() => document.documentElement.dataset.tema)
+      confere(tema === 'escuro', `o tema não mudou na hora (data-tema=${tema})`)
       await p.getByRole('button', { name: 'Continuar' }).click()
-    }
-    await p.waitForURL(/\/mapa/)
-  })
+      await p.waitForURL(/permissao|mapa/)
+      if (p.url().includes('permissao')) {
+        await p.getByRole('button', { name: 'Continuar' }).click()
+      }
+      await p.waitForURL(/\/mapa/)
+    },
+  )
 
   await passo('Mapa carrega os marcadores da API (GET /problemas)', p, async () => {
     const resposta = await p.waitForResponse((r) => /\/api\/v1\/problemas\?/.test(r.url()))
@@ -445,7 +459,7 @@ async function esperarHabilitado(botao, limite = 20_000) {
   }
 }
 
-async function novaPagina(nome, tela = CELULAR) {
+async function novaPagina(nome, tela = CELULAR, { primeiraVez = false } = {}) {
   const celular = tela.width < 1024
   const contexto = await navegador.newContext({
     viewport: tela,
@@ -458,6 +472,15 @@ async function novaPagina(nome, tela = CELULAR) {
   })
   // A legenda abre sozinha na primeira visita e cobriria os controles; o usuário a fecharia.
   await contexto.addInitScript(() => localStorage.setItem('ocorrencias.legendaVista', '1'))
+  // Fora da primeira vez, o tema já foi escolhido (claro, o padrão de quem usa o celular de dia).
+  if (!primeiraVez) {
+    await contexto.addInitScript(() =>
+      localStorage.setItem(
+        'ocorrencias.tema',
+        JSON.stringify({ state: { preferencia: 'claro', escolhido: true }, version: 0 }),
+      ),
+    )
+  }
   const pagina = await contexto.newPage()
   pagina.on('console', (m) => {
     if (m.type() === 'error') errosConsole.push(`[${nome}] ${m.text().slice(0, 200)}`)

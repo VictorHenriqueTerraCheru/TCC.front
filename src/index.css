@@ -8,13 +8,73 @@
 @import './assets/material-symbols/rounded.css' layer(base);
 
 /*
- * Tema escuro único (docs/superpowers/specs/2026-10-17-redesign-mapa-vetorial-design.md).
+ * Dois temas (docs/superpowers/specs/2026-10-17-redesign-mapa-vetorial-design.md): claro no :root
+ * (estilo Apple Maps) e escuro em [data-tema='escuro'], que só sobrescreve as cores. O <html>
+ * recebe data-tema do script do index.html (antes da pintura) e de useAplicarTema.
  * Nomes do shadcn (background, primary…) + tokens próprios: azul em dois tons (o cheio passa no
- * contraste AA com texto branco), vidro sobre o mapa, superfícies e categorias.
+ * contraste AA com texto branco), vidro sobre o mapa, superfícies e categorias. O teste
+ * scripts/contraste.test.mjs confere os pares dos dois temas.
  */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   --radius: 1rem;
+
+  --background: #f2f2f7;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+
+  /* Azul: --primario em texto/ícones; --primario-cheio no fundo de botões com texto branco. */
+  --primario: #0b67c6;
+  --primario-cheio: #1f74db;
+  --primario-suave: rgba(11, 103, 198, 0.12);
+  --primary: #1f74db;
+  --primary-foreground: #ffffff;
+  --muted: #e8ebf1;
+  --muted-foreground: #5c6878;
+  --accent: #e3eefc;
+  --accent-foreground: #0b4a8f;
+  --destructive: #d70015;
+  --destructive-foreground: #ffffff;
+  --border: rgba(17, 24, 39, 0.1);
+  --input: #c7cfda;
+  --ring: #0b67c6;
+
+  /* Superfícies sólidas (telas sem mapa) e vidro (só sobre o mapa). */
+  --superficie-1: #ffffff;
+  --superficie-2: #e8ebf1;
+  --vidro: rgba(255, 255, 255, 0.74);
+  --vidro-borda: rgba(17, 24, 39, 0.08);
+
+  /* Selo "Nova" e barra "Em avaliação". */
+  --nova: #1f74db;
+  --nova-foreground: #ffffff;
+
+  /* Calor dos incidentes (amostra da legenda). */
+  --calor: #ff3b30;
+
+  /* Polegares do card rápido (👍 confirma/continua, 👎 não vi/resolvido). */
+  --voto-sim: #1a8f3f;
+  --voto-nao: #d70015;
+
+  /* Categorias: forte (balão/ícone/rótulo) e clara (fundo translúcido do ícone). No claro, mais
+     fechadas para o rótulo passar no AA sobre o branco. */
+  --cat-via-publica: #c24e00;
+  --cat-via-publica-claro: rgba(194, 78, 0, 0.14);
+  --cat-eletrica: #946300;
+  --cat-eletrica-claro: rgba(148, 99, 0, 0.14);
+  --cat-limpeza: #8b5a2b;
+  --cat-limpeza-claro: rgba(139, 90, 43, 0.14);
+  --cat-seguranca: #d70015;
+  --cat-seguranca-claro: rgba(215, 0, 21, 0.12);
+  --cat-transito: #c2380f;
+  --cat-transito-claro: rgba(194, 56, 15, 0.13);
+}
+
+:root[data-tema='escuro'] {
+  color-scheme: dark;
 
   --background: #121a24;
   --foreground: #eef3fa;
@@ -23,7 +83,6 @@
   --popover: #1a2431;
   --popover-foreground: #eef3fa;
 
-  /* Azul: --primario em texto/ícones sobre o escuro; --primario-cheio no fundo de botões. */
   --primario: #3b9eff;
   --primario-cheio: #1f74db;
   --primario-suave: rgba(59, 158, 255, 0.18);
@@ -39,28 +98,22 @@
   --input: #33445a;
   --ring: #3b9eff;
 
-  /* Superfícies sólidas (telas sem mapa) e vidro (só sobre o mapa). */
   --superficie-1: #1a2431;
   --superficie-2: #223041;
   --vidro: rgba(26, 34, 46, 0.62);
   --vidro-borda: rgba(160, 190, 230, 0.12);
 
-  /* Selo "Nova" e barra "Em avaliação". */
-  --nova: #1f74db;
-  --nova-foreground: #ffffff;
+  --voto-sim: #34c759;
+  --voto-nao: #ff5a52;
 
-  /* Calor dos incidentes (amostra da legenda). */
-  --calor: #ff3b30;
-
-  /* Categorias: forte (balão/ícone) e clara (fundo translúcido do ícone). */
   --cat-via-publica: #ff7a1a;
   --cat-via-publica-claro: rgba(255, 122, 26, 0.18);
   --cat-eletrica: #f5b800;
   --cat-eletrica-claro: rgba(245, 184, 0, 0.18);
   --cat-limpeza: #c08552;
   --cat-limpeza-claro: rgba(192, 133, 82, 0.2);
-  --cat-seguranca: #ff3b30;
-  --cat-seguranca-claro: rgba(255, 59, 48, 0.18);
+  --cat-seguranca: #ff4d42;
+  --cat-seguranca-claro: rgba(255, 77, 66, 0.18);
   --cat-transito: #ff5e3a;
   --cat-transito-claro: rgba(255, 94, 58, 0.18);
 }
@@ -116,7 +169,7 @@
   --color-cat-transito-claro: var(--cat-transito-claro);
 }
 
-/* Vidro escuro azulado sobre o mapa (seletor, chips, botões, barra de abas, painel). */
+/* Vidro sobre o mapa (seletor, chips, botões, barra de abas, painel). */
 @utility vidro {
   background: var(--vidro);
   backdrop-filter: blur(20px) saturate(180%);
@@ -124,7 +177,7 @@
   border: 1px solid var(--vidro-borda);
 }
 
-/* Controles nativos do MapLibre (zoom, atribuição) no vidro escuro. */
+/* Controles nativos do MapLibre (zoom, atribuição) no vidro. */
 .maplibregl-ctrl-group,
 .maplibregl-ctrl-attrib {
   background: var(--vidro) !important;
@@ -139,8 +192,9 @@
 .maplibregl-ctrl-group button + button {
   border-top-color: var(--vidro-borda) !important;
 }
-.maplibregl-ctrl-icon,
-.maplibregl-ctrl-attrib-button {
+/* Os ícones do MapLibre são escuros: no tema escuro, invertidos. */
+[data-tema='escuro'] .maplibregl-ctrl-icon,
+[data-tema='escuro'] .maplibregl-ctrl-attrib-button {
   filter: invert(1) brightness(1.4);
 }
 .maplibregl-ctrl-attrib-inner,
