@@ -15,7 +15,9 @@ import {
   SucessoIncidentePage,
   SucessoProblemaPage,
 } from '@/features/registro'
-import { PerfilPage } from '@/features/usuarios'
+import { FilaVerificacaoPage } from '@/features/admin'
+import { ConfiguracoesPage, HistoricoPage, PerfilPage } from '@/features/perfil'
+import { SolicitarVerificacaoPage } from '@/features/verificacao'
 
 import { AppLayout } from './layouts/app-layout'
 import { RaizLayout } from './layouts/raiz-layout'
@@ -42,6 +44,10 @@ export const rotas: RouteObject[] = [
           },
           { path: 'recentes', element: <RecentesPage /> },
           { path: 'perfil', element: <PerfilPage /> },
+          { path: 'perfil/verificacao', element: <SolicitarVerificacaoPage /> },
+          { path: 'perfil/historico', element: <HistoricoPage /> },
+          { path: 'perfil/configuracoes', element: <ConfiguracoesPage /> },
+          { path: 'admin/verificacoes', element: <FilaVerificacaoPage /> },
           {
             path: 'registrar',
             element: <RegistroLayout />,

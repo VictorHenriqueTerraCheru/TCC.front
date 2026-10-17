@@ -37,3 +37,15 @@ export function erroDeRegra(status: number, type: string, title: string) {
     { status, headers: { 'Content-Type': 'application/problem+json' } },
   )
 }
+
+/** Paginação da API: ?pagina&tamanho → { itens, pagina, tamanho, total }. */
+export function paginar<T>(lista: T[], url: URL) {
+  const pagina = Number(url.searchParams.get('pagina') ?? 1)
+  const tamanho = Number(url.searchParams.get('tamanho') ?? 20)
+  return {
+    itens: lista.slice((pagina - 1) * tamanho, pagina * tamanho),
+    pagina,
+    tamanho,
+    total: lista.length,
+  }
+}

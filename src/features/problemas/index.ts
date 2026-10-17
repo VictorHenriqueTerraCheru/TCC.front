@@ -1,5 +1,6 @@
 export { detalheProblemaQuery, useDetalheProblema } from './api/use-detalhe-problema'
 export { problemasNaAreaQuery, useProblemasNaArea } from './api/use-problemas-na-area'
+export { recentesQuery, useRecentes } from './api/use-recentes'
 export { useVotarExistencia, useVotarPersistencia } from './api/use-votar'
 export type { FiltroProblemasNaArea } from './api/use-problemas-na-area'
 export { CamadaProblemas } from './components/camada-problemas'
