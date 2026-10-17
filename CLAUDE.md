@@ -1,6 +1,6 @@
 # CLAUDE.md — Front web de Ocorrências Urbanas (TCC)
 
-Aplicação web em **React + TypeScript** do TCC "Sistema colaborativo de registro e validação de ocorrências urbanas" (Gustavo Brandão e Victor Henrique Terra Cherú — Unilasalle-RJ). É **mobile-first e responsiva**: no celular segue o protótipo; no computador, o mapa ocupa a tela e os detalhes viram um painel lateral. Consome a API .NET do repositório `TCC.back` (`../TCC.back`), **já implementada** (etapas 0–7; até o merge dos PRs, o código mais recente está na branch `etapa-7`).
+Aplicação web em **React + TypeScript** do TCC "Sistema colaborativo de registro e validação de ocorrências urbanas" (Gustavo Brandão e Victor Henrique Terra Cherú — Unilasalle-RJ). É **mobile-first e responsiva**: no celular segue o protótipo; no computador, o mapa ocupa a tela e os detalhes viram um painel lateral. Consome a API .NET do repositório `TCC.back` (`../TCC.back`), **já implementada** (etapas 0–7 e a refatoração para o padrão MedComite.Core, tudo na `main`).
 
 **O front não calcula confiança, não decide ciclo de vida e não geocodifica.** Isso é da API. O front exibe, coleta votos e envia a posição do navegador.
 
