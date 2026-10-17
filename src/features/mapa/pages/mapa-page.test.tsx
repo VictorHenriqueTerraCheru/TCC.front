@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 
@@ -52,6 +52,17 @@ describe('MapaPage', () => {
 
     expect(await screen.findByText('Não foi possível carregar o mapa.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
+  })
+
+  it('aviso de área vazia some ao mexer no mapa e não volta a cada área vazia', async () => {
+    server.use(http.get(rota('/problemas'), () => HttpResponse.json([])))
+    const { container } = renderizarMapa()
+
+    expect(await screen.findByText('Nenhuma ocorrência nesta área')).toBeInTheDocument()
+
+    fireEvent.pointerDown(container.querySelector('.leaflet-container')!)
+
+    expect(screen.queryByText('Nenhuma ocorrência nesta área')).not.toBeInTheDocument()
   })
 
   it('marca chips de filtro na URL e limpa os que não existem no novo modo', async () => {

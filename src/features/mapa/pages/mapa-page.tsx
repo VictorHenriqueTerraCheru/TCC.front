@@ -76,6 +76,7 @@ export function MapaPage() {
   const [retangulo, setRetangulo] = useState<Retangulo | null>(null)
   const [legendaAberta, setLegendaAberta] = useState(() => !legendaJaVista())
   const [aviso, setAviso] = useState<string | null>(null)
+  const [vazioDispensado, setVazioDispensado] = useState(false)
 
   const categoriasQuery = useCategorias()
   const categorias = categoriasQuery.data
@@ -102,6 +103,21 @@ export function MapaPage() {
     centralizouRef.current = true
     mapa.setView([localizacao.posicao.lat, localizacao.posicao.lng], ZOOM_PADRAO)
   }, [mapa, localizacao.posicao, painelAberto])
+
+  // Tela 25: o aviso de área vazia sai quando a pessoa mexe no mapa (arrastar, pinça, roda,
+  // botões de zoom) e só volta depois de ela ver alguma ocorrência. Sem isso, ele reaparece a
+  // cada área vazia enquanto ela procura. Eventos do DOM: setView/flyTo do app não contam.
+  useEffect(() => {
+    if (!mapa) return
+    const container = mapa.getContainer()
+    const dispensar = () => setVazioDispensado(true)
+    container.addEventListener('pointerdown', dispensar)
+    container.addEventListener('wheel', dispensar, { passive: true })
+    return () => {
+      container.removeEventListener('pointerdown', dispensar)
+      container.removeEventListener('wheel', dispensar)
+    }
+  }, [mapa])
 
   useEffect(() => {
     if (!aviso) return
@@ -154,6 +170,7 @@ export function MapaPage() {
   const carregou =
     consultas.length > 0 && consultas.every((c) => c.isSuccess && !c.isPlaceholderData)
   const vazio = carregou && consultas.every((c) => c.data?.length === 0)
+  if (vazioDispensado && carregou && !vazio) setVazioDispensado(false)
   const falhou = falhouCategorias || consultas.some((c) => c.isError)
   const semLocalizacao = localizacao.estado === 'prompt' || localizacao.estado === 'denied'
   const pontoArea = rotaArea ? pontoDaUrl(params) : null
@@ -225,7 +242,7 @@ export function MapaPage() {
         )}
       </div>
 
-      {vazio && !falhou && !painelAberto && (
+      {vazio && !vazioDispensado && !falhou && !painelAberto && (
         <div className="pointer-events-none absolute inset-x-6 top-1/2 z-[1000] -translate-y-1/2">
           <EstadoVazio aoVerAreaMaior={() => mapa?.zoomOut(2)} />
         </div>
