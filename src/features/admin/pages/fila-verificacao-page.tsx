@@ -58,7 +58,7 @@ function TotalPendentes() {
 export function FilaVerificacaoPage() {
   const navigate = useNavigate()
   const autenticado = useAutenticado()
-  const { data: me, isPending } = useMe()
+  const { data: me, isPending, isError, refetch } = useMe()
   const [aba, setAba] = useState<StatusVerificacao>('pendente')
 
   if (!autenticado) return <Navigate to="/login" replace state={{ de: '/admin/verificacoes' }} />
@@ -68,7 +68,15 @@ export function FilaVerificacaoPage() {
       <TelaComVoltar titulo="Fila de verificação" aoVoltar={() => navigate('/perfil')}>
         {isPending ? (
           <Skeleton className="h-60 rounded-2xl bg-muted" />
-        ) : me?.perfil !== 'administrador' ? (
+        ) : isError ? (
+          // Falha de rede/servidor no /me não é falta de permissão: oferece tentar de novo.
+          <div role="alert" className="space-y-3 py-10 text-center">
+            <p>Não foi possível confirmar seu perfil.</p>
+            <Button variant="outline" onClick={() => void refetch()}>
+              Tentar novamente
+            </Button>
+          </div>
+        ) : me.perfil !== 'administrador' ? (
           <div className="space-y-3 py-10 text-center">
             <p>Esta área é só para administradores.</p>
             <Button asChild variant="outline">

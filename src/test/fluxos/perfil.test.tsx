@@ -1,7 +1,10 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { http, HttpResponse } from 'msw'
 
 import { rotas } from '@/app/router'
+import { rota } from '@/infrastructure/mocks/rota'
+import { server } from '@/infrastructure/mocks/server'
 import { definirLargura, renderizarRotas } from '@/test/render'
 import { entrarComoAdmin, entrarComoCidadao, sair } from '@/test/sessao'
 
@@ -103,6 +106,32 @@ describe('perfil, verificação e fila do admin', () => {
     entrarComoCidadao()
     abrir('/admin/verificacoes')
     expect(await screen.findByText('Esta área é só para administradores.')).toBeInTheDocument()
+  })
+
+  it('admin com /me fora do ar vê "Tentar novamente", não "só para administradores"', async () => {
+    entrarComoAdmin()
+    server.use(http.get(rota('/me'), () => new HttpResponse(null, { status: 500 })))
+    abrir('/admin/verificacoes')
+
+    expect(
+      await screen.findByText('Não foi possível confirmar seu perfil.', {}, { timeout: 5000 }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Esta área é só para administradores.')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
+  })
+
+  it('"Cancelar" na edição do nome descarta o texto digitado', async () => {
+    entrarComoCidadao()
+    const usuario = userEvent.setup()
+    abrir('/perfil/configuracoes')
+
+    await usuario.click(await screen.findByRole('button', { name: /Nome\s*Ana Lima/ }))
+    await usuario.clear(screen.getByLabelText('Nome'))
+    await usuario.type(screen.getByLabelText('Nome'), 'Rascunho descartado')
+    await usuario.click(screen.getByRole('button', { name: 'Cancelar' }))
+    await usuario.click(await screen.findByRole('button', { name: /Nome\s*Ana Lima/ }))
+
+    expect(await screen.findByLabelText('Nome')).toHaveValue('Ana Lima')
   })
 
   it('histórico agrupa por período e filtra por votos', async () => {
