@@ -1,0 +1,18 @@
+# Servidor dos arquivos do build (dist/) no container. O HTTPS fica com o Railway, na frente.
+{
+	admin off
+	auto_https off
+}
+
+:{$PORT:8080} {
+	root * /srv
+	encode zstd gzip
+
+	# Arquivos com hash no nome (assets/index-a1b2c3.js) nunca mudam: o navegador guarda por 1 ano.
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	# SPA: rota que não é arquivo (/mapa, /problemas/123) devolve o index.html e o React Router resolve.
+	try_files {path} /index.html
+	file_server
+}

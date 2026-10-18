@@ -57,7 +57,7 @@ Cada etapa termina com `npm run lint` e `npm test` verdes, `npm run build` sem e
 ## Etapa 6 — Responsivo, acabamento, deploy e prints do TCC (≈ 1–2 dias)
 - Revisar cada tela no mobile lado a lado com os prints de `docs/design/` e conferir o desktop em 1366×768 e 1920×1080.
 - `manifest.webmanifest` e ícones (permite "Adicionar à tela inicial"); sem *service worker* de cache de dados (offline está fora do escopo).
-- Deploy em hospedagem estática com HTTPS e *fallback* de SPA para `index.html` (Vercel, Netlify ou Cloudflare Pages). `VITE_API_URL` apontando para a API publicada; peça para incluir o domínio em `Cors__Origens` da API.
+- Deploy no Railway, no mesmo projeto da API: `Dockerfile` (build com Node, servido pelo Caddy com *fallback* de SPA para `index.html`); HTTPS pelo domínio do Railway. `VITE_API_URL` (argumento de build) apontando para a API publicada; o domínio do front vai em `Cors__Origens__0` da API.
 - Script `npm run prints` (Playwright) contra o ambiente publicado, com dados de seed realistas e sem dados pessoais reais, capturando para a Seção 5.3.3 do TCC: Mapa (Ambos, com legenda), Detalhe (Alta), Detalhe (Nova), Área de incidentes, Registro de problema (com duplicata), Registro de incidente, Recentes, Perfil + Verificação, Fila do admin, Cadastro/Login — em 390×844 — e o Mapa com painel lateral em 1440×900.
 
 **Aceite:** pelo navegador do celular, a aplicação publicada cria conta, registra, vota e vê o mapa; os 11 prints estão gerados.
