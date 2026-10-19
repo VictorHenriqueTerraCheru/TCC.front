@@ -37,7 +37,11 @@ export const useRascunhoStore = create<RascunhoState>()(
     (set) => ({
       ...vazio,
       escolherCategoria: (categoriaId) => set({ categoriaId }),
-      definirLocal: (local) => set({ local }),
+      // O mapa dispara moveend também ao redimensionar, com o mesmo centro. Um objeto novo
+      // reiniciaria o debounce do endereço, que troca a altura do cartão e redimensiona o mapa
+      // de novo: o endereço nunca chegava e o arrasto travava.
+      definirLocal: (local) =>
+        set((s) => (s.local?.lat === local.lat && s.local.lng === local.lng ? s : { local })),
       definirDescricao: (descricao) => set({ descricao }),
       definirHorario: (horario) => set({ horario }),
       limpar: () => set(vazio),
