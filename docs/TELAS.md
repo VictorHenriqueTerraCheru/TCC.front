@@ -6,11 +6,11 @@ Numeração igual à do protótipo (`docs/design/`), que mostra a versão **mobi
 |---|---|---|---|---|
 | 1 | Mapa — Problemas | `/mapa` | 01-04 | `GET /problemas`, `GET /categorias` |
 | 2 | Mapa — Ambos (com legenda "Como ler o mapa") | `/mapa?modo=ambos` | 01-04 | `GET /problemas`, `GET /incidentes/calor` |
-| 3 | Detalhe de problema (folha inferior) | `/mapa/problema/:id` | 01-04 | `GET /problemas/{id}`, `PUT .../votos/*` |
+| 3 | Detalhe de problema (folha inferior) | `/mapa/problema/:id` | 01-04 | `GET /problemas/{id}`, `PUT .../voto` |
 | 4 | Área de incidentes (folha inferior) | `/mapa/area?lat&lng` | 01-04 | `GET /incidentes/area`, `GET /geocodificacao/reversa` |
 | 5 | Registrar — Categoria (passo 1 de 4) | `/registrar` | 05-08 | `GET /categorias` |
 | 6 | Registrar — Local (passo 2) | `/registrar/local` | 05-08 | `GET /geocodificacao/reversa` |
-| 7 | Registrar — Duplicata (passo 3) | `/registrar/conferencia` | 05-08 | `GET /problemas/duplicatas`, `PUT .../votos/existencia` |
+| 7 | Registrar — Duplicata (passo 3) | `/registrar/conferencia` | 05-08 | `GET /problemas/duplicatas`, `PUT .../voto` (sim) |
 | 8 | Registrar — Revisão (passo 4) | `/registrar/revisao` | 05-08 | `POST /problemas` |
 | 9 | Recentes | `/recentes` | 09-13 | `GET /problemas/recentes` |
 | 10 | Perfil — Cidadão | `/perfil` | 09-13 | `GET /me`, `GET /me/historico?tamanho=3` |
@@ -39,11 +39,11 @@ Numeração igual à do protótipo (`docs/design/`), que mostra a versão **mobi
 ## Comportamentos que não estão óbvios no print
 
 - **Tela 1/2/24 — seletor Problemas | Incidentes | Ambos**: Problemas mostra só marcadores; Incidentes só calor; Ambos os dois. Os chips de filtro mudam conforme o modo (grupos de problema × grupos de incidente). O chip de ampulheta filtra "Em avaliação" (`status=nova`).
-- **Tela 3 — detalhe Ativa**: barra "Confiança alta · 82/100"; o texto "Calculada com N votos, ponderados por proximidade e histórico de quem votou" usa `existencia.confirmacoes + existencia.naoVi`. Botões refletem `meusVotos` (o voto atual fica marcado). Se `souAutor`, o botão "Confirmar que existe" fica desabilitado com a dica "Você registrou este problema".
-- **Tela 22 — Nova**: em vez da confiança, "Em avaliação · X de 5 votos" com barra segmentada; o cartão "Ainda está lá?" não aparece; o cartão azul convida a confirmar ("Você está a 90 m. Viu este fio?") com "Confirmar que existe" e "Não vi".
-- **Tela 23 — Possivelmente resolvida**: o cartão azul usa `persistencia.resolvidoUltimas24h` ("7 pessoas disseram que foi resolvido nas últimas 24 h").
+- **Tela 3 — detalhe Ativa**: barra "Confiança alta · 82/100"; o texto "Calculada com N votos, ponderados por proximidade e histórico de quem votou" usa `votos.sim + votos.nao`. Uma pergunta só, "Ainda está lá?" ("Sim, está lá" / "Não está lá", `PUT /problemas/{id}/voto`): a API usa a mesma resposta na confiança e no ciclo de vida. O botão de `meuVoto` fica marcado. Se `souAutor`, não há botões, só a dica "Você registrou este problema".
+- **Tela 22 — Nova**: em vez da confiança, "Em avaliação · X de 5 votos" com barra segmentada; o cartão azul faz a mesma pergunta ("Você está a 90 m. Ainda está lá?"). Os "não" dados em Nova contam para a resolução quando o problema sai de Nova.
+- **Tela 23 — Possivelmente resolvida**: o cartão azul usa `votos.naoUltimas24h` ("7 pessoas disseram que não está mais lá nas últimas 24 h").
 - **Rodapé verde "Você está a X m — seu voto pesa mais por estar perto"** só aparece quando a distância é ≤ 2 000 m e a localização está permitida; acima disso, não mostra nada; sem permissão, mostra o aviso da tela 19.
-- **Tela 7 — duplicata**: só aparece se `GET /problemas/duplicatas` devolver itens. "Sim, confirmar esse" vota existência no problema existente e vai para a tela de sucesso com o texto adaptado ("Sua confirmação foi registrada"). "Não, é outro" segue para a revisão.
+- **Tela 7 — duplicata**: só aparece se `GET /problemas/duplicatas` devolver itens. "Sim, confirmar esse" vota "sim" no problema existente e vai para a tela de sucesso com o texto adaptado ("Sua confirmação foi registrada"). "Não, é outro" segue para a revisão.
 - **Tela 21a**: "Agora" / "Há 1 hora" / "Outro horário" (stepper de 15 min, limitado a 24 h atrás). A área é um círculo fixo de 150 m sobre o centro do mapa; o texto "O ponto exato não é salvo nem exibido" é verdade porque a API arredonda.
 - **Tela 21c**: o resumo usa o `rotuloArea` de `GET /geocodificacao/reversa` do centro + "Roubos · N relatos nos últimos 7 dias" vindo da resposta do POST.
 - **Tela 11**: o contador `0/500` e a validação "escreva pelo menos 30 caracteres" são locais; o banner vermelho aparece se `GET /me` trouxer `verificacao.status = recusada`.

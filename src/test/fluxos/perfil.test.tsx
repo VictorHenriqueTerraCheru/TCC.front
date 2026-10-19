@@ -154,7 +154,7 @@ describe('perfil, verificação e fila do admin', () => {
 
     await usuario.click(screen.getByRole('radio', { name: 'Votos' }))
     await waitFor(() => expect(screen.queryByText(/^Registrou/)).not.toBeInTheDocument())
-    expect(screen.getByText('Confirmou que existe · Buraco na via')).toBeInTheDocument()
+    expect(screen.getByText('Disse que está lá · Buraco na via')).toBeInTheDocument()
   })
 
   it('configurações: edita o nome e sai da conta', async () => {

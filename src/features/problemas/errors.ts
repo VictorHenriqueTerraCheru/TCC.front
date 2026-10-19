@@ -2,9 +2,7 @@ import { isApiError, isErroDeRede } from '@/infrastructure/api'
 
 // type da API (docs/API.md, "Códigos de erro") → mensagem para o usuário.
 const mensagens: Record<string, string> = {
-  'autor-nao-vota-existencia':
-    'Você registrou este problema; quem registra não confirma a existência.',
-  'persistencia-indisponivel-em-nova': '"Ainda está lá?" abre depois da avaliação.',
+  'autor-nao-vota': 'Você registrou este problema; quem registra não vota nele.',
   'problema-resolvido': 'Este problema já foi resolvido.',
 }
 

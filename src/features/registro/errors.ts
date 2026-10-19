@@ -8,7 +8,7 @@ const mensagens: Record<string, string> = {
     'O horário precisa estar dentro das últimas 24 horas. Ajuste e envie de novo.',
   'limite-diario-incidentes':
     'Você chegou ao limite de relatos de incidente nas últimas 24 horas. Tente mais tarde.',
-  'autor-nao-vota-existencia': 'Esse registro é seu: quem registra não confirma a existência.',
+  'autor-nao-vota': 'Esse registro é seu: quem registra não vota nele.',
 }
 
 /** Mensagem para erros de regra (4xx). Falha de rede é tratada à parte (tela 26). */

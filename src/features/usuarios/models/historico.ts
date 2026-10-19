@@ -6,14 +6,12 @@ import type { Schema } from '@/infrastructure/api'
 export type ItemHistorico = Schema<'ObterHistoricoItem'>
 export type FiltroHistorico = 'tudo' | 'registros' | 'votos'
 
-/** "Confirmou que existe · Buraco na pista" — textos do print 29. */
+/** "Disse que está lá · Buraco na pista" — textos do print 29, com o voto único. */
 export function tituloItem({ tipo, valor, categoria }: ItemHistorico): string {
   const acao = {
     registroProblema: 'Registrou',
     registroIncidente: 'Registrou',
-    votoExistencia: valor === 'naoVi' ? 'Disse que não viu' : 'Confirmou que existe',
-    votoPersistencia:
-      valor === 'resolvido' ? 'Respondeu “Foi resolvido”' : 'Respondeu “Sim, continua”',
+    voto: valor === 'nao' ? 'Disse que não está lá' : 'Disse que está lá',
   }[tipo]
   const anonimo = tipo === 'registroIncidente' ? ' (anônimo)' : ''
   return `${acao} · ${categoria.nome}${anonimo}`

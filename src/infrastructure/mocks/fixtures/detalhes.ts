@@ -39,27 +39,24 @@ export function criarDetalhes(): Map<string, Detalhe> {
         status: p.status,
         confianca: p.confianca,
         faixa: p.faixa,
-        meusVotos: null,
+        meuVoto: null,
         souAutor: false,
       }
       const porStatus: Record<string, Partial<Detalhe>> = {
         nova: {
           criadoEm: horasAtras(0.7),
           avaliacao: { votantes: 2, necessarios: 5, encerraEm: horasAtras(-70) },
-          existencia: { confirmacoes: 2, naoVi: 0 },
-          persistencia: { continua: 0, resolvido: 0, resolvidoUltimas24h: 0 },
+          votos: { sim: 2, nao: 0, naoUltimas24h: 0 },
         },
         possivelmenteResolvida: {
           criadoEm: horasAtras(5 * 24 + 3),
           avaliacao: null,
-          existencia: { confirmacoes: 12, naoVi: 0 },
-          persistencia: { continua: 2, resolvido: 7, resolvidoUltimas24h: 7 },
+          votos: { sim: 12, nao: 7, naoUltimas24h: 7 },
         },
         ativa: {
           criadoEm: horasAtras(2 * 24 + 4),
           avaliacao: null,
-          existencia: { confirmacoes: 15, naoVi: 1 },
-          persistencia: { continua: 9, resolvido: 1, resolvidoUltimas24h: 1 },
+          votos: { sim: 15, nao: 1, naoUltimas24h: 1 },
         },
       }
       return [p.id, { ...base, ...porStatus[p.status] } as Detalhe]
