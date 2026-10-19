@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { Icone } from '@/common/components/icone'
 import { useDesktop } from '@/common/hooks/use-media-query'
@@ -41,11 +41,14 @@ export function PainelResponsivo({
 
   const observador = useRef<ResizeObserver | null>(null)
   // Aberta, o resumo encolhe (os polegares saem): a medida só vale recolhida, senão a folha
-  // voltaria para um estágio baixo demais e pularia quando os polegares reaparecessem.
+  // voltaria para um estágio baixo demais e pularia quando os polegares reaparecessem. A ref muda
+  // junto com o estado, não num efeito: o ResizeObserver entrega a mudança de altura antes dos
+  // efeitos passivos e veria o estágio anterior.
   const abertoRef = useRef(aberto)
-  useEffect(() => {
-    abertoRef.current = aberto
-  }, [aberto])
+  const mudarAberto = useCallback((valor: boolean) => {
+    abertoRef.current = valor
+    setAberto(valor)
+  }, [])
   const medirResumo = useCallback((elemento: HTMLElement | null) => {
     observador.current?.disconnect()
     observador.current = null
@@ -78,7 +81,7 @@ export function PainelResponsivo({
   }
 
   const recolhido = !!snaps && !aberto
-  const expandir = () => setAberto(true)
+  const expandir = () => mudarAberto(true)
 
   return (
     <ContextoPainel.Provider value={{ recolhido, expandir, medirResumo }}>
@@ -89,7 +92,7 @@ export function PainelResponsivo({
         {...(snaps && {
           snapPoints: snaps,
           activeSnapPoint: snap,
-          setActiveSnapPoint: (ponto: number | string | null) => setAberto(ponto === snaps[1]),
+          setActiveSnapPoint: (ponto: number | string | null) => mudarAberto(ponto === snaps[1]),
         })}
       >
         <DrawerContent
