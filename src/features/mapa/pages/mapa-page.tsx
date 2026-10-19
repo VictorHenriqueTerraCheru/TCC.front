@@ -134,10 +134,11 @@ export function MapaPage() {
     ({ lat, lng }) => {
       if (!mapa) return
       centralizouRef.current = true
-      // Celular: o ponto fica no quarto de cima, acima da folha. Desktop: no centro da área livre.
+      // Celular: o ponto fica no meio da faixa livre entre os filtros do topo e o card rápido da
+      // folha (~5 % acima do centro da tela). Desktop: no centro da área à direita do painel.
       const offset: [number, number] = desktop
         ? [LARGURA_PAINEL / 2, 0]
-        : [0, -mapa.getContainer().clientHeight * 0.25]
+        : [0, -mapa.getContainer().clientHeight * 0.05]
       mapa.easeTo({ center: [lng, lat], offset })
     },
     [mapa, desktop],

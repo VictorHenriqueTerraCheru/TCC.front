@@ -102,7 +102,8 @@ export function PainelResponsivo({
               if (evento.target.getBoundingClientRect().bottom > window.innerHeight) expandir()
             }}
             className={cn(
-              'overflow-y-auto px-4 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]',
+              // overscroll-contain: chegar ao fim da rolagem da folha não passa o gesto ao mapa.
+              'overflow-y-auto overscroll-contain px-4 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]',
               // Os 15 % de baixo da folha ficam fora da tela no estágio aberto: a rolagem termina
               // na parte visível (senão o foco do teclado pode parar fora da tela). 1,25rem = alça.
               snaps && 'max-h-[calc(85dvh-1.25rem)]',

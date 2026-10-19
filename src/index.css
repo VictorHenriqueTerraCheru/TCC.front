@@ -246,4 +246,12 @@
   body {
     @apply bg-background font-sans text-foreground antialiased;
   }
+  /* Celular com a barra de abas: só o <main> e as folhas rolam. As folhas do mapa não são
+     modais, então o vaul não bloqueia o touchmove; sem isto, arrastar a folha no iOS rola (ou
+     estica) o documento e leva o mapa junto, que pode ficar deslocado depois de fechar. */
+  html:has([data-layout-celular]),
+  html:has([data-layout-celular]) body {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
 }
