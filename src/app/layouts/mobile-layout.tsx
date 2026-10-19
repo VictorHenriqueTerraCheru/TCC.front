@@ -13,7 +13,7 @@ export function MobileLayout() {
   const telaCheia = /^\/(registrar|admin)(\/|$)|^\/perfil\/.+/.test(pathname)
   const noMapa = pathname.startsWith('/mapa')
   return (
-    <div className="relative h-dvh">
+    <div data-layout-celular className="relative h-dvh">
       {/* O mapa passa por baixo da barra; nas outras páginas o conteúdo termina acima dela. */}
       <main className={cn('relative h-full overflow-y-auto', !telaCheia && !noMapa && 'pb-24')}>
         <Outlet />

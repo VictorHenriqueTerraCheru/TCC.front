@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 
 import { PainelResponsivo } from '@/common/components/painel-responsivo'
+import { ContextoPainel } from '@/common/hooks/use-painel-responsivo'
 import { EntreParaContinuar } from '@/features/auth'
 import { criarDetalhes } from '@/infrastructure/mocks/fixtures/detalhes'
 import { problemasNaArea } from '@/infrastructure/mocks/fixtures/problemas'
@@ -17,16 +18,17 @@ import { ALTURA_RESUMO, ResumoAlerta } from './resumo-alerta'
 const ATIVA = criarDetalhes().get(problemasNaArea[0]!.id)!
 const NOVA = criarDetalhes().get(problemasNaArea[10]!.id)!
 
-function renderizar(problema: DetalheProblema) {
+/** Por padrão, na folha recolhida do celular: é só nela que o card tem os polegares. */
+function renderizar(problema: DetalheProblema, { recolhido = true } = {}) {
   definirLargura(390)
   return renderizarRotas([
     {
       path: '/',
       element: (
-        <>
+        <ContextoPainel.Provider value={{ recolhido, expandir: () => {}, medirResumo: () => {} }}>
           <ResumoAlerta problema={problema} />
           <EntreParaContinuar />
-        </>
+        </ContextoPainel.Provider>
       ),
     },
   ])
@@ -66,6 +68,14 @@ describe('ResumoAlerta', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Voto rápido: Não está lá' }))
 
     expect(votos).toEqual([expect.objectContaining({ valor: 'nao' })])
+  })
+
+  it('aberto (folha expandida ou desktop), sem polegares: o cartão completo já pergunta', () => {
+    entrarComoCidadao()
+    renderizar(ATIVA, { recolhido: false })
+
+    expect(screen.queryByText('Ainda está lá?')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
 
   it('autor não vê os polegares', () => {
@@ -111,5 +121,6 @@ describe('ResumoAlerta', () => {
 
     await userEvent.click(screen.getByRole('heading', { name: ATIVA.categoria.nome }))
     expect(estagio()).toHaveAttribute('data-estagio', 'aberto')
+    expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
 })

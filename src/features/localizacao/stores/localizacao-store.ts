@@ -56,11 +56,35 @@ function pararDeAcompanhar() {
   idMonitoramento = null
 }
 
+// O iOS esquece a permissão (Safari com "Perguntar", sobretudo o app na tela inicial): na volta a
+// Permissions API diz 'prompt' mesmo para quem já liberou. Guardamos que liberou para, na
+// abertura, pedir de novo sozinho em vez de mostrar "Localização desativada".
+const CHAVE_CONCEDIDA = 'ocorrencias.localizacaoConcedida'
+
+function concedeuAntes(): boolean {
+  try {
+    return localStorage.getItem(CHAVE_CONCEDIDA) === '1'
+  } catch {
+    return false
+  }
+}
+
+function lembrarConcessao(concedida: boolean) {
+  try {
+    if (concedida) localStorage.setItem(CHAVE_CONCEDIDA, '1')
+    else localStorage.removeItem(CHAVE_CONCEDIDA)
+  } catch {
+    // Sem storage: na próxima visita o banner pede o "Ativar" de novo.
+  }
+}
+
 function aplicarEstado(estado: EstadoLocalizacao) {
   if (estado === 'granted') {
+    lembrarConcessao(true)
     useLocalizacaoStore.setState({ estado })
     acompanharPosicao()
   } else {
+    if (estado === 'denied') lembrarConcessao(false)
     pararDeAcompanhar()
     useLocalizacaoStore.setState({ estado, posicao: null })
   }
@@ -78,7 +102,21 @@ export function iniciarMonitoramento(): () => void {
 
   let status: PermissionStatus | null = null
   let cancelado = false
-  const aoMudar = () => status && aplicarEstado(status.state)
+  // 'prompt' de quem já liberou: pede de novo (fica em 'verificando' até o navegador responder).
+  // Vale na abertura e no evento `change`: com o app aberto em segundo plano, o iOS também pode
+  // voltar a permissão para 'prompt'.
+  const aplicarPermissao = (estado: PermissionState) => {
+    if (estado !== 'prompt' || !concedeuAntes()) return aplicarEstado(estado)
+    // O acompanhamento de quando estava liberada para antes: um PERMISSION_DENIED dele marcaria
+    // denied (e apagaria a concessão) no meio do pedido novo. O sucesso o liga de novo.
+    pararDeAcompanhar()
+    useLocalizacaoStore.setState({ estado: 'verificando' })
+    void solicitarLocalizacao().then((posicao) => {
+      if (!posicao && !cancelado && useLocalizacaoStore.getState().estado === 'verificando')
+        aplicarEstado('prompt')
+    })
+  }
+  const aoMudar = () => status && aplicarPermissao(status.state)
 
   if (navigator.permissions?.query) {
     navigator.permissions
@@ -87,11 +125,11 @@ export function iniciarMonitoramento(): () => void {
         if (cancelado) return
         status = resultado
         status.addEventListener('change', aoMudar)
-        aplicarEstado(status.state)
+        aplicarPermissao(status.state)
       })
-      .catch(() => !cancelado && aplicarEstado('prompt'))
+      .catch(() => !cancelado && aplicarPermissao('prompt'))
   } else {
-    aplicarEstado('prompt')
+    aplicarPermissao('prompt')
   }
 
   return () => {

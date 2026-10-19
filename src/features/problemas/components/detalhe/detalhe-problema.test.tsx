@@ -117,22 +117,15 @@ describe('DetalheProblema', () => {
     renderizar(ATIVA)
 
     await userEvent.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
-    expect(screen.getByRole('button', { name: 'Voto rápido: Não está lá' })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Não está lá' })).toBeDisabled()
   })
 
-  it('voto pendente no card rápido desabilita os botões do detalhe (um voto por vez)', async () => {
+  it('aberto (folha expandida ou desktop), só o cartão completo pergunta "Ainda está lá?"', async () => {
     entrarComoCidadao()
-    server.use(
-      http.put(rota('/problemas/:id/voto'), async () => {
-        await delay('infinite')
-      }),
-    )
     renderizar(ATIVA)
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Voto rápido: Sim, está lá' }))
-    expect(screen.getByRole('button', { name: 'Sim, está lá' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Não está lá' })).toBeDisabled()
+    expect(await screen.findByRole('button', { name: 'Sim, está lá' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
 
   it('souAutor: sem botões de voto, com a dica no cartão', async () => {

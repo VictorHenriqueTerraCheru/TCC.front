@@ -40,12 +40,21 @@ export function PainelResponsivo({
   const snap = snaps ? snaps[aberto ? 1 : 0]! : null
 
   const observador = useRef<ResizeObserver | null>(null)
+  // Aberta, o resumo encolhe (os polegares saem): a medida só vale recolhida, senão a folha
+  // voltaria para um estágio baixo demais e pularia quando os polegares reaparecessem. A ref muda
+  // junto com o estado, não num efeito: o ResizeObserver entrega a mudança de altura antes dos
+  // efeitos passivos e veria o estágio anterior.
+  const abertoRef = useRef(aberto)
+  const mudarAberto = useCallback((valor: boolean) => {
+    abertoRef.current = valor
+    setAberto(valor)
+  }, [])
   const medirResumo = useCallback((elemento: HTMLElement | null) => {
     observador.current?.disconnect()
     observador.current = null
     if (!elemento) return
     const medir = () => {
-      if (elemento.offsetHeight === 0) return
+      if (abertoRef.current || elemento.offsetHeight === 0) return
       // O resumo termina onde a folha para, mais o respiro de baixo da rolagem, que já é
       // max(1,5 rem, área segura): o texto não encosta na barra de gestos do iPhone/Android.
       const rolagem = elemento.closest<HTMLElement>('[data-rolagem-painel]')
@@ -72,7 +81,7 @@ export function PainelResponsivo({
   }
 
   const recolhido = !!snaps && !aberto
-  const expandir = () => setAberto(true)
+  const expandir = () => mudarAberto(true)
 
   return (
     <ContextoPainel.Provider value={{ recolhido, expandir, medirResumo }}>
@@ -83,7 +92,7 @@ export function PainelResponsivo({
         {...(snaps && {
           snapPoints: snaps,
           activeSnapPoint: snap,
-          setActiveSnapPoint: (ponto: number | string | null) => setAberto(ponto === snaps[1]),
+          setActiveSnapPoint: (ponto: number | string | null) => mudarAberto(ponto === snaps[1]),
         })}
       >
         <DrawerContent
@@ -102,7 +111,8 @@ export function PainelResponsivo({
               if (evento.target.getBoundingClientRect().bottom > window.innerHeight) expandir()
             }}
             className={cn(
-              'overflow-y-auto px-4 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]',
+              // overscroll-contain: chegar ao fim da rolagem da folha não passa o gesto ao mapa.
+              'overflow-y-auto overscroll-contain px-4 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]',
               // Os 15 % de baixo da folha ficam fora da tela no estágio aberto: a rolagem termina
               // na parte visível (senão o foco do teclado pode parar fora da tela). 1,25rem = alça.
               snaps && 'max-h-[calc(85dvh-1.25rem)]',
