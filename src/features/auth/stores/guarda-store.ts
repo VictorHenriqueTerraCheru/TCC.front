@@ -8,8 +8,7 @@ export type MotivoConta = 'votar' | 'registrar'
 
 /** Ação que o visitante tentou fazer; quem sabe executá-la é a tela de destino. */
 export type AcaoPendente =
-  | { tipo: 'votarExistencia'; problemaId: string; valor: Schema<'ValorExistencia'> }
-  | { tipo: 'votarPersistencia'; problemaId: string; valor: Schema<'ValorPersistencia'> }
+  | { tipo: 'votar'; problemaId: string; valor: Schema<'ValorVotoContrato'> }
   /** Registro interrompido por um 401: conferir duplicatas ou enviar (o rascunho está salvo). */
   | { tipo: 'continuarRegistro'; passo: 'conferir' | 'enviar' }
 

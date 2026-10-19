@@ -62,7 +62,7 @@ src/
 
 Features (mesmas áreas do back, mais as de tela): `auth`, `usuarios` (dados de `/me` e do histórico), `categorias`, `problemas` (marcadores, detalhe, votos, recentes), `incidentes`, `registro`, `verificacao` (pedido e cartão do perfil; depende de `usuarios`), `admin` (fila; depende de `verificacao`), `geocodificacao`, `localizacao`, `aparencia` (escolha do tema na primeira abertura e o seletor de Configurações), e as de tela `mapa` (compõe problemas + incidentes, dona de `/mapa/*`) e `perfil` (compõe usuarios + verificacao: perfil, histórico, configurações).
 
-Votos ficam em `problemas/` (são `/problemas/{id}/votos/*` e mexem no cache do detalhe): uma feature `votos` separada criaria dependência circular com `problemas`. Quando duas features precisariam uma da outra, quem compõe é a de tela (`mapa`) ou o `app/`.
+Votos ficam em `problemas/` (é `/problemas/{id}/voto` e mexe no cache do detalhe): uma feature `votos` separada criaria dependência circular com `problemas`. Quando duas features precisariam uma da outra, quem compõe é a de tela (`mapa`) ou o `app/`.
 
 Fluxo: **page** (borda) → **hook de `api/`** (o "service" do front) → cliente tipado `api` → API. O hook usa `api.GET('/rota', …).then(dados)`: `dados()` devolve o corpo ou lança `ApiError`; para respostas 204, `.then(semConteudo)`.
 
@@ -70,7 +70,7 @@ Componentes de layout compartilhados (`common/components/`): `MapaVetorial` (Map
 
 ### Guarda e ação pendente (regras 1 e 13)
 
-`exigirConta(motivo, acao, { pendente, retorno })` executa `acao` se há sessão; senão guarda `{ retorno, acao: pendente }` em `sessionStorage` (`ocorrencias.pendencia`) e abre a folha. Login/cadastro chamam `concluirLogin()` e navegam para `retorno`; **a tela de destino executa a ação** com `useConsumirAcaoPendente()` (ex.: `problemas/hooks/use-votos.ts`), porque só ela sabe como. "Agora não" e "← Voltar" no login descartam a pendência. Num `401`, o middleware limpa a sessão e marca `expirou`; o `onError` da chamada passa de novo pela guarda, que agora vê o visitante e guarda a ação. Ao entrar/sair, `useSincronizarCacheComSessao` invalida o cache do TanStack Query (meusVotos, souAutor, /me).
+`exigirConta(motivo, acao, { pendente, retorno })` executa `acao` se há sessão; senão guarda `{ retorno, acao: pendente }` em `sessionStorage` (`ocorrencias.pendencia`) e abre a folha. Login/cadastro chamam `concluirLogin()` e navegam para `retorno`; **a tela de destino executa a ação** com `useConsumirAcaoPendente()` (ex.: `problemas/hooks/use-votos.ts`), porque só ela sabe como. "Agora não" e "← Voltar" no login descartam a pendência. Num `401`, o middleware limpa a sessão e marca `expirou`; o `onError` da chamada passa de novo pela guarda, que agora vê o visitante e guarda a ação. Ao entrar/sair, `useSincronizarCacheComSessao` invalida o cache do TanStack Query (meuVoto, souAutor, /me).
 
 Layouts de rota: `RaizLayout` (monitor de localização, redirecionamento da pré-permissão, sincronização do cache, folha da guarda) → `AppLayout` (com navegação) ou `TelaCheiaLayout` (login, cadastro, pré-permissão; cartão centralizado no desktop).
 

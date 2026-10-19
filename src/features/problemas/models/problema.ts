@@ -4,5 +4,5 @@ export type ProblemaNaArea = Schema<'ListarProblemasNaAreaResponse'>
 export type StatusProblema = Schema<'StatusProblema'>
 export type FaixaConfianca = Schema<'FaixaConfianca'>
 export type DetalheProblema = Schema<'ObterDetalheProblemaResponse'>
-export type ValorExistencia = Schema<'ValorExistencia'>
-export type ValorPersistencia = Schema<'ValorPersistencia'>
+/** Resposta a "Ainda está lá?": alimenta a confiança e o ciclo de vida na API. */
+export type ValorVoto = Schema<'ValorVotoContrato'>

@@ -123,7 +123,7 @@ try {
       await p.getByLabel('Senha', { exact: true }).fill(NOVO.senha)
       await p.locator('#aceitou-termos').check()
       const votou = p.waitForResponse(
-        (r) => /\/votos\//.test(r.url()) && r.request().method() !== 'GET',
+        (r) => /\/voto$/.test(r.url()) && r.request().method() === 'PUT',
       )
       await p.getByRole('button', { name: /criar conta/i }).click()
       await p.waitForURL(new RegExp(`/mapa/problema/${estado.problemaSeed}`))
@@ -131,11 +131,12 @@ try {
       confere(resposta.ok(), `voto retomado respondeu ${resposta.status()}`)
       estado.usuarioId = sql(`select id from usuarios where email = '${NOVO.email}'`)
       confere(estado.usuarioId, 'usuário novo não está no banco')
+      await p.getByRole('button', { name: /^Voto rápido/, pressed: true }).waitFor()
+      // Voto único "Ainda está lá?": uma linha por usuário e problema.
       const votos = sql(
         `select count(*) from votos where usuario_id = '${estado.usuarioId}' and problema_id = '${estado.problemaSeed}'`,
       )
       confere(votos === '1', `esperava 1 voto no banco, há ${votos}`)
-      await p.getByRole('button', { name: /^Voto rápido/, pressed: true }).waitFor()
       return `usuário ${estado.usuarioId.slice(0, 8)} no banco, voto gravado e marcado na tela`
     },
   )
@@ -299,13 +300,11 @@ try {
       const card = q.getByRole('region', { name: 'Resumo do alerta' })
       await card.waitFor()
       const antes = await card.innerText()
-      const votou = q.waitForResponse((r) => /\/votos\/existencia/.test(r.url()))
-      await q.getByRole('button', { name: 'Voto rápido: Confirmar que existe' }).click()
+      const votou = q.waitForResponse((r) => /\/voto$/.test(r.url()))
+      await q.getByRole('button', { name: 'Voto rápido: Sim, está lá' }).click()
       const resposta = await votou
       confere(resposta.ok(), `voto respondeu ${resposta.status()}`)
-      await q
-        .getByRole('button', { name: 'Voto rápido: Confirmar que existe', pressed: true })
-        .waitFor()
+      await q.getByRole('button', { name: 'Voto rápido: Sim, está lá', pressed: true }).waitFor()
       await card.getByText('1 confirmaram').waitFor()
       const votos = sql(
         `select count(*) from votos where problema_id = '${estado.problemaNovo}' and usuario_id <> '${estado.usuarioId}'`,

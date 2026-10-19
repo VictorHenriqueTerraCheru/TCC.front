@@ -5,7 +5,7 @@ import { historicoInicial, verificacoesIniciais } from './fixtures/perfil'
 import { calorIncidentes } from './fixtures/problemas'
 import { usuariosIniciais } from './fixtures/usuarios'
 
-type MeusVotos = Schema<'ObterDetalheProblemaMeusVotos'>
+type ValorVoto = Schema<'ValorVotoContrato'>
 type Detalhe = Schema<'ObterDetalheProblemaResponse'>
 type CelulaCalor = Schema<'ObterCalorIncidentesResponse'>
 type Verificacao = Schema<'ListarVerificacoesItem'>
@@ -23,7 +23,7 @@ export function metrosEntre(a: { lat: number; lng: number }, b: { lat: number; l
 
 /** Estado em memória da API falsa (usuário logado no mock). Reiniciado a cada teste. */
 let detalhes = criarDetalhes()
-let votos = new Map<string, MeusVotos>()
+let votos = new Map<string, ValorVoto>()
 let usuarios = [...usuariosIniciais]
 let autoria = new Set([ID_DO_AUTOR])
 let celulas = [...calorIncidentes]
@@ -167,7 +167,7 @@ export const banco = {
     if (!detalhe) return null
     return {
       ...detalhe,
-      meusVotos: autenticado ? (votos.get(id) ?? { existencia: null, persistencia: null }) : null,
+      meuVoto: autenticado ? (votos.get(id) ?? null) : null,
       souAutor: autenticado && autoria.has(id),
     }
   },
@@ -186,7 +186,7 @@ export const banco = {
         criadoEm: d.criadoEm,
         distanciaMetros: Math.round(distancia),
         faixa: d.faixa,
-        confirmacoes: d.existencia.confirmacoes,
+        confirmacoes: d.votos.sim,
       }))
   },
   registrarProblema(categoriaId: number, lat: number, lng: number, descricao: string | null) {
@@ -208,28 +208,31 @@ export const banco = {
         necessarios: 5,
         encerraEm: new Date(agora.getTime() + 72 * 3_600_000).toISOString(),
       },
-      existencia: { confirmacoes: 0, naoVi: 0 },
-      persistencia: { continua: 0, resolvido: 0, resolvidoUltimas24h: 0 },
-      meusVotos: null,
+      votos: { sim: 0, nao: 0, naoUltimas24h: 0 },
+      meuVoto: null,
       souAutor: false,
     }
     detalhes.set(detalhe.id, detalhe)
     autoria.add(detalhe.id)
     return banco.detalhe(detalhe.id, true)!
   },
-  votar(id: string, tipo: 'existencia' | 'persistencia', valor: string) {
+  votar(id: string, valor: ValorVoto) {
     const detalhe = detalhes.get(id)!
-    const meus = votos.get(id) ?? { existencia: null, persistencia: null }
-    const anterior = meus[tipo]
-    if (anterior !== valor) {
-      const contagem =
-        tipo === 'existencia' ? { ...detalhe.existencia } : { ...detalhe.persistencia }
-      const balde = (v: string) => (v === 'confirma' ? 'confirmacoes' : v) as keyof typeof contagem
-      if (anterior) (contagem[balde(anterior)] as number)--
-      ;(contagem[balde(valor)] as number)++
-      detalhes.set(id, { ...detalhe, [tipo]: contagem })
-      votos.set(id, { ...meus, [tipo]: valor } as MeusVotos)
+    const anterior = votos.get(id) ?? null
+    if (anterior === valor) return
+    const contagem = { ...detalhe.votos }
+    if (anterior === 'sim') contagem.sim--
+    if (anterior === 'nao') {
+      contagem.nao--
+      contagem.naoUltimas24h--
     }
+    if (valor === 'sim') contagem.sim++
+    else {
+      contagem.nao++
+      contagem.naoUltimas24h++
+    }
+    detalhes.set(id, { ...detalhe, votos: contagem })
+    votos.set(id, valor)
   },
 
   calor(): CelulaCalor[] {

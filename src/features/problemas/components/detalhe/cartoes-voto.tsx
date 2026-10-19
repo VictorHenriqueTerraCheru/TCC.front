@@ -1,5 +1,6 @@
 import { Icone } from '@/common/components/icone'
 import { distanciaTexto } from '@/common/lib/formatacao'
+import { cn } from '@/common/lib/utils'
 
 import { mensagemErroVoto } from '../../errors'
 import { useDistanciaAte } from '../../hooks/use-distancia-ate'
@@ -7,178 +8,100 @@ import { useVotos } from '../../hooks/use-votos'
 import type { DetalheProblema } from '../../models/problema'
 import { BotaoVoto } from './botao-voto'
 
-interface CartaoProps {
-  problema: DetalheProblema
-}
-
 const DICA_AUTOR = 'Você registrou este problema'
 
-function ErroVoto({ erro }: { erro: unknown }) {
-  if (!erro) return null
-  return (
-    <p role="alert" className="mt-2 text-xs text-destructive">
-      {mensagemErroVoto(erro)}
-    </p>
-  )
+function pessoas(n: number) {
+  return n === 1 ? '1 pessoa disse' : `${n} pessoas disseram`
 }
 
-/** Tela 3: os dois cartões lado a lado (Ativa). */
-export function CartoesAtiva({ problema }: CartaoProps) {
-  const { existencia, persistencia, votarExistencia, votarPersistencia, meus, votando } =
-    useVotos(problema)
-  const { confirmacoes } = problema.existencia
-  const { continua, resolvido } = problema.persistencia
-
-  return (
-    <div className="grid grid-cols-2 gap-2">
-      <section className="flex flex-col rounded-2xl border border-border/60 bg-card p-3">
-        <h3 className="text-xs font-medium">Confirmações de existência</h3>
-        <p className="mt-1">
-          <span className="text-4xl">{confirmacoes}</span>{' '}
-          <span className="text-xs text-muted-foreground">
-            {confirmacoes === 1 ? 'pessoa' : 'pessoas'}
-          </span>
-        </p>
-        <p className="mb-3 text-xs text-muted-foreground">Viram o problema no local</p>
-        <BotaoVoto
-          className="mt-auto"
-          variante="tonal"
-          selecionado={meus.existencia === 'confirma'}
-          disabled={problema.souAutor || votando}
-          title={problema.souAutor ? DICA_AUTOR : undefined}
-          onClick={() => votarExistencia('confirma')}
-        >
-          Confirmar que existe
-        </BotaoVoto>
-        {problema.souAutor && <p className="mt-2 text-xs text-muted-foreground">{DICA_AUTOR}</p>}
-        <ErroVoto erro={existencia.error} />
-      </section>
-
-      <section className="flex flex-col rounded-2xl border border-border/60 bg-card p-3">
-        <h3 className="text-xs font-medium">Ainda está lá?</h3>
-        <p className="mt-1 mb-3">
-          <span className="text-4xl">{continua}</span>{' '}
-          <span className="text-xs text-muted-foreground">sim</span>{' '}
-          <span className="text-4xl">{resolvido}</span>{' '}
-          <span className="text-xs text-muted-foreground">não</span>
-        </p>
-        <div className="mt-auto flex flex-col gap-2">
-          <BotaoVoto
-            variante="tonal"
-            selecionado={meus.persistencia === 'continua'}
-            disabled={votando}
-            onClick={() => votarPersistencia('continua')}
-          >
-            Sim, continua
-          </BotaoVoto>
-          <BotaoVoto
-            variante="outline"
-            selecionado={meus.persistencia === 'resolvido'}
-            disabled={votando}
-            onClick={() => votarPersistencia('resolvido')}
-          >
-            Não, foi resolvido
-          </BotaoVoto>
-        </div>
-        <ErroVoto erro={persistencia.error} />
-      </section>
-    </div>
-  )
-}
-
-// "Viu este fio?" — substantivo por categoria (seed fixo).
-const substantivo: Record<string, string> = {
-  buraco: 'buraco',
-  calcada: 'dano na calçada',
-  poste: 'poste apagado',
-  fio: 'fio',
-  descarte: 'descarte',
-  lixo: 'lixo',
-}
-
-/** Tela 22: cartão azul convidando a confirmar um registro novo. */
-export function CartaoAvaliarNova({ problema }: CartaoProps) {
-  const { existencia, votarExistencia, meus, votando } = useVotos(problema)
+/** Destaque por status: o convite muda, a pergunta é a mesma. */
+function Convite({ problema }: { problema: DetalheProblema }) {
   const distancia = useDistanciaAte(problema)
-  const pergunta = `Viu este ${substantivo[problema.categoria.icone] ?? 'problema'}?`
 
-  return (
-    <section className="rounded-2xl bg-primario-suave p-4 text-primario">
+  if (problema.status === 'nova') {
+    return (
       <div className="mb-1 flex items-start gap-3">
         <Icone nome="near_me" preenchido className="mt-0.5 text-[20px]" />
         <div>
           <h3 className="font-medium">
             {distancia !== null
-              ? `Você está a ${distanciaTexto(distancia)}. ${pergunta}`
-              : pergunta}
+              ? `Você está a ${distanciaTexto(distancia)}. Ainda está lá?`
+              : 'Ainda está lá?'}
           </h3>
           <p className="text-sm">Quem está perto ajuda mais a avaliar registros novos.</p>
         </div>
       </div>
-      <div className="mt-3 flex gap-2">
-        <BotaoVoto
-          className="flex-1"
-          variante="default"
-          selecionado={meus.existencia === 'confirma'}
-          disabled={problema.souAutor || votando}
-          onClick={() => votarExistencia('confirma')}
-        >
-          Confirmar que existe
-        </BotaoVoto>
-        <BotaoVoto
-          variante="outline"
-          className="border-primario/40 text-primario"
-          selecionado={meus.existencia === 'naoVi'}
-          disabled={problema.souAutor || votando}
-          onClick={() => votarExistencia('naoVi')}
-        >
-          Não vi
-        </BotaoVoto>
-      </div>
-      {problema.souAutor && <p className="mt-2 text-xs">{DICA_AUTOR}</p>}
-      <ErroVoto erro={existencia.error} />
-    </section>
-  )
+    )
+  }
+
+  if (problema.status === 'possivelmenteResolvida') {
+    return (
+      <>
+        <h3 className="mb-2 text-2xl">Ainda está lá?</h3>
+        <p className="text-sm">
+          {pessoas(problema.votos.naoUltimas24h)} que não está mais lá nas últimas 24 h. Se você
+          passou por lá, ajude a confirmar.
+        </p>
+      </>
+    )
+  }
+
+  return <h3 className="font-medium">Ainda está lá?</h3>
 }
 
-/** Tela 23: "Ainda está lá?" em destaque, com os votos de resolvido nas últimas 24 h. */
-export function CartaoAindaEstaLa({ problema }: CartaoProps) {
-  const { persistencia, votarPersistencia, meus, votando } = useVotos(problema)
-  const { continua, resolvido, resolvidoUltimas24h } = problema.persistencia
+/**
+ * A única pergunta do detalhe (telas 3, 22 e 23). A mesma resposta alimenta, na API, a confiança
+ * e o ciclo de vida: "Sim" = viu no local; "Não" = foi resolvido ou não encontrou. Nova e
+ * Possivelmente resolvida ganham o cartão azul de destaque; Ativa, um cartão neutro.
+ */
+export function CartaoVoto({ problema }: { problema: DetalheProblema }) {
+  const { erro, votar, meuVoto, votando, podeVotar } = useVotos(problema)
+  const destaque = problema.status !== 'ativa'
+  const { sim, nao } = problema.votos
 
   return (
-    <section className="rounded-2xl bg-primario-suave p-4 text-primario">
-      <h3 className="mb-2 text-2xl">Ainda está lá?</h3>
-      <p className="text-sm">
-        {resolvidoUltimas24h === 1
-          ? '1 pessoa disse que foi resolvido nas últimas 24 h.'
-          : `${resolvidoUltimas24h} pessoas disseram que foi resolvido nas últimas 24 h.`}{' '}
-        Se você passou por lá, ajude a confirmar.
+    <section
+      className={cn(
+        'rounded-2xl p-4',
+        destaque ? 'bg-primario-suave text-primario' : 'border border-border/60 bg-card',
+      )}
+    >
+      <Convite problema={problema} />
+      <p className={cn('mt-2 text-xs', destaque ? 'font-medium' : 'text-muted-foreground')}>
+        <span className={cn('text-2xl', !destaque && 'text-foreground')}>{sim}</span> sim{' '}
+        <span className={cn('ml-2 text-2xl', !destaque && 'text-foreground')}>{nao}</span> não
       </p>
-      <p className="mt-2 text-xs font-medium">
-        {resolvido} · foi resolvido <span className="ml-3">{continua} · continua</span>
-      </p>
-      <div className="mt-3 flex gap-2">
-        <BotaoVoto
-          className="flex-1"
-          variante="default"
-          selecionado={meus.persistencia === 'continua'}
-          disabled={votando}
-          onClick={() => votarPersistencia('continua')}
-        >
-          Sim, continua
-        </BotaoVoto>
-        <BotaoVoto
-          className="flex-1 border-primario/40 text-primario"
-          variante="outline"
-          selecionado={meus.persistencia === 'resolvido'}
-          disabled={votando}
-          onClick={() => votarPersistencia('resolvido')}
-        >
-          Não, foi resolvido
-        </BotaoVoto>
-      </div>
-      <ErroVoto erro={persistencia.error} />
+      {podeVotar ? (
+        <div className="mt-3 flex gap-2">
+          <BotaoVoto
+            className="flex-1"
+            variante={destaque ? 'default' : 'tonal'}
+            selecionado={meuVoto === 'sim'}
+            disabled={votando}
+            onClick={() => votar('sim')}
+          >
+            Sim, está lá
+          </BotaoVoto>
+          <BotaoVoto
+            className={cn('flex-1', destaque && 'border-primario/40 text-primario')}
+            variante="outline"
+            selecionado={meuVoto === 'nao'}
+            disabled={votando}
+            onClick={() => votar('nao')}
+          >
+            Não está lá
+          </BotaoVoto>
+        </div>
+      ) : (
+        problema.souAutor && (
+          <p className={cn('mt-2 text-xs', !destaque && 'text-muted-foreground')}>{DICA_AUTOR}</p>
+        )
+      )}
+      {erro && (
+        <p role="alert" className="mt-2 text-xs text-destructive">
+          {mensagemErroVoto(erro)}
+        </p>
+      )}
     </section>
   )
 }

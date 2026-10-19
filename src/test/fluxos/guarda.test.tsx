@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 
@@ -17,9 +17,6 @@ function abrir(caminho: string) {
   return renderizarRotas(rotas, caminho)
 }
 
-const cartaoExistencia = () =>
-  screen.getByRole('heading', { name: 'Confirmações de existência' }).closest('section')!
-
 async function entrarComo(usuario: ReturnType<typeof userEvent.setup>, email: string) {
   await usuario.type(await screen.findByLabelText('E-mail'), email)
   await usuario.type(screen.getByLabelText('Senha'), 'tcc12345')
@@ -36,33 +33,33 @@ describe('guarda "visitante vê, conta age"', () => {
     const usuario = userEvent.setup()
     const { router } = abrir(`/mapa/problema/${ATIVA}?modo=ambos`)
 
-    await usuario.click(await screen.findByRole('button', { name: 'Confirmar que existe' }))
+    await usuario.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
     await usuario.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
     expect(router.state.location.pathname).toBe('/login')
 
     await entrarComo(usuario, 'cidadao1@tcc.local')
 
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Confirmar que existe' })).toHaveAttribute(
+      expect(screen.getByRole('button', { name: 'Sim, está lá' })).toHaveAttribute(
         'aria-pressed',
         'true',
       ),
     )
     expect(router.state.location.pathname).toBe(`/mapa/problema/${ATIVA}`)
     expect(router.state.location.search).toBe('?modo=ambos')
-    expect(within(cartaoExistencia()).getByText('16')).toBeInTheDocument()
+    expect(screen.getByText(/Calculada com 17 votos/)).toBeInTheDocument()
   })
 
   it('card rápido: visitante toca no polegar → login → o voto é retomado (regra 1)', async () => {
     const usuario = userEvent.setup()
     const { router } = abrir(`/mapa/problema/${ATIVA}`)
 
-    await usuario.click(await screen.findByRole('button', { name: 'Voto rápido: Sim, continua' }))
+    await usuario.click(await screen.findByRole('button', { name: 'Voto rápido: Sim, está lá' }))
     await usuario.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
     await entrarComo(usuario, 'cidadao1@tcc.local')
 
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Voto rápido: Sim, continua' })).toHaveAttribute(
+      expect(screen.getByRole('button', { name: 'Voto rápido: Sim, está lá' })).toHaveAttribute(
         'aria-pressed',
         'true',
       ),
@@ -74,24 +71,24 @@ describe('guarda "visitante vê, conta age"', () => {
     const usuario = userEvent.setup()
     const { router } = abrir(`/mapa/problema/${ATIVA}`)
 
-    await usuario.click(await screen.findByRole('button', { name: 'Confirmar que existe' }))
+    await usuario.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
     await usuario.click(await screen.findByRole('button', { name: 'Agora não' }))
     expect(JSON.parse(sessionStorage.getItem('ocorrencias.pendencia')!).state.pendencia).toBeNull()
     await router.navigate('/login', { state: { de: `/mapa/problema/${ATIVA}` } })
     await entrarComo(usuario, 'cidadao1@tcc.local')
 
-    expect(await screen.findByRole('button', { name: 'Confirmar que existe' })).toHaveAttribute(
+    expect(await screen.findByRole('button', { name: 'Sim, está lá' })).toHaveAttribute(
       'aria-pressed',
       'false',
     )
-    expect(within(cartaoExistencia()).getByText('15')).toBeInTheDocument()
+    expect(screen.getByText(/Calculada com 16 votos/)).toBeInTheDocument()
   })
 
   it('"voltar" do navegador no login também esquece o voto', async () => {
     const usuario = userEvent.setup()
     const { router } = abrir(`/mapa/problema/${ATIVA}`)
 
-    await usuario.click(await screen.findByRole('button', { name: 'Confirmar que existe' }))
+    await usuario.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
     await usuario.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
     expect(router.state.location.pathname).toBe('/login')
     await router.navigate(-1)
@@ -139,16 +136,11 @@ describe('guarda "visitante vê, conta age"', () => {
 
   it('token expirado (401) limpa a sessão e reabre a guarda com o voto guardado (regra 13)', async () => {
     entrarComoCidadao()
-    server.use(
-      http.put(
-        rota('/problemas/:id/votos/existencia'),
-        () => new HttpResponse(null, { status: 401 }),
-      ),
-    )
+    server.use(http.put(rota('/problemas/:id/voto'), () => new HttpResponse(null, { status: 401 })))
     const usuario = userEvent.setup()
     abrir(`/mapa/problema/${ATIVA}`)
 
-    await usuario.click(await screen.findByRole('button', { name: 'Confirmar que existe' }))
+    await usuario.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
 
     expect(await screen.findByRole('heading', { name: 'Entre para votar' })).toBeInTheDocument()
     expect(
@@ -158,9 +150,9 @@ describe('guarda "visitante vê, conta age"', () => {
     expect(
       JSON.parse(sessionStorage.getItem('ocorrencias.pendencia')!).state.pendencia.acao,
     ).toEqual({
-      tipo: 'votarExistencia',
+      tipo: 'votar',
       problemaId: ATIVA,
-      valor: 'confirma',
+      valor: 'sim',
     })
   })
 })

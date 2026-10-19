@@ -8,7 +8,7 @@ import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
 import { CategoriaIcone } from '@/features/categorias'
-import { detalheProblemaQuery, useVotarExistencia } from '@/features/problemas'
+import { detalheProblemaQuery, useVotar } from '@/features/problemas'
 import type { Schema } from '@/infrastructure/api'
 
 import { duplicatasQuery } from '../api/use-registro'
@@ -73,7 +73,7 @@ export function ConferenciaPage() {
   })
   const [escolhidaId, setEscolhidaId] = useState<string | null>(null)
   const escolhida = duplicatas?.find((d) => d.id === escolhidaId) ?? duplicatas?.[0]
-  const confirmar = useVotarExistencia(escolhida?.id ?? '')
+  const confirmar = useVotar(escolhida?.id ?? '')
   // /problemas/duplicatas não traz coordenadas: o ponto do vizinho vem do detalhe.
   const { data: vizinho } = useQuery({
     ...detalheProblemaQuery(escolhida?.id ?? ''),
@@ -85,7 +85,7 @@ export function ConferenciaPage() {
 
   function confirmarExistente() {
     if (!escolhida) return
-    confirmar.mutate('confirma', {
+    confirmar.mutate('sim', {
       onSuccess: (problema) => {
         navigate('/registrar/sucesso', { replace: true, state: { problema, confirmacao: true } })
       },

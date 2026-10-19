@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { Icone } from '@/common/components/icone'
 import { useDesktop } from '@/common/hooks/use-media-query'
@@ -10,7 +10,10 @@ interface PainelResponsivoProps {
   /** Nome acessível do painel (o título visível fica no conteúdo). */
   titulo: string
   aoFechar(): void
-  /** Celular: abre só com os primeiros `alturaResumo` px (card rápido); arrastar expande. */
+  /**
+   * Celular: abre só com os primeiros `alturaResumo` px (card rápido); arrastar expande. Se o
+   * conteúdo registrar o resumo (`medirResumo`), a altura medida substitui este valor.
+   */
   alturaResumo?: number
   children: ReactNode
 }
@@ -27,10 +30,34 @@ export function PainelResponsivo({
   children,
 }: PainelResponsivoProps) {
   const desktop = useDesktop()
+  const [alturaMedida, setAlturaMedida] = useState<number | null>(null)
+  const altura = alturaResumo ? (alturaMedida ?? alturaResumo) : null
   // O vaul calcula os estágios supondo a folha da altura da tela: ela tem h-dvh e o estágio
   // aberto para em 85 %, deixando o mapa à vista em cima.
-  const snaps = alturaResumo ? [`${alturaResumo}px`, 0.85] : undefined
-  const [snap, setSnap] = useState<number | string | null>(snaps?.[0] ?? null)
+  const snaps = useMemo(() => (altura ? [`${altura}px`, 0.85] : undefined), [altura])
+  // O estágio fica por posição: quando a medida muda o px do resumo, a folha continua nele.
+  const [aberto, setAberto] = useState(false)
+  const snap = snaps ? snaps[aberto ? 1 : 0]! : null
+
+  const observador = useRef<ResizeObserver | null>(null)
+  const medirResumo = useCallback((elemento: HTMLElement | null) => {
+    observador.current?.disconnect()
+    observador.current = null
+    if (!elemento) return
+    const medir = () => {
+      if (elemento.offsetHeight === 0) return
+      // O resumo termina onde a folha para, mais o respiro de baixo da rolagem, que já é
+      // max(1,5 rem, área segura): o texto não encosta na barra de gestos do iPhone/Android.
+      const rolagem = elemento.closest<HTMLElement>('[data-rolagem-painel]')
+      const respiro = rolagem ? parseFloat(getComputedStyle(rolagem).paddingBottom) || 0 : 0
+      setAlturaMedida(Math.ceil(elemento.offsetTop + elemento.offsetHeight + respiro))
+    }
+    medir()
+    if (typeof ResizeObserver !== 'undefined') {
+      observador.current = new ResizeObserver(medir)
+      observador.current.observe(elemento)
+    }
+  }, [])
 
   if (desktop) {
     return (
@@ -44,18 +71,20 @@ export function PainelResponsivo({
     )
   }
 
-  const recolhido = !!snaps && snap === snaps[0]
-  const expandir = () => {
-    if (snaps) setSnap(snaps[1] ?? null)
-  }
+  const recolhido = !!snaps && !aberto
+  const expandir = () => setAberto(true)
 
   return (
-    <ContextoPainel.Provider value={{ recolhido, expandir }}>
+    <ContextoPainel.Provider value={{ recolhido, expandir, medirResumo }}>
       <Drawer
         open
         modal={false}
-        onOpenChange={(aberto) => !aberto && aoFechar()}
-        {...(snaps && { snapPoints: snaps, activeSnapPoint: snap, setActiveSnapPoint: setSnap })}
+        onOpenChange={(visivel) => !visivel && aoFechar()}
+        {...(snaps && {
+          snapPoints: snaps,
+          activeSnapPoint: snap,
+          setActiveSnapPoint: (ponto: number | string | null) => setAberto(ponto === snaps[1]),
+        })}
       >
         <DrawerContent
           semFundo
@@ -65,13 +94,12 @@ export function PainelResponsivo({
         >
           <DrawerTitle className="sr-only">{titulo}</DrawerTitle>
           <div
+            data-rolagem-painel
             // Teclado: foco num elemento abaixo da borda do resumo expande a folha (senão ele
             // ficaria escondido fora da tela).
             onFocusCapture={(evento) => {
-              if (!snaps || snap !== snaps[0]) return
-              if (evento.target.getBoundingClientRect().bottom > window.innerHeight) {
-                setSnap(snaps[1] ?? null)
-              }
+              if (!recolhido) return
+              if (evento.target.getBoundingClientRect().bottom > window.innerHeight) expandir()
             }}
             className={cn(
               'overflow-y-auto px-4 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]',

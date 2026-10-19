@@ -2,7 +2,7 @@ import type { MaterialSymbol } from 'material-symbols'
 
 import { Icone } from '@/common/components/icone'
 import { usePainelResponsivo } from '@/common/hooks/use-painel-responsivo'
-import { distanciaTexto, tempoRelativo } from '@/common/lib/formatacao'
+import { distanciaTexto } from '@/common/lib/formatacao'
 import { cn } from '@/common/lib/utils'
 import { aparenciaDoGrupo, grupoDe, iconeDe } from '@/features/categorias'
 
@@ -11,8 +11,11 @@ import { useDistanciaAte } from '../../hooks/use-distancia-ate'
 import { useVotos } from '../../hooks/use-votos'
 import type { DetalheProblema } from '../../models/problema'
 
-/** Altura do primeiro estágio da folha no celular: só o card rápido aparece. */
-export const ALTURA_RESUMO = 184
+/**
+ * Altura do primeiro estágio da folha no celular antes da medida: o card registra-se no painel
+ * (`medirResumo`) e a folha passa a parar logo abaixo dele.
+ */
+export const ALTURA_RESUMO = 236
 
 interface Polegar {
   rotulo: string
@@ -42,66 +45,43 @@ function BotaoPolegar({ polegar, desabilitado }: { polegar: Polegar; desabilitad
 }
 
 /**
- * Card rápido do alerta (estilo Waze): primeiro estágio da folha do detalhe. Os polegares votam
- * o que o status pede, com a mesma guarda de conta do detalhe: existência em `nova`,
- * persistência em `ativa` e `possivelmenteResolvida`. O autor não vota existência; `resolvida`
- * é só leitura.
+ * Card rápido do alerta (estilo Waze): primeiro estágio da folha do detalhe. "Ainda está lá?" com
+ * os polegares, com a mesma guarda de conta do detalhe. O autor não vota; `resolvida` é só leitura.
  */
 export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
   const aparencia = aparenciaDoGrupo[grupoDe(problema.categoria)]
-  const painel = usePainelResponsivo()
+  const { recolhido, expandir, medirResumo } = usePainelResponsivo()
   const distancia = useDistanciaAte(problema)
-  const { existencia, persistencia, votarExistencia, votarPersistencia, meus, votando } =
-    useVotos(problema)
+  const { erro, votar, meuVoto, votando, podeVotar } = useVotos(problema)
 
-  let polegares: [Polegar, Polegar] | null = null
-  if (problema.status === 'nova' && !problema.souAutor) {
-    polegares = [
-      {
-        rotulo: 'Confirmar que existe',
-        icone: 'thumb_up',
-        cor: 'var(--voto-sim)',
-        marcado: meus.existencia === 'confirma',
-        votar: () => votarExistencia('confirma'),
-      },
-      {
-        rotulo: 'Não vi',
-        icone: 'thumb_down',
-        cor: 'var(--voto-nao)',
-        marcado: meus.existencia === 'naoVi',
-        votar: () => votarExistencia('naoVi'),
-      },
-    ]
-  } else if (problema.status === 'ativa' || problema.status === 'possivelmenteResolvida') {
-    polegares = [
-      {
-        rotulo: 'Sim, continua',
-        icone: 'thumb_up',
-        cor: 'var(--voto-sim)',
-        marcado: meus.persistencia === 'continua',
-        votar: () => votarPersistencia('continua'),
-      },
-      {
-        rotulo: 'Não, foi resolvido',
-        icone: 'thumb_down',
-        cor: 'var(--voto-nao)',
-        marcado: meus.persistencia === 'resolvido',
-        votar: () => votarPersistencia('resolvido'),
-      },
-    ]
-  }
-  const erro = existencia.error ?? persistencia.error
+  const polegares: [Polegar, Polegar] = [
+    {
+      rotulo: 'Sim, está lá',
+      icone: 'thumb_up',
+      cor: 'var(--voto-sim)',
+      marcado: meuVoto === 'sim',
+      votar: () => votar('sim'),
+    },
+    {
+      rotulo: 'Não está lá',
+      icone: 'thumb_down',
+      cor: 'var(--voto-nao)',
+      marcado: meuVoto === 'nao',
+      votar: () => votar('nao'),
+    },
+  ]
 
   return (
     // Tocar no card (fora dos polegares) expande a folha: alternativa de um toque ao arrasto.
     <section
+      ref={medirResumo}
       aria-label="Resumo do alerta"
-      className={cn('pr-10', painel.recolhido && 'cursor-pointer')}
+      className={cn(recolhido && 'cursor-pointer')}
       onClick={(evento) => {
-        if (!(evento.target as Element).closest('button')) painel.expandir()
+        if (!(evento.target as Element).closest('button')) expandir()
       }}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 pr-10">
         <span
           aria-hidden="true"
           className="flex size-12 shrink-0 items-center justify-center rounded-full text-white"
@@ -116,24 +96,25 @@ export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
           </h2>
         </div>
       </div>
-      <div className="mt-3 flex items-end gap-3">
-        <div className="min-w-0 flex-1 text-[13px] text-muted-foreground">
-          <p className="truncate">
-            {problema.endereco} · {tempoRelativo(problema.criadoEm)}
-          </p>
-          <p>
-            {problema.existencia.confirmacoes} confirmaram
-            {distancia !== null && ` · ${distanciaTexto(distancia)} de você`}
-          </p>
-        </div>
-        {polegares && (
-          <div className="flex shrink-0 gap-2">
-            {polegares.map((polegar) => (
-              <BotaoPolegar key={polegar.rotulo} polegar={polegar} desabilitado={votando} />
-            ))}
-          </div>
-        )}
+      <div className="mt-3 space-y-1 text-[13px] text-muted-foreground">
+        <p className="flex items-start gap-1.5">
+          <Icone nome="location_on" className="mt-px text-[16px]" />
+          <span className="line-clamp-2">{problema.endereco}</span>
+        </p>
+        <p className="flex items-center gap-1.5">
+          <Icone nome="group" className="text-[16px]" />
+          {problema.votos.sim} confirmaram
+          {distancia !== null && ` · ${distanciaTexto(distancia)} de você`}
+        </p>
       </div>
+      {podeVotar && (
+        <div className="mt-3 flex items-center gap-3 rounded-2xl bg-foreground/5 py-2 pr-2 pl-4">
+          <p className="min-w-0 flex-1 text-[15px] font-semibold">Ainda está lá?</p>
+          {polegares.map((polegar) => (
+            <BotaoPolegar key={polegar.rotulo} polegar={polegar} desabilitado={votando} />
+          ))}
+        </div>
+      )}
       {erro && (
         <p role="alert" className="mt-2 text-xs text-destructive">
           {mensagemErroVoto(erro)}

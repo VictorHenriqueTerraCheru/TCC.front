@@ -1,6 +1,7 @@
 import type { MaterialSymbol } from 'material-symbols'
 
 import { Icone } from '@/common/components/icone'
+import { usePainelResponsivo } from '@/common/hooks/use-painel-responsivo'
 import { horaCurta, tempoRelativo } from '@/common/lib/formatacao'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
@@ -10,7 +11,7 @@ import { isApiError } from '@/infrastructure/api'
 import { useDetalheProblema } from '../../api/use-detalhe-problema'
 import type { DetalheProblema as Detalhe, StatusProblema } from '../../models/problema'
 import { BarraAvaliacao, BarraConfianca } from './barras'
-import { CartaoAindaEstaLa, CartaoAvaliarNova, CartoesAtiva } from './cartoes-voto'
+import { CartaoVoto } from './cartoes-voto'
 import { ResumoAlerta } from './resumo-alerta'
 import { RodapeLocalizacao } from './rodape-localizacao'
 
@@ -49,16 +50,10 @@ function ChipStatus({ status }: { status: StatusProblema }) {
   )
 }
 
+/** O endereço fica no resumo, que continua à vista com a folha aberta. */
 function Informacoes({ problema }: { problema: Detalhe }) {
   return (
     <div className="mb-4 space-y-3 text-sm">
-      <div className="flex gap-3">
-        <Icone nome="location_on" className="text-[20px] text-muted-foreground" />
-        <div>
-          <p>{problema.endereco}</p>
-          <p className="text-xs text-muted-foreground">Endereço aproximado</p>
-        </div>
-      </div>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <Icone nome="schedule" className="text-[20px] text-muted-foreground" />
         <p className="flex-1">
@@ -71,8 +66,8 @@ function Informacoes({ problema }: { problema: Detalhe }) {
   )
 }
 
-function legendaConfianca({ existencia }: Detalhe) {
-  const votos = existencia.confirmacoes + existencia.naoVi
+function legendaConfianca({ votos: { sim, nao } }: Detalhe) {
+  const votos = sim + nao
   return `Calculada com ${votos} ${votos === 1 ? 'voto' : 'votos'}, ponderados por proximidade e histórico de quem votou.`
 }
 
@@ -81,7 +76,7 @@ function Corpo({ problema }: { problema: Detalhe }) {
   // Resolvida sai do mapa, mas o detalhe ainda abre por link salvo ou logo após o voto que a
   // resolveu. A API recusa votos nesse estado (problema-resolvido): só leitura.
   if (problema.status === 'resolvida') {
-    const { resolvido } = problema.persistencia
+    const { nao: resolvido } = problema.votos
     return (
       <p className="flex items-start gap-3 rounded-2xl bg-primario-suave p-4 text-sm">
         <Icone nome="check_circle" preenchido className="text-[20px] text-primario" />
@@ -95,31 +90,24 @@ function Corpo({ problema }: { problema: Detalhe }) {
   }
 
   if (problema.status === 'nova') {
-    const { confirmacoes } = problema.existencia
     return (
       <>
         {problema.avaliacao && <BarraAvaliacao avaliacao={problema.avaliacao} />}
-        <CartaoAvaliarNova problema={problema} />
-        <p className="flex items-start gap-2 text-xs text-muted-foreground">
-          <Icone nome="group" className="text-[16px]" />
-          {confirmacoes} {confirmacoes === 1 ? 'confirmação' : 'confirmações'} de existência ·
-          "Ainda está lá?" abre após a avaliação
-        </p>
+        <CartaoVoto problema={problema} />
         <RodapeLocalizacao ponto={problema} mostrarDistancia={false} />
       </>
     )
   }
 
   if (problema.status === 'possivelmenteResolvida') {
-    const { confirmacoes } = problema.existencia
     return (
       <>
-        <CartaoAindaEstaLa problema={problema} />
+        <CartaoVoto problema={problema} />
         {problema.confianca !== null && problema.faixa && (
           <BarraConfianca
             confianca={problema.confianca}
             faixa={problema.faixa}
-            legenda={`${confirmacoes} ${confirmacoes === 1 ? 'confirmação' : 'confirmações'} de existência`}
+            legenda={legendaConfianca(problema)}
           />
         )}
         <RodapeLocalizacao ponto={problema} />
@@ -136,7 +124,7 @@ function Corpo({ problema }: { problema: Detalhe }) {
           legenda={legendaConfianca(problema)}
         />
       )}
-      <CartoesAtiva problema={problema} />
+      <CartaoVoto problema={problema} />
       <RodapeLocalizacao ponto={problema} />
     </>
   )
@@ -159,6 +147,7 @@ function Carregando() {
 }
 
 export function DetalheProblema({ id }: { id: string }) {
+  const { recolhido } = usePainelResponsivo()
   const { data: problema, isPending, isError, error, refetch } = useDetalheProblema(id)
 
   if (isPending) return <Carregando />
@@ -182,10 +171,14 @@ export function DetalheProblema({ id }: { id: string }) {
 
   return (
     <article className="space-y-4">
-      {/* No celular, a folha abre só com o resumo (ALTURA_RESUMO); arrastar mostra o resto. */}
+      {/* No celular, a folha abre só com o resumo; arrastar mostra o resto. */}
       <ResumoAlerta problema={problema} />
-      <Informacoes problema={problema} />
-      <Corpo problema={problema} />
+      {/* Recolhida, a folha para um pouco abaixo do resumo (área segura): o resto só aparece
+          ao abrir, para não espiar cortado na borda. */}
+      <div className={cn('space-y-4 transition-opacity duration-300', recolhido && 'opacity-0')}>
+        <Informacoes problema={problema} />
+        <Corpo problema={problema} />
+      </div>
     </article>
   )
 }
