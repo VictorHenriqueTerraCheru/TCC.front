@@ -45,8 +45,9 @@ function BotaoPolegar({ polegar, desabilitado }: { polegar: Polegar; desabilitad
 }
 
 /**
- * Card rápido do alerta (estilo Waze): primeiro estágio da folha do detalhe. "Ainda está lá?" com
- * os polegares, com a mesma guarda de conta do detalhe. O autor não vota; `resolvida` é só leitura.
+ * Card rápido do alerta (estilo Waze): primeiro estágio da folha do detalhe. Recolhida, tem
+ * "Ainda está lá?" com os polegares, com a mesma guarda de conta do detalhe. O autor não vota;
+ * `resolvida` é só leitura.
  */
 export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
   const aparencia = aparenciaDoGrupo[grupoDe(problema.categoria)]
@@ -107,7 +108,9 @@ export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
           {distancia !== null && ` · ${distanciaTexto(distancia)} de você`}
         </p>
       </div>
-      {podeVotar && (
+      {/* Só na folha recolhida: aberta (ou no desktop), o cartão completo do detalhe já pergunta,
+          e duas perguntas iguais na mesma tela confundem. */}
+      {podeVotar && recolhido && (
         <div className="mt-3 flex items-center gap-3 rounded-2xl bg-foreground/5 py-2 pr-2 pl-4">
           <p className="min-w-0 flex-1 text-[15px] font-semibold">Ainda está lá?</p>
           {polegares.map((polegar) => (

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { Icone } from '@/common/components/icone'
 import { useDesktop } from '@/common/hooks/use-media-query'
@@ -40,12 +40,18 @@ export function PainelResponsivo({
   const snap = snaps ? snaps[aberto ? 1 : 0]! : null
 
   const observador = useRef<ResizeObserver | null>(null)
+  // Aberta, o resumo encolhe (os polegares saem): a medida só vale recolhida, senão a folha
+  // voltaria para um estágio baixo demais e pularia quando os polegares reaparecessem.
+  const abertoRef = useRef(aberto)
+  useEffect(() => {
+    abertoRef.current = aberto
+  }, [aberto])
   const medirResumo = useCallback((elemento: HTMLElement | null) => {
     observador.current?.disconnect()
     observador.current = null
     if (!elemento) return
     const medir = () => {
-      if (elemento.offsetHeight === 0) return
+      if (abertoRef.current || elemento.offsetHeight === 0) return
       // O resumo termina onde a folha para, mais o respiro de baixo da rolagem, que já é
       // max(1,5 rem, área segura): o texto não encosta na barra de gestos do iPhone/Android.
       const rolagem = elemento.closest<HTMLElement>('[data-rolagem-painel]')
