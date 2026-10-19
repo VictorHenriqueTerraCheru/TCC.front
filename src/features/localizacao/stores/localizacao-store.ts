@@ -107,6 +107,9 @@ export function iniciarMonitoramento(): () => void {
   // voltar a permissão para 'prompt'.
   const aplicarPermissao = (estado: PermissionState) => {
     if (estado !== 'prompt' || !concedeuAntes()) return aplicarEstado(estado)
+    // O acompanhamento de quando estava liberada para antes: um PERMISSION_DENIED dele marcaria
+    // denied (e apagaria a concessão) no meio do pedido novo. O sucesso o liga de novo.
+    pararDeAcompanhar()
     useLocalizacaoStore.setState({ estado: 'verificando' })
     void solicitarLocalizacao().then((posicao) => {
       if (!posicao && !cancelado && useLocalizacaoStore.getState().estado === 'verificando')

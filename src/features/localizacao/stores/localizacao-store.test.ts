@@ -115,6 +115,12 @@ describe('localizacao-store', () => {
 
     expect(geo.getCurrentPosition).toHaveBeenCalledOnce()
     expect(useLocalizacaoStore.getState().estado).not.toBe('prompt')
+    // O acompanhamento antigo para antes do pedido: um PERMISSION_DENIED dele não pode marcar
+    // denied (e apagar a concessão) enquanto o pedido novo está em andamento.
+    expect(geo.clearWatch).toHaveBeenCalledWith(1)
+    expect(geo.clearWatch.mock.invocationCallOrder[0]).toBeLessThan(
+      geo.getCurrentPosition.mock.invocationCallOrder[0]!,
+    )
   })
 
   it('se o pedido automático for negado, esquece a concessão e fica denied', async () => {
