@@ -10,3 +10,4 @@ npm test && npm run lint && npm run build
 ```
 
 Arquitetura, regras e documentos: [`CLAUDE.md`](CLAUDE.md) e [`docs/`](docs/).
+.
