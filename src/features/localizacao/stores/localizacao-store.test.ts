@@ -78,6 +78,57 @@ describe('localizacao-store', () => {
     expect(geo.watchPosition).toHaveBeenCalledOnce()
   })
 
+  it('guarda que a permissão foi concedida', async () => {
+    instalarNavegador('granted')
+    limpar = iniciarMonitoramento()
+
+    await vi.waitFor(() => expect(useLocalizacaoStore.getState().estado).toBe('granted'))
+    expect(localStorage.getItem('ocorrencias.localizacaoConcedida')).toBe('1')
+  })
+
+  it('em prompt, se já concedeu antes (iOS esquece), pede de novo sem esperar o Ativar', async () => {
+    localStorage.setItem('ocorrencias.localizacaoConcedida', '1')
+    const geo = instalarNavegador('prompt')
+    limpar = iniciarMonitoramento()
+
+    await vi.waitFor(() => expect(geo.getCurrentPosition).toHaveBeenCalledOnce())
+    // Enquanto o navegador responde, o banner de "Localização desativada" não aparece.
+    expect(useLocalizacaoStore.getState().estado).toBe('verificando')
+
+    geo.getCurrentPosition.mock.calls[0]![0](posicao)
+    expect(useLocalizacaoStore.getState()).toMatchObject({
+      estado: 'granted',
+      posicao: { lat: -22.95, lng: -43.18, precisao: 15 },
+    })
+    expect(geo.watchPosition).toHaveBeenCalledOnce()
+  })
+
+  it('se o pedido automático for negado, esquece a concessão e fica denied', async () => {
+    localStorage.setItem('ocorrencias.localizacaoConcedida', '1')
+    const geo = instalarNavegador('prompt')
+    limpar = iniciarMonitoramento()
+
+    await vi.waitFor(() => expect(geo.getCurrentPosition).toHaveBeenCalledOnce())
+    geo.getCurrentPosition.mock.calls[0]![1](negado)
+
+    expect(useLocalizacaoStore.getState()).toMatchObject({ estado: 'denied', posicao: null })
+    expect(localStorage.getItem('ocorrencias.localizacaoConcedida')).toBeNull()
+  })
+
+  it('se o pedido automático falhar por outro motivo, volta a prompt', async () => {
+    localStorage.setItem('ocorrencias.localizacaoConcedida', '1')
+    const geo = instalarNavegador('prompt')
+    limpar = iniciarMonitoramento()
+
+    await vi.waitFor(() => expect(geo.getCurrentPosition).toHaveBeenCalledOnce())
+    geo.getCurrentPosition.mock.calls[0]![1]({
+      code: 3,
+      PERMISSION_DENIED: 1,
+    } as GeolocationPositionError)
+
+    await vi.waitFor(() => expect(useLocalizacaoStore.getState().estado).toBe('prompt'))
+  })
+
   it('pedido negado vira denied e resolve null', async () => {
     const geo = instalarNavegador(null)
     limpar = iniciarMonitoramento()

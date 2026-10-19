@@ -56,11 +56,35 @@ function pararDeAcompanhar() {
   idMonitoramento = null
 }
 
+// O iOS esquece a permissão (Safari com "Perguntar", sobretudo o app na tela inicial): na volta a
+// Permissions API diz 'prompt' mesmo para quem já liberou. Guardamos que liberou para, na
+// abertura, pedir de novo sozinho em vez de mostrar "Localização desativada".
+const CHAVE_CONCEDIDA = 'ocorrencias.localizacaoConcedida'
+
+function concedeuAntes(): boolean {
+  try {
+    return localStorage.getItem(CHAVE_CONCEDIDA) === '1'
+  } catch {
+    return false
+  }
+}
+
+function lembrarConcessao(concedida: boolean) {
+  try {
+    if (concedida) localStorage.setItem(CHAVE_CONCEDIDA, '1')
+    else localStorage.removeItem(CHAVE_CONCEDIDA)
+  } catch {
+    // Sem storage: na próxima visita o banner pede o "Ativar" de novo.
+  }
+}
+
 function aplicarEstado(estado: EstadoLocalizacao) {
   if (estado === 'granted') {
+    lembrarConcessao(true)
     useLocalizacaoStore.setState({ estado })
     acompanharPosicao()
   } else {
+    if (estado === 'denied') lembrarConcessao(false)
     pararDeAcompanhar()
     useLocalizacaoStore.setState({ estado, posicao: null })
   }
@@ -79,6 +103,14 @@ export function iniciarMonitoramento(): () => void {
   let status: PermissionStatus | null = null
   let cancelado = false
   const aoMudar = () => status && aplicarEstado(status.state)
+  // 'prompt' de quem já liberou: pede de novo (fica em 'verificando' até o navegador responder).
+  const aplicarInicial = (estado: PermissionState) => {
+    if (estado !== 'prompt' || !concedeuAntes()) return aplicarEstado(estado)
+    void solicitarLocalizacao().then((posicao) => {
+      if (!posicao && !cancelado && useLocalizacaoStore.getState().estado === 'verificando')
+        aplicarEstado('prompt')
+    })
+  }
 
   if (navigator.permissions?.query) {
     navigator.permissions
@@ -87,11 +119,11 @@ export function iniciarMonitoramento(): () => void {
         if (cancelado) return
         status = resultado
         status.addEventListener('change', aoMudar)
-        aplicarEstado(status.state)
+        aplicarInicial(status.state)
       })
-      .catch(() => !cancelado && aplicarEstado('prompt'))
+      .catch(() => !cancelado && aplicarInicial('prompt'))
   } else {
-    aplicarEstado('prompt')
+    aplicarInicial('prompt')
   }
 
   return () => {
