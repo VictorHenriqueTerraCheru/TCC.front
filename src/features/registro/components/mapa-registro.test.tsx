@@ -26,6 +26,16 @@ describe('MapaRegistro', () => {
     expect(useRascunhoStore.getState().local).toEqual({ lat: -22.95, lng: -43.18 })
   })
 
+  it('moveend com o mesmo centro (redimensionar) não troca o local', () => {
+    renderizar(<MapaRegistro modo="pino" categoria={buraco} />)
+    act(() => mapaFalso.mover({ lat: -22.95, lng: -43.18 }))
+    const antes = useRascunhoStore.getState().local
+
+    act(() => mapaFalso.mover({ lat: -22.95, lng: -43.18 }))
+
+    expect(useRascunhoStore.getState().local).toBe(antes)
+  })
+
   it('modo área desenha o raio de 150 m', () => {
     renderizar(<MapaRegistro modo="area" />)
 

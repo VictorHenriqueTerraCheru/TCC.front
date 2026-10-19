@@ -28,7 +28,9 @@ export function CartaoEndereco() {
       <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
         <Icone nome="location_on" preenchido className="text-[22px]" />
       </span>
-      <div className="min-w-0 flex-1">
+      {/* Altura mínima: o esqueleto e o endereço ocupam o mesmo espaço e o mapa acima não muda de
+          tamanho a cada consulta. */}
+      <div className="min-h-[84px] min-w-0 flex-1">
         <p className="text-xs text-muted-foreground">Endereço aproximado</p>
         {atualizando || !data ? (
           <div aria-label="Buscando endereço" className="mt-1 space-y-1.5">
