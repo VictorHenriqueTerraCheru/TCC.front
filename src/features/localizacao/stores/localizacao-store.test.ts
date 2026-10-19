@@ -18,18 +18,21 @@ function instalarNavegador(estadoPermissao: PermissionState | null) {
     watchPosition: vi.fn<(s: Sucesso, f: Falha) => number>(() => 1),
     clearWatch: vi.fn(),
   }
-  const permissions = estadoPermissao && {
-    query: vi.fn(() =>
-      Promise.resolve({
-        state: estadoPermissao,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-      }),
-    ),
+  const status = {
+    state: estadoPermissao,
+    addEventListener: vi.fn<(tipo: string, ouvinte: () => void) => void>(),
+    removeEventListener: vi.fn(),
   }
+  const permissions = estadoPermissao && { query: vi.fn(() => Promise.resolve(status)) }
   vi.stubGlobal('isSecureContext', true)
   vi.stubGlobal('navigator', { ...navigator, geolocation, permissions })
-  return geolocation
+  return Object.assign(geolocation, {
+    /** Simula o navegador mudando a permissão (evento `change` do PermissionStatus). */
+    mudarPermissao(estado: PermissionState) {
+      status.state = estado
+      for (const [, ouvinte] of status.addEventListener.mock.calls) ouvinte()
+    },
+  })
 }
 
 describe('localizacao-store', () => {
@@ -101,6 +104,17 @@ describe('localizacao-store', () => {
       posicao: { lat: -22.95, lng: -43.18, precisao: 15 },
     })
     expect(geo.watchPosition).toHaveBeenCalledOnce()
+  })
+
+  it('app aberto: se o iOS volta a permissão para prompt, pede de novo em vez do banner', async () => {
+    const geo = instalarNavegador('granted')
+    limpar = iniciarMonitoramento()
+    await vi.waitFor(() => expect(useLocalizacaoStore.getState().estado).toBe('granted'))
+
+    geo.mudarPermissao('prompt')
+
+    expect(geo.getCurrentPosition).toHaveBeenCalledOnce()
+    expect(useLocalizacaoStore.getState().estado).not.toBe('prompt')
   })
 
   it('se o pedido automático for negado, esquece a concessão e fica denied', async () => {

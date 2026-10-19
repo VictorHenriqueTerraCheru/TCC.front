@@ -102,15 +102,18 @@ export function iniciarMonitoramento(): () => void {
 
   let status: PermissionStatus | null = null
   let cancelado = false
-  const aoMudar = () => status && aplicarEstado(status.state)
   // 'prompt' de quem já liberou: pede de novo (fica em 'verificando' até o navegador responder).
-  const aplicarInicial = (estado: PermissionState) => {
+  // Vale na abertura e no evento `change`: com o app aberto em segundo plano, o iOS também pode
+  // voltar a permissão para 'prompt'.
+  const aplicarPermissao = (estado: PermissionState) => {
     if (estado !== 'prompt' || !concedeuAntes()) return aplicarEstado(estado)
+    useLocalizacaoStore.setState({ estado: 'verificando' })
     void solicitarLocalizacao().then((posicao) => {
       if (!posicao && !cancelado && useLocalizacaoStore.getState().estado === 'verificando')
         aplicarEstado('prompt')
     })
   }
+  const aoMudar = () => status && aplicarPermissao(status.state)
 
   if (navigator.permissions?.query) {
     navigator.permissions
@@ -119,11 +122,11 @@ export function iniciarMonitoramento(): () => void {
         if (cancelado) return
         status = resultado
         status.addEventListener('change', aoMudar)
-        aplicarInicial(status.state)
+        aplicarPermissao(status.state)
       })
-      .catch(() => !cancelado && aplicarInicial('prompt'))
+      .catch(() => !cancelado && aplicarPermissao('prompt'))
   } else {
-    aplicarInicial('prompt')
+    aplicarPermissao('prompt')
   }
 
   return () => {
