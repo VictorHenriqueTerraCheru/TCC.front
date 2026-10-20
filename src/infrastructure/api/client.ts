@@ -21,7 +21,13 @@ const autenticacao: Middleware = {
     return request
   },
   onResponse({ request, response }) {
-    if (response.status === 401 && request.headers.has('Authorization')) {
+    // Só expira se o token enviado ainda é o da sessão: um 401 atrasado de outra conta não a derruba.
+    const enviado = request.headers.get('Authorization')
+    if (
+      response.status === 401 &&
+      enviado !== null &&
+      enviado === `Bearer ${obterProvedorAutenticacao().obterToken()}`
+    ) {
       obterProvedorAutenticacao().aoExpirarSessao()
     }
   },
