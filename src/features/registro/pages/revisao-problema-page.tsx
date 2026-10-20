@@ -13,7 +13,12 @@ import { PassoRegistro } from '../components/passo-registro'
 import { LinhaResumo, Resumo } from '../components/resumo'
 import { useEnvio } from '../hooks/use-envio'
 import { useRetomarRegistro } from '../hooks/use-retomar-registro'
-import { useEnderecoDoRascunho, useExigirPasso, useRascunho } from '../hooks/use-rascunho'
+import {
+  useEnderecoDoRascunho,
+  useExigirCategoria,
+  useExigirPasso,
+  useRascunho,
+} from '../hooks/use-rascunho'
 import { caminhoDaCategoria } from '../models/rotas'
 
 const LIMITE_DESCRICAO = 280
@@ -25,7 +30,8 @@ export function RevisaoProblemaPage() {
   const { categoria, categoriaId, local, descricao, definirDescricao } = useRascunho()
   const { data: endereco } = useEnderecoDoRascunho()
   const registrar = useRegistrarProblema()
-  useExigirPasso(categoriaId !== null && local !== null, '/registrar/local')
+  useExigirCategoria('problema')
+  useExigirPasso(local !== null, '/registrar/local')
 
   // Sucesso: a tela de sucesso recebe o problema criado (e limpa o rascunho ao abrir).
   const envio = useEnvio(registrar.mutateAsync, (problema) => {

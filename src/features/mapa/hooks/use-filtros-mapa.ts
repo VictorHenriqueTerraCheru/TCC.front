@@ -46,11 +46,12 @@ export function useFiltrosMapa() {
   return {
     ...filtros,
     alterarModo(modo: ModoMapa) {
-      // Chips que não existem no novo modo saem do filtro.
+      // Chips que não existem no novo modo saem do filtro, mas só com os grupos carregados: antes disso
+      // não dá para saber quais existem, e a lista da URL (deep link) é mantida.
       const disponiveis = gruposDoModo(todos, modo).map((g) => g.chave)
       gravar({
         modo,
-        grupos: filtros.grupos.filter((g) => disponiveis.includes(g)),
+        grupos: carregado ? filtros.grupos.filter((g) => disponiveis.includes(g)) : filtros.grupos,
         somenteNovas: filtros.somenteNovas && mostraProblemas(modo),
       })
     },

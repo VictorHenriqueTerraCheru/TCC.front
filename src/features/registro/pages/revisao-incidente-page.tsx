@@ -10,7 +10,12 @@ import { PassoRegistro } from '../components/passo-registro'
 import { LinhaResumo, Resumo } from '../components/resumo'
 import { useEnvio } from '../hooks/use-envio'
 import { useRetomarRegistro } from '../hooks/use-retomar-registro'
-import { useEnderecoDoRascunho, useExigirPasso, useRascunho } from '../hooks/use-rascunho'
+import {
+  useEnderecoDoRascunho,
+  useExigirCategoria,
+  useExigirPasso,
+  useRascunho,
+} from '../hooks/use-rascunho'
 import { descreverHorario, ocorridoEm } from '../models/horario'
 import { caminhoDaCategoria } from '../models/rotas'
 
@@ -20,7 +25,8 @@ export function RevisaoIncidentePage() {
   const { categoria, categoriaId, local, horario } = useRascunho()
   const { data: endereco } = useEnderecoDoRascunho()
   const registrar = useRegistrarIncidente()
-  useExigirPasso(categoriaId !== null && local !== null, '/registrar/incidente/local')
+  useExigirCategoria('incidente')
+  useExigirPasso(local !== null, '/registrar/incidente/local')
 
   const envio = useEnvio(registrar.mutateAsync, (area, { categoriaId: idCategoria, lat, lng }) => {
     navigate('/registrar/incidente/sucesso', {

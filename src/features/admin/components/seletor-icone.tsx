@@ -6,6 +6,7 @@ import { IconeDinamico } from '@/common/components/icone-remoto'
 import { useDebouncedValue } from '@/common/hooks/use-debounced-value'
 import { buscarIcones } from '@/common/lib/iconify'
 import { cn } from '@/common/lib/utils'
+import { iconeDe } from '@/features/categorias'
 
 const MINIMO_LETRAS = 2
 const MAXIMO_RESULTADOS = 48
@@ -37,7 +38,7 @@ export function SeletorIcone({ valor, aoMudar, erro }: SeletorIconeProps) {
     <div className="space-y-3">
       <div className="flex items-center gap-3 text-sm">
         <span className="flex size-12 items-center justify-center rounded-full bg-muted text-[26px]">
-          {valor ? <IconeDinamico nome={valor} /> : <Icone nome="category" />}
+          {valor ? <IconeDinamico nome={iconeDe({ icone: valor })} /> : <Icone nome="category" />}
         </span>
         <span className={cn(!valor && 'text-muted-foreground')}>
           {valor ? (

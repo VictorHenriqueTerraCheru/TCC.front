@@ -15,7 +15,7 @@ import { duplicatasQuery } from '../api/use-registro'
 import { mensagemErroRegistro } from '../errors'
 import { MapaRegistro } from '../components/mapa-registro'
 import { PassoRegistro } from '../components/passo-registro'
-import { useExigirPasso, useRascunho } from '../hooks/use-rascunho'
+import { useExigirCategoria, useExigirPasso, useRascunho } from '../hooks/use-rascunho'
 
 type Duplicata = Schema<'BuscarDuplicatasResponse'>
 
@@ -65,7 +65,8 @@ function CartaoDuplicata({
 export function ConferenciaPage() {
   const navigate = useNavigate()
   const { categoria, categoriaId, local } = useRascunho()
-  useExigirPasso(categoriaId !== null && local !== null, '/registrar/local')
+  useExigirCategoria('problema')
+  useExigirPasso(local !== null, '/registrar/local')
 
   const { data: duplicatas } = useQuery({
     ...duplicatasQuery(categoriaId ?? 0, local ?? { lat: 0, lng: 0 }),
