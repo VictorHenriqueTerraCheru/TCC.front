@@ -11,7 +11,7 @@ const D_VALIDO = /^[MmLlHhVvCcSsQqTtAaZz0-9eE+\-.,\s]+$/
 const TAMANHO_MAXIMO_D = 4000
 const TAMANHO_MAXIMO_VIEWBOX = 512
 const TEMPO_LIMITE_MS = 8000
-const NOME_VALIDO = /^[a-z0-9_]+$/
+const NOME_VALIDO = /^[a-z0-9_-]+$/
 
 export interface IconeRemotoDados {
   /** Atributos `d` dos `<path>`, na ordem. */

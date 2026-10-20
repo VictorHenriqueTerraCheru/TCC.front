@@ -11,7 +11,7 @@ import { circuloGeoJson } from '@/common/lib/geo'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { useExigirConta } from '@/features/auth'
-import { useAparencia, useCategorias } from '@/features/categorias'
+import { useAparencia, useCategorias, useGrupos } from '@/features/categorias'
 import {
   areaIncidentesQuery,
   CamadaCalor,
@@ -86,6 +86,7 @@ export function MapaPage() {
 
   const categoriasQuery = useCategorias()
   const categorias = categoriasQuery.data
+  const gruposQuery = useGrupos()
   const categoriasPorId = useMemo(
     () => new Map((categorias ?? []).map((c) => [c.id, c])),
     [categorias],
@@ -177,12 +178,14 @@ export function MapaPage() {
     (consulta) => !!consulta,
   )
   // Sem categorias os marcadores não têm ícone nem cor (e não aparecem): conta como falha do mapa.
+  // Sem grupos o filtro por chip não se resolve e as camadas podem sumir: idem.
   const falhouCategorias = camadas.problemas !== null && categoriasQuery.isError
+  const falhouGrupos = gruposQuery.isError
   const carregou =
     consultas.length > 0 && consultas.every((c) => c.isSuccess && !c.isPlaceholderData)
   const vazio = carregou && consultas.every((c) => c.data?.length === 0)
   if (vazioDispensado && carregou && !vazio) setVazioDispensado(false)
-  const falhou = falhouCategorias || consultas.some((c) => c.isError)
+  const falhou = falhouCategorias || falhouGrupos || consultas.some((c) => c.isError)
   const semLocalizacao = localizacao.estado === 'prompt' || localizacao.estado === 'denied'
   const pontoArea = rotaArea ? pontoDaUrl(params) : null
   const latArea = pontoArea?.lat
@@ -262,6 +265,7 @@ export function MapaPage() {
               size="sm"
               onClick={() => {
                 if (falhouCategorias) void categoriasQuery.refetch()
+                if (falhouGrupos) void gruposQuery.refetch()
                 consultas.forEach((c) => void c.refetch())
               }}
             >

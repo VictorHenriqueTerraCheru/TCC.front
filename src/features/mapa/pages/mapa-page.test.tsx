@@ -50,6 +50,14 @@ describe('MapaPage', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
+  it('falha em GET /grupos mostra o erro do mapa em vez de sumir com as camadas', async () => {
+    server.use(http.get(rota('/grupos'), () => new HttpResponse(null, { status: 500 })))
+    renderizarMapa()
+
+    expect(await screen.findByText('Não foi possível carregar o mapa.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
+  })
+
   it('falha em GET /categorias mostra o erro do mapa com "Tentar novamente"', async () => {
     server.use(http.get(rota('/categorias'), () => new HttpResponse(null, { status: 500 })))
     renderizarMapa()

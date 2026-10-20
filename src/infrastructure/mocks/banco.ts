@@ -213,7 +213,7 @@ export const banco = {
       }))
   },
   registrarProblema(categoriaId: number, lat: number, lng: number, descricao: string | null) {
-    const { tipo: _tipo, ...categoria } = categorias.find((c) => c.id === categoriaId)!
+    const { tipo: _tipo, ativa: _ativa, ...categoria } = banco.categoriaPorId(categoriaId)!
     const agora = new Date()
     const detalhe: Detalhe = {
       id: crypto.randomUUID(),
@@ -280,6 +280,10 @@ export const banco = {
   /** GET /categorias: só as ativas, sem o campo `ativa`. */
   categoriasAtivas() {
     return categoriasAdmin.filter((c) => c.ativa).map(({ ativa: _ativa, ...c }) => c)
+  },
+  /** Categoria pelo id, ativa ou não (o mapa e o histórico ainda mostram as desativadas). */
+  categoriaPorId(id: number): CategoriaAdmin | undefined {
+    return categoriasAdmin.find((c) => c.id === id)
   },
   /** GET /admin/categorias. */
   categoriasTodas(): CategoriaAdmin[] {

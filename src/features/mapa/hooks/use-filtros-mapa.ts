@@ -23,7 +23,7 @@ export function useFiltrosMapa() {
     modo,
     grupos: (params.get('grupos') ?? '')
       .split(',')
-      .filter((g) => !carregado || disponiveis.includes(g)),
+      .filter((g) => g !== '' && (!carregado || disponiveis.includes(g))),
     somenteNovas: params.get('nova') === '1',
   }
 

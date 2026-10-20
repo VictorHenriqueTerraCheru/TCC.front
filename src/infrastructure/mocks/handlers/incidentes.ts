@@ -2,7 +2,6 @@ import { http, HttpResponse } from 'msw'
 
 import type { Schema } from '../../api'
 import { banco, metrosEntre } from '../banco'
-import { categorias } from '../fixtures/categorias'
 import { grupoDasCelulas } from '../fixtures/problemas'
 import { rota } from '../rota'
 import { erroDeRegra, lista, noRetangulo, retanguloDaUrl } from './comum'
@@ -50,7 +49,8 @@ export const incidentesHandlers = [
     async ({ request }) => {
       if (!request.headers.has('Authorization')) return new HttpResponse(null, { status: 401 })
       const { categoriaId, lat, lng, ocorridoEm } = await request.json()
-      if (categorias.find((c) => c.id === categoriaId)?.tipo !== 'incidente') {
+      const categoria = banco.categoriaPorId(categoriaId)
+      if (!categoria?.ativa || categoria.tipo !== 'incidente') {
         return erroDeRegra(422, 'categoria-nao-e-incidente', 'A categoria não é de incidente.')
       }
       const instante = Date.parse(ocorridoEm)

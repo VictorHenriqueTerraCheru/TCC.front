@@ -79,6 +79,12 @@ describe('carregarIcone', () => {
     expect(park).not.toBeNull()
   })
 
+  it('aceita hífen no nome, como o contrato de categorias', async () => {
+    server.use(iconesDoIconify({ 'ico-a-b-rounded': corpoValido }))
+
+    expect(await carregarIcone('ico-a-b')).not.toBeNull()
+  })
+
   it('guarda no localStorage: outra sessão não pede de novo', async () => {
     server.use(iconesDoIconify({ 'ico-a-rounded': corpoValido }))
     await carregarIcone('ico_a')
