@@ -1,6 +1,6 @@
 import { useGuardaStore, type AcaoPendente } from './guarda-store'
 
-const voto: AcaoPendente = { tipo: 'votar', problemaId: 'p-1', valor: 'existe' as never }
+const voto: AcaoPendente = { tipo: 'votar', problemaId: 'p-1', valor: 'sim' }
 const pendencia = { retorno: '/problemas/p-1?aba=1', acao: voto }
 
 beforeEach(() => {
