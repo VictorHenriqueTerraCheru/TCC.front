@@ -93,6 +93,34 @@ describe('mocks de registro usam as categorias do admin', () => {
     expect(acidentes(depois)).toBe(acidentes(antes))
   })
 
+  it('a área lista toda categoria de incidente ativa, mesmo com zero', async () => {
+    const criada = banco.criarCategoria({
+      nome: 'Rua inundada',
+      grupo: 'seguranca',
+      tipo: 'incidente',
+      icone: 'ico_a',
+    })
+    if (typeof criada === 'string') throw new Error(criada)
+
+    expect((await resumo()).contagens.find((c) => c.categoriaId === criada.id)).toMatchObject({
+      nome: 'Rua inundada',
+      dias7: 0,
+    })
+  })
+
+  it('mover a categoria de grupo move o calor já registrado junto', async () => {
+    const grupo = banco.criarGrupo('Clima', 'incidente', 'azul')
+    if (typeof grupo === 'string') throw new Error(grupo)
+    await registrarIncidente(7)
+    banco.editarCategoria(7, { nome: 'Roubo', grupo: grupo.chave, icone: 'roubo' })
+
+    const nasCelulas = (grupos: string[]) =>
+      banco.calor(grupos).some((c) => c.lat === -22.95 && c.lng === -43.18)
+
+    expect(nasCelulas([grupo.chave])).toBe(true)
+    expect(nasCelulas(['seguranca'])).toBe(false)
+  })
+
   it('categoria desativada some da contagem da área', async () => {
     const criada = banco.criarCategoria({
       nome: 'Rua inundada',

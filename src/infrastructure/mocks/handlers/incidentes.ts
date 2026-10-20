@@ -24,24 +24,21 @@ function resumoDaArea(ponto: { lat: number; lng: number }) {
   const deExemplo = celulas - novos.length
   const roubos = deExemplo + doNovo(7)
   const acidentes = Math.floor(deExemplo / 4) + doNovo(8)
-  const outras = [...new Set(ativos.map((i) => i.categoriaId))]
-    .filter((id) => id !== 7 && id !== 8)
-    .map((id) => ({
-      categoriaId: id,
-      nome: banco.categoriaPorId(id)?.nome ?? 'Incidente',
-      dias7: doNovo(id),
-      dias30: doNovo(id),
-    }))
-  const total = roubos + acidentes + outras.reduce((soma, c) => soma + c.dias7, 0)
+  // Como na API: toda categoria de incidente ativa aparece, com zero se não houve registro por perto.
+  const contagens = banco
+    .categoriasAtivas()
+    .filter((c) => c.tipo === 'incidente')
+    .map((c) => {
+      const dias7 = c.id === 7 ? roubos : c.id === 8 ? acidentes : doNovo(c.id)
+      const dias30 = c.id === 7 ? roubos * 3 + 5 : c.id === 8 ? acidentes * 3 + 2 : dias7
+      return { categoriaId: c.id, nome: c.nome, dias7, dias30 }
+    })
+  const total = contagens.reduce((soma, c) => soma + c.dias7, 0)
   return {
     raioMetros: 400,
     atualizadoEm: new Date().toISOString(),
     nivel: total >= 10 ? 'alta' : total >= 4 ? 'media' : 'baixa',
-    contagens: [
-      { categoriaId: 7, nome: 'Roubo', dias7: roubos, dias30: roubos * 3 + 5 },
-      { categoriaId: 8, nome: 'Acidente de trânsito', dias7: acidentes, dias30: acidentes * 3 + 2 },
-      ...outras,
-    ],
+    contagens,
   }
 }
 

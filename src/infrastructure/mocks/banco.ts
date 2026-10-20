@@ -30,7 +30,7 @@ let votos = new Map<string, ValorVoto>()
 let usuarios = [...usuariosIniciais]
 let autoria = new Set([ID_DO_AUTOR])
 let incidentesRegistrados = 0
-let incidentesNovos: { categoriaId: number; grupo: string; lat: number; lng: number }[] = []
+let incidentesNovos: { categoriaId: number; lat: number; lng: number }[] = []
 let verificacoes = verificacoesIniciais()
 let historico = historicoInicial()
 let perfis = new Map<string, { perfil: Perfil; verificadoEm: string | null }>()
@@ -264,8 +264,11 @@ export const banco = {
    */
   calor(filtroGrupos: string[] = []): CelulaCalor[] {
     const entra = (grupo: string) => filtroGrupos.length === 0 || filtroGrupos.includes(grupo)
+    // O grupo sai da categoria atual (o admin pode movê-la depois do registro).
+    const grupoDe = (categoriaId: number) =>
+      categoriasAdmin.find((c) => c.id === categoriaId)?.grupo ?? grupoDasCelulas
     const celulas = entra(grupoDasCelulas) ? calorIncidentes.map((c) => ({ ...c })) : []
-    for (const novo of incidentesNovos.filter((i) => entra(i.grupo))) {
+    for (const novo of incidentesNovos.filter((i) => entra(grupoDe(i.categoriaId)))) {
       const existente = celulas.find((c) => c.lat === novo.lat && c.lng === novo.lng)
       if (existente) existente.quantidade++
       else celulas.push({ lat: novo.lat, lng: novo.lng, quantidade: 1 })
@@ -277,8 +280,7 @@ export const banco = {
     if (incidentesRegistrados >= LIMITE_INCIDENTES) return null
     incidentesRegistrados++
     const ponto = { lat: Math.round(lat * 1000) / 1000, lng: Math.round(lng * 1000) / 1000 }
-    const grupo = categoriasAdmin.find((c) => c.id === categoriaId)?.grupo ?? grupoDasCelulas
-    incidentesNovos = [...incidentesNovos, { categoriaId, grupo, ...ponto }]
+    incidentesNovos = [...incidentesNovos, { categoriaId, ...ponto }]
     return ponto
   },
   /** Incidentes registrados nesta sessão, com a categoria (as células do calor só guardam contagem). */

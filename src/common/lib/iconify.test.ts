@@ -141,10 +141,13 @@ describe('carregarIcone: entradas hostis', () => {
     expect(await carregarIcone('ico_a')).not.toBeNull()
   })
 
-  it.each(['a,b', 'Maiuscula', 'com-hifen', ''])('nome "%s" nem chega à rede', async (nome) => {
-    // Sem handler: qualquer requisição derrubaria o teste (onUnhandledFrame: 'error').
-    expect(await carregarIcone(nome)).toBeNull()
-  })
+  it.each(['a,b', 'Maiuscula', 'com espaço', 'a/b', ''])(
+    'nome "%s" nem chega à rede',
+    async (nome) => {
+      // Sem handler: qualquer requisição derrubaria o teste (onUnhandledFrame: 'error').
+      expect(await carregarIcone(nome)).toBeNull()
+    },
+  )
 
   it.each(['constructor', '__proto__', 'toString'])(
     'nome de propriedade de objeto (%s) não vira o protótipo como resposta',
