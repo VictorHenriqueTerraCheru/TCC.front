@@ -48,7 +48,7 @@ export function SeletorHorario({ horario, aoMudar }: SeletorHorarioProps) {
                 })
               }
               className={cn(
-                'flex h-8 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium focus-visible:outline-2',
+                'flex h-11 items-center gap-1.5 rounded-lg border px-4 text-sm font-medium focus-visible:outline-2',
                 selecionado
                   ? 'border-transparent bg-primario-suave text-primario'
                   : 'border-input hover:bg-foreground/5',
