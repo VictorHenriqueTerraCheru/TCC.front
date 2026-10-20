@@ -17,7 +17,7 @@ import {
   SucessoIncidentePage,
   SucessoProblemaPage,
 } from '@/features/registro'
-import { CategoriasAdminPage, FilaVerificacaoPage } from '@/features/admin'
+import { CategoriasAdminPage, FilaVerificacaoPage, UsuariosAdminPage } from '@/features/admin'
 import { ConfiguracoesPage, HistoricoPage, PerfilPage } from '@/features/perfil'
 import { SolicitarVerificacaoPage } from '@/features/verificacao'
 
@@ -51,6 +51,7 @@ export const rotas: RouteObject[] = [
           { path: 'perfil/configuracoes', element: <ConfiguracoesPage /> },
           { path: 'admin/verificacoes', element: <FilaVerificacaoPage /> },
           { path: 'admin/categorias', element: <CategoriasAdminPage /> },
+          { path: 'admin/usuarios', element: <UsuariosAdminPage /> },
           {
             path: 'registrar',
             element: <RegistroLayout />,

@@ -101,6 +101,42 @@ export const adminHandlers = [
   ),
 ]
 
+adminHandlers.push(
+  http.get(rota('/admin/usuarios'), ({ request }) => {
+    const negado = exigirAdmin(request)
+    if (negado) return negado
+    const url = new URL(request.url)
+    const perfil = url.searchParams.get('perfil')
+    if (
+      perfil &&
+      !['cidadao', 'cidadaoverificado', 'administrador'].includes(perfil.toLowerCase())
+    ) {
+      return new HttpResponse(null, { status: 400 })
+    }
+    return HttpResponse.json(
+      paginar(banco.usuariosAdmin(url.searchParams.get('busca'), perfil), url),
+    )
+  }),
+  http.patch<{ id: string }, Schema<'AlterarPerfilRequest'>>(
+    rota('/admin/usuarios/:id/perfil'),
+    async ({ request, params }) => {
+      const negado = exigirAdmin(request)
+      if (negado) return negado
+      const { perfil } = await request.json()
+      const resultado = banco.alterarPerfilUsuario(
+        banco.usuarioDoToken(request).id,
+        params.id,
+        perfil,
+      )
+      if (resultado === 'nao-encontrado') return new HttpResponse(null, { status: 404 })
+      if (resultado === 'proprio-perfil') {
+        return erroDeRegra(422, resultado, 'Você não pode alterar o seu próprio perfil.')
+      }
+      return new HttpResponse(null, { status: 204 })
+    },
+  ),
+)
+
 function respostaAnalise(resultado: 'ok' | 'nao-encontrada' | 'verificacao-ja-analisada') {
   if (resultado === 'nao-encontrada') return new HttpResponse(null, { status: 404 })
   if (resultado === 'verificacao-ja-analisada') {

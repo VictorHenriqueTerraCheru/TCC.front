@@ -92,6 +92,51 @@ export const banco = {
         atual?.verificadoEm ?? (usuario.perfil === 'cidadao' ? null : '2026-09-25T15:00:00Z'),
     }
   },
+  /** GET /admin/usuarios: cadastro mais novo primeiro; perfil/verificadoEm refletem trocas feitas pelo admin. */
+  usuariosAdmin(busca: string | null, perfil: string | null): Schema<'ListarUsuariosItem'>[] {
+    const termo = busca?.trim().toLowerCase() ?? ''
+    return usuarios
+      .map((u, indice) => {
+        const atual = perfis.get(u.id)
+        const efetivo = atual?.perfil ?? u.perfil
+        return {
+          id: u.id,
+          nome: u.nome,
+          email: u.email,
+          perfil: efetivo,
+          criadoEm: new Date(Date.UTC(2026, 2, 2 + indice, 12)).toISOString(),
+          verificadoEm:
+            atual?.verificadoEm ?? (efetivo === 'cidadao' ? null : '2026-09-25T15:00:00Z'),
+        }
+      })
+      .filter(
+        (u) =>
+          (!perfil || u.perfil.toLowerCase() === perfil.toLowerCase()) &&
+          (termo === '' ||
+            u.nome.toLowerCase().includes(termo) ||
+            u.email.toLowerCase().includes(termo)),
+      )
+      .reverse()
+  },
+  /** PATCH /admin/usuarios/{id}/perfil: virar verificado grava a data (mantém se já era); voltar a cidadão zera. */
+  alterarPerfilUsuario(adminId: string, id: string, perfil: Perfil) {
+    if (id === adminId) return 'proprio-perfil' as const
+    const usuario = usuarios.find((u) => u.id === id)
+    if (!usuario) return 'nao-encontrado' as const
+    const atual = perfis.get(id)
+    const verificadoEm =
+      perfil === 'cidadao'
+        ? null
+        : (atual?.verificadoEm ??
+          (usuario.perfil === 'cidadao' ? null : '2026-09-25T15:00:00Z') ??
+          null)
+    perfis.set(id, {
+      perfil,
+      verificadoEm:
+        perfil === 'cidadaoVerificado' ? (verificadoEm ?? new Date().toISOString()) : verificadoEm,
+    })
+    return 'ok' as const
+  },
   renomear(id: string, nome: string) {
     usuarios = usuarios.map((u) => (u.id === id ? { ...u, nome } : u))
   },

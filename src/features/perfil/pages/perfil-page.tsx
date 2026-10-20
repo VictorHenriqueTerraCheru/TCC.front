@@ -162,6 +162,19 @@ export function PerfilPage() {
                 </span>
                 <Icone nome="chevron_right" />
               </Link>
+              <Link
+                to="/admin/usuarios"
+                className="flex items-center gap-3 rounded-[20px] bg-card p-4 hover:bg-superficie-2 focus-visible:outline-2"
+              >
+                <Icone nome="group" className="text-primario" />
+                <span className="flex-1">
+                  <span className="block font-medium">Usuários</span>
+                  <span className="text-xs text-muted-foreground">
+                    Ver quem se cadastrou e alterar perfis
+                  </span>
+                </span>
+                <Icone nome="chevron_right" />
+              </Link>
             </div>
           )}
           <HistoricoResumo />
