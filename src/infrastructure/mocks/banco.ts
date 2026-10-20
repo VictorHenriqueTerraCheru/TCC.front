@@ -1,6 +1,7 @@
 import type { Schema } from '../api'
 import { categorias } from './fixtures/categorias'
 import { criarDetalhes, ID_DO_AUTOR } from './fixtures/detalhes'
+import { grupos as gruposIniciais } from './fixtures/grupos'
 import { historicoInicial, verificacoesIniciais } from './fixtures/perfil'
 import { calorIncidentes } from './fixtures/problemas'
 import { usuariosIniciais } from './fixtures/usuarios'
@@ -10,6 +11,8 @@ type Detalhe = Schema<'ObterDetalheProblemaResponse'>
 type CelulaCalor = Schema<'ObterCalorIncidentesResponse'>
 type Verificacao = Schema<'ListarVerificacoesItem'>
 type Perfil = Schema<'Perfil'>
+type Grupo = Schema<'GrupoResponse'>
+type CategoriaAdmin = Schema<'CategoriaAdminResponse'>
 
 /** Limite de incidentes por conta em 24 h (docs/API.md, 429 limite-diario-incidentes). */
 const LIMITE_INCIDENTES = 10
@@ -31,6 +34,26 @@ let incidentesRegistrados = 0
 let verificacoes = verificacoesIniciais()
 let historico = historicoInicial()
 let perfis = new Map<string, { perfil: Perfil; verificadoEm: string | null }>()
+let grupos: Grupo[] = [...gruposIniciais]
+let categoriasAdmin: CategoriaAdmin[] = categorias.map((c) => ({ ...c, ativa: true }))
+
+/** "Água e esgoto" → "aguaEEsgoto" (mesma regra do back). */
+function chaveDe(rotulo: string) {
+  const palavras = rotulo
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter(Boolean)
+  const chave = palavras
+    .map((p, i) => (i === 0 ? p.toLowerCase() : p[0]!.toUpperCase() + p.slice(1).toLowerCase()))
+    .join('')
+    .slice(0, 30)
+  return /^[a-z]/i.test(chave) ? chave : `grupo${chave}`.slice(0, 30)
+}
+
+const mesmoRotulo = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase()
 
 const iniciais = (nome: string) =>
   nome
@@ -250,7 +273,88 @@ export const banco = {
     return ponto
   },
 
+  /** GET /grupos: em ordem de exibição. */
+  grupos(): Grupo[] {
+    return [...grupos].sort((a, b) => a.ordem - b.ordem || a.rotulo.localeCompare(b.rotulo))
+  },
+  /** GET /categorias: só as ativas, sem o campo `ativa`. */
+  categoriasAtivas() {
+    return categoriasAdmin.filter((c) => c.ativa).map(({ ativa: _ativa, ...c }) => c)
+  },
+  /** GET /admin/categorias. */
+  categoriasTodas(): CategoriaAdmin[] {
+    return categoriasAdmin
+  },
+  criarGrupo(rotulo: string, tipo: Grupo['tipo'], cor: Grupo['cor']) {
+    if (grupos.some((g) => mesmoRotulo(g.rotulo, rotulo))) return 'grupo-rotulo-duplicado' as const
+    const base = chaveDe(rotulo)
+    let chave = base
+    for (let n = 2; grupos.some((g) => g.chave === chave); n++) chave = `${base}${n}`
+    const grupo: Grupo = {
+      chave,
+      rotulo: rotulo.trim(),
+      tipo,
+      cor,
+      ordem: Math.max(0, ...grupos.map((g) => g.ordem)) + 1,
+    }
+    grupos = [...grupos, grupo]
+    return grupo
+  },
+  editarGrupo(chave: string, rotulo: string, cor: Grupo['cor'], ordem: number) {
+    const atual = grupos.find((g) => g.chave === chave)
+    if (!atual) return 'nao-encontrado' as const
+    if (grupos.some((g) => g.chave !== chave && mesmoRotulo(g.rotulo, rotulo))) {
+      return 'grupo-rotulo-duplicado' as const
+    }
+    const novo = { ...atual, rotulo: rotulo.trim(), cor, ordem }
+    grupos = grupos.map((g) => (g.chave === chave ? novo : g))
+    return novo
+  },
+  apagarGrupo(chave: string) {
+    if (!grupos.some((g) => g.chave === chave)) return 'nao-encontrado' as const
+    if (categoriasAdmin.some((c) => c.grupo === chave)) return 'grupo-em-uso' as const
+    grupos = grupos.filter((g) => g.chave !== chave)
+    return 'ok' as const
+  },
+  criarCategoria(corpo: Schema<'CriarCategoriaRequest'>) {
+    const grupo = grupos.find((g) => g.chave === corpo.grupo)
+    if (!grupo) return 'grupo-inexistente' as const
+    if (grupo.tipo !== corpo.tipo) return 'grupo-tipo-incompativel' as const
+    if (categoriasAdmin.some((c) => mesmoRotulo(c.nome, corpo.nome)))
+      return 'nome-duplicado' as const
+    const categoria: CategoriaAdmin = {
+      id: Math.max(0, ...categoriasAdmin.map((c) => c.id)) + 1,
+      nome: corpo.nome.trim(),
+      grupo: corpo.grupo,
+      tipo: corpo.tipo,
+      icone: corpo.icone,
+      ativa: true,
+    }
+    categoriasAdmin = [...categoriasAdmin, categoria]
+    return categoria
+  },
+  editarCategoria(id: number, corpo: Schema<'EditarCategoriaRequest'>) {
+    const atual = categoriasAdmin.find((c) => c.id === id)
+    if (!atual) return 'nao-encontrado' as const
+    const grupo = grupos.find((g) => g.chave === corpo.grupo)
+    if (!grupo) return 'grupo-inexistente' as const
+    if (grupo.tipo !== atual.tipo) return 'grupo-tipo-incompativel' as const
+    if (categoriasAdmin.some((c) => c.id !== id && mesmoRotulo(c.nome, corpo.nome))) {
+      return 'nome-duplicado' as const
+    }
+    const nova = { ...atual, nome: corpo.nome.trim(), grupo: corpo.grupo, icone: corpo.icone }
+    categoriasAdmin = categoriasAdmin.map((c) => (c.id === id ? nova : c))
+    return nova
+  },
+  alterarAtivaCategoria(id: number, ativa: boolean) {
+    if (!categoriasAdmin.some((c) => c.id === id)) return false
+    categoriasAdmin = categoriasAdmin.map((c) => (c.id === id ? { ...c, ativa } : c))
+    return true
+  },
+
   reiniciar() {
+    grupos = [...gruposIniciais]
+    categoriasAdmin = categorias.map((c) => ({ ...c, ativa: true }))
     detalhes = criarDetalhes()
     votos = new Map()
     usuarios = [...usuariosIniciais]
