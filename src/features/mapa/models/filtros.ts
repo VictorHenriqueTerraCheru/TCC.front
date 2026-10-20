@@ -22,7 +22,8 @@ export interface FiltrosMapa {
 export function gruposDoModo(grupos: Grupo[], modo: ModoMapa): Grupo[] {
   if (modo === 'problemas') return gruposDoTipo(grupos, 'problema')
   if (modo === 'incidentes') return gruposDoTipo(grupos, 'incidente')
-  return [...gruposDoTipo(grupos, 'problema'), ...gruposDoTipo(grupos, 'incidente')]
+  // Filtra a lista original: a ordem de exibição configurada vale mesmo misturando os dois tipos.
+  return grupos.filter((g) => g.tipo === 'problema' || g.tipo === 'incidente')
 }
 
 export function mostraProblemas(modo: ModoMapa) {

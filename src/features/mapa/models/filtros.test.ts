@@ -30,6 +30,12 @@ describe('filtros do mapa', () => {
     ])
   })
 
+  it('Ambos respeita a ordem configurada, misturando os tipos', () => {
+    const naOrdem = [grupos[3]!, grupos[0]!, grupos[4]!, grupos[1]!, grupos[2]!]
+
+    expect(gruposDoModo(naOrdem, 'ambos').map((g) => g.chave)).toEqual(naOrdem.map((g) => g.chave))
+  })
+
   it('Problemas liga só os marcadores; Incidentes só o calor', () => {
     expect(
       filtrosDasCamadas({ modo: 'problemas', grupos: [], somenteNovas: false }, grupos),
