@@ -32,7 +32,7 @@ describe('MapaPage', () => {
     await usuario.click(screen.getByRole('radio', { name: /Incidentes/ }))
 
     expect(router.state.location.search).toBe('?modo=incidentes')
-    expect(screen.getByRole('button', { name: /Segurança/ })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /Segurança/ })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Via pública/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Em avaliação/ })).not.toBeInTheDocument()
   })
@@ -42,7 +42,10 @@ describe('MapaPage', () => {
 
     expect(screen.getByRole('radio', { name: /Problemas/ })).toHaveAttribute('aria-checked', 'true')
     for (const chip of [/Via pública/, /Elétrica/, /Limpeza/]) {
-      expect(screen.getByRole('button', { name: chip })).toHaveAttribute('aria-pressed', 'false')
+      expect(await screen.findByRole('button', { name: chip })).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      )
     }
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
@@ -126,8 +129,8 @@ describe('MapaPage', () => {
     const usuario = userEvent.setup()
     const { router } = renderizarMapa('/mapa?modo=ambos')
 
-    await usuario.click(screen.getByRole('button', { name: /Elétrica/ }))
-    await usuario.click(screen.getByRole('button', { name: /Segurança/ }))
+    await usuario.click(await screen.findByRole('button', { name: /Elétrica/ }))
+    await usuario.click(await screen.findByRole('button', { name: /Segurança/ }))
     await usuario.click(screen.getByRole('button', { name: /Em avaliação/ }))
 
     expect(screen.getByRole('button', { name: /Elétrica/ })).toHaveAttribute('aria-pressed', 'true')

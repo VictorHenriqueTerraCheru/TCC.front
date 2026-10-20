@@ -1,7 +1,8 @@
-import { Icone } from '@/common/components/icone'
+import { IconeDinamico } from '@/common/components/icone-remoto'
 import { cn } from '@/common/lib/utils'
 
-import { aparenciaDoGrupo, grupoDe, iconeDe, type CategoriaResumo } from '../models/categoria'
+import { useAparencia } from '../hooks/use-aparencia'
+import { iconeDe, type CategoriaResumo } from '../models/categoria'
 
 interface CategoriaIconeProps {
   categoria: Pick<CategoriaResumo, 'icone' | 'grupo'>
@@ -17,7 +18,8 @@ const tamanhos = {
 
 /** Ícone circular da categoria: fundo claro + ícone na cor forte do grupo. */
 export function CategoriaIcone({ categoria, tamanho = 'md', className }: CategoriaIconeProps) {
-  const aparencia = aparenciaDoGrupo[grupoDe(categoria)]
+  const { aparenciaDe } = useAparencia()
+  const aparencia = aparenciaDe(categoria)
   return (
     <span
       className={cn(
@@ -28,7 +30,7 @@ export function CategoriaIcone({ categoria, tamanho = 'md', className }: Categor
         className,
       )}
     >
-      <Icone nome={iconeDe(categoria)} className="text-[length:inherit]" />
+      <IconeDinamico nome={iconeDe(categoria)} className="text-[length:inherit]" />
     </span>
   )
 }

@@ -19,7 +19,16 @@ function abrir(caminho = '/registrar') {
 
 type Usuario = ReturnType<typeof userEvent.setup>
 
-async function escolher(usuario: Usuario, categoria: string) {
+async function escolher(
+  usuario: Usuario,
+  categoria: string,
+  tipo: 'problema' | 'incidente' = 'problema',
+) {
+  await usuario.click(
+    await screen.findByRole('link', {
+      name: tipo === 'problema' ? /Continua lá/ : /Aconteceu e passou/,
+    }),
+  )
   await usuario.click(await screen.findByRole('button', { name: categoria }))
   await usuario.click(screen.getByRole('button', { name: 'Continuar' }))
 }
@@ -157,7 +166,7 @@ describe('fluxo de registro', () => {
     const usuario = userEvent.setup()
     abrir()
 
-    await escolher(usuario, 'Roubo')
+    await escolher(usuario, 'Roubo', 'incidente')
     expect(await screen.findByRole('heading', { name: 'Onde aconteceu?' })).toBeInTheDocument()
     await usuario.click(screen.getByRole('radio', { name: 'Outro horário' }))
     await usuario.click(screen.getByRole('button', { name: '15 minutos antes' }))
@@ -181,7 +190,7 @@ describe('fluxo de registro', () => {
     const usuario = userEvent.setup()
     abrir()
 
-    await escolher(usuario, 'Acidente de trânsito')
+    await escolher(usuario, 'Acidente de trânsito', 'incidente')
     await usuario.click(await screen.findByRole('button', { name: 'Continuar' }))
     await usuario.click(await screen.findByRole('button', { name: /Enviar registro/ }))
 

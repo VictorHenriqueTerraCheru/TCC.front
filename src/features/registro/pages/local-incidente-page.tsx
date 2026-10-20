@@ -8,6 +8,7 @@ import { MapaRegistro } from '../components/mapa-registro'
 import { PassoRegistro } from '../components/passo-registro'
 import { SeletorHorario } from '../components/seletor-horario'
 import { useEnderecoDoRascunho, useExigirPasso, useRascunho } from '../hooks/use-rascunho'
+import { caminhoDaCategoria } from '../models/rotas'
 
 /** Tela 21a: incidente, passo 2 de 3 — área de 150 m + "Quando aconteceu?". */
 export function LocalIncidentePage() {
@@ -21,7 +22,7 @@ export function LocalIncidentePage() {
       titulo="Onde aconteceu?"
       passo={{ atual: 2, total: 3, rotulo: `Local · ${categoria?.nome ?? ''}` }}
       acaoTopo="voltar"
-      aoTopo={() => navigate('/registrar')}
+      aoTopo={() => navigate(caminhoDaCategoria('incidente'))}
       mapa={<MapaRegistro modo="area" />}
       rodape={
         <Button

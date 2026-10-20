@@ -15,7 +15,7 @@ const variacoes: [StatusProblema, FaixaConfianca | null][] = [
 describe('MarcadorProblema', () => {
   it.each(variacoes)('%s / %s', (status, faixa) => {
     const html = renderToStaticMarkup(
-      <MarcadorProblema cor="var(--cat-eletrica)" icone="bolt" status={status} faixa={faixa} />,
+      <MarcadorProblema cor="var(--cat-ocre)" icone="bolt" status={status} faixa={faixa} />,
     )
     expect(html).toMatchSnapshot()
   })

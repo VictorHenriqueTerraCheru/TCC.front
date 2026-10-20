@@ -1,6 +1,5 @@
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query'
 
-import type { GrupoCategoria } from '@/features/categorias'
 import { api, dados } from '@/infrastructure/api'
 
 export interface FiltroCalorIncidentes {
@@ -9,7 +8,7 @@ export interface FiltroCalorIncidentes {
   maxLat: number
   maxLng: number
   /** Vazio = todos os grupos de incidente. */
-  grupos: GrupoCategoria[]
+  grupos: string[]
   dias: number
 }
 

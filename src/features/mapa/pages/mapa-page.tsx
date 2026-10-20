@@ -11,7 +11,7 @@ import { circuloGeoJson } from '@/common/lib/geo'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { useExigirConta } from '@/features/auth'
-import { useCategorias } from '@/features/categorias'
+import { useAparencia, useCategorias } from '@/features/categorias'
 import {
   areaIncidentesQuery,
   CamadaCalor,
@@ -63,7 +63,8 @@ export function MapaPage() {
   const desktop = useDesktop()
   const tema = useTema()
   const filtros = useFiltrosMapa()
-  const camadas = filtrosDasCamadas(filtros)
+  const { grupos: todosOsGrupos } = useAparencia()
+  const camadas = filtrosDasCamadas(filtros, todosOsGrupos)
   const localizacao = useLocalizacao()
   const ativarLocalizacao = useAtivarLocalizacao()
   const navegacao = useNavegacaoMapa()

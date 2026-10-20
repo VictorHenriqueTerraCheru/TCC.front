@@ -8,7 +8,7 @@ Numeração igual à do protótipo (`docs/design/`), que mostra a versão **mobi
 | 2 | Mapa — Ambos (com legenda "Como ler o mapa") | `/mapa?modo=ambos` | 01-04 | `GET /problemas`, `GET /incidentes/calor` |
 | 3 | Detalhe de problema (folha inferior) | `/mapa/problema/:id` | 01-04 | `GET /problemas/{id}`, `PUT .../voto` |
 | 4 | Área de incidentes (folha inferior) | `/mapa/area?lat&lng` | 01-04 | `GET /incidentes/area`, `GET /geocodificacao/reversa` |
-| 5 | Registrar — Categoria (passo 1 de 4) | `/registrar` | 05-08 | `GET /categorias` |
+| 5 | Registrar — Tipo e categoria (passo 1 de 4) | `/registrar` (tipo) → `/registrar/categoria?tipo=` | 05-08 | `GET /categorias`, `GET /grupos` |
 | 6 | Registrar — Local (passo 2) | `/registrar/local` | 05-08 | `GET /geocodificacao/reversa` |
 | 7 | Registrar — Duplicata (passo 3) | `/registrar/conferencia` | 05-08 | `GET /problemas/duplicatas`, `PUT .../voto` (sim) |
 | 8 | Registrar — Revisão (passo 4) | `/registrar/revisao` | 05-08 | `POST /problemas` |

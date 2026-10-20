@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router'
 
-import { isGrupoCategoria, type GrupoCategoria } from '@/features/categorias'
+import { useAparencia } from '@/features/categorias'
 
 import { gruposDoModo, mostraProblemas, type FiltrosMapa, type ModoMapa } from '../models/filtros'
 
@@ -11,17 +11,16 @@ function lerModo(valor: string | null): ModoMapa {
 /** Modo e chips ficam na URL (`/mapa?modo=ambos&grupos=eletrica&nova=1`), como em docs/TELAS.md. */
 export function useFiltrosMapa() {
   const [params, setParams] = useSearchParams()
+  const { grupos: todos } = useAparencia()
 
   const modo = lerModo(params.get('modo'))
   // Link com chip de outro modo (`?grupos=seguranca` sem modo): ignorado. Sem isso, as duas
   // camadas desligariam e o mapa ficaria vazio sem nenhum chip marcado para desfazer.
-  const disponiveis = gruposDoModo(modo)
+  // Também descarta chave de grupo que não existe (mais); com os grupos ainda carregando, nenhuma passa.
+  const disponiveis = gruposDoModo(todos, modo).map((g) => g.chave)
   const filtros: FiltrosMapa = {
     modo,
-    grupos: (params.get('grupos') ?? '')
-      .split(',')
-      .filter(isGrupoCategoria)
-      .filter((g) => disponiveis.includes(g)),
+    grupos: (params.get('grupos') ?? '').split(',').filter((g) => disponiveis.includes(g)),
     somenteNovas: params.get('nova') === '1',
   }
 
@@ -45,14 +44,14 @@ export function useFiltrosMapa() {
     ...filtros,
     alterarModo(modo: ModoMapa) {
       // Chips que não existem no novo modo saem do filtro.
-      const disponiveis = gruposDoModo(modo)
+      const disponiveis = gruposDoModo(todos, modo).map((g) => g.chave)
       gravar({
         modo,
         grupos: filtros.grupos.filter((g) => disponiveis.includes(g)),
         somenteNovas: filtros.somenteNovas && mostraProblemas(modo),
       })
     },
-    alternarGrupo(grupo: GrupoCategoria) {
+    alternarGrupo(grupo: string) {
       const grupos = filtros.grupos.includes(grupo)
         ? filtros.grupos.filter((g) => g !== grupo)
         : [...filtros.grupos, grupo]

@@ -1,6 +1,6 @@
 import { Marker } from '@vis.gl/react-maplibre'
 
-import { aparenciaDoGrupo, grupoDe, iconeDe, type Categoria } from '@/features/categorias'
+import { iconeDe, useAparencia, type Categoria } from '@/features/categorias'
 
 import type { ProblemaNaArea } from '../models/problema'
 import { MarcadorProblema } from './marcador-problema'
@@ -21,6 +21,7 @@ export function CamadaProblemas({
   selecionadoId,
   aoSelecionar,
 }: CamadaProblemasProps) {
+  const { aparenciaDe } = useAparencia()
   return problemas.map((problema) => {
     const categoria = categorias.get(problema.categoriaId)
     if (!categoria) return null
@@ -50,7 +51,7 @@ export function CamadaProblemas({
           className="block cursor-pointer focus-visible:outline-2"
         >
           <MarcadorProblema
-            cor={aparenciaDoGrupo[grupoDe(categoria)].corForte}
+            cor={aparenciaDe(categoria).corForte}
             icone={iconeDe(categoria)}
             status={problema.status}
             faixa={problema.faixa}

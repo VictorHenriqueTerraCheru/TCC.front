@@ -11,6 +11,7 @@ import {
   LocalIncidentePage,
   LocalProblemaPage,
   RegistroLayout,
+  TipoPage,
   RevisaoIncidentePage,
   RevisaoProblemaPage,
   SucessoIncidentePage,
@@ -53,7 +54,8 @@ export const rotas: RouteObject[] = [
             path: 'registrar',
             element: <RegistroLayout />,
             children: [
-              { index: true, element: <CategoriaPage /> },
+              { index: true, element: <TipoPage /> },
+              { path: 'categoria', element: <CategoriaPage /> },
               { path: 'local', element: <LocalProblemaPage /> },
               { path: 'conferencia', element: <ConferenciaPage /> },
               { path: 'revisao', element: <RevisaoProblemaPage /> },

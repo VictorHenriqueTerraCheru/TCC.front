@@ -14,6 +14,7 @@ import { LinhaResumo, Resumo } from '../components/resumo'
 import { useEnvio } from '../hooks/use-envio'
 import { useRetomarRegistro } from '../hooks/use-retomar-registro'
 import { useEnderecoDoRascunho, useExigirPasso, useRascunho } from '../hooks/use-rascunho'
+import { caminhoDaCategoria } from '../models/rotas'
 
 const LIMITE_DESCRICAO = 280
 
@@ -91,7 +92,7 @@ export function RevisaoProblemaPage() {
             }
             rotulo="Categoria"
             valor={categoria?.nome ?? '—'}
-            aoEditar={() => navigate('/registrar')}
+            aoEditar={() => navigate(caminhoDaCategoria('problema'))}
           />
           <LinhaResumo
             icone="keep"

@@ -1,6 +1,5 @@
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 
-import type { GrupoCategoria } from '@/features/categorias'
 import { api, dados } from '@/infrastructure/api'
 
 const TAMANHO_PAGINA = 20
@@ -10,7 +9,7 @@ export const RAIO_RECENTES_KM = 10
 const arredondar = (valor: number) => Math.round(valor * 1000) / 1000
 
 // GET /problemas/recentes — não resolvidos no raio, mais recentes primeiro.
-export function recentesQuery(centro: { lat: number; lng: number }, grupos: GrupoCategoria[]) {
+export function recentesQuery(centro: { lat: number; lng: number }, grupos: string[]) {
   const ponto = { lat: arredondar(centro.lat), lng: arredondar(centro.lng) }
   return infiniteQueryOptions({
     queryKey: ['problemas', 'recentes', ponto, { grupos }],
@@ -35,6 +34,6 @@ export function recentesQuery(centro: { lat: number; lng: number }, grupos: Grup
   })
 }
 
-export function useRecentes(centro: { lat: number; lng: number }, grupos: GrupoCategoria[]) {
+export function useRecentes(centro: { lat: number; lng: number }, grupos: string[]) {
   return useInfiniteQuery(recentesQuery(centro, grupos))
 }
