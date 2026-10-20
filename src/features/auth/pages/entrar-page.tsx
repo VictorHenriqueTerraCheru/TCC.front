@@ -68,7 +68,7 @@ export function EntrarPage() {
           <AvisoDialog
             titulo="Esqueci minha senha"
             gatilho={
-              <Button type="button" variant="link" size="sm">
+              <Button type="button" variant="link">
                 Esqueci minha senha
               </Button>
             }
@@ -87,9 +87,13 @@ export function EntrarPage() {
           {entrar.isPending ? 'Entrando…' : 'Entrar'}
         </Button>
 
-        <p className="mt-auto pt-10 text-center text-sm text-muted-foreground">
-          Ainda não tem conta?{' '}
-          <Link to="/cadastro" replace className="font-medium text-primario hover:underline">
+        <p className="mt-auto flex items-center justify-center gap-1 pt-10 text-sm text-muted-foreground">
+          Ainda não tem conta?
+          <Link
+            to="/cadastro"
+            replace
+            className="inline-flex min-h-11 items-center font-medium text-primario hover:underline"
+          >
             Criar conta
           </Link>
         </p>
