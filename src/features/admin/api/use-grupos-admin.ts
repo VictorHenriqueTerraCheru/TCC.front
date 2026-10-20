@@ -8,6 +8,8 @@ function useInvalidarGrupos() {
   return () => {
     void queryClient.invalidateQueries({ queryKey: ['grupos'] })
     void queryClient.invalidateQueries({ queryKey: ['admin', 'categorias'] })
+    void queryClient.invalidateQueries({ queryKey: ['problemas'] })
+    void queryClient.invalidateQueries({ queryKey: ['incidentes'] })
   }
 }
 

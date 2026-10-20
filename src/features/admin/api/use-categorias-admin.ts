@@ -14,12 +14,18 @@ export function useCategoriasAdmin() {
   return useQuery(categoriasAdminQuery)
 }
 
-/** A lista pública (`['categorias']`) e a do admin mudam juntas. */
+/**
+ * A lista pública (`['categorias']`) e a do admin mudam juntas. Mapa, recentes, área de incidentes e histórico
+ * trazem a categoria embutida (nome, grupo, ícone) ou só as ativas: também são recarregados.
+ */
 function useInvalidarCategorias() {
   const queryClient = useQueryClient()
   return () => {
     void queryClient.invalidateQueries({ queryKey: ['admin', 'categorias'] })
     void queryClient.invalidateQueries({ queryKey: ['categorias'] })
+    void queryClient.invalidateQueries({ queryKey: ['problemas'] })
+    void queryClient.invalidateQueries({ queryKey: ['incidentes'] })
+    void queryClient.invalidateQueries({ queryKey: ['me', 'historico'] })
   }
 }
 

@@ -121,6 +121,21 @@ describe('mocks de registro usam as categorias do admin', () => {
     expect(nasCelulas(['seguranca'])).toBe(false)
   })
 
+  it('editar a categoria atualiza também o histórico do usuário', () => {
+    banco.editarCategoria(1, { nome: 'Buraco grande', grupo: 'eletrica', icone: 'ico_a' })
+
+    const doBuraco = banco.historico('todos').filter((h) => h.categoria.id === 1)
+    expect(doBuraco.length).toBeGreaterThan(0)
+    for (const item of doBuraco) {
+      expect(item.categoria).toEqual({
+        id: 1,
+        nome: 'Buraco grande',
+        grupo: 'eletrica',
+        icone: 'ico_a',
+      })
+    }
+  })
+
   it('categoria desativada some da contagem da área', async () => {
     const criada = banco.criarCategoria({
       nome: 'Rua inundada',

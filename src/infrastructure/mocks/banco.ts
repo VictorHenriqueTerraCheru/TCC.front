@@ -364,14 +364,11 @@ export const banco = {
     const nova = { ...atual, nome: corpo.nome.trim(), grupo: corpo.grupo, icone: corpo.icone }
     categoriasAdmin = categoriasAdmin.map((c) => (c.id === id ? nova : c))
     // Os problemas já registrados guardam a categoria embutida: acompanham a edição, como no join da API.
+    const embutida = { id, nome: nova.nome, grupo: nova.grupo, icone: nova.icone }
     for (const [chave, d] of detalhes) {
-      if (d.categoria.id === id) {
-        detalhes.set(chave, {
-          ...d,
-          categoria: { id, nome: nova.nome, grupo: nova.grupo, icone: nova.icone },
-        })
-      }
+      if (d.categoria.id === id) detalhes.set(chave, { ...d, categoria: embutida })
     }
+    historico = historico.map((h) => (h.categoria.id === id ? { ...h, categoria: embutida } : h))
     return nova
   },
   alterarAtivaCategoria(id: number, ativa: boolean) {
