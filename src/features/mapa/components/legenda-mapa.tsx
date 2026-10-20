@@ -67,7 +67,7 @@ export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): vo
           type="button"
           onClick={aoFechar}
           aria-label="Fechar legenda"
-          className="-m-1 flex size-7 items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+          className="-m-2.5 flex size-11 items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
           <Icone nome="close" className="text-[18px]" />
         </button>
