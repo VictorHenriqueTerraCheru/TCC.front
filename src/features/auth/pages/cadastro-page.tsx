@@ -131,9 +131,13 @@ export function CadastroPage() {
           <Button type="submit" className="w-full" disabled={cadastrar.isPending}>
             {cadastrar.isPending ? 'Criando conta…' : 'Criar conta'}
           </Button>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Já tem conta?{' '}
-            <Link to="/login" replace className="font-medium text-primario hover:underline">
+          <p className="mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground">
+            Já tem conta?
+            <Link
+              to="/login"
+              replace
+              className="inline-flex min-h-11 items-center font-medium text-primario hover:underline"
+            >
               Entrar
             </Link>
           </p>
