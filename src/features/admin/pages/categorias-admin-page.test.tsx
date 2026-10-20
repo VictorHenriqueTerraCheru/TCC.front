@@ -53,6 +53,15 @@ describe('administração de categorias e grupos', () => {
     expect(screen.queryByRole('button', { name: 'Nova categoria' })).not.toBeInTheDocument()
   })
 
+  it('falha em GET /grupos mostra erro com "Tentar novamente" em vez de chaves cruas', async () => {
+    server.use(http.get(rota('/grupos'), () => new HttpResponse(null, { status: 500 })))
+    abrir()
+
+    expect(await screen.findByText('Não foi possível carregar os grupos.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Nova categoria' })).not.toBeInTheDocument()
+  })
+
   it('visitante vai para o login', async () => {
     sair()
     const { router } = abrir()

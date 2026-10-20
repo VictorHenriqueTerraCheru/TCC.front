@@ -8,7 +8,13 @@ import { semAcento } from '@/common/lib/texto'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { aparenciaDaCor, CategoriaIcone, PontoGrupo, useAparencia } from '@/features/categorias'
+import {
+  aparenciaDaCor,
+  CategoriaIcone,
+  PontoGrupo,
+  useAparencia,
+  useGrupos,
+} from '@/features/categorias'
 
 import {
   useAlterarAtivaCategoria,
@@ -30,6 +36,7 @@ const situacoes: { valor: Situacao; rotulo: string }[] = [
 
 export function ListaCategorias() {
   const categorias = useCategoriasAdmin()
+  const gruposQuery = useGrupos()
   const { grupos, grupoDe } = useAparencia()
   const alterarAtiva = useAlterarAtivaCategoria()
   // 'nova' abre o formulário vazio; uma categoria abre a edição dela.
@@ -39,12 +46,26 @@ export function ListaCategorias() {
   const [situacao, setSituacao] = useState<Situacao>('todas')
   const [grupo, setGrupo] = useState<string | null>(null)
 
-  if (categorias.isPending) return <Skeleton className="h-60 rounded-2xl bg-muted" />
-  if (categorias.isError) {
+  if (categorias.isPending || gruposQuery.isPending) {
+    return <Skeleton className="h-60 rounded-2xl bg-muted" />
+  }
+  // Sem grupos a lista mostraria chaves cruas, sem filtros, e o formulário diria que não há grupos.
+  if (categorias.isError || gruposQuery.isError) {
     return (
       <div role="alert" className="space-y-3 py-6">
-        <p>Não foi possível carregar as categorias.</p>
-        <Button variant="outline" size="sm" onClick={() => void categorias.refetch()}>
+        <p>
+          {categorias.isError
+            ? 'Não foi possível carregar as categorias.'
+            : 'Não foi possível carregar os grupos.'}
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            if (categorias.isError) void categorias.refetch()
+            if (gruposQuery.isError) void gruposQuery.refetch()
+          }}
+        >
           Tentar novamente
         </Button>
       </div>

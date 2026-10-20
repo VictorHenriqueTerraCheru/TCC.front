@@ -50,7 +50,17 @@ export const incidentesHandlers = [
       if (!request.headers.has('Authorization')) return new HttpResponse(null, { status: 401 })
       const { categoriaId, lat, lng, ocorridoEm } = await request.json()
       const categoria = banco.categoriaPorId(categoriaId)
-      if (!categoria?.ativa || categoria.tipo !== 'incidente') {
+      if (!categoria?.ativa) {
+        return HttpResponse.json(
+          {
+            title: 'Erro de validação.',
+            status: 400,
+            errors: { categoriaId: ['Categoria inexistente.'] },
+          },
+          { status: 400 },
+        )
+      }
+      if (categoria.tipo !== 'incidente') {
         return erroDeRegra(422, 'categoria-nao-e-incidente', 'A categoria não é de incidente.')
       }
       const instante = Date.parse(ocorridoEm)

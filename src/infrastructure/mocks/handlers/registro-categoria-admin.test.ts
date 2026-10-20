@@ -32,6 +32,10 @@ describe('mocks de registro usam as categorias do admin', () => {
   it('categoria desativada não aceita novo registro', async () => {
     banco.alterarAtivaCategoria(8, false)
 
-    expect((await registrarIncidente(8)).status).toBe(422)
+    expect((await registrarIncidente(8)).status).toBe(400)
+  })
+
+  it('categoria de outro tipo continua sendo 422', async () => {
+    expect((await registrarIncidente(1)).status).toBe(422)
   })
 })

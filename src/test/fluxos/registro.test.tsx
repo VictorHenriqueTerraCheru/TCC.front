@@ -53,6 +53,14 @@ describe('fluxo de registro', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
   })
 
+  it('visitante em /registrar/categoria?tipo=incidente volta para a mesma URL depois do login', async () => {
+    sair()
+    const { router } = abrir('/registrar/categoria?tipo=incidente')
+    await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
+
+    expect(router.state.location.state).toEqual({ de: '/registrar/categoria?tipo=incidente' })
+  })
+
   it('aceite: registrar onde já há um buraco a menos de 50 m abre a conferência; "Não, é outro" segue e envia', async () => {
     const usuario = userEvent.setup()
     const { router } = abrir()
