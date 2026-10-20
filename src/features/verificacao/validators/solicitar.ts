@@ -1,10 +1,13 @@
 import { z } from 'zod'
 
-import { tiposVinculo } from '../models/verificacao'
+import { tiposVinculo, type TipoVinculo } from '../models/verificacao'
 
 // Mesmas regras da API: 30 a 500 caracteres depois de remover espaços nas pontas.
 export const solicitarSchema = z.object({
-  tipoVinculo: z.enum(tiposVinculo as [string, ...string[]], 'Escolha o tipo de vínculo.'),
+  tipoVinculo: z.enum(
+    tiposVinculo as [TipoVinculo, ...TipoVinculo[]],
+    'Escolha o tipo de vínculo.',
+  ),
   justificativa: z
     .string()
     .trim()

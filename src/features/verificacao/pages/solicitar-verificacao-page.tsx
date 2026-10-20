@@ -12,7 +12,7 @@ import { useMe } from '@/features/usuarios'
 
 import { useSolicitarVerificacao } from '../api/use-solicitar'
 import { mensagemErroVerificacao } from '../errors'
-import { rotuloVinculo, tiposVinculo, type TipoVinculo } from '../models/verificacao'
+import { rotuloVinculo, tiposVinculo } from '../models/verificacao'
 import { solicitarSchema, type SolicitarForm } from '../validators/solicitar'
 
 const LIMITE = 500
@@ -34,7 +34,7 @@ export function SolicitarVerificacaoPage() {
 
   const enviar = handleSubmit((form) =>
     solicitar.mutate(
-      { tipoVinculo: form.tipoVinculo as TipoVinculo, justificativa: form.justificativa },
+      { tipoVinculo: form.tipoVinculo, justificativa: form.justificativa },
       { onSuccess: () => navigate('/perfil', { replace: true }) },
     ),
   )
