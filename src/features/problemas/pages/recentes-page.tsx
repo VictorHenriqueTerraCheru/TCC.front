@@ -17,6 +17,7 @@ import {
   gruposDoTipo,
   PontoGrupo,
   useAparencia,
+  useGrupos,
 } from '@/features/categorias'
 import { useLocalizacao } from '@/features/localizacao'
 import type { Schema } from '@/infrastructure/api'
@@ -94,6 +95,7 @@ function Cartao({ item }: { item: ItemRecente }) {
 export function RecentesPage() {
   const { estado, posicao } = useLocalizacao()
   const { grupos: todos, carregado } = useAparencia()
+  const gruposQuery = useGrupos()
   const [escolhidos, setGrupos] = useState<string[]>([])
   // Grupo apagado pelo admin enquanto a tela está aberta sai da seleção (e do filtro enviado).
   const grupos = carregado ? escolhidos.filter((g) => todos.some((t) => t.chave === g)) : escolhidos
@@ -106,6 +108,20 @@ export function RecentesPage() {
     setGrupos(() =>
       grupos.includes(grupo) ? grupos.filter((g) => g !== grupo) : [...grupos, grupo],
     )
+
+  // Sem os grupos a lista sairia sem filtros e sem aviso: melhor o erro, com a nova tentativa.
+  if (gruposQuery.isError) {
+    return (
+      <Pagina titulo="Recentes">
+        <div role="alert" className="space-y-3 py-6">
+          <p>Não foi possível carregar os filtros.</p>
+          <Button variant="outline" size="sm" onClick={() => void gruposQuery.refetch()}>
+            Tentar novamente
+          </Button>
+        </div>
+      </Pagina>
+    )
+  }
 
   return (
     <Pagina titulo="Recentes">
