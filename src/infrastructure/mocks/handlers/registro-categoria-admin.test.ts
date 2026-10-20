@@ -59,6 +59,31 @@ describe('mocks de registro usam as categorias do admin', () => {
     )
   })
 
+  it('o calor de um incidente novo aparece só no filtro do grupo da sua categoria', async () => {
+    const grupo = banco.criarGrupo('Clima', 'incidente', 'azul')
+    if (typeof grupo === 'string') throw new Error(grupo)
+    const criada = banco.criarCategoria({
+      nome: 'Rua inundada',
+      grupo: grupo.chave,
+      tipo: 'incidente',
+      icone: 'ico_a',
+    })
+    if (typeof criada === 'string') throw new Error(criada)
+    await registrarIncidente(criada.id)
+    const calor = async (grupos: string) =>
+      (await (
+        await fetch(
+          rota(`/incidentes/calor?minLat=-23&maxLat=-22&minLng=-44&maxLng=-43&grupos=${grupos}`),
+        )
+      ).json()) as { lat: number; lng: number; quantidade: number }[]
+
+    const doClima = await calor(grupo.chave)
+    const deSeguranca = await calor('seguranca')
+
+    expect(doClima).toEqual([{ lat: -22.95, lng: -43.18, quantidade: 1 }])
+    expect(deSeguranca.some((c) => c.lat === -22.95 && c.lng === -43.18)).toBe(false)
+  })
+
   it('categoria desativada não aceita novo registro', async () => {
     banco.alterarAtivaCategoria(8, false)
 

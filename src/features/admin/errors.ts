@@ -4,7 +4,8 @@ const mensagens: Record<string, string> = {
   'nome-duplicado': 'Já existe uma categoria com este nome.',
   'grupo-tipo-incompativel': 'O grupo escolhido é de outro tipo (Estado ou Evento).',
   'grupo-rotulo-duplicado': 'Já existe um grupo com este nome.',
-  'grupo-em-uso': 'Este grupo ainda tem categorias. Mova ou desative-as antes de apagar.',
+  'grupo-em-uso':
+    'Este grupo ainda tem categorias (inclusive desativadas). Mova todas para outro grupo antes de apagar.',
 }
 
 export function mensagemErroCategorias(erro: unknown): string {

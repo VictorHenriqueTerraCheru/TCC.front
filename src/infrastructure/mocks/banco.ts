@@ -3,7 +3,7 @@ import { categorias } from './fixtures/categorias'
 import { criarDetalhes, ID_DO_AUTOR } from './fixtures/detalhes'
 import { grupos as gruposIniciais } from './fixtures/grupos'
 import { historicoInicial, verificacoesIniciais } from './fixtures/perfil'
-import { calorIncidentes } from './fixtures/problemas'
+import { calorIncidentes, grupoDasCelulas } from './fixtures/problemas'
 import { usuariosIniciais } from './fixtures/usuarios'
 
 type ValorVoto = Schema<'ValorVotoContrato'>
@@ -29,9 +29,8 @@ let detalhes = criarDetalhes()
 let votos = new Map<string, ValorVoto>()
 let usuarios = [...usuariosIniciais]
 let autoria = new Set([ID_DO_AUTOR])
-let celulas = [...calorIncidentes]
 let incidentesRegistrados = 0
-let incidentesNovos: { categoriaId: number; lat: number; lng: number }[] = []
+let incidentesNovos: { categoriaId: number; grupo: string; lat: number; lng: number }[] = []
 let verificacoes = verificacoesIniciais()
 let historico = historicoInicial()
 let perfis = new Map<string, { perfil: Perfil; verificadoEm: string | null }>()
@@ -259,19 +258,27 @@ export const banco = {
     votos.set(id, valor)
   },
 
-  calor(): CelulaCalor[] {
+  /**
+   * GET /incidentes/calor: as células de exemplo (que valem como o grupo `grupoDasCelulas`) mais o que foi
+   * registrado na sessão, cada registro no grupo da sua categoria. Sem `filtroGrupos` entra tudo.
+   */
+  calor(filtroGrupos: string[] = []): CelulaCalor[] {
+    const entra = (grupo: string) => filtroGrupos.length === 0 || filtroGrupos.includes(grupo)
+    const celulas = entra(grupoDasCelulas) ? calorIncidentes.map((c) => ({ ...c })) : []
+    for (const novo of incidentesNovos.filter((i) => entra(i.grupo))) {
+      const existente = celulas.find((c) => c.lat === novo.lat && c.lng === novo.lng)
+      if (existente) existente.quantidade++
+      else celulas.push({ lat: novo.lat, lng: novo.lng, quantidade: 1 })
+    }
     return celulas
   },
-  /** POST /incidentes: arredonda o ponto em 3 casas e soma na célula. null = limite diário. */
+  /** POST /incidentes: arredonda o ponto em 3 casas e guarda o registro. null = limite diário. */
   registrarIncidente(categoriaId: number, lat: number, lng: number) {
     if (incidentesRegistrados >= LIMITE_INCIDENTES) return null
     incidentesRegistrados++
     const ponto = { lat: Math.round(lat * 1000) / 1000, lng: Math.round(lng * 1000) / 1000 }
-    const existente = celulas.find((c) => c.lat === ponto.lat && c.lng === ponto.lng)
-    celulas = existente
-      ? celulas.map((c) => (c === existente ? { ...c, quantidade: c.quantidade + 1 } : c))
-      : [...celulas, { ...ponto, quantidade: 1 }]
-    incidentesNovos = [...incidentesNovos, { categoriaId, ...ponto }]
+    const grupo = categoriasAdmin.find((c) => c.id === categoriaId)?.grupo ?? grupoDasCelulas
+    incidentesNovos = [...incidentesNovos, { categoriaId, grupo, ...ponto }]
     return ponto
   },
   /** Incidentes registrados nesta sessão, com a categoria (as células do calor só guardam contagem). */
@@ -369,7 +376,6 @@ export const banco = {
     votos = new Map()
     usuarios = [...usuariosIniciais]
     autoria = new Set([ID_DO_AUTOR])
-    celulas = [...calorIncidentes]
     incidentesRegistrados = 0
     incidentesNovos = []
     verificacoes = verificacoesIniciais()

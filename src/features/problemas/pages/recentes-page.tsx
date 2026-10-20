@@ -93,16 +93,18 @@ function Cartao({ item }: { item: ItemRecente }) {
 /** Tela 9: problemas não resolvidos num raio de 10 km, mais recentes primeiro. */
 export function RecentesPage() {
   const { estado, posicao } = useLocalizacao()
-  const { grupos: todos } = useAparencia()
-  const [grupos, setGrupos] = useState<string[]>([])
+  const { grupos: todos, carregado } = useAparencia()
+  const [escolhidos, setGrupos] = useState<string[]>([])
+  // Grupo apagado pelo admin enquanto a tela está aberta sai da seleção (e do filtro enviado).
+  const grupos = carregado ? escolhidos.filter((g) => todos.some((t) => t.chave === g)) : escolhidos
   const centro =
     estado === 'granted' && posicao ? posicao : { lat: CENTRO_PADRAO[0], lng: CENTRO_PADRAO[1] }
   const recentes = useRecentes(centro, grupos)
   const itens = recentes.data?.pages.flatMap((p) => p.itens) ?? []
 
   const alternar = (grupo: string) =>
-    setGrupos((atuais) =>
-      atuais.includes(grupo) ? atuais.filter((g) => g !== grupo) : [...atuais, grupo],
+    setGrupos(() =>
+      grupos.includes(grupo) ? grupos.filter((g) => g !== grupo) : [...grupos, grupo],
     )
 
   return (

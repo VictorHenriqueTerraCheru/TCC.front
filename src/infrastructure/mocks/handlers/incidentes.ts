@@ -2,7 +2,6 @@ import { http, HttpResponse } from 'msw'
 
 import type { Schema } from '../../api'
 import { banco, metrosEntre } from '../banco'
-import { grupoDasCelulas } from '../fixtures/problemas'
 import { rota } from '../rota'
 import { erroDeRegra, lista, noRetangulo, retanguloDaUrl } from './comum'
 
@@ -49,8 +48,7 @@ export const incidentesHandlers = [
     if (!retangulo) return HttpResponse.json({ title: 'Retângulo inválido.' }, { status: 400 })
 
     const grupos = lista(url, 'grupos')
-    if (grupos.length && !grupos.includes(grupoDasCelulas)) return HttpResponse.json([])
-    return HttpResponse.json(banco.calor().filter((c) => noRetangulo(c, retangulo)))
+    return HttpResponse.json(banco.calor(grupos).filter((c) => noRetangulo(c, retangulo)))
   }),
   http.get(rota('/incidentes/area'), ({ request }) => {
     const url = new URL(request.url)
