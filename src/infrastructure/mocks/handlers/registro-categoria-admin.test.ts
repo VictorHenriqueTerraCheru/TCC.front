@@ -84,6 +84,44 @@ describe('mocks de registro usam as categorias do admin', () => {
     expect(deSeguranca.some((c) => c.lat === -22.95 && c.lng === -43.18)).toBe(false)
   })
 
+  it('sem categoria nova, quatro incidentes de roubo não inventam acidente nem somem do total', async () => {
+    const antes = await resumo()
+    for (let i = 0; i < 4; i++) await registrarIncidente(7)
+    const depois = await resumo()
+    const acidentes = (r: Resumo) => r.contagens.find((c) => c.categoriaId === 8)?.dias7
+
+    expect(acidentes(depois)).toBe(acidentes(antes))
+  })
+
+  it('categoria desativada some da contagem da área', async () => {
+    const criada = banco.criarCategoria({
+      nome: 'Rua inundada',
+      grupo: 'seguranca',
+      tipo: 'incidente',
+      icone: 'ico_a',
+    })
+    if (typeof criada === 'string') throw new Error(criada)
+    await registrarIncidente(criada.id)
+    banco.alterarAtivaCategoria(criada.id, false)
+
+    expect((await resumo()).contagens.some((c) => c.categoriaId === criada.id)).toBe(false)
+  })
+
+  it('editar a categoria atualiza os problemas já registrados', () => {
+    const antes = banco.problemas().find((p) => p.categoriaId === 3)
+    expect(antes).toBeDefined()
+
+    banco.editarCategoria(3, { nome: 'Poste sem luz', grupo: 'limpeza', icone: 'ico_a' })
+
+    const detalhe = banco.detalhe(antes!.id, false)
+    expect(detalhe?.categoria).toEqual({
+      id: 3,
+      nome: 'Poste sem luz',
+      grupo: 'limpeza',
+      icone: 'ico_a',
+    })
+  })
+
   it('categoria desativada não aceita novo registro', async () => {
     banco.alterarAtivaCategoria(8, false)
 

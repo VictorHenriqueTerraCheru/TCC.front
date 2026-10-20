@@ -15,12 +15,16 @@ function resumoDaArea(ponto: { lat: number; lng: number }) {
     .filter((c) => metrosEntre(ponto, c) <= 400)
     .reduce((soma, c) => soma + c.quantidade, 0)
   const novos = banco.incidentesNovos().filter((i) => metrosEntre(ponto, i) <= 400)
-  const doNovo = (categoriaId: number) => novos.filter((i) => i.categoriaId === categoriaId).length
+  // Como na API, categoria desativada some das contagens da área.
+  const ativos = novos.filter((i) => banco.categoriaPorId(i.categoriaId)?.ativa)
+  const doNovo = (categoriaId: number) => ativos.filter((i) => i.categoriaId === categoriaId).length
 
-  // Todo registro da sessão também entrou numa célula: sai do bolo de roubos e volta na sua categoria.
-  const roubos = celulas - novos.length + doNovo(7)
-  const acidentes = Math.floor(celulas / 4) + doNovo(8)
-  const outras = [...new Set(novos.map((i) => i.categoriaId))]
+  // Todo registro da sessão também entrou em `celulas`: sai do bolo de roubos e volta na sua categoria,
+  // e a estimativa de acidentes parte só das células de exemplo.
+  const deExemplo = celulas - novos.length
+  const roubos = deExemplo + doNovo(7)
+  const acidentes = Math.floor(deExemplo / 4) + doNovo(8)
+  const outras = [...new Set(ativos.map((i) => i.categoriaId))]
     .filter((id) => id !== 7 && id !== 8)
     .map((id) => ({
       categoriaId: id,
