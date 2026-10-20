@@ -2,7 +2,7 @@ import { Navigate, useNavigate, useSearchParams } from 'react-router'
 
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { gruposDoTipo, useAparencia, useCategorias } from '@/features/categorias'
+import { gruposDoTipo, useCategorias, useGrupos } from '@/features/categorias'
 
 import { PassoRegistro } from '../components/passo-registro'
 import { SeletorCategoria } from '../components/seletor-categoria'
@@ -20,7 +20,7 @@ export function CategoriaPage() {
 function CategoriaDoTipo({ tipo }: { tipo: NonNullable<ReturnType<typeof lerTipo>> }) {
   const navigate = useNavigate()
   const categorias = useCategorias()
-  const { grupos } = useAparencia()
+  const grupos = useGrupos()
   const { categoria, escolherCategoria } = useRascunho()
   const recentesIds = useRecentesStore((s) => s.ids)
   const registrarRecente = useRecentesStore((s) => s.registrar)
@@ -55,19 +55,26 @@ function CategoriaDoTipo({ tipo }: { tipo: NonNullable<ReturnType<typeof lerTipo
       <h2 className="mb-4 text-2xl">
         {tipo === 'problema' ? 'O que continua lá?' : 'O que aconteceu?'}
       </h2>
-      {categorias.isPending ? (
+      {categorias.isPending || grupos.isPending ? (
         <Skeleton className="h-60 rounded-2xl bg-muted" />
-      ) : categorias.isError ? (
+      ) : categorias.isError || grupos.isError ? (
         <div role="alert" className="space-y-3 py-6">
           <p>Não foi possível carregar as categorias.</p>
-          <Button variant="outline" size="sm" onClick={() => void categorias.refetch()}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              void categorias.refetch()
+              void grupos.refetch()
+            }}
+          >
             Tentar novamente
           </Button>
         </div>
       ) : (
         <SeletorCategoria
           categorias={doTipo}
-          grupos={gruposDoTipo(grupos, tipo)}
+          grupos={gruposDoTipo(grupos.data, tipo)}
           selecionadaId={escolhida?.id ?? null}
           recentesIds={recentesIds}
           aoEscolher={escolherCategoria}

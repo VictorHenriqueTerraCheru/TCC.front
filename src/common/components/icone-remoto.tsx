@@ -43,6 +43,7 @@ export function IconeDinamico({
   }
   return (
     <IconeRemoto
+      key={nome}
       nome={nome}
       alternativo={alternativo}
       preenchido={preenchido}
@@ -90,8 +91,8 @@ function IconeRemoto({
       className={cn('shrink-0 select-none', className)}
       style={{ fontSize: undefined, ...style }}
     >
-      {dados.caminhos.map((d) => (
-        <path key={d} d={d} />
+      {dados.caminhos.map((d, i) => (
+        <path key={i} d={d} />
       ))}
     </svg>
   )

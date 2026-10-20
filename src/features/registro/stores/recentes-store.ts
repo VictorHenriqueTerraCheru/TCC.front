@@ -17,6 +17,17 @@ export const useRecentesStore = create<RecentesState>()(
       registrar: (id) =>
         set((s) => ({ ids: [id, ...s.ids.filter((i) => i !== id)].slice(0, MAXIMO) })),
     }),
-    { name: 'ocorrencias.categoriasRecentes', storage: createJSONStorage(() => localStorage) },
+    {
+      name: 'ocorrencias.categoriasRecentes',
+      storage: createJSONStorage(() => localStorage),
+      // O localStorage pode ter sido editado: só ids inteiros entram.
+      merge: (salvo, atual) => {
+        const ids = (salvo as Partial<RecentesState> | undefined)?.ids
+        return {
+          ...atual,
+          ids: Array.isArray(ids) ? ids.filter((i) => Number.isInteger(i)).slice(0, MAXIMO) : [],
+        }
+      },
+    },
   ),
 )

@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 
-import { limparCacheDeIcones } from '@/common/lib/iconify'
+import { carregarIcone, limparCacheDeIcones } from '@/common/lib/iconify'
 import { server } from '@/infrastructure/mocks/server'
 import { renderizar } from '@/test/render'
 
@@ -44,9 +44,8 @@ describe('IconeDinamico', () => {
     )
     const { container } = renderizar(<IconeDinamico nome="ico_a" alternativo="category" />)
 
-    await waitFor(() =>
-      expect(container.querySelector('.material-symbols-rounded')).toBeInTheDocument(),
-    )
+    expect(await carregarIcone('ico_a')).toBeNull() // a falha já foi processada
+    expect(container.querySelector('.material-symbols-rounded')).toHaveTextContent('category')
     expect(container.querySelector('svg')).toBeNull()
   })
 })

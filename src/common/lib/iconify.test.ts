@@ -111,6 +111,56 @@ describe('carregarIcone', () => {
   })
 })
 
+describe('carregarIcone: entradas hostis', () => {
+  it.each([
+    ['caminhos que não é lista', { caminhos: 'x', tamanho: 24 }],
+    ['d com caracteres fora do SVG', { caminhos: ['M1 1 <script>'], tamanho: 24 }],
+    ['tamanho absurdo', { caminhos: ['M1 1h4'], tamanho: 100000 }],
+    ['sem tamanho', { caminhos: ['M1 1h4'] }],
+    ['null', null],
+  ])('cache do localStorage adulterado (%s) é ignorado e o ícone vem da rede', async (_, lixo) => {
+    localStorage.setItem('ocorrencias.iconesRemotos', JSON.stringify({ ico_a: lixo }))
+    server.use(iconesDoIconify({ 'ico-a-rounded': corpoValido }))
+
+    expect(await carregarIcone('ico_a')).toEqual({
+      caminhos: ['M8.5 17.5q-1.4 0-1.9-.5L12 4z'],
+      tamanho: 24,
+    })
+  })
+
+  it('cache que não é objeto não quebra', async () => {
+    localStorage.setItem('ocorrencias.iconesRemotos', '[1,2]')
+    server.use(iconesDoIconify({ 'ico-a-rounded': corpoValido }))
+
+    expect(await carregarIcone('ico_a')).not.toBeNull()
+  })
+
+  it.each(['a,b', 'Maiuscula', 'com-hifen', ''])('nome "%s" nem chega à rede', async (nome) => {
+    // Sem handler: qualquer requisição derrubaria o teste (onUnhandledFrame: 'error').
+    expect(await carregarIcone(nome)).toBeNull()
+  })
+
+  it.each(['constructor', '__proto__', 'toString'])(
+    'nome de propriedade de objeto (%s) não vira o protótipo como resposta',
+    async (nome) => {
+      server.use(iconesDoIconify({}))
+
+      expect(await carregarIcone(nome)).toBeNull()
+      expect(localStorage.getItem('ocorrencias.iconesRemotos') ?? '').not.toContain(`"${nome}"`)
+    },
+  )
+
+  it('largura absurda vinda da rede descarta o ícone', async () => {
+    server.use(
+      http.get(`${HOST}/material-symbols.json`, () =>
+        HttpResponse.json({ width: 99999, icons: { 'ico-a-rounded': { body: corpoValido } } }),
+      ),
+    )
+
+    expect(await carregarIcone('ico_a')).toBeNull()
+  })
+})
+
 describe('buscarIcones', () => {
   it('devolve os nomes Rounded sólidos, sem repetir', async () => {
     server.use(

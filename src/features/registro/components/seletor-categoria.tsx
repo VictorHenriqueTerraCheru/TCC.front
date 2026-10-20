@@ -53,6 +53,19 @@ export function SeletorCategoria({
     }))
     .filter((s) => s.itens.length > 0)
 
+  // Categoria cujo grupo não está na lista (removido, ou de outro tipo): não some, vai em "Outras".
+  const orfas = categorias.filter(
+    (c) =>
+      !grupos.some((g) => g.chave === c.grupo) &&
+      (termo === '' || semAcento(c.nome).includes(termo)),
+  )
+  if (orfas.length > 0 && grupoFiltro === null) {
+    secoes.push({
+      grupo: { chave: 'outras', rotulo: 'Outras', tipo: orfas[0]!.tipo, cor: 'cinza', ordem: 0 },
+      itens: orfas,
+    })
+  }
+
   const recentes = recentesIds
     .map((id) => categorias.find((c) => c.id === id))
     .filter((c): c is Categoria => c !== undefined)

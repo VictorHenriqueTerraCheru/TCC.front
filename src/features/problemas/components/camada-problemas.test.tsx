@@ -11,14 +11,14 @@ import { CamadaProblemas } from './camada-problemas'
 
 const porId = new Map(categorias.map((c) => [c.id, c as Categoria]))
 
-function montar(selecionadoId?: string) {
+function montar(selecionadoId?: string, mapa = porId) {
   const aoSelecionar = vi.fn()
   const aoTocar = vi.fn()
   renderizar(
     <MapaVetorial centro={[-22.9519, -43.1866]} aoTocar={aoTocar}>
       <CamadaProblemas
         problemas={problemasNaArea}
-        categorias={porId}
+        categorias={mapa}
         selecionadoId={selecionadoId}
         aoSelecionar={aoSelecionar}
       />
@@ -47,5 +47,12 @@ describe('CamadaProblemas', () => {
         .style.zIndex
     expect(zDe(baixa.id)).toBe('1000')
     expect(zDe(alta.id)).toBe('300')
+  })
+
+  it('problema de categoria desativada continua no mapa, em cinza', () => {
+    montar(undefined, new Map())
+
+    expect(screen.getAllByTestId('marcador')).toHaveLength(problemasNaArea.length)
+    expect(screen.getAllByRole('button', { name: 'Problema' })).toHaveLength(problemasNaArea.length)
   })
 })

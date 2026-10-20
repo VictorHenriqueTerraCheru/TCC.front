@@ -7,15 +7,15 @@ import { CategoriaIcone } from '@/features/categorias'
 import { MapaRegistro } from '../components/mapa-registro'
 import { PassoRegistro } from '../components/passo-registro'
 import { SeletorHorario } from '../components/seletor-horario'
-import { useEnderecoDoRascunho, useExigirPasso, useRascunho } from '../hooks/use-rascunho'
+import { useEnderecoDoRascunho, useExigirCategoria, useRascunho } from '../hooks/use-rascunho'
 import { caminhoDaCategoria } from '../models/rotas'
 
 /** Tela 21a: incidente, passo 2 de 3 — área de 150 m + "Quando aconteceu?". */
 export function LocalIncidentePage() {
   const navigate = useNavigate()
-  const { categoria, categoriaId, local, horario, definirHorario } = useRascunho()
+  const { categoria, local, horario, definirHorario } = useRascunho()
   const { data: endereco, atualizando } = useEnderecoDoRascunho()
-  useExigirPasso(categoriaId !== null, '/registrar')
+  useExigirCategoria('incidente')
 
   return (
     <PassoRegistro

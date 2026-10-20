@@ -109,7 +109,7 @@ export function FormularioGrupo({ grupo, aoConcluir }: FormularioGrupoProps) {
           type="number"
           inputMode="numeric"
           min={1}
-          max={1000}
+          max={100000}
           erro={formState.errors.ordem?.message}
           ajuda="Menor aparece primeiro nos filtros e na escolha de categoria."
           {...register('ordem', { valueAsNumber: true })}

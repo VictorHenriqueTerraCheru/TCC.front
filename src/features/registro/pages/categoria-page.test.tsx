@@ -150,4 +150,51 @@ describe('passo 1: tipo e categoria', () => {
     expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
   })
+
+  it('categoria cujo grupo sumiu aparece em "Outras" e continua escolhível', async () => {
+    server.use(
+      http.get(rota('/categorias'), () =>
+        HttpResponse.json([
+          ...categorias,
+          { id: 9, nome: 'Sem grupo', grupo: 'removido', tipo: 'problema', icone: 'ico_a' },
+        ]),
+      ),
+    )
+    const usuario = userEvent.setup()
+    abrir('/registrar/categoria?tipo=problema')
+
+    const outras = await screen.findByRole('region', { name: 'Outras' })
+    await usuario.click(within(outras).getByRole('button', { name: 'Sem grupo' }))
+    expect(screen.getByText('Selecionada: Sem grupo')).toBeInTheDocument()
+  })
+
+  it('falha em /grupos oferece tentar de novo em vez de uma lista vazia', async () => {
+    server.use(http.get(rota('/grupos'), () => new HttpResponse(null, { status: 500 })))
+    abrir('/registrar/categoria?tipo=problema')
+
+    expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()
+    expect(screen.queryByText(/Nenhuma categoria com esse nome/)).not.toBeInTheDocument()
+  })
+
+  it('passo de local com categoria de outro tipo volta para a lista do tipo certo', async () => {
+    useRascunhoStore.getState().escolherCategoria(7) // Roubo (incidente)
+    const { router } = abrir('/registrar/local')
+
+    await waitFor(() =>
+      expect(router.state.location.pathname + router.state.location.search).toBe(
+        '/registrar/categoria?tipo=problema',
+      ),
+    )
+  })
+
+  it('passo de local com categoria que foi desativada volta para a lista', async () => {
+    useRascunhoStore.getState().escolherCategoria(99)
+    const { router } = abrir('/registrar/incidente/local')
+
+    await waitFor(() =>
+      expect(router.state.location.pathname + router.state.location.search).toBe(
+        '/registrar/categoria?tipo=incidente',
+      ),
+    )
+  })
 })

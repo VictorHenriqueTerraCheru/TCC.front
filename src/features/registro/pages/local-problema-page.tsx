@@ -10,7 +10,7 @@ import { duplicatasQuery } from '../api/use-registro'
 import { CartaoEndereco } from '../components/cartao-endereco'
 import { MapaRegistro } from '../components/mapa-registro'
 import { PassoRegistro } from '../components/passo-registro'
-import { useExigirPasso, useRascunho } from '../hooks/use-rascunho'
+import { useExigirCategoria, useRascunho } from '../hooks/use-rascunho'
 import { useRetomarRegistro } from '../hooks/use-retomar-registro'
 import { caminhoDaCategoria } from '../models/rotas'
 
@@ -21,7 +21,7 @@ export function LocalProblemaPage() {
   const exigirConta = useExigirConta()
   const { categoria, categoriaId, local } = useRascunho()
   const [conferindo, setConferindo] = useState(false)
-  useExigirPasso(categoriaId !== null, '/registrar')
+  useExigirCategoria('problema')
 
   async function confirmar() {
     if (categoriaId === null || !local) return
