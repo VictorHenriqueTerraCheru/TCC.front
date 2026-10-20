@@ -55,6 +55,22 @@ describe('cliente da API', () => {
     expect(aoExpirarSessao).toHaveBeenCalledOnce()
   })
 
+  it('401 de uma chamada feita com o token antigo não expira a sessão nova', async () => {
+    token = 'jwt-a'
+    server.use(
+      http.get(rota('/me'), async () => {
+        await new Promise((r) => setTimeout(r, 20))
+        return new HttpResponse(null, { status: 401 })
+      }),
+    )
+
+    const pendente = api.GET('/me')
+    token = 'jwt-b' // saiu e entrou com outra conta enquanto a resposta não voltava
+    await pendente
+
+    expect(aoExpirarSessao).not.toHaveBeenCalled()
+  })
+
   it('converte ProblemDetails em ApiError com type e errors', async () => {
     server.use(
       http.post(rota('/auth/cadastro'), () =>
