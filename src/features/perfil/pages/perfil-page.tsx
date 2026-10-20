@@ -135,19 +135,34 @@ export function PerfilPage() {
           <Totais me={me} />
           {me.perfil === 'cidadao' && <CartaoVerificacao me={me} />}
           {me.perfil === 'administrador' && (
-            <Link
-              to="/admin/verificacoes"
-              className="flex items-center gap-3 rounded-[20px] bg-card p-4 hover:bg-superficie-2 focus-visible:outline-2"
-            >
-              <Icone nome="admin_panel_settings" className="text-primario" />
-              <span className="flex-1">
-                <span className="block font-medium">Fila de verificação</span>
-                <span className="text-xs text-muted-foreground">
-                  Analisar pedidos de verificação
+            <div className="space-y-2">
+              <Link
+                to="/admin/verificacoes"
+                className="flex items-center gap-3 rounded-[20px] bg-card p-4 hover:bg-superficie-2 focus-visible:outline-2"
+              >
+                <Icone nome="admin_panel_settings" className="text-primario" />
+                <span className="flex-1">
+                  <span className="block font-medium">Fila de verificação</span>
+                  <span className="text-xs text-muted-foreground">
+                    Analisar pedidos de verificação
+                  </span>
                 </span>
-              </span>
-              <Icone nome="chevron_right" />
-            </Link>
+                <Icone nome="chevron_right" />
+              </Link>
+              <Link
+                to="/admin/categorias"
+                className="flex items-center gap-3 rounded-[20px] bg-card p-4 hover:bg-superficie-2 focus-visible:outline-2"
+              >
+                <Icone nome="category" className="text-primario" />
+                <span className="flex-1">
+                  <span className="block font-medium">Categorias</span>
+                  <span className="text-xs text-muted-foreground">
+                    Criar e editar categorias, grupos e ícones
+                  </span>
+                </span>
+                <Icone nome="chevron_right" />
+              </Link>
+            </div>
           )}
           <HistoricoResumo />
         </>

@@ -70,7 +70,7 @@ export const usuariosHandlers = [
   ),
 ]
 
-function exigirAdmin(request: Request) {
+export function exigirAdmin(request: Request) {
   const semToken = exigirToken(request)
   if (semToken) return semToken
   return banco.usuarioDoToken(request).perfil === 'administrador'

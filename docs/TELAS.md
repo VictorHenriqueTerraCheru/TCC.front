@@ -8,7 +8,7 @@ Numeração igual à do protótipo (`docs/design/`), que mostra a versão **mobi
 | 2 | Mapa — Ambos (com legenda "Como ler o mapa") | `/mapa?modo=ambos` | 01-04 | `GET /problemas`, `GET /incidentes/calor` |
 | 3 | Detalhe de problema (folha inferior) | `/mapa/problema/:id` | 01-04 | `GET /problemas/{id}`, `PUT .../voto` |
 | 4 | Área de incidentes (folha inferior) | `/mapa/area?lat&lng` | 01-04 | `GET /incidentes/area`, `GET /geocodificacao/reversa` |
-| 5 | Registrar — Categoria (passo 1 de 4) | `/registrar` | 05-08 | `GET /categorias` |
+| 5 | Registrar — Tipo e categoria (passo 1 de 4) | `/registrar` (tipo) → `/registrar/categoria?tipo=` | 05-08 | `GET /categorias`, `GET /grupos` |
 | 6 | Registrar — Local (passo 2) | `/registrar/local` | 05-08 | `GET /geocodificacao/reversa` |
 | 7 | Registrar — Duplicata (passo 3) | `/registrar/conferencia` | 05-08 | `GET /problemas/duplicatas`, `PUT .../voto` (sim) |
 | 8 | Registrar — Revisão (passo 4) | `/registrar/revisao` | 05-08 | `POST /problemas` |
@@ -34,10 +34,13 @@ Numeração igual à do protótipo (`docs/design/`), que mostra a versão **mobi
 | 26 | Falha ao enviar (diálogo sobre a revisão, dados preservados) | modal | 25-27 | — |
 | 27 | Visitante — "Entre para votar" (folha) | modal | 25-27 | — |
 | 28 | Configurações (conta, permissão de localização, sobre, sair) | `/perfil/configuracoes` | 28-29 | `PATCH /me` — o botão "Abrir configurações do Android" do protótipo vira "Como liberar a localização" (o navegador não abre as configurações do sistema) |
+| 30 | Admin — Categorias e grupos (seções Categorias/Grupos; formulário em folha com seletor de ícone) | `/admin/categorias` | — (sem print) | `GET /admin/categorias`, `POST/PUT /admin/categorias`, `PATCH .../ativa`, `GET /grupos`, `POST/PUT/DELETE /admin/grupos`; o seletor de ícone busca em `api.iconify.design/search` |
 | 29 | Histórico completo (Tudo / Registros / Votos, agrupado por Hoje/Ontem/Esta semana) | `/perfil/historico` | 28-29 | `GET /me/historico` |
 
 ## Comportamentos que não estão óbvios no print
 
+- **Tela 5 — tipo e categoria**: `/registrar` pergunta "Estado ou evento?" e oferece dois cartões: **Estado** (continua lá até ser resolvido = problema) e **Evento** (aconteceu e passou = incidente) e tocar num cartão já avança. `/registrar/categoria?tipo=` lista só as categorias do tipo, agrupadas por grupo (seções na ordem da API, grade de 3 colunas), com busca sem acento, "Recentes" (neste aparelho, `localStorage`) e chips para pular entre grupos. Grupos e categorias vêm da API: o que o admin criar aparece sem mudar o app.
+- **Tela 30 — admin de categorias**: o tipo da categoria e do grupo não muda depois de criado; só se apaga grupo sem categorias; desativar categoria a esconde sem apagar o histórico. O ícone é um nome Material Symbols; se não estiver no pacote embutido, o app busca aquele SVG no Iconify na primeira vez e guarda em cache.
 - **Tela 1/2/24 — seletor Problemas | Incidentes | Ambos**: Problemas mostra só marcadores; Incidentes só calor; Ambos os dois. Os chips de filtro mudam conforme o modo (grupos de problema × grupos de incidente). O chip de ampulheta filtra "Em avaliação" (`status=nova`).
 - **Tela 3 — detalhe Ativa**: barra "Confiança alta · 82/100"; o texto "Calculada com N votos, ponderados por proximidade e histórico de quem votou" usa `votos.sim + votos.nao`. Uma pergunta só, "Ainda está lá?" ("Sim, está lá" / "Não está lá", `PUT /problemas/{id}/voto`): a API usa a mesma resposta na confiança e no ciclo de vida. O botão de `meuVoto` fica marcado. Se `souAutor`, não há botões, só a dica "Você registrou este problema".
 - **Tela 22 — Nova**: em vez da confiança, "Em avaliação · X de 5 votos" com barra segmentada; o cartão azul faz a mesma pergunta ("Você está a 90 m. Ainda está lá?"). Os "não" dados em Nova contam para a resolução quando o problema sai de Nova.

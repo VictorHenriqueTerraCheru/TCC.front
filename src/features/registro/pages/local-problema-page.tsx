@@ -10,8 +10,9 @@ import { duplicatasQuery } from '../api/use-registro'
 import { CartaoEndereco } from '../components/cartao-endereco'
 import { MapaRegistro } from '../components/mapa-registro'
 import { PassoRegistro } from '../components/passo-registro'
-import { useExigirPasso, useRascunho } from '../hooks/use-rascunho'
+import { useExigirCategoria, useRascunho } from '../hooks/use-rascunho'
 import { useRetomarRegistro } from '../hooks/use-retomar-registro'
+import { caminhoDaCategoria } from '../models/rotas'
 
 /** Tela 6: passo 2 — pino fixo no centro, mapa que se move. */
 export function LocalProblemaPage() {
@@ -20,7 +21,7 @@ export function LocalProblemaPage() {
   const exigirConta = useExigirConta()
   const { categoria, categoriaId, local } = useRascunho()
   const [conferindo, setConferindo] = useState(false)
-  useExigirPasso(categoriaId !== null, '/registrar')
+  useExigirCategoria('problema')
 
   async function confirmar() {
     if (categoriaId === null || !local) return
@@ -50,7 +51,7 @@ export function LocalProblemaPage() {
       titulo="Onde fica?"
       passo={{ atual: 2, total: 4, rotulo: 'Local' }}
       acaoTopo="voltar"
-      aoTopo={() => navigate('/registrar')}
+      aoTopo={() => navigate(caminhoDaCategoria('problema'))}
       mapa={<MapaRegistro modo="pino" categoria={categoria} />}
       rodape={
         <Button className="w-full" disabled={!local || conferindo} onClick={() => void confirmar()}>

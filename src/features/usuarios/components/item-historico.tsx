@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 
 import { Icone } from '@/common/components/icone'
 import { cn } from '@/common/lib/utils'
-import { aparenciaDoGrupo, CategoriaIcone, grupoDe } from '@/features/categorias'
+import { CategoriaIcone, useAparencia } from '@/features/categorias'
 
 import { tituloItem, type ItemHistorico } from '../models/historico'
 
@@ -20,8 +20,9 @@ const chips: Partial<
 }
 
 function IconeItem({ item }: { item: ItemHistorico }) {
+  const { aparenciaDe } = useAparencia()
   if (item.tipo.startsWith('registro')) return <CategoriaIcone categoria={item.categoria} />
-  const aparencia = aparenciaDoGrupo[grupoDe(item.categoria)]
+  const aparencia = aparenciaDe(item.categoria)
   const icone: MaterialSymbol = 'how_to_vote'
   return (
     <span

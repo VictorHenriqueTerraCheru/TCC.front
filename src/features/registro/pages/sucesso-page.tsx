@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router'
 
 import { Icone } from '@/common/components/icone'
 import { Button } from '@/common/ui/button'
-import { aparenciaDoGrupo, grupoDe, iconeDe } from '@/features/categorias'
+import { iconeDe, useAparencia } from '@/features/categorias'
 import { MarcadorProblema, type DetalheProblemaDados } from '@/features/problemas'
 
 import { useRascunhoStore } from '../stores/rascunho-store'
@@ -50,6 +50,7 @@ export function TelaSucesso({ titulo, texto, cartao, verNoMapa }: TelaSucessoPro
 /** Tela 20: problema registrado — ou confirmação de um existente (tela 7). */
 export function SucessoProblemaPage() {
   const { state } = useLocation()
+  const { aparenciaDe } = useAparencia()
   const { problema, confirmacao } = (state ?? {}) as {
     problema?: DetalheProblemaDados
     confirmacao?: boolean
@@ -59,7 +60,7 @@ export function SucessoProblemaPage() {
     <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4">
       <span className="shrink-0 pr-6">
         <MarcadorProblema
-          cor={aparenciaDoGrupo[grupoDe(problema.categoria)].corForte}
+          cor={aparenciaDe(problema.categoria).corForte}
           icone={iconeDe(problema.categoria)}
           status={problema.status}
           faixa={problema.faixa}

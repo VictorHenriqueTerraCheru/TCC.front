@@ -11,12 +11,13 @@ import {
   LocalIncidentePage,
   LocalProblemaPage,
   RegistroLayout,
+  TipoPage,
   RevisaoIncidentePage,
   RevisaoProblemaPage,
   SucessoIncidentePage,
   SucessoProblemaPage,
 } from '@/features/registro'
-import { FilaVerificacaoPage } from '@/features/admin'
+import { CategoriasAdminPage, FilaVerificacaoPage } from '@/features/admin'
 import { ConfiguracoesPage, HistoricoPage, PerfilPage } from '@/features/perfil'
 import { SolicitarVerificacaoPage } from '@/features/verificacao'
 
@@ -49,11 +50,13 @@ export const rotas: RouteObject[] = [
           { path: 'perfil/historico', element: <HistoricoPage /> },
           { path: 'perfil/configuracoes', element: <ConfiguracoesPage /> },
           { path: 'admin/verificacoes', element: <FilaVerificacaoPage /> },
+          { path: 'admin/categorias', element: <CategoriasAdminPage /> },
           {
             path: 'registrar',
             element: <RegistroLayout />,
             children: [
-              { index: true, element: <CategoriaPage /> },
+              { index: true, element: <TipoPage /> },
+              { path: 'categoria', element: <CategoriaPage /> },
               { path: 'local', element: <LocalProblemaPage /> },
               { path: 'conferencia', element: <ConferenciaPage /> },
               { path: 'revisao', element: <RevisaoProblemaPage /> },

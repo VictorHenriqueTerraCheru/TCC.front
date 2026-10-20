@@ -19,7 +19,16 @@ function abrir(caminho = '/registrar') {
 
 type Usuario = ReturnType<typeof userEvent.setup>
 
-async function escolher(usuario: Usuario, categoria: string) {
+async function escolher(
+  usuario: Usuario,
+  categoria: string,
+  tipo: 'problema' | 'incidente' = 'problema',
+) {
+  await usuario.click(
+    await screen.findByRole('link', {
+      name: tipo === 'problema' ? /^Estado/ : /^Evento/,
+    }),
+  )
   await usuario.click(await screen.findByRole('button', { name: categoria }))
   await usuario.click(screen.getByRole('button', { name: 'Continuar' }))
 }
@@ -42,6 +51,14 @@ describe('fluxo de registro', () => {
     sair()
     const { router } = abrir()
     await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
+  })
+
+  it('visitante em /registrar/categoria?tipo=incidente volta para a mesma URL depois do login', async () => {
+    sair()
+    const { router } = abrir('/registrar/categoria?tipo=incidente')
+    await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
+
+    expect(router.state.location.state).toEqual({ de: '/registrar/categoria?tipo=incidente' })
   })
 
   it('aceite: registrar onde já há um buraco a menos de 50 m abre a conferência; "Não, é outro" segue e envia', async () => {
@@ -157,7 +174,7 @@ describe('fluxo de registro', () => {
     const usuario = userEvent.setup()
     abrir()
 
-    await escolher(usuario, 'Roubo')
+    await escolher(usuario, 'Roubo', 'incidente')
     expect(await screen.findByRole('heading', { name: 'Onde aconteceu?' })).toBeInTheDocument()
     await usuario.click(screen.getByRole('radio', { name: 'Outro horário' }))
     await usuario.click(screen.getByRole('button', { name: '15 minutos antes' }))
@@ -181,7 +198,7 @@ describe('fluxo de registro', () => {
     const usuario = userEvent.setup()
     abrir()
 
-    await escolher(usuario, 'Acidente de trânsito')
+    await escolher(usuario, 'Acidente de trânsito', 'incidente')
     await usuario.click(await screen.findByRole('button', { name: 'Continuar' }))
     await usuario.click(await screen.findByRole('button', { name: /Enviar registro/ }))
 

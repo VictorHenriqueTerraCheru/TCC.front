@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { Icone } from '@/common/components/icone'
+import { aparenciaDaCor } from '@/features/categorias'
 import { gradienteCalorCss } from '@/features/incidentes'
 import { dimensoesMarcador, MarcadorProblema } from '@/features/problemas'
 
@@ -27,7 +28,7 @@ function Balao({
         style={{ transform: `scale(${escala})` }}
       >
         <MarcadorProblema
-          cor="var(--cat-via-publica)"
+          cor={aparenciaDaCor.laranja.corForte}
           icone="edit_road"
           status={status}
           faixa={faixa}

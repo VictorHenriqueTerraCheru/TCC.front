@@ -58,7 +58,7 @@ describe('DetalheProblema', () => {
     renderizar(ATIVA)
 
     expect(await screen.findByRole('heading', { name: 'Buraco na via' })).toBeInTheDocument()
-    expect(screen.getByText('Via pública')).toBeInTheDocument()
+    expect(await screen.findByText('Via pública')).toBeInTheDocument()
     expect(screen.getByText('Confiança alta')).toBeInTheDocument()
     expect(screen.getByText('82 / 100')).toBeInTheDocument()
     expect(screen.getByText(/Calculada com 16 votos/)).toBeInTheDocument()

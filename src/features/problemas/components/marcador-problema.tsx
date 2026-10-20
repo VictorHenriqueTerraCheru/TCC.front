@@ -1,12 +1,13 @@
-import type { MaterialSymbol } from 'material-symbols'
+import { IconeDinamico } from '@/common/components/icone-remoto'
 
 import { dimensoesMarcador, PONTA, varianteDo } from '../models/marcador'
 import type { FaixaConfianca, StatusProblema } from '../models/problema'
 
 interface MarcadorProblemaProps {
-  /** Cor forte da categoria como valor CSS (ex.: var(--cat-eletrica)). */
+  /** Cor forte da categoria como valor CSS (ex.: var(--cat-ocre)). */
   cor: string
-  icone: MaterialSymbol
+  /** Nome Material Symbols da categoria (pode estar fora do pacote embutido). */
+  icone: string
   status: StatusProblema
   faixa: FaixaConfianca | null
   /** Problema aberto no painel: maior e com sombra no chão. */
@@ -98,17 +99,11 @@ export function MarcadorProblema({
           placeItems: 'center',
         }}
       >
-        <span
-          className="material-symbols-rounded"
-          style={{
-            fontSize: Math.round(d * 0.56),
-            lineHeight: 1,
-            color: '#ffffff',
-            fontVariationSettings: "'FILL' 1",
-          }}
-        >
-          {icone}
-        </span>
+        <IconeDinamico
+          nome={icone}
+          preenchido
+          style={{ fontSize: Math.round(d * 0.56), lineHeight: 1, color: '#ffffff' }}
+        />
       </span>
       {tracejado && (
         <span

@@ -1,12 +1,11 @@
 import { ChipFiltro } from '@/common/components/chip-filtro'
 import { Icone } from '@/common/components/icone'
-import { cn } from '@/common/lib/utils'
-import { aparenciaDoGrupo, type GrupoCategoria } from '@/features/categorias'
+import { aparenciaDaCor, PontoGrupo, useAparencia } from '@/features/categorias'
 
 import { gruposDoModo, mostraProblemas, type FiltrosMapa } from '../models/filtros'
 
 interface ChipsFiltroProps extends FiltrosMapa {
-  aoAlternarGrupo(grupo: GrupoCategoria): void
+  aoAlternarGrupo(grupo: string): void
   aoAlternarNovas(): void
 }
 
@@ -18,23 +17,27 @@ export function ChipsFiltro({
   aoAlternarGrupo,
   aoAlternarNovas,
 }: ChipsFiltroProps) {
+  const { grupos: todos } = useAparencia()
   return (
     <div
       role="group"
       aria-label="Filtros"
       className="pointer-events-auto -mx-3 flex [scrollbar-width:none] gap-2 overflow-x-auto px-3 pb-1"
     >
-      {gruposDoModo(modo).map((grupo) => {
-        const aparencia = aparenciaDoGrupo[grupo]
-        const selecionado = grupos.includes(grupo)
+      {gruposDoModo(todos, modo).map((grupo) => {
+        const selecionado = grupos.includes(grupo.chave)
         return (
-          <ChipFiltro key={grupo} selecionado={selecionado} aoClicar={() => aoAlternarGrupo(grupo)}>
-            <Icone
-              nome={selecionado ? 'check' : aparencia.icone}
-              preenchido
-              className={cn('text-[18px]', !selecionado && aparencia.forte)}
-            />
-            {aparencia.rotulo}
+          <ChipFiltro
+            key={grupo.chave}
+            selecionado={selecionado}
+            aoClicar={() => aoAlternarGrupo(grupo.chave)}
+          >
+            {selecionado ? (
+              <Icone nome="check" preenchido className="text-[18px]" />
+            ) : (
+              <PontoGrupo cor={aparenciaDaCor[grupo.cor]} />
+            )}
+            {grupo.rotulo}
           </ChipFiltro>
         )
       })}

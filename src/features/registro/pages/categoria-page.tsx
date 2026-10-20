@@ -1,110 +1,84 @@
-import { useNavigate } from 'react-router'
+import { Navigate, useNavigate, useSearchParams } from 'react-router'
 
-import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { CategoriaIcone, useCategorias, type Categoria } from '@/features/categorias'
+import { gruposDoTipo, useCategorias, useGrupos } from '@/features/categorias'
 
 import { PassoRegistro } from '../components/passo-registro'
+import { SeletorCategoria } from '../components/seletor-categoria'
 import { useRascunho } from '../hooks/use-rascunho'
+import { lerTipo } from '../models/rotas'
+import { useRecentesStore } from '../stores/recentes-store'
 
-function Grade({
-  categorias,
-  selecionada,
-  aoEscolher,
-}: {
-  categorias: Categoria[]
-  selecionada: number | null
-  aoEscolher(id: number): void
-}) {
-  return (
-    <div className="grid grid-cols-2 gap-2">
-      {categorias.map((categoria) => {
-        const ativa = categoria.id === selecionada
-        return (
-          <button
-            key={categoria.id}
-            type="button"
-            aria-pressed={ativa}
-            onClick={() => aoEscolher(categoria.id)}
-            className={cn(
-              'flex min-h-16 items-center gap-3 rounded-xl border p-2 text-left text-sm font-medium transition-colors focus-visible:outline-2',
-              ativa
-                ? 'border-primario bg-primario-suave'
-                : 'border-border bg-card hover:bg-superficie-2',
-            )}
-          >
-            <CategoriaIcone categoria={categoria} tamanho="sm" />
-            {categoria.nome}
-          </button>
-        )
-      })}
-    </div>
-  )
+/** Tela 5, passo 1b: a categoria do tipo escolhido em `/registrar`. */
+export function CategoriaPage() {
+  const tipo = lerTipo(useSearchParams()[0].get('tipo'))
+  if (!tipo) return <Navigate to="/registrar" replace />
+  return <CategoriaDoTipo tipo={tipo} />
 }
 
-/** Tela 5: passo 1 — categoria. */
-export function CategoriaPage() {
+function CategoriaDoTipo({ tipo }: { tipo: NonNullable<ReturnType<typeof lerTipo>> }) {
   const navigate = useNavigate()
-  const { data: categorias, isPending } = useCategorias()
-  const { categoria, categoriaId, escolherCategoria, limpar } = useRascunho()
+  const categorias = useCategorias()
+  const grupos = useGrupos()
+  const { categoria, escolherCategoria } = useRascunho()
+  const recentesIds = useRecentesStore((s) => s.ids)
+  const registrarRecente = useRecentesStore((s) => s.registrar)
 
-  const problemas = categorias?.filter((c) => c.tipo === 'problema') ?? []
-  const incidentes = categorias?.filter((c) => c.tipo === 'incidente') ?? []
+  const doTipo = categorias.data?.filter((c) => c.tipo === tipo) ?? []
+  // Rascunho de outro tipo (voltou e trocou de ideia): conta como sem escolha.
+  const escolhida = categoria?.tipo === tipo ? categoria : null
 
-  function fechar() {
-    limpar()
-    navigate('/mapa')
+  function continuar() {
+    if (!escolhida) return
+    registrarRecente(escolhida.id)
+    navigate(tipo === 'incidente' ? '/registrar/incidente/local' : '/registrar/local')
   }
 
   return (
     <PassoRegistro
       titulo="Nova ocorrência"
       passo={{ atual: 1, total: 4, rotulo: 'Categoria' }}
-      acaoTopo="fechar"
-      aoTopo={fechar}
+      acaoTopo="voltar"
+      aoTopo={() => navigate('/registrar')}
       rodape={
-        <Button
-          className="w-full"
-          disabled={!categoria}
-          onClick={() =>
-            navigate(
-              categoria?.tipo === 'incidente' ? '/registrar/incidente/local' : '/registrar/local',
-            )
-          }
-        >
-          Continuar
-        </Button>
+        <div className="space-y-2">
+          <p className="min-h-5 text-center text-[13px] text-muted-foreground" aria-live="polite">
+            {escolhida ? `Selecionada: ${escolhida.nome}` : 'Escolha uma categoria para continuar'}
+          </p>
+          <Button className="w-full" disabled={!escolhida} onClick={continuar}>
+            Continuar
+          </Button>
+        </div>
       }
     >
-      <h2 className="mb-4 text-2xl">O que você quer registrar?</h2>
-      {isPending ? (
+      <h2 className="mb-4 text-2xl">
+        {tipo === 'problema' ? 'Qual é o estado?' : 'Qual foi o evento?'}
+      </h2>
+      {categorias.isPending || grupos.isPending ? (
         <Skeleton className="h-60 rounded-2xl bg-muted" />
-      ) : (
-        <div className="space-y-6">
-          <section>
-            <h3 className="text-sm font-medium">Problemas que continuam no local</h3>
-            <p className="mb-3 text-xs text-muted-foreground">
-              Viram um marcador no mapa e ficam lá até a comunidade confirmar que foram resolvidos.
-            </p>
-            <Grade
-              categorias={problemas}
-              selecionada={categoriaId}
-              aoEscolher={escolherCategoria}
-            />
-          </section>
-          <section>
-            <h3 className="text-sm font-medium">Algo que aconteceu agora</h3>
-            <p className="mb-3 text-xs text-muted-foreground">
-              Não viram marcador: entram de forma anônima no mapa de calor da região.
-            </p>
-            <Grade
-              categorias={incidentes}
-              selecionada={categoriaId}
-              aoEscolher={escolherCategoria}
-            />
-          </section>
+      ) : categorias.isError || grupos.isError ? (
+        <div role="alert" className="space-y-3 py-6">
+          <p>Não foi possível carregar as categorias.</p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              void categorias.refetch()
+              void grupos.refetch()
+            }}
+          >
+            Tentar novamente
+          </Button>
         </div>
+      ) : (
+        <SeletorCategoria
+          categorias={doTipo}
+          grupos={gruposDoTipo(grupos.data, tipo)}
+          selecionadaId={escolhida?.id ?? null}
+          recentesIds={recentesIds}
+          aoEscolher={escolherCategoria}
+        />
       )}
     </PassoRegistro>
   )

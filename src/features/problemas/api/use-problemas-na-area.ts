@@ -1,6 +1,5 @@
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query'
 
-import type { GrupoCategoria } from '@/features/categorias'
 import { api, dados } from '@/infrastructure/api'
 
 import type { StatusProblema } from '../models/problema'
@@ -11,7 +10,7 @@ export interface FiltroProblemasNaArea {
   maxLat: number
   maxLng: number
   /** Vazio = todos os grupos. */
-  grupos: GrupoCategoria[]
+  grupos: string[]
   /** Vazio = todos os não resolvidos. */
   status: StatusProblema[]
 }

@@ -32,7 +32,7 @@ describe('MapaPage', () => {
     await usuario.click(screen.getByRole('radio', { name: /Incidentes/ }))
 
     expect(router.state.location.search).toBe('?modo=incidentes')
-    expect(screen.getByRole('button', { name: /Segurança/ })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /Segurança/ })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Via pública/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Em avaliação/ })).not.toBeInTheDocument()
   })
@@ -42,9 +42,20 @@ describe('MapaPage', () => {
 
     expect(screen.getByRole('radio', { name: /Problemas/ })).toHaveAttribute('aria-checked', 'true')
     for (const chip of [/Via pública/, /Elétrica/, /Limpeza/]) {
-      expect(screen.getByRole('button', { name: chip })).toHaveAttribute('aria-pressed', 'false')
+      expect(await screen.findByRole('button', { name: chip })).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      )
     }
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('falha em GET /grupos mostra o erro do mapa em vez de sumir com as camadas', async () => {
+    server.use(http.get(rota('/grupos'), () => new HttpResponse(null, { status: 500 })))
+    renderizarMapa()
+
+    expect(await screen.findByText('Não foi possível carregar o mapa.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
   })
 
   it('falha em GET /categorias mostra o erro do mapa com "Tentar novamente"', async () => {
@@ -126,8 +137,8 @@ describe('MapaPage', () => {
     const usuario = userEvent.setup()
     const { router } = renderizarMapa('/mapa?modo=ambos')
 
-    await usuario.click(screen.getByRole('button', { name: /Elétrica/ }))
-    await usuario.click(screen.getByRole('button', { name: /Segurança/ }))
+    await usuario.click(await screen.findByRole('button', { name: /Elétrica/ }))
+    await usuario.click(await screen.findByRole('button', { name: /Segurança/ }))
     await usuario.click(screen.getByRole('button', { name: /Em avaliação/ }))
 
     expect(screen.getByRole('button', { name: /Elétrica/ })).toHaveAttribute('aria-pressed', 'true')

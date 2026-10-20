@@ -42,12 +42,17 @@ const PARES = [
   ['--primario', '--card'],
   ['--destructive', '--background'],
   ['--foreground', '--superficie-2'],
-  // Rótulo da categoria em texto (chips, card rápido, histórico).
-  ['--cat-via-publica', '--card'],
-  ['--cat-eletrica', '--card'],
-  ['--cat-limpeza', '--card'],
-  ['--cat-seguranca', '--card'],
-  ['--cat-transito', '--card'],
+  // Rótulo da categoria em texto (chips, card rápido, histórico): um par por slot de cor de grupo.
+  ['--cat-laranja', '--card'],
+  ['--cat-ocre', '--card'],
+  ['--cat-marrom', '--card'],
+  ['--cat-vermelho', '--card'],
+  ['--cat-terracota', '--card'],
+  ['--cat-azul', '--card'],
+  ['--cat-verde-agua', '--card'],
+  ['--cat-roxo', '--card'],
+  ['--cat-rosa', '--card'],
+  ['--cat-cinza', '--card'],
 ]
 
 describe.each(['claro', 'escuro'])('tema %s', (tema) => {

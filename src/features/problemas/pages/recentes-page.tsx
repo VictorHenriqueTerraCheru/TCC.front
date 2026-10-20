@@ -12,10 +12,12 @@ import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
 import {
-  aparenciaDoGrupo,
+  aparenciaDaCor,
   CategoriaIcone,
   gruposDoTipo,
-  type GrupoCategoria,
+  PontoGrupo,
+  useAparencia,
+  useGrupos,
 } from '@/features/categorias'
 import { useLocalizacao } from '@/features/localizacao'
 import type { Schema } from '@/infrastructure/api'
@@ -92,16 +94,34 @@ function Cartao({ item }: { item: ItemRecente }) {
 /** Tela 9: problemas não resolvidos num raio de 10 km, mais recentes primeiro. */
 export function RecentesPage() {
   const { estado, posicao } = useLocalizacao()
-  const [grupos, setGrupos] = useState<GrupoCategoria[]>([])
+  const { grupos: todos, carregado } = useAparencia()
+  const gruposQuery = useGrupos()
+  const [escolhidos, setGrupos] = useState<string[]>([])
+  // Grupo apagado pelo admin enquanto a tela está aberta sai da seleção (e do filtro enviado).
+  const grupos = carregado ? escolhidos.filter((g) => todos.some((t) => t.chave === g)) : escolhidos
   const centro =
     estado === 'granted' && posicao ? posicao : { lat: CENTRO_PADRAO[0], lng: CENTRO_PADRAO[1] }
   const recentes = useRecentes(centro, grupos)
   const itens = recentes.data?.pages.flatMap((p) => p.itens) ?? []
 
-  const alternar = (grupo: GrupoCategoria) =>
-    setGrupos((atuais) =>
-      atuais.includes(grupo) ? atuais.filter((g) => g !== grupo) : [...atuais, grupo],
+  const alternar = (grupo: string) =>
+    setGrupos(() =>
+      grupos.includes(grupo) ? grupos.filter((g) => g !== grupo) : [...grupos, grupo],
     )
+
+  // Sem os grupos a lista sairia sem filtros e sem aviso: melhor o erro, com a nova tentativa.
+  if (gruposQuery.isError) {
+    return (
+      <Pagina titulo="Recentes">
+        <div role="alert" className="space-y-3 py-6">
+          <p>Não foi possível carregar os filtros.</p>
+          <Button variant="outline" size="sm" onClick={() => void gruposQuery.refetch()}>
+            Tentar novamente
+          </Button>
+        </div>
+      </Pagina>
+    )
+  }
 
   return (
     <Pagina titulo="Recentes">
@@ -114,17 +134,20 @@ export function RecentesPage() {
         aria-label="Filtros"
         className="-mx-4 mb-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1"
       >
-        {gruposDoTipo('problema').map((grupo) => {
-          const aparencia = aparenciaDoGrupo[grupo]
-          const selecionado = grupos.includes(grupo)
+        {gruposDoTipo(todos, 'problema').map((grupo) => {
+          const selecionado = grupos.includes(grupo.chave)
           return (
-            <ChipFiltro key={grupo} selecionado={selecionado} aoClicar={() => alternar(grupo)}>
-              <Icone
-                nome={selecionado ? 'check' : aparencia.icone}
-                preenchido
-                className={cn('text-[18px]', !selecionado && aparencia.forte)}
-              />
-              {aparencia.rotulo}
+            <ChipFiltro
+              key={grupo.chave}
+              selecionado={selecionado}
+              aoClicar={() => alternar(grupo.chave)}
+            >
+              {selecionado ? (
+                <Icone nome="check" preenchido className="text-[18px]" />
+              ) : (
+                <PontoGrupo cor={aparenciaDaCor[grupo.cor]} />
+              )}
+              {grupo.rotulo}
             </ChipFiltro>
           )
         })}

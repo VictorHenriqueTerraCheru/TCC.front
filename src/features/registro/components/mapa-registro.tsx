@@ -8,7 +8,7 @@ import { useTema } from '@/common/hooks/use-tema'
 import { distanciaTexto } from '@/common/lib/formatacao'
 import { circuloGeoJson, linhaGeoJson } from '@/common/lib/geo'
 import { CENTRO_PADRAO, COR_TRACEJADO } from '@/common/lib/mapa'
-import { aparenciaDoGrupo, grupoDe, iconeDe, type CategoriaResumo } from '@/features/categorias'
+import { iconeDe, useAparencia, type CategoriaResumo } from '@/features/categorias'
 import { useAtivarLocalizacao, useLocalizacao } from '@/features/localizacao'
 import { MarcadorProblema } from '@/features/problemas'
 
@@ -190,10 +190,11 @@ export function MapaRegistro(props: MapaRegistroProps) {
   const { centro, provisorio } = useCentroInicial()
   const local = useRascunhoStore((s) => s.local)
   const tema = useTema()
+  const { aparenciaDe } = useAparencia()
 
   if (props.modo === 'conferencia') {
     const { novo, existente } = props
-    const cor = aparenciaDoGrupo[grupoDe(existente.categoria)].corForte
+    const cor = aparenciaDe(existente.categoria).corForte
     const icone = iconeDe(existente.categoria)
     const meio = { lat: (novo.lat + existente.lat) / 2, lng: (novo.lng + existente.lng) / 2 }
     return (
@@ -263,7 +264,7 @@ export function MapaRegistro(props: MapaRegistroProps) {
       <div className="pointer-events-none absolute top-1/2 left-1/2 z-[1000] -translate-x-1/2 -translate-y-full">
         {categoria && (
           <MarcadorProblema
-            cor={aparenciaDoGrupo[grupoDe(categoria)].corForte}
+            cor={aparenciaDe(categoria).corForte}
             icone={iconeDe(categoria)}
             status="ativa"
             faixa="alta"

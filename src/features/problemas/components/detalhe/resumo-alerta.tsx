@@ -1,10 +1,11 @@
 import type { MaterialSymbol } from 'material-symbols'
 
 import { Icone } from '@/common/components/icone'
+import { IconeDinamico } from '@/common/components/icone-remoto'
 import { usePainelResponsivo } from '@/common/hooks/use-painel-responsivo'
 import { distanciaTexto } from '@/common/lib/formatacao'
 import { cn } from '@/common/lib/utils'
-import { aparenciaDoGrupo, grupoDe, iconeDe } from '@/features/categorias'
+import { iconeDe, useAparencia } from '@/features/categorias'
 
 import { mensagemErroVoto } from '../../errors'
 import { useDistanciaAte } from '../../hooks/use-distancia-ate'
@@ -50,7 +51,8 @@ function BotaoPolegar({ polegar, desabilitado }: { polegar: Polegar; desabilitad
  * `resolvida` é só leitura.
  */
 export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
-  const aparencia = aparenciaDoGrupo[grupoDe(problema.categoria)]
+  const { aparenciaDe } = useAparencia()
+  const aparencia = aparenciaDe(problema.categoria)
   const { recolhido, expandir, medirResumo } = usePainelResponsivo()
   const distancia = useDistanciaAte(problema)
   const { erro, votar, meuVoto, votando, podeVotar } = useVotos(problema)
@@ -88,7 +90,7 @@ export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
           className="flex size-12 shrink-0 items-center justify-center rounded-full text-white"
           style={{ background: aparencia.corForte }}
         >
-          <Icone nome={iconeDe(problema.categoria)} preenchido className="text-[26px]" />
+          <IconeDinamico nome={iconeDe(problema.categoria)} preenchido className="text-[26px]" />
         </span>
         <div className="min-w-0 flex-1">
           <p className={cn('text-xs font-semibold', aparencia.forte)}>{aparencia.rotulo}</p>

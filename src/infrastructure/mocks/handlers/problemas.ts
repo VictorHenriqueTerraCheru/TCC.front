@@ -3,7 +3,6 @@ import { http, HttpResponse } from 'msw'
 import type { Schema } from '../../api'
 
 import { banco, metrosEntre } from '../banco'
-import { categorias } from '../fixtures/categorias'
 import { rota } from '../rota'
 import { erroDeRegra, lista, noRetangulo, paginar, retanguloDaUrl } from './comum'
 
@@ -35,7 +34,7 @@ export const problemasHandlers = [
 
     const grupos = lista(url, 'grupos')
     const status = lista(url, 'status')
-    const grupoDe = (categoriaId: number) => categorias.find((c) => c.id === categoriaId)?.grupo
+    const grupoDe = (categoriaId: number) => banco.categoriaPorId(categoriaId)?.grupo
 
     return HttpResponse.json(
       banco
@@ -84,8 +83,8 @@ export const problemasHandlers = [
   http.post<never, Schema<'RegistrarProblemaRequest'>>(rota('/problemas'), async ({ request }) => {
     if (!autenticado(request)) return new HttpResponse(null, { status: 401 })
     const { categoriaId, lat, lng, descricao } = await request.json()
-    const categoria = categorias.find((c) => c.id === categoriaId)
-    if (!categoria) {
+    const categoria = banco.categoriaPorId(categoriaId)
+    if (!categoria?.ativa) {
       return HttpResponse.json(
         {
           title: 'Erro de validação.',

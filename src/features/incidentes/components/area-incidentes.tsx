@@ -109,8 +109,8 @@ export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
 
       <p className="flex gap-3 rounded-2xl bg-superficie-2 p-3 text-xs text-muted-foreground">
         <Icone nome="info" className="text-[18px]" />
-        Incidentes são pontuais: aparecem apenas agregados, sem local exato, e não recebem votos de
-        "continua lá".
+        Eventos são pontuais: aparecem apenas agregados, sem local exato, e não recebem votos de
+        "Ainda está lá?".
       </p>
     </article>
   )

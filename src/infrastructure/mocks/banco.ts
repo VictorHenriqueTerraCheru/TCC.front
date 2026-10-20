@@ -1,8 +1,9 @@
 import type { Schema } from '../api'
 import { categorias } from './fixtures/categorias'
 import { criarDetalhes, ID_DO_AUTOR } from './fixtures/detalhes'
+import { grupos as gruposIniciais } from './fixtures/grupos'
 import { historicoInicial, verificacoesIniciais } from './fixtures/perfil'
-import { calorIncidentes } from './fixtures/problemas'
+import { calorIncidentes, grupoDasCelulas } from './fixtures/problemas'
 import { usuariosIniciais } from './fixtures/usuarios'
 
 type ValorVoto = Schema<'ValorVotoContrato'>
@@ -10,6 +11,8 @@ type Detalhe = Schema<'ObterDetalheProblemaResponse'>
 type CelulaCalor = Schema<'ObterCalorIncidentesResponse'>
 type Verificacao = Schema<'ListarVerificacoesItem'>
 type Perfil = Schema<'Perfil'>
+type Grupo = Schema<'GrupoResponse'>
+type CategoriaAdmin = Schema<'CategoriaAdminResponse'>
 
 /** Limite de incidentes por conta em 24 h (docs/API.md, 429 limite-diario-incidentes). */
 const LIMITE_INCIDENTES = 10
@@ -26,11 +29,31 @@ let detalhes = criarDetalhes()
 let votos = new Map<string, ValorVoto>()
 let usuarios = [...usuariosIniciais]
 let autoria = new Set([ID_DO_AUTOR])
-let celulas = [...calorIncidentes]
 let incidentesRegistrados = 0
+let incidentesNovos: { categoriaId: number; lat: number; lng: number }[] = []
 let verificacoes = verificacoesIniciais()
 let historico = historicoInicial()
 let perfis = new Map<string, { perfil: Perfil; verificadoEm: string | null }>()
+let grupos: Grupo[] = [...gruposIniciais]
+let categoriasAdmin: CategoriaAdmin[] = categorias.map((c) => ({ ...c, ativa: true }))
+
+/** "Água e esgoto" → "aguaEEsgoto" (mesma regra do back). */
+function chaveDe(rotulo: string) {
+  const palavras = rotulo
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter(Boolean)
+  const chave = palavras
+    .map((p, i) => (i === 0 ? p.toLowerCase() : p[0]!.toUpperCase() + p.slice(1).toLowerCase()))
+    .join('')
+    .slice(0, 30)
+  return /^[a-z]/i.test(chave) ? chave : `grupo${chave}`.slice(0, 30)
+}
+
+const mesmoRotulo = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase()
 
 const iniciais = (nome: string) =>
   nome
@@ -190,7 +213,7 @@ export const banco = {
       }))
   },
   registrarProblema(categoriaId: number, lat: number, lng: number, descricao: string | null) {
-    const { tipo: _tipo, ...categoria } = categorias.find((c) => c.id === categoriaId)!
+    const { tipo: _tipo, ativa: _ativa, ...categoria } = banco.categoriaPorId(categoriaId)!
     const agora = new Date()
     const detalhe: Detalhe = {
       id: crypto.randomUUID(),
@@ -235,28 +258,134 @@ export const banco = {
     votos.set(id, valor)
   },
 
-  calor(): CelulaCalor[] {
+  /**
+   * GET /incidentes/calor: as células de exemplo (que valem como o grupo `grupoDasCelulas`) mais o que foi
+   * registrado na sessão, cada registro no grupo da sua categoria. Sem `filtroGrupos` entra tudo.
+   */
+  calor(filtroGrupos: string[] = []): CelulaCalor[] {
+    const entra = (grupo: string) => filtroGrupos.length === 0 || filtroGrupos.includes(grupo)
+    // O grupo sai da categoria atual (o admin pode movê-la depois do registro).
+    const grupoDe = (categoriaId: number) =>
+      categoriasAdmin.find((c) => c.id === categoriaId)?.grupo ?? grupoDasCelulas
+    const celulas = entra(grupoDasCelulas) ? calorIncidentes.map((c) => ({ ...c })) : []
+    for (const novo of incidentesNovos.filter((i) => entra(grupoDe(i.categoriaId)))) {
+      const existente = celulas.find((c) => c.lat === novo.lat && c.lng === novo.lng)
+      if (existente) existente.quantidade++
+      else celulas.push({ lat: novo.lat, lng: novo.lng, quantidade: 1 })
+    }
     return celulas
   },
-  /** POST /incidentes: arredonda o ponto em 3 casas e soma na célula. null = limite diário. */
-  registrarIncidente(lat: number, lng: number) {
+  /** POST /incidentes: arredonda o ponto em 3 casas e guarda o registro. null = limite diário. */
+  registrarIncidente(categoriaId: number, lat: number, lng: number) {
     if (incidentesRegistrados >= LIMITE_INCIDENTES) return null
     incidentesRegistrados++
     const ponto = { lat: Math.round(lat * 1000) / 1000, lng: Math.round(lng * 1000) / 1000 }
-    const existente = celulas.find((c) => c.lat === ponto.lat && c.lng === ponto.lng)
-    celulas = existente
-      ? celulas.map((c) => (c === existente ? { ...c, quantidade: c.quantidade + 1 } : c))
-      : [...celulas, { ...ponto, quantidade: 1 }]
+    incidentesNovos = [...incidentesNovos, { categoriaId, ...ponto }]
     return ponto
+  },
+  /** Incidentes registrados nesta sessão, com a categoria (as células do calor só guardam contagem). */
+  incidentesNovos() {
+    return incidentesNovos
+  },
+
+  /** GET /grupos: em ordem de exibição. */
+  grupos(): Grupo[] {
+    return [...grupos].sort((a, b) => a.ordem - b.ordem || a.rotulo.localeCompare(b.rotulo))
+  },
+  /** GET /categorias: só as ativas, sem o campo `ativa`. */
+  categoriasAtivas() {
+    return categoriasAdmin.filter((c) => c.ativa).map(({ ativa: _ativa, ...c }) => c)
+  },
+  /** Categoria pelo id, ativa ou não (o mapa e o histórico ainda mostram as desativadas). */
+  categoriaPorId(id: number): CategoriaAdmin | undefined {
+    return categoriasAdmin.find((c) => c.id === id)
+  },
+  /** GET /admin/categorias. */
+  categoriasTodas(): CategoriaAdmin[] {
+    return categoriasAdmin
+  },
+  criarGrupo(rotulo: string, tipo: Grupo['tipo'], cor: Grupo['cor']) {
+    if (grupos.some((g) => mesmoRotulo(g.rotulo, rotulo))) return 'grupo-rotulo-duplicado' as const
+    const base = chaveDe(rotulo)
+    let chave = base
+    for (let n = 2; grupos.some((g) => g.chave === chave); n++) chave = `${base}${n}`
+    const grupo: Grupo = {
+      chave,
+      rotulo: rotulo.trim(),
+      tipo,
+      cor,
+      ordem: Math.max(0, ...grupos.map((g) => g.ordem)) + 1,
+    }
+    grupos = [...grupos, grupo]
+    return grupo
+  },
+  editarGrupo(chave: string, rotulo: string, cor: Grupo['cor'], ordem: number) {
+    const atual = grupos.find((g) => g.chave === chave)
+    if (!atual) return 'nao-encontrado' as const
+    if (grupos.some((g) => g.chave !== chave && mesmoRotulo(g.rotulo, rotulo))) {
+      return 'grupo-rotulo-duplicado' as const
+    }
+    const novo = { ...atual, rotulo: rotulo.trim(), cor, ordem }
+    grupos = grupos.map((g) => (g.chave === chave ? novo : g))
+    return novo
+  },
+  apagarGrupo(chave: string) {
+    if (!grupos.some((g) => g.chave === chave)) return 'nao-encontrado' as const
+    if (categoriasAdmin.some((c) => c.grupo === chave)) return 'grupo-em-uso' as const
+    grupos = grupos.filter((g) => g.chave !== chave)
+    return 'ok' as const
+  },
+  criarCategoria(corpo: Schema<'CriarCategoriaRequest'>) {
+    const grupo = grupos.find((g) => g.chave === corpo.grupo)
+    if (!grupo) return 'grupo-inexistente' as const
+    if (grupo.tipo !== corpo.tipo) return 'grupo-tipo-incompativel' as const
+    if (categoriasAdmin.some((c) => mesmoRotulo(c.nome, corpo.nome)))
+      return 'nome-duplicado' as const
+    const categoria: CategoriaAdmin = {
+      id: Math.max(0, ...categoriasAdmin.map((c) => c.id)) + 1,
+      nome: corpo.nome.trim(),
+      grupo: corpo.grupo,
+      tipo: corpo.tipo,
+      icone: corpo.icone,
+      ativa: true,
+    }
+    categoriasAdmin = [...categoriasAdmin, categoria]
+    return categoria
+  },
+  editarCategoria(id: number, corpo: Schema<'EditarCategoriaRequest'>) {
+    const atual = categoriasAdmin.find((c) => c.id === id)
+    if (!atual) return 'nao-encontrado' as const
+    const grupo = grupos.find((g) => g.chave === corpo.grupo)
+    if (!grupo) return 'grupo-inexistente' as const
+    if (grupo.tipo !== atual.tipo) return 'grupo-tipo-incompativel' as const
+    if (categoriasAdmin.some((c) => c.id !== id && mesmoRotulo(c.nome, corpo.nome))) {
+      return 'nome-duplicado' as const
+    }
+    const nova = { ...atual, nome: corpo.nome.trim(), grupo: corpo.grupo, icone: corpo.icone }
+    categoriasAdmin = categoriasAdmin.map((c) => (c.id === id ? nova : c))
+    // Os problemas já registrados guardam a categoria embutida: acompanham a edição, como no join da API.
+    const embutida = { id, nome: nova.nome, grupo: nova.grupo, icone: nova.icone }
+    for (const [chave, d] of detalhes) {
+      if (d.categoria.id === id) detalhes.set(chave, { ...d, categoria: embutida })
+    }
+    historico = historico.map((h) => (h.categoria.id === id ? { ...h, categoria: embutida } : h))
+    return nova
+  },
+  alterarAtivaCategoria(id: number, ativa: boolean) {
+    if (!categoriasAdmin.some((c) => c.id === id)) return false
+    categoriasAdmin = categoriasAdmin.map((c) => (c.id === id ? { ...c, ativa } : c))
+    return true
   },
 
   reiniciar() {
+    grupos = [...gruposIniciais]
+    categoriasAdmin = categorias.map((c) => ({ ...c, ativa: true }))
     detalhes = criarDetalhes()
     votos = new Map()
     usuarios = [...usuariosIniciais]
     autoria = new Set([ID_DO_AUTOR])
-    celulas = [...calorIncidentes]
     incidentesRegistrados = 0
+    incidentesNovos = []
     verificacoes = verificacoesIniciais()
     historico = historicoInicial()
     perfis = new Map()

@@ -12,6 +12,7 @@ import { useEnvio } from '../hooks/use-envio'
 import { useRetomarRegistro } from '../hooks/use-retomar-registro'
 import { useEnderecoDoRascunho, useExigirPasso, useRascunho } from '../hooks/use-rascunho'
 import { descreverHorario, ocorridoEm } from '../models/horario'
+import { caminhoDaCategoria } from '../models/rotas'
 
 /** Tela 21b: incidente, passo 3 de 3 — aviso de anonimato, resumo e envio. */
 export function RevisaoIncidentePage() {
@@ -77,7 +78,7 @@ export function RevisaoIncidentePage() {
             }
             rotulo="Categoria"
             valor={categoria?.nome ?? '—'}
-            aoEditar={() => navigate('/registrar')}
+            aoEditar={() => navigate(caminhoDaCategoria('incidente'))}
           />
           <LinhaResumo icone="blur_on" rotulo="Tipo" valor="Incidente — entra no mapa de calor" />
           <LinhaResumo

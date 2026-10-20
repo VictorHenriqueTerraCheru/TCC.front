@@ -1,6 +1,12 @@
 import { Marker } from '@vis.gl/react-maplibre'
 
-import { aparenciaDoGrupo, grupoDe, iconeDe, type Categoria } from '@/features/categorias'
+import {
+  aparenciaDaCor,
+  ICONE_PADRAO,
+  iconeDe,
+  useAparencia,
+  type Categoria,
+} from '@/features/categorias'
 
 import type { ProblemaNaArea } from '../models/problema'
 import { MarcadorProblema } from './marcador-problema'
@@ -21,9 +27,10 @@ export function CamadaProblemas({
   selecionadoId,
   aoSelecionar,
 }: CamadaProblemasProps) {
+  const { aparenciaDe } = useAparencia()
   return problemas.map((problema) => {
+    // GET /categorias só traz as ativas: problema de categoria desativada continua no mapa, em cinza.
     const categoria = categorias.get(problema.categoriaId)
-    if (!categoria) return null
     const selecionado = problema.id === selecionadoId
     const z = selecionado
       ? 1000
@@ -45,13 +52,13 @@ export function CamadaProblemas({
       >
         <button
           type="button"
-          aria-label={categoria.nome}
+          aria-label={categoria?.nome ?? 'Problema'}
           data-problema={problema.id}
           className="block cursor-pointer focus-visible:outline-2"
         >
           <MarcadorProblema
-            cor={aparenciaDoGrupo[grupoDe(categoria)].corForte}
-            icone={iconeDe(categoria)}
+            cor={(categoria ? aparenciaDe(categoria) : aparenciaDaCor.cinza).corForte}
+            icone={categoria ? iconeDe(categoria) : ICONE_PADRAO}
             status={problema.status}
             faixa={problema.faixa}
             selecionado={selecionado}
