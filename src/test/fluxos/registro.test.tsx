@@ -4,6 +4,7 @@ import { http, HttpResponse } from 'msw'
 
 import { rotas } from '@/app/router'
 import { useRascunhoStore } from '@/features/registro/stores/rascunho-store'
+import { banco } from '@/infrastructure/mocks/banco'
 import { erroDeRegra } from '@/infrastructure/mocks/handlers/comum'
 import { rota } from '@/infrastructure/mocks/rota'
 import { server } from '@/infrastructure/mocks/server'
@@ -126,6 +127,26 @@ describe('fluxo de registro', () => {
     expect(
       await screen.findByRole('heading', { name: 'Confirmação registrada' }),
     ).toBeInTheDocument()
+  })
+
+  it('revisão com categoria desativada volta para a escolha da categoria', async () => {
+    sessionStorage.setItem(
+      'ocorrencias.rascunhoRegistro',
+      JSON.stringify({
+        state: {
+          categoriaId: 3,
+          local: { lat: -22.9535, lng: -43.1827 },
+          descricao: '',
+          horario: { modo: 'agora', outroEm: null },
+        },
+        version: 0,
+      }),
+    )
+    await useRascunhoStore.persist.rehydrate()
+    banco.alterarAtivaCategoria(3, false)
+    const { router } = abrir('/registrar/revisao')
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/registrar/categoria'))
   })
 
   it('aceite: recarregar no meio do fluxo não perde o rascunho', async () => {

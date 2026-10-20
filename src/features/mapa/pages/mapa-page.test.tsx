@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 
 import { useMonitorarLocalizacao } from '@/features/localizacao'
+import { banco } from '@/infrastructure/mocks/banco'
 import { rota } from '@/infrastructure/mocks/rota'
 import { server } from '@/infrastructure/mocks/server'
 import { mapaFalso } from '@/test/maplibre-falso'
@@ -48,6 +49,29 @@ describe('MapaPage', () => {
       )
     }
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('trocar de modo antes de os grupos chegarem não apaga os chips do link', async () => {
+    let liberar = () => {}
+    const espera = new Promise<void>((resolver) => {
+      liberar = resolver
+    })
+    server.use(
+      http.get(rota('/grupos'), async () => {
+        await espera
+        return HttpResponse.json(banco.grupos())
+      }),
+    )
+    const usuario = userEvent.setup()
+    const { router } = renderizarMapa('/mapa?modo=incidentes&grupos=seguranca')
+
+    await usuario.click(screen.getByRole('radio', { name: /Ambos/ }))
+    expect(router.state.location.search).toContain('grupos=seguranca')
+    liberar()
+    expect(await screen.findByRole('button', { name: /Segurança/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
   })
 
   it('falha em GET /grupos mostra o erro do mapa em vez de sumir com as camadas', async () => {
