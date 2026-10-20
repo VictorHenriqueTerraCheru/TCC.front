@@ -18,7 +18,7 @@ export function EstadoVazio({ aoVerAreaMaior, aoFechar }: EstadoVazioProps) {
         type="button"
         onClick={aoFechar}
         aria-label="Fechar aviso"
-        className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-2"
+        className="absolute top-1.5 right-1.5 flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-2"
       >
         <Icone nome="close" className="text-[20px]" />
       </button>
