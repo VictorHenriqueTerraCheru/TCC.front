@@ -72,7 +72,7 @@ export function TipoPage() {
         </p>
       }
     >
-      <h2 className="text-[28px] leading-tight font-bold tracking-tight">Isso continua lá?</h2>
+      <h2 className="text-[28px] leading-tight font-bold tracking-tight">Estado ou evento?</h2>
       <p className="mt-2 mb-5 text-[15px] text-muted-foreground">
         Escolha como registrar o que você viu.
       </p>

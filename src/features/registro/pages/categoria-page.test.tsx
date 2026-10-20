@@ -42,7 +42,7 @@ describe('passo 1: tipo e categoria', () => {
     const { router } = abrir('/registrar/categoria?tipo=qualquer')
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/registrar'))
-    expect(await screen.findByRole('heading', { name: 'Isso continua lá?' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Estado ou evento?' })).toBeInTheDocument()
   })
 
   it('mostra as categorias do tipo agrupadas, uma seção por grupo, na ordem da API', async () => {
