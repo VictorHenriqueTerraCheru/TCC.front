@@ -19,6 +19,8 @@ export function useSincronizarCacheComSessao() {
       useSessaoStore.subscribe((atual, anterior) => {
         if (atual.sessao?.token === anterior.sessao?.token) return
         DA_CONTA.forEach((queryKey) => queryClient.removeQueries({ queryKey }))
+        // Detalhe traz meuVoto/souAutor: volta ao estado inicial (as abertas buscam de novo).
+        void queryClient.resetQueries({ queryKey: ['problemas', 'detalhe'] })
         void queryClient.invalidateQueries()
       }),
     [queryClient],

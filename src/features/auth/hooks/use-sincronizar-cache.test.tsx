@@ -6,6 +6,22 @@ import { entrarComo, entrarComoAdmin, sair } from '@/test/sessao'
 
 import { useSincronizarCacheComSessao } from './use-sincronizar-cache'
 
+test('na troca de conta, o detalhe em cache (meuVoto, souAutor) não é servido à conta nova', () => {
+  entrarComoAdmin()
+  const queryClient = new QueryClient()
+  queryClient.setQueryData(['problemas', 'detalhe', 'p1'], { meuVoto: 'sim', souAutor: true })
+  renderHook(useSincronizarCacheComSessao, {
+    wrapper: ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    ),
+  })
+
+  entrarComo('u-cidadao2', 'João Pereira')
+
+  expect(queryClient.getQueryData(['problemas', 'detalhe', 'p1'])).toBeUndefined()
+  sair()
+})
+
 test('na troca de conta, /me e a fila do admin saem do cache; o resto só fica velho', () => {
   entrarComoAdmin()
   const queryClient = new QueryClient()
