@@ -53,7 +53,7 @@ function CategoriaDoTipo({ tipo }: { tipo: NonNullable<ReturnType<typeof lerTipo
       }
     >
       <h2 className="mb-4 text-2xl">
-        {tipo === 'problema' ? 'O que continua lá?' : 'O que aconteceu?'}
+        {tipo === 'problema' ? 'Qual é o estado?' : 'Qual foi o evento?'}
       </h2>
       {categorias.isPending || grupos.isPending ? (
         <Skeleton className="h-60 rounded-2xl bg-muted" />

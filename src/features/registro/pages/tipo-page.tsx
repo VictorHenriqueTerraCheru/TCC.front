@@ -11,6 +11,8 @@ import { useRascunhoStore } from '../stores/rascunho-store'
 interface Opcao {
   tipo: TipoGrupo
   titulo: string
+  /** Em uma frase, o que o nome quer dizer. */
+  significado: string
   exemplos: string
   consequencia: string
   iconeConsequencia: MaterialSymbol
@@ -21,7 +23,8 @@ interface Opcao {
 const opcoes: Opcao[] = [
   {
     tipo: 'problema',
-    titulo: 'Continua lá',
+    titulo: 'Estado',
+    significado: 'Continua lá até ser resolvido',
     exemplos: 'Buraco, poste apagado, lixo acumulado…',
     consequencia: 'Vira um ponto no mapa até alguém confirmar que foi resolvido.',
     iconeConsequencia: 'location_on',
@@ -33,7 +36,8 @@ const opcoes: Opcao[] = [
   },
   {
     tipo: 'incidente',
-    titulo: 'Aconteceu e passou',
+    titulo: 'Evento',
+    significado: 'Aconteceu e passou',
     exemplos: 'Roubo, acidente, rua inundada…',
     consequencia: 'Anônimo. Entra no mapa de calor da região, sem ponto exato.',
     iconeConsequencia: 'visibility_off',
@@ -64,7 +68,7 @@ export function TipoPage() {
       rodape={
         <p className="text-center text-[13px] leading-snug text-muted-foreground">
           Em dúvida? Se daqui a uma semana ainda der pra ver no local, é{' '}
-          <strong className="font-semibold text-foreground">continua lá</strong>.
+          <strong className="font-semibold text-foreground">estado</strong>.
         </p>
       }
     >
@@ -94,6 +98,7 @@ export function TipoPage() {
             </div>
             <div>
               <p className="text-xl font-bold tracking-tight">{opcao.titulo}</p>
+              <p className="mt-0.5 text-[15px] font-medium text-foreground">{opcao.significado}</p>
               <p className="mt-1 text-[15px] leading-snug text-muted-foreground">
                 {opcao.exemplos}
               </p>

@@ -26,7 +26,7 @@ async function escolher(
 ) {
   await usuario.click(
     await screen.findByRole('link', {
-      name: tipo === 'problema' ? /Continua lá/ : /Aconteceu e passou/,
+      name: tipo === 'problema' ? /^Estado/ : /^Evento/,
     }),
   )
   await usuario.click(await screen.findByRole('button', { name: categoria }))

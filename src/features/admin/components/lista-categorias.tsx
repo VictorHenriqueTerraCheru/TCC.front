@@ -1,10 +1,14 @@
 import { useState } from 'react'
 
+import { CampoBusca } from '@/common/components/campo-busca'
+import { ChipFiltro } from '@/common/components/chip-filtro'
 import { FolhaResponsiva } from '@/common/components/folha-responsiva'
+import { Segmentado } from '@/common/components/segmentado'
+import { semAcento } from '@/common/lib/texto'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { CategoriaIcone, useAparencia } from '@/features/categorias'
+import { aparenciaDaCor, CategoriaIcone, PontoGrupo, useAparencia } from '@/features/categorias'
 
 import {
   useAlterarAtivaCategoria,
@@ -12,9 +16,17 @@ import {
   type CategoriaAdmin,
 } from '../api/use-categorias-admin'
 import { mensagemErroCategorias } from '../errors'
+import { EtiquetaTipo } from './etiqueta-tipo'
 import { FormularioCategoria } from './formulario-categoria'
+import { ResumoDosFiltros, SegmentadoTipo, type FiltroTipo } from './filtros-lista'
 
-const rotuloTipo = { problema: 'Continua lá', incidente: 'Aconteceu e passou' } as const
+type Situacao = 'todas' | 'ativas' | 'inativas'
+
+const situacoes: { valor: Situacao; rotulo: string }[] = [
+  { valor: 'todas', rotulo: 'Todas' },
+  { valor: 'ativas', rotulo: 'Ativas' },
+  { valor: 'inativas', rotulo: 'Inativas' },
+]
 
 export function ListaCategorias() {
   const categorias = useCategoriasAdmin()
@@ -22,6 +34,10 @@ export function ListaCategorias() {
   const alterarAtiva = useAlterarAtivaCategoria()
   // 'nova' abre o formulário vazio; uma categoria abre a edição dela.
   const [formulario, setFormulario] = useState<'nova' | CategoriaAdmin | null>(null)
+  const [busca, setBusca] = useState('')
+  const [tipo, setTipo] = useState<FiltroTipo>('todos')
+  const [situacao, setSituacao] = useState<Situacao>('todas')
+  const [grupo, setGrupo] = useState<string | null>(null)
 
   if (categorias.isPending) return <Skeleton className="h-60 rounded-2xl bg-muted" />
   if (categorias.isError) {
@@ -43,9 +59,42 @@ export function ListaCategorias() {
       a.nome.localeCompare(b.nome),
   )
 
+  const termo = semAcento(busca.trim())
+  const visiveis = ordenadas.filter(
+    (c) =>
+      (tipo === 'todos' || c.tipo === tipo) &&
+      (situacao === 'todas' || c.ativa === (situacao === 'ativas')) &&
+      (grupo === null || c.grupo === grupo) &&
+      (termo === '' ||
+        semAcento(c.nome).includes(termo) ||
+        semAcento(grupoDe(c)?.rotulo ?? c.grupo).includes(termo)),
+  )
+  const filtrando = termo !== '' || tipo !== 'todos' || situacao !== 'todas' || grupo !== null
+  // Os chips de grupo seguem o tipo escolhido (grupo de Estado não mistura com Evento).
+  const gruposDoFiltro = grupos.filter((g) => tipo === 'todos' || g.tipo === tipo)
+
+  function limpar() {
+    setBusca('')
+    setTipo('todos')
+    setSituacao('todas')
+    setGrupo(null)
+  }
+
+  function mudarTipo(novo: FiltroTipo) {
+    setTipo(novo)
+    // O grupo marcado pode ser do outro tipo: sai do filtro.
+    if (
+      grupo !== null &&
+      novo !== 'todos' &&
+      grupos.find((g) => g.chave === grupo)?.tipo !== novo
+    ) {
+      setGrupo(null)
+    }
+  }
+
   return (
     <>
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
           Desativar esconde a categoria sem apagar o histórico.
         </p>
@@ -54,46 +103,97 @@ export function ListaCategorias() {
         </Button>
       </div>
 
+      <div className="mb-3 space-y-3">
+        <CampoBusca
+          valor={busca}
+          aoMudar={setBusca}
+          rotulo="Buscar categoria"
+          placeholder="Buscar por nome ou grupo"
+        />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <SegmentadoTipo valor={tipo} aoMudar={mudarTipo} />
+          <Segmentado<Situacao>
+            rotulo="Situação"
+            opcoes={situacoes}
+            valor={situacao}
+            aoMudar={setSituacao}
+          />
+        </div>
+        <div
+          role="group"
+          aria-label="Filtrar por grupo"
+          className="-mx-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1"
+        >
+          <ChipFiltro selecionado={grupo === null} aoClicar={() => setGrupo(null)}>
+            Todos os grupos
+          </ChipFiltro>
+          {gruposDoFiltro.map((g) => (
+            <ChipFiltro
+              key={g.chave}
+              selecionado={grupo === g.chave}
+              aoClicar={() => setGrupo(grupo === g.chave ? null : g.chave)}
+            >
+              <PontoGrupo cor={aparenciaDaCor[g.cor]} />
+              {g.rotulo}
+            </ChipFiltro>
+          ))}
+        </div>
+        <ResumoDosFiltros
+          mostradas={visiveis.length}
+          total={ordenadas.length}
+          substantivo="categorias"
+          filtrando={filtrando}
+          aoLimpar={limpar}
+        />
+      </div>
+
       {alterarAtiva.isError && (
         <p role="alert" className="mb-3 text-sm text-destructive">
           {mensagemErroCategorias(alterarAtiva.error)}
         </p>
       )}
 
-      <ul className="divide-y divide-border rounded-[20px] bg-card">
-        {ordenadas.map((categoria) => (
-          <li
-            key={categoria.id}
-            className={cn('flex items-center gap-3 p-3', !categoria.ativa && 'opacity-60')}
-          >
-            <CategoriaIcone categoria={categoria} />
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-medium">{categoria.nome}</p>
-              <p className="truncate text-xs text-muted-foreground">
-                {grupoDe(categoria)?.rotulo ?? categoria.grupo} · {rotuloTipo[categoria.tipo]}
-                {!categoria.ativa && ' · Inativa'}
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              aria-label={`Editar ${categoria.nome}`}
-              onClick={() => setFormulario(categoria)}
+      {visiveis.length === 0 ? (
+        <p className="rounded-[20px] bg-card py-10 text-center text-sm text-muted-foreground">
+          Nenhuma categoria com esses filtros.
+        </p>
+      ) : (
+        <ul className="divide-y divide-border rounded-[20px] bg-card">
+          {visiveis.map((categoria) => (
+            <li
+              key={categoria.id}
+              className={cn('flex items-center gap-3 p-3', !categoria.ativa && 'opacity-60')}
             >
-              Editar
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              aria-label={`${categoria.ativa ? 'Desativar' : 'Ativar'} ${categoria.nome}`}
-              disabled={alterarAtiva.isPending}
-              onClick={() => alterarAtiva.mutate({ id: categoria.id, ativa: !categoria.ativa })}
-            >
-              {categoria.ativa ? 'Desativar' : 'Ativar'}
-            </Button>
-          </li>
-        ))}
-      </ul>
+              <CategoriaIcone categoria={categoria} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{categoria.nome}</p>
+                <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                  <EtiquetaTipo tipo={categoria.tipo} />
+                  <span className="truncate">{grupoDe(categoria)?.rotulo ?? categoria.grupo}</span>
+                  {!categoria.ativa && <span className="font-medium">Inativa</span>}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                aria-label={`Editar ${categoria.nome}`}
+                onClick={() => setFormulario(categoria)}
+              >
+                Editar
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                aria-label={`${categoria.ativa ? 'Desativar' : 'Ativar'} ${categoria.nome}`}
+                disabled={alterarAtiva.isPending}
+                onClick={() => alterarAtiva.mutate({ id: categoria.id, ativa: !categoria.ativa })}
+              >
+                {categoria.ativa ? 'Desativar' : 'Ativar'}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
 
       <FolhaResponsiva
         aberto={formulario !== null}

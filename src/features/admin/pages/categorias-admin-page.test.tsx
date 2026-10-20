@@ -64,10 +64,11 @@ describe('administração de categorias e grupos', () => {
     abrir()
 
     const linha = (await screen.findByText('Buraco na via')).closest('li')!
-    expect(within(linha).getByText(/Via pública · Continua lá/)).toBeInTheDocument()
-    expect(screen.getByText('Roubo').closest('li')).toHaveTextContent(
-      'Segurança · Aconteceu e passou',
-    )
+    expect(within(linha).getByText('Estado')).toBeInTheDocument()
+    expect(within(linha).getByText('Via pública')).toBeInTheDocument()
+    const roubo = screen.getByText('Roubo').closest('li')!
+    expect(within(roubo).getByText('Evento')).toBeInTheDocument()
+    expect(within(roubo).getByText('Segurança')).toBeInTheDocument()
   })
 
   it('cria um grupo e depois uma categoria nele, com ícone buscado no Iconify', async () => {
@@ -78,7 +79,7 @@ describe('administração de categorias e grupos', () => {
     await usuario.click(await screen.findByRole('radio', { name: 'Grupos' }))
     await usuario.click(screen.getByRole('button', { name: 'Novo grupo' }))
     await usuario.type(await screen.findByLabelText('Nome do grupo'), 'Clima')
-    await usuario.click(screen.getByRole('radio', { name: 'Aconteceu e passou' }))
+    await usuario.click(screen.getByRole('radio', { name: 'Evento' }))
     await usuario.click(screen.getByRole('radio', { name: 'Azul' }))
     await usuario.click(screen.getByRole('button', { name: 'Salvar' }))
     expect(await screen.findByText('Clima')).toBeInTheDocument()
@@ -86,7 +87,7 @@ describe('administração de categorias e grupos', () => {
     await usuario.click(screen.getByRole('radio', { name: 'Categorias' }))
     await usuario.click(await screen.findByRole('button', { name: 'Nova categoria' }))
     await usuario.type(await screen.findByLabelText('Nome'), 'Rua inundada')
-    await usuario.click(screen.getByRole('radio', { name: 'Aconteceu e passou' }))
+    await usuario.click(screen.getByRole('radio', { name: 'Evento' }))
     await usuario.click(
       within(screen.getByRole('group', { name: 'Grupo' })).getByRole('button', { name: 'Clima' }),
     )
@@ -97,7 +98,8 @@ describe('administração de categorias e grupos', () => {
     await usuario.click(screen.getByRole('button', { name: 'Salvar' }))
 
     const linha = (await screen.findByText('Rua inundada')).closest('li')!
-    expect(linha).toHaveTextContent('Clima · Aconteceu e passou')
+    expect(within(linha).getByText('Evento')).toBeInTheDocument()
+    expect(within(linha).getByText('Clima')).toBeInTheDocument()
     await waitFor(() => expect(linha.querySelector('svg path')).toHaveAttribute('d', 'M1 1h4v4z'))
   })
 
@@ -132,7 +134,7 @@ describe('administração de categorias e grupos', () => {
 
     await usuario.click(await screen.findByRole('button', { name: 'Editar Fio caído' }))
     expect(await screen.findByText(/O tipo não muda depois de criada/)).toBeInTheDocument()
-    expect(screen.queryByRole('radio', { name: 'Aconteceu e passou' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: 'Evento' })).not.toBeInTheDocument()
     const nome = screen.getByLabelText('Nome')
     await usuario.clear(nome)
     await usuario.type(nome, 'Fio solto')
@@ -198,5 +200,101 @@ describe('administração de categorias e grupos', () => {
     abrir()
 
     expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()
+  })
+
+  it('Estado e Evento têm etiquetas de cores diferentes', async () => {
+    abrir()
+
+    const estado = within((await screen.findByText('Buraco na via')).closest('li')!).getByText(
+      'Estado',
+    )
+    const evento = within(screen.getByText('Roubo').closest('li')!).getByText('Evento')
+    expect(estado.className).toContain('text-primario')
+    expect(evento.className).toContain('text-cat-roxo')
+  })
+
+  describe('busca e filtros das categorias', () => {
+    const nomesVisiveis = () =>
+      screen
+        .getAllByRole('button', { name: /^Editar / })
+        .map((b) => b.getAttribute('aria-label')!.replace('Editar ', ''))
+
+    it('busca por nome ou por grupo, sem acento', async () => {
+      const usuario = userEvent.setup()
+      abrir()
+      await screen.findByText('Buraco na via')
+
+      await usuario.type(screen.getByRole('searchbox', { name: 'Buscar categoria' }), 'calcada')
+      expect(nomesVisiveis()).toEqual(['Calçada danificada'])
+
+      await usuario.clear(screen.getByRole('searchbox', { name: 'Buscar categoria' }))
+      await usuario.type(screen.getByRole('searchbox', { name: 'Buscar categoria' }), 'eletrica')
+      expect(nomesVisiveis()).toEqual(['Fio caído', 'Poste apagado'])
+      expect(screen.getByText('2 de 8 categorias')).toBeInTheDocument()
+    })
+
+    it('filtra por tipo e os chips de grupo seguem o tipo', async () => {
+      const usuario = userEvent.setup()
+      abrir()
+      await screen.findByText('Buraco na via')
+
+      await usuario.click(screen.getByRole('radio', { name: 'Evento' }))
+      expect(nomesVisiveis()).toEqual(['Roubo', 'Acidente de trânsito'])
+      const chips = within(screen.getByRole('group', { name: 'Filtrar por grupo' }))
+      expect(chips.getByRole('button', { name: 'Segurança' })).toBeInTheDocument()
+      expect(chips.queryByRole('button', { name: 'Limpeza' })).not.toBeInTheDocument()
+
+      await usuario.click(chips.getByRole('button', { name: 'Trânsito' }))
+      expect(nomesVisiveis()).toEqual(['Acidente de trânsito'])
+
+      // Trocar para Estado tira o chip de grupo de Evento do filtro.
+      await usuario.click(screen.getByRole('radio', { name: 'Estado' }))
+      expect(nomesVisiveis()).toHaveLength(6)
+    })
+
+    it('filtra por situação e Limpar filtros volta tudo', async () => {
+      const usuario = userEvent.setup()
+      abrir()
+      await usuario.click(await screen.findByRole('button', { name: 'Desativar Roubo' }))
+      await screen.findByRole('button', { name: 'Ativar Roubo' })
+
+      await usuario.click(screen.getByRole('radio', { name: 'Inativas' }))
+      expect(nomesVisiveis()).toEqual(['Roubo'])
+      await usuario.click(screen.getByRole('radio', { name: 'Ativas' }))
+      expect(nomesVisiveis()).not.toContain('Roubo')
+
+      await usuario.click(screen.getByRole('button', { name: 'Limpar filtros' }))
+      expect(nomesVisiveis()).toContain('Roubo')
+      expect(screen.queryByRole('button', { name: 'Limpar filtros' })).not.toBeInTheDocument()
+    })
+
+    it('sem resultado avisa', async () => {
+      const usuario = userEvent.setup()
+      abrir()
+      await screen.findByText('Buraco na via')
+
+      await usuario.type(screen.getByRole('searchbox', { name: 'Buscar categoria' }), 'zzz')
+
+      expect(screen.getByText('Nenhuma categoria com esses filtros.')).toBeInTheDocument()
+    })
+  })
+
+  describe('busca e filtros dos grupos', () => {
+    it('busca por nome e filtra por tipo', async () => {
+      const usuario = userEvent.setup()
+      abrir()
+      await usuario.click(await screen.findByRole('radio', { name: 'Grupos' }))
+      await screen.findByText('Via pública')
+
+      await usuario.type(screen.getByRole('searchbox', { name: 'Buscar grupo' }), 'transito')
+      expect(screen.getByRole('button', { name: 'Editar Trânsito' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Editar Limpeza' })).not.toBeInTheDocument()
+
+      await usuario.clear(screen.getByRole('searchbox', { name: 'Buscar grupo' }))
+      await usuario.click(screen.getByRole('radio', { name: 'Estado' }))
+      expect(screen.getByRole('button', { name: 'Editar Limpeza' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Editar Segurança' })).not.toBeInTheDocument()
+      expect(screen.getByText('3 de 5 grupos')).toBeInTheDocument()
+    })
   })
 })

@@ -5,22 +5,13 @@ import { CampoTexto } from '@/common/components/campo-texto'
 import { Segmentado } from '@/common/components/segmentado'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
-import {
-  aparenciaDaCor,
-  coresGrupo,
-  nomeDaCor,
-  type Grupo,
-  type TipoGrupo,
-} from '@/features/categorias'
+import { aparenciaDaCor, coresGrupo, nomeDaCor, type Grupo } from '@/features/categorias'
 
 import { useCriarGrupo, useEditarGrupo } from '../api/use-grupos-admin'
 import { mensagemErroCategorias } from '../errors'
+import { ajudaDoTipo, opcoesDeTipo } from '../models/tipo'
+import { EtiquetaTipo } from './etiqueta-tipo'
 import { grupoSchema, type GrupoForm } from '../validators/grupo'
-
-const tipos: { valor: TipoGrupo; rotulo: string }[] = [
-  { valor: 'problema', rotulo: 'Continua lá' },
-  { valor: 'incidente', rotulo: 'Aconteceu e passou' },
-]
 
 interface FormularioGrupoProps {
   /** Sem grupo = criar. */
@@ -69,16 +60,17 @@ export function FormularioGrupo({ grupo, aoConcluir }: FormularioGrupoProps) {
         <p className="text-sm font-medium">Tipo</p>
         {grupo ? (
           <p className="text-sm text-muted-foreground">
-            {tipos.find((t) => t.valor === grupo.tipo)?.rotulo}. O tipo não muda depois de criado.
+            <EtiquetaTipo tipo={grupo.tipo} className="mr-2" />O tipo não muda depois de criado.
           </p>
         ) : (
           <Segmentado
             rotulo="Tipo"
-            opcoes={tipos}
+            opcoes={opcoesDeTipo}
             valor={tipo}
             aoMudar={(valor) => setValue('tipo', valor)}
           />
         )}
+        <p className="text-xs text-muted-foreground">{ajudaDoTipo[grupo?.tipo ?? tipo]}</p>
       </div>
 
       <div className="space-y-2">

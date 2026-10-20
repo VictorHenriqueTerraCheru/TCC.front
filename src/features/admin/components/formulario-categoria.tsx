@@ -5,13 +5,7 @@ import { CampoTexto } from '@/common/components/campo-texto'
 import { ChipFiltro } from '@/common/components/chip-filtro'
 import { Segmentado } from '@/common/components/segmentado'
 import { Button } from '@/common/ui/button'
-import {
-  aparenciaDaCor,
-  gruposDoTipo,
-  PontoGrupo,
-  type Grupo,
-  type TipoGrupo,
-} from '@/features/categorias'
+import { aparenciaDaCor, gruposDoTipo, PontoGrupo, type Grupo } from '@/features/categorias'
 
 import {
   useCriarCategoria,
@@ -19,13 +13,10 @@ import {
   type CategoriaAdmin,
 } from '../api/use-categorias-admin'
 import { mensagemErroCategorias } from '../errors'
+import { ajudaDoTipo, opcoesDeTipo } from '../models/tipo'
+import { EtiquetaTipo } from './etiqueta-tipo'
 import { categoriaSchema, type CategoriaForm } from '../validators/categoria'
 import { SeletorIcone } from './seletor-icone'
-
-const tipos: { valor: TipoGrupo; rotulo: string }[] = [
-  { valor: 'problema', rotulo: 'Continua lá' },
-  { valor: 'incidente', rotulo: 'Aconteceu e passou' },
-]
 
 interface FormularioCategoriaProps {
   /** Sem categoria = criar. */
@@ -75,13 +66,12 @@ export function FormularioCategoria({ categoria, grupos, aoConcluir }: Formulari
         <p className="text-sm font-medium">Tipo</p>
         {categoria ? (
           <p className="text-sm text-muted-foreground">
-            {tipos.find((t) => t.valor === categoria.tipo)?.rotulo}. O tipo não muda depois de
-            criada.
+            <EtiquetaTipo tipo={categoria.tipo} className="mr-2" />O tipo não muda depois de criada.
           </p>
         ) : (
           <Segmentado
             rotulo="Tipo"
-            opcoes={tipos}
+            opcoes={opcoesDeTipo}
             valor={tipo}
             aoMudar={(valor) => {
               setValue('tipo', valor)
@@ -89,6 +79,7 @@ export function FormularioCategoria({ categoria, grupos, aoConcluir }: Formulari
             }}
           />
         )}
+        <p className="text-xs text-muted-foreground">{ajudaDoTipo[categoria?.tipo ?? tipo]}</p>
       </div>
 
       <div className="space-y-2">

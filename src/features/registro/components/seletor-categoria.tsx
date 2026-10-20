@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { ChipFiltro } from '@/common/components/chip-filtro'
 import { Icone } from '@/common/components/icone'
+import { semAcento } from '@/common/lib/texto'
 import { cn } from '@/common/lib/utils'
 import {
   aparenciaDaCor,
@@ -10,8 +11,6 @@ import {
   type Categoria,
   type Grupo,
 } from '@/features/categorias'
-
-const semAcento = (texto: string) => texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
 interface SeletorCategoriaProps {
   /** Categorias do tipo escolhido. */

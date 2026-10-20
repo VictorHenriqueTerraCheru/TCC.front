@@ -29,7 +29,7 @@ describe('passo 1: tipo e categoria', () => {
     const usuario = userEvent.setup()
     const { router } = abrir('/registrar')
 
-    await usuario.click(await screen.findByRole('link', { name: /Aconteceu e passou/ }))
+    await usuario.click(await screen.findByRole('link', { name: /^Evento/ }))
 
     expect(router.state.location.pathname + router.state.location.search).toBe(
       '/registrar/categoria?tipo=incidente',
