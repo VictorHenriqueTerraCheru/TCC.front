@@ -23,19 +23,33 @@ export function ListaGrupos() {
   const [busca, setBusca] = useState('')
   const [tipo, setTipo] = useState<FiltroTipo>('todos')
 
-  if (grupos.isPending) return <Skeleton className="h-60 rounded-2xl bg-muted" />
-  if (grupos.isError) {
+  if (grupos.isPending || categorias.isPending) {
+    return <Skeleton className="h-60 rounded-2xl bg-muted" />
+  }
+  // Sem a lista de categorias não há contagem, e sem ela nenhum grupo vazio poderia ser apagado.
+  if (grupos.isError || categorias.isError) {
     return (
       <div role="alert" className="space-y-3 py-6">
-        <p>Não foi possível carregar os grupos.</p>
-        <Button variant="outline" size="sm" onClick={() => void grupos.refetch()}>
+        <p>
+          {grupos.isError
+            ? 'Não foi possível carregar os grupos.'
+            : 'Não foi possível carregar as categorias.'}
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            if (grupos.isError) void grupos.refetch()
+            if (categorias.isError) void categorias.refetch()
+          }}
+        >
           Tentar novamente
         </Button>
       </div>
     )
   }
 
-  const total = (chave: string) => categorias.data?.filter((c) => c.grupo === chave).length
+  const total = (chave: string) => categorias.data.filter((c) => c.grupo === chave).length
 
   const termo = semAcento(busca.trim())
   const visiveis = grupos.data.filter(

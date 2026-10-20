@@ -6,14 +6,30 @@ import { grupoDasCelulas } from '../fixtures/problemas'
 import { rota } from '../rota'
 import { erroDeRegra, lista, noRetangulo, retanguloDaUrl } from './comum'
 
-/** GET /incidentes/area: contagens num raio de 400 m (roubos vêm das células do mock). */
+/**
+ * GET /incidentes/area: contagens num raio de 400 m. As células do mock valem como roubo (e um quarto
+ * delas como acidente); o que foi registrado na sessão conta na categoria que o usuário escolheu.
+ */
 function resumoDaArea(ponto: { lat: number; lng: number }) {
-  const roubos = banco
+  const celulas = banco
     .calor()
     .filter((c) => metrosEntre(ponto, c) <= 400)
     .reduce((soma, c) => soma + c.quantidade, 0)
-  const acidentes = Math.floor(roubos / 4)
-  const total = roubos + acidentes
+  const novos = banco.incidentesNovos().filter((i) => metrosEntre(ponto, i) <= 400)
+  const doNovo = (categoriaId: number) => novos.filter((i) => i.categoriaId === categoriaId).length
+
+  // Todo registro da sessão também entrou numa célula: sai do bolo de roubos e volta na sua categoria.
+  const roubos = celulas - novos.length + doNovo(7)
+  const acidentes = Math.floor(celulas / 4) + doNovo(8)
+  const outras = [...new Set(novos.map((i) => i.categoriaId))]
+    .filter((id) => id !== 7 && id !== 8)
+    .map((id) => ({
+      categoriaId: id,
+      nome: banco.categoriaPorId(id)?.nome ?? 'Incidente',
+      dias7: doNovo(id),
+      dias30: doNovo(id),
+    }))
+  const total = roubos + acidentes + outras.reduce((soma, c) => soma + c.dias7, 0)
   return {
     raioMetros: 400,
     atualizadoEm: new Date().toISOString(),
@@ -21,6 +37,7 @@ function resumoDaArea(ponto: { lat: number; lng: number }) {
     contagens: [
       { categoriaId: 7, nome: 'Roubo', dias7: roubos, dias30: roubos * 3 + 5 },
       { categoriaId: 8, nome: 'Acidente de trânsito', dias7: acidentes, dias30: acidentes * 3 + 2 },
+      ...outras,
     ],
   }
 }
@@ -67,8 +84,7 @@ export const incidentesHandlers = [
       if (instante > Date.now() || instante < Date.now() - 24 * 3_600_000) {
         return erroDeRegra(422, 'horario-fora-da-janela', 'Horário fora da janela de 24 h.')
       }
-      // Simplificação do mock: toda célula conta como roubo no resumo da área.
-      const ponto = banco.registrarIncidente(lat, lng)
+      const ponto = banco.registrarIncidente(categoriaId, lat, lng)
       if (!ponto)
         return erroDeRegra(429, 'limite-diario-incidentes', 'Limite diário de incidentes.')
       return HttpResponse.json(resumoDaArea(ponto), { status: 201 })

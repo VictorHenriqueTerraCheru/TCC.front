@@ -62,6 +62,17 @@ describe('administração de categorias e grupos', () => {
     expect(screen.queryByRole('button', { name: 'Nova categoria' })).not.toBeInTheDocument()
   })
 
+  it('na aba Grupos, falha em GET /admin/categorias mostra erro em vez de travar o apagar', async () => {
+    server.use(http.get(rota('/admin/categorias'), () => new HttpResponse(null, { status: 500 })))
+    const usuario = userEvent.setup()
+    abrir()
+
+    await usuario.click(await screen.findByRole('radio', { name: 'Grupos' }))
+
+    expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
+  })
+
   it('visitante vai para o login', async () => {
     sair()
     const { router } = abrir()

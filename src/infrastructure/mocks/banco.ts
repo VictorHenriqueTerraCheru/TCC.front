@@ -31,6 +31,7 @@ let usuarios = [...usuariosIniciais]
 let autoria = new Set([ID_DO_AUTOR])
 let celulas = [...calorIncidentes]
 let incidentesRegistrados = 0
+let incidentesNovos: { categoriaId: number; lat: number; lng: number }[] = []
 let verificacoes = verificacoesIniciais()
 let historico = historicoInicial()
 let perfis = new Map<string, { perfil: Perfil; verificadoEm: string | null }>()
@@ -262,7 +263,7 @@ export const banco = {
     return celulas
   },
   /** POST /incidentes: arredonda o ponto em 3 casas e soma na célula. null = limite diário. */
-  registrarIncidente(lat: number, lng: number) {
+  registrarIncidente(categoriaId: number, lat: number, lng: number) {
     if (incidentesRegistrados >= LIMITE_INCIDENTES) return null
     incidentesRegistrados++
     const ponto = { lat: Math.round(lat * 1000) / 1000, lng: Math.round(lng * 1000) / 1000 }
@@ -270,7 +271,12 @@ export const banco = {
     celulas = existente
       ? celulas.map((c) => (c === existente ? { ...c, quantidade: c.quantidade + 1 } : c))
       : [...celulas, { ...ponto, quantidade: 1 }]
+    incidentesNovos = [...incidentesNovos, { categoriaId, ...ponto }]
     return ponto
+  },
+  /** Incidentes registrados nesta sessão, com a categoria (as células do calor só guardam contagem). */
+  incidentesNovos() {
+    return incidentesNovos
   },
 
   /** GET /grupos: em ordem de exibição. */
@@ -365,6 +371,7 @@ export const banco = {
     autoria = new Set([ID_DO_AUTOR])
     celulas = [...calorIncidentes]
     incidentesRegistrados = 0
+    incidentesNovos = []
     verificacoes = verificacoesIniciais()
     historico = historicoInicial()
     perfis = new Map()
