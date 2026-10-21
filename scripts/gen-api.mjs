@@ -12,7 +12,7 @@ import openapiTS, { astToString } from 'openapi-typescript'
 
 const PREFIXO = '/api/v1'
 const DESTINO = 'src/infrastructure/api/schema.d.ts'
-const DATAS_ANULAVEIS = new Set(['ObterMeResponse.verificadoEm'])
+const DATAS_ANULAVEIS = new Set(['ObterMeResponse.verificadoEm', 'ListarUsuariosItem.verificadoEm'])
 
 const origem = process.argv[2] ?? 'docs/openapi.json'
 const texto = /^https?:\/\//.test(origem)
