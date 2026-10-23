@@ -257,7 +257,7 @@ export function MapaPage() {
         {falhou && (
           <div
             role="alert"
-            className="pointer-events-auto flex items-center gap-3 rounded-2xl bg-destructive/15 py-2 pr-2 pl-4 text-[13px] text-destructive shadow-md"
+            className="pointer-events-auto flex items-center gap-3 rounded-2xl bg-destructive/15 py-2 pr-2 pl-4 text-[13px] text-destructive shadow-2"
           >
             <span className="flex-1">Não foi possível carregar o mapa.</span>
             <Button
@@ -302,13 +302,13 @@ export function MapaPage() {
       {aviso && (
         <div
           role="status"
-          className="pointer-events-none absolute inset-x-0 bottom-[168px] z-[1000] mx-auto w-fit max-w-[90%] rounded-2xl px-4 py-2.5 text-sm shadow-lg vidro lg:bottom-8"
+          className="pointer-events-none absolute inset-x-0 bottom-[168px] z-[1000] mx-auto w-fit max-w-[90%] rounded-2xl px-4 py-2.5 text-sm shadow-3 vidro lg:bottom-8"
         >
           {aviso}
         </div>
       )}
 
-      <div className="pointer-events-auto absolute right-3 bottom-[168px] z-[1000] flex flex-col divide-y divide-vidro-borda overflow-hidden rounded-[14px] shadow-md vidro lg:right-4 lg:bottom-14">
+      <div className="pointer-events-auto absolute right-3 bottom-[168px] z-[1000] flex flex-col divide-y divide-vidro-borda overflow-hidden rounded-[14px] shadow-2 vidro lg:right-4 lg:bottom-14">
         <BotaoMapa
           aria-label={legendaAberta ? 'Fechar legenda' : 'Abrir legenda'}
           aria-pressed={legendaAberta}
@@ -343,7 +343,7 @@ export function MapaPage() {
             evento.preventDefault()
             exigirConta('registrar', () => navigate('/registrar'), { retorno: '/registrar' })
           }}
-          className="absolute bottom-[92px] left-1/2 z-[1000] flex h-12 -translate-x-1/2 items-center gap-2 rounded-full bg-primary px-5 font-semibold text-primary-foreground shadow-[0_8px_22px_rgba(59,158,255,.45)] transition hover:brightness-110 focus-visible:outline-2"
+          className="absolute bottom-[92px] left-1/2 z-[1000] flex h-12 -translate-x-1/2 pressionavel items-center gap-2 rounded-full bg-primary bg-linear-to-b from-black/0 to-black/12 px-5 font-semibold text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2"
         >
           <Icone nome="add_location_alt" />
           Registrar

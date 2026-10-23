@@ -78,7 +78,7 @@ export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
             </span>
           </div>
 
-          <table className="w-full overflow-hidden rounded-2xl border border-border/60 bg-card text-left">
+          <table className="w-full overflow-hidden rounded-2xl border border-border/60 bg-card text-left shadow-1">
             <thead className="text-xs text-muted-foreground">
               <tr>
                 <th className="px-4 pt-3 pb-2 font-medium">Tipo</th>

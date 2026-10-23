@@ -37,7 +37,7 @@ function CartaoDuplicata({
       aria-pressed={aoEscolher ? selecionada : undefined}
       disabled={!aoEscolher}
       className={cn(
-        'flex w-full gap-3 rounded-2xl border bg-card p-3 text-left disabled:opacity-100',
+        'flex w-full gap-3 rounded-2xl border bg-card p-3 text-left shadow-1 disabled:opacity-100',
         selecionada ? 'border-primario' : 'border-border/60',
       )}
     >

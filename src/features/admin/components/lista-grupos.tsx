@@ -91,11 +91,11 @@ export function ListaGrupos() {
       </div>
 
       {visiveis.length === 0 ? (
-        <p className="rounded-[20px] bg-card py-10 text-center text-sm text-muted-foreground">
+        <p className="rounded-[20px] bg-card py-10 text-center text-sm text-muted-foreground shadow-1">
           Nenhum grupo com esses filtros.
         </p>
       ) : (
-        <ul className="divide-y divide-border rounded-[20px] bg-card">
+        <ul className="divide-y divide-border rounded-[20px] bg-card shadow-1">
           {visiveis.map((grupo) => {
             const quantas = total(grupo.chave)
             return (

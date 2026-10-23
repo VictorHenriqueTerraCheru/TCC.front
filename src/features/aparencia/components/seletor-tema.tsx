@@ -1,7 +1,9 @@
+import { m } from 'motion/react'
 import { useId } from 'react'
 
 import { Icone } from '@/common/components/icone'
 import { useTemaStore, type PreferenciaTema, type Tema } from '@/common/hooks/use-tema'
+import { MOLA_SUAVE } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
 
 const OPCOES: { valor: PreferenciaTema; rotulo: string; descricao?: string }[] = [
@@ -34,7 +36,7 @@ function Tela({ tema }: { tema: Tema }) {
 function Miniatura({ preferencia }: { preferencia: PreferenciaTema }) {
   const recorte = useId()
   return (
-    <svg viewBox="0 0 60 100" aria-hidden="true" className="h-24 w-[58px] rounded-xl shadow-sm">
+    <svg viewBox="0 0 60 100" aria-hidden="true" className="h-24 w-[58px] rounded-xl shadow-1">
       {preferencia === 'automatico' ? (
         <>
           <Tela tema="claro" />
@@ -59,6 +61,7 @@ function Miniatura({ preferencia }: { preferencia: PreferenciaTema }) {
 export function SeletorTema({ className }: { className?: string }) {
   const preferencia = useTemaStore((s) => s.preferencia)
   const definirPreferencia = useTemaStore((s) => s.definirPreferencia)
+  const idAnel = useId()
 
   return (
     <div role="radiogroup" aria-label="Aparência" className={cn('grid grid-cols-3', className)}>
@@ -71,14 +74,17 @@ export function SeletorTema({ className }: { className?: string }) {
             role="radio"
             aria-checked={selecionado}
             onClick={() => definirPreferencia(opcao.valor)}
-            className="flex flex-col items-center gap-2 rounded-2xl py-3 focus-visible:outline-2"
+            className="flex pressionavel flex-col items-center gap-2 rounded-2xl py-3 focus-visible:outline-2"
           >
-            <span
-              className={cn(
-                'rounded-[14px] p-[3px] ring-2 transition-shadow',
-                selecionado ? 'ring-primario' : 'ring-transparent',
+            <span className="relative rounded-[14px] p-[3px]">
+              {/* O anel desliza até a miniatura escolhida. */}
+              {selecionado && (
+                <m.span
+                  layoutId={idAnel}
+                  transition={MOLA_SUAVE}
+                  className="absolute inset-0 rounded-[14px] ring-2 ring-primario"
+                />
               )}
-            >
               <Miniatura preferencia={opcao.valor} />
             </span>
             <span className="text-sm font-medium">{opcao.rotulo}</span>

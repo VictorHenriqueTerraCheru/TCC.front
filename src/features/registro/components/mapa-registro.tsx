@@ -68,7 +68,7 @@ function BotaoGps() {
         type="button"
         onClick={() => void centralizar()}
         aria-label="Usar minha localização"
-        className="absolute right-3 bottom-10 z-[1000] flex size-11 items-center justify-center rounded-xl bg-superficie-2 shadow-md focus-visible:outline-2"
+        className="absolute right-3 bottom-10 z-[1000] flex size-11 pressionavel items-center justify-center rounded-xl bg-superficie-2 shadow-2 focus-visible:outline-2"
       >
         <Icone nome="my_location" />
       </button>
@@ -79,7 +79,7 @@ function BotaoGps() {
 
 function DicaArrastar({ texto }: { texto: string }) {
   return (
-    <p className="pointer-events-none absolute inset-x-0 top-3 z-[1000] mx-auto flex w-fit items-center gap-2 rounded-lg bg-background/95 px-3 py-1.5 text-sm shadow-md">
+    <p className="pointer-events-none absolute inset-x-0 top-3 z-[1000] mx-auto flex w-fit items-center gap-2 rounded-lg bg-background/95 px-3 py-1.5 text-sm shadow-2">
       <Icone nome="pan_tool" className="text-[18px]" />
       {texto}
     </p>

@@ -1,4 +1,5 @@
 import { Icone } from '@/common/components/icone'
+import { NumeroComPulso } from '@/common/components/numero-animado'
 import { distanciaTexto } from '@/common/lib/formatacao'
 import { cn } from '@/common/lib/utils'
 
@@ -68,8 +69,13 @@ export function CartaoVoto({ problema }: { problema: DetalheProblema }) {
     >
       <Convite problema={problema} />
       <p className={cn('mt-2 text-xs', destaque ? 'font-medium' : 'text-muted-foreground')}>
-        <span className={cn('text-2xl', !destaque && 'text-foreground')}>{sim}</span> sim{' '}
-        <span className={cn('ml-2 text-2xl', !destaque && 'text-foreground')}>{nao}</span> não
+        <NumeroComPulso valor={sim} className={cn('text-2xl', !destaque && 'text-foreground')} />{' '}
+        sim{' '}
+        <NumeroComPulso
+          valor={nao}
+          className={cn('ml-2 text-2xl', !destaque && 'text-foreground')}
+        />{' '}
+        não
       </p>
       {podeVotar ? (
         <div className="mt-3 flex gap-2">

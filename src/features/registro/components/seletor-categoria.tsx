@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
+import { CampoBusca } from '@/common/components/campo-busca'
 import { ChipFiltro } from '@/common/components/chip-filtro'
-import { Icone } from '@/common/components/icone'
 import { semAcento } from '@/common/lib/texto'
 import { cn } from '@/common/lib/utils'
 import {
@@ -73,17 +73,7 @@ export function SeletorCategoria({
 
   return (
     <div className="space-y-4">
-      <label className="flex h-11 items-center gap-2 rounded-xl bg-muted px-3 text-muted-foreground focus-within:outline-2">
-        <Icone nome="search" className="text-[20px]" />
-        <input
-          type="search"
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          placeholder="Buscar categoria"
-          aria-label="Buscar categoria"
-          className="min-w-0 flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
-        />
-      </label>
+      <CampoBusca valor={busca} aoMudar={setBusca} rotulo="Buscar categoria" />
 
       {grupos.length > 1 && (
         <div
@@ -121,7 +111,7 @@ export function SeletorCategoria({
                 aria-pressed={categoria.id === selecionadaId}
                 onClick={() => aoEscolher(categoria.id)}
                 className={cn(
-                  'flex min-h-11 items-center gap-2 rounded-full border py-1 pr-3 pl-1.5 text-sm font-medium focus-visible:outline-2',
+                  'flex min-h-11 pressionavel items-center gap-2 rounded-full border py-1 pr-3 pl-1.5 text-sm font-medium focus-visible:outline-2',
                   categoria.id === selecionadaId
                     ? 'border-primario bg-primario-suave'
                     : 'border-border bg-card hover:bg-superficie-2',
@@ -153,8 +143,8 @@ export function SeletorCategoria({
                     aria-pressed={ativa}
                     onClick={() => aoEscolher(categoria.id)}
                     className={cn(
-                      'flex min-h-24 flex-col items-center gap-1.5 rounded-2xl border-2 p-2 text-center text-[13px] leading-tight font-medium transition-colors focus-visible:outline-2',
-                      ativa ? cor.claro : 'border-border bg-card hover:bg-superficie-2',
+                      'flex min-h-24 pressionavel flex-col items-center gap-1.5 rounded-2xl border-2 p-2 text-center text-[13px] leading-tight font-medium focus-visible:outline-2',
+                      ativa ? cor.claro : 'border-border bg-card shadow-1 hover:bg-superficie-2',
                     )}
                     style={ativa ? { borderColor: cor.corForte } : undefined}
                   >

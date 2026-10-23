@@ -22,7 +22,7 @@ export function CartaoSolicitacao({ solicitacao }: { solicitacao: Solicitacao })
   return (
     <article
       aria-label={`Pedido de ${usuario.nome}`}
-      className="rounded-2xl border border-border/60 bg-card p-4"
+      className="rounded-2xl border border-border/60 bg-card p-4 shadow-1"
     >
       <header className="mb-3 flex items-center gap-3">
         <Avatar nome={usuario.nome} />

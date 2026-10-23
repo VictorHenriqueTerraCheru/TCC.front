@@ -7,6 +7,7 @@ import { Pagina } from '@/common/components/pagina'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { ItemAnimado } from '@/common/components/item-animado'
 import { useAutenticado } from '@/features/auth'
 import {
   aparenciaPerfil,
@@ -53,7 +54,7 @@ function Totais({ me }: { me: Me }) {
         ['Registros', me.totalRegistros],
         ['Votos', me.totalVotos],
       ].map(([rotulo, valor]) => (
-        <div key={rotulo} className="rounded-[20px] border border-border bg-card p-4">
+        <div key={rotulo} className="rounded-[20px] border border-border bg-card p-4 shadow-1">
           <p className="text-xs text-muted-foreground">{rotulo}</p>
           <p className="text-3xl">{valor}</p>
         </div>
@@ -79,9 +80,9 @@ function HistoricoResumo() {
       ) : itens?.length ? (
         <ul>
           {itens.map((item, i) => (
-            <li key={`${item.data}-${i}`}>
+            <ItemAnimado key={`${item.data}-${i}`} indice={i}>
               <ItemHistoricoLinha item={item} quando={quandoItemResumo(item.data)} />
-            </li>
+            </ItemAnimado>
           ))}
         </ul>
       ) : (
@@ -106,7 +107,7 @@ export function PerfilPage() {
           <Link
             to="/perfil/configuracoes"
             aria-label="Configurações"
-            className="flex size-12 items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+            className="flex size-12 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
           >
             <Icone nome="settings" />
           </Link>
@@ -138,7 +139,7 @@ export function PerfilPage() {
             <div className="space-y-2">
               <Link
                 to="/admin/verificacoes"
-                className="flex items-center gap-3 rounded-[20px] bg-card p-4 hover:bg-superficie-2 focus-visible:outline-2"
+                className="flex pressionavel items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-superficie-2 focus-visible:outline-2"
               >
                 <Icone nome="admin_panel_settings" className="text-primario" />
                 <span className="flex-1">
@@ -151,7 +152,7 @@ export function PerfilPage() {
               </Link>
               <Link
                 to="/admin/categorias"
-                className="flex items-center gap-3 rounded-[20px] bg-card p-4 hover:bg-superficie-2 focus-visible:outline-2"
+                className="flex pressionavel items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-superficie-2 focus-visible:outline-2"
               >
                 <Icone nome="category" className="text-primario" />
                 <span className="flex-1">
@@ -164,7 +165,7 @@ export function PerfilPage() {
               </Link>
               <Link
                 to="/admin/usuarios"
-                className="flex items-center gap-3 rounded-[20px] bg-card p-4 hover:bg-superficie-2 focus-visible:outline-2"
+                className="flex pressionavel items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-superficie-2 focus-visible:outline-2"
               >
                 <Icone nome="group" className="text-primario" />
                 <span className="flex-1">

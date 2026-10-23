@@ -35,7 +35,7 @@ export function CartaoVerificacao({ me }: { me: Me }) {
 
   if (me.verificacao?.status === 'pendente') {
     return (
-      <section className="rounded-[20px] border border-border bg-card p-4">
+      <section className="rounded-[20px] border border-border bg-card p-4 shadow-1">
         <h2 className="mb-1 flex items-center gap-2 font-medium">
           <Icone nome="hourglass_top" className="text-[22px] text-nova" />
           Pedido em análise
@@ -49,7 +49,7 @@ export function CartaoVerificacao({ me }: { me: Me }) {
   }
 
   return (
-    <section className="rounded-[20px] border border-border bg-card p-4">
+    <section className="rounded-[20px] border border-border bg-card p-4 shadow-1">
       <h2 className="mb-1 flex items-center gap-2 font-medium">
         <Icone nome="verified_user" className="text-[22px] text-primario" />
         Verifique seu perfil

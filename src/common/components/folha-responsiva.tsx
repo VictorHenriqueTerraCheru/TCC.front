@@ -26,7 +26,9 @@ export function FolhaResponsiva({
   const conteudo = (
     <>
       {icone}
-      <Titulo className="mb-2 text-left text-2xl leading-8 font-normal">{titulo}</Titulo>
+      <Titulo className="mb-2 text-left text-2xl leading-8 font-semibold tracking-tight">
+        {titulo}
+      </Titulo>
       {children}
     </>
   )

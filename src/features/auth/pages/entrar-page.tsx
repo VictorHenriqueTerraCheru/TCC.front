@@ -83,7 +83,7 @@ export function EntrarPage() {
             {erroGeral}
           </p>
         )}
-        <Button type="submit" className="mt-6" disabled={entrar.isPending}>
+        <Button type="submit" className="mt-6" carregando={entrar.isPending}>
           {entrar.isPending ? 'Entrando…' : 'Entrar'}
         </Button>
 

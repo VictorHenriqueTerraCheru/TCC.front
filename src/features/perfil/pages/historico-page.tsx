@@ -6,6 +6,7 @@ import { Segmentado } from '@/common/components/segmentado'
 import { TelaComVoltar } from '@/common/components/tela-com-voltar'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { ItemAnimado } from '@/common/components/item-animado'
 import { useAutenticado } from '@/features/auth'
 import {
   agruparPorPeriodo,
@@ -50,9 +51,9 @@ function Lista({ filtro }: { filtro: FiltroHistorico }) {
           </h2>
           <ul>
             {grupo.itens.map((item, i) => (
-              <li key={`${item.data}-${i}`}>
+              <ItemAnimado key={`${item.data}-${i}`} indice={i}>
                 <ItemHistoricoLinha item={item} quando={quandoItem(item.data)} />
-              </li>
+              </ItemAnimado>
             ))}
           </ul>
         </section>

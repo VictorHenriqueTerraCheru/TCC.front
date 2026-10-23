@@ -11,6 +11,7 @@ import { CENTRO_PADRAO } from '@/common/lib/mapa'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { ItemAnimado } from '@/common/components/item-animado'
 import {
   aparenciaDaCor,
   CategoriaIcone,
@@ -38,7 +39,7 @@ function Cartao({ item }: { item: ItemRecente }) {
   return (
     <Link
       to={`/mapa/problema/${item.id}`}
-      className="flex gap-3 rounded-[20px] border border-border bg-card p-3 hover:bg-superficie-2 focus-visible:outline-2"
+      className="flex pressionavel gap-3 rounded-[20px] border border-border bg-card p-3 shadow-1 hover:bg-superficie-2 focus-visible:outline-2"
     >
       <CategoriaIcone categoria={item.categoria} />
       <div className="min-w-0 flex-1">
@@ -173,10 +174,10 @@ export function RecentesPage() {
       ) : (
         <ListaInfinita consulta={recentes}>
           <ul className="space-y-2">
-            {itens.map((item) => (
-              <li key={item.id}>
+            {itens.map((item, i) => (
+              <ItemAnimado key={item.id} indice={i}>
                 <Cartao item={item} />
-              </li>
+              </ItemAnimado>
             ))}
           </ul>
         </ListaInfinita>

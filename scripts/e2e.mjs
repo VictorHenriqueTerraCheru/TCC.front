@@ -146,6 +146,9 @@ try {
     await p.goto(BASE + '/mapa')
     await p.getByRole('link', { name: 'Registrar' }).click()
     await p.waitForURL(/\/registrar$/)
+    // Passo 1: "Estado ou evento?" (problema = estado).
+    await p.getByRole('link', { name: /^Estado/ }).click()
+    await p.waitForURL(/\/registrar\/categoria\?tipo=problema/)
     await p.getByRole('button', { name: /Buraco na via/ }).click()
     await p.getByRole('button', { name: 'Continuar' }).click()
     await p.waitForURL(/\/registrar\/local/)
@@ -201,6 +204,8 @@ try {
   // ---------------------------------------------------------------- registro de incidente
   await passo('Registrar incidente (anônimo) e conferir a área no banco', p, async () => {
     await p.goto(BASE + '/registrar')
+    await p.getByRole('link', { name: /^Evento/ }).click()
+    await p.waitForURL(/\/registrar\/categoria\?tipo=incidente/)
     await p.getByRole('button', { name: /Roubo/ }).click()
     await p.getByRole('button', { name: 'Continuar' }).click()
     await p.waitForURL(/\/registrar\/incidente\/local/)

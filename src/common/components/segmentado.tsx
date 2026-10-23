@@ -1,3 +1,7 @@
+import { m } from 'motion/react'
+import { useId } from 'react'
+
+import { MOLA_SUAVE } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
 
 interface SegmentadoProps<T extends string> {
@@ -8,7 +12,7 @@ interface SegmentadoProps<T extends string> {
   className?: string
 }
 
-/** Controle segmentado de vidro (seletor de modo do mapa, abas do histórico). */
+/** Controle segmentado de vidro (seletor de modo do mapa, abas do histórico); a pílula desliza. */
 export function Segmentado<T extends string>({
   rotulo,
   opcoes,
@@ -16,6 +20,8 @@ export function Segmentado<T extends string>({
   aoMudar,
   className,
 }: SegmentadoProps<T>) {
+  // Um layoutId por instância: dois segmentados na mesma tela não trocam pílulas entre si.
+  const idPilula = useId()
   return (
     <div
       role="radiogroup"
@@ -33,13 +39,18 @@ export function Segmentado<T extends string>({
             aria-checked={selecionado}
             onClick={() => aoMudar(opcao.valor)}
             className={cn(
-              'flex items-center justify-center rounded-[11px] text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2',
-              selecionado
-                ? 'bg-primario-suave text-primario'
-                : 'text-muted-foreground hover:bg-foreground/5',
+              'relative flex pressionavel items-center justify-center rounded-[11px] text-[13px] font-semibold focus-visible:outline-2 focus-visible:-outline-offset-2',
+              selecionado ? 'text-primario' : 'text-muted-foreground hover:text-foreground',
             )}
           >
-            {opcao.rotulo}
+            {selecionado && (
+              <m.span
+                layoutId={idPilula}
+                transition={MOLA_SUAVE}
+                className="absolute inset-0 rounded-[11px] bg-primario-suave shadow-1 ring-1 ring-primario/15"
+              />
+            )}
+            <span className="relative">{opcao.rotulo}</span>
           </button>
         )
       })}

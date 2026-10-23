@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
+import { MotionGlobalConfig } from 'motion/react'
 
 import { useTemaStore } from '@/common/hooks/use-tema'
 import { provedorAutenticacao } from '@/features/auth'
@@ -9,6 +10,9 @@ import { server } from '@/infrastructure/mocks/server'
 
 // jsdom não tem WebGL: o mapa vira um falso que imita a API usada pelo app.
 vi.mock('@vis.gl/react-maplibre', () => import('./maplibre-falso'))
+
+// Sem animações: o AnimatePresence só tiraria os elementos do DOM depois da saída animada.
+MotionGlobalConfig.skipAnimations = true
 
 // Mesma composição do main.tsx.
 registrarAutenticacao(provedorAutenticacao)
@@ -47,3 +51,10 @@ Object.defineProperty(window, 'matchMedia', {
 Element.prototype.setPointerCapture ??= () => {}
 Element.prototype.releasePointerCapture ??= () => {}
 Element.prototype.hasPointerCapture ??= () => false
+
+// O Checkbox do Radix mede o input escondido com ResizeObserver, que o jsdom não tem.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}

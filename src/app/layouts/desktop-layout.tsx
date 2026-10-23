@@ -1,6 +1,8 @@
+import { m } from 'motion/react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router'
 
 import { Icone } from '@/common/components/icone'
+import { MOLA_SUAVE } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
 import { useExigirConta } from '@/features/auth'
 
@@ -23,7 +25,7 @@ export function DesktopLayout() {
             exigirConta('registrar', () => navigate('/registrar'), { retorno: '/registrar' })
           }}
           aria-label="Registrar ocorrência"
-          className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-[0_8px_22px_rgba(59,158,255,.45)] transition hover:brightness-110 focus-visible:outline-2"
+          className="mb-4 flex size-14 pressionavel items-center justify-center rounded-2xl bg-primary bg-linear-to-b from-black/0 to-black/12 text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2"
         >
           <Icone nome="add_location_alt" />
         </Link>
@@ -31,17 +33,24 @@ export function DesktopLayout() {
           <NavLink
             key={item.rota}
             to={item.rota}
-            className="group flex w-full flex-col items-center gap-1 text-xs font-medium focus-visible:outline-2"
+            className="group flex w-full pressionavel flex-col items-center gap-1 text-xs font-medium focus-visible:outline-2"
           >
             {({ isActive }) => (
               <>
                 <span
                   className={cn(
-                    'flex h-8 w-14 items-center justify-center rounded-full transition-colors',
-                    isActive ? 'bg-primario-suave text-primario' : 'group-hover:bg-foreground/5',
+                    'relative flex h-8 w-14 items-center justify-center rounded-full transition-colors',
+                    isActive ? 'text-primario' : 'group-hover:bg-foreground/5',
                   )}
                 >
-                  <Icone nome={item.icone} preenchido={isActive} />
+                  {isActive && (
+                    <m.span
+                      layoutId="aba-ativa-trilho"
+                      transition={MOLA_SUAVE}
+                      className="absolute inset-0 rounded-full bg-primario-suave"
+                    />
+                  )}
+                  <Icone nome={item.icone} preenchido={isActive} className="relative" />
                 </span>
                 <span
                   className={cn(isActive ? 'font-semibold text-primario' : 'text-muted-foreground')}

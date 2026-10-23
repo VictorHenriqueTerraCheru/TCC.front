@@ -1,4 +1,8 @@
+import { m } from 'motion/react'
+
 import { Icone } from '@/common/components/icone'
+import { NumeroAnimado } from '@/common/components/numero-animado'
+import { MOLA_SUAVE } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
 
 import type { DetalheProblema, FaixaConfianca } from '../../models/problema'
@@ -29,7 +33,7 @@ export function BarraConfianca({
         <span className={cn('font-medium', faixa === 'alta' && 'text-primario')}>
           {rotuloFaixa[faixa]}
         </span>
-        <span className="ml-auto text-sm">{valor} / 100</span>
+        <NumeroAnimado valor={valor} formatar={(n) => `${n} / 100`} className="ml-auto text-sm" />
       </div>
       <div
         role="meter"
@@ -39,7 +43,12 @@ export function BarraConfianca({
         aria-valuenow={valor}
         className="h-1.5 overflow-hidden rounded-full bg-muted"
       >
-        <div className="h-full rounded-full bg-primario" style={{ width: `${valor}%` }} />
+        <m.div
+          className="h-full rounded-full bg-primario"
+          initial={{ width: 0 }}
+          animate={{ width: `${valor}%` }}
+          transition={MOLA_SUAVE}
+        />
       </div>
       <p className="mt-2 text-xs text-muted-foreground">{legenda}</p>
     </section>
@@ -66,7 +75,10 @@ export function BarraAvaliacao({
         {Array.from({ length: necessarios }, (_, i) => (
           <span
             key={i}
-            className={cn('h-1.5 flex-1 rounded-full', i < votantes ? 'bg-nova' : 'bg-muted')}
+            className={cn(
+              'h-1.5 flex-1 rounded-full transition-colors duration-500',
+              i < votantes ? 'bg-nova' : 'bg-muted',
+            )}
           />
         ))}
       </div>

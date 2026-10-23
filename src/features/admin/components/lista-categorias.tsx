@@ -175,11 +175,11 @@ export function ListaCategorias() {
       )}
 
       {visiveis.length === 0 ? (
-        <p className="rounded-[20px] bg-card py-10 text-center text-sm text-muted-foreground">
+        <p className="rounded-[20px] bg-card py-10 text-center text-sm text-muted-foreground shadow-1">
           Nenhuma categoria com esses filtros.
         </p>
       ) : (
-        <ul className="divide-y divide-border rounded-[20px] bg-card">
+        <ul className="divide-y divide-border rounded-[20px] bg-card shadow-1">
           {visiveis.map((categoria) => (
             <li
               key={categoria.id}

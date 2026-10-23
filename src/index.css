@@ -47,6 +47,13 @@
   --superficie-2: #e8ebf1;
   --vidro: rgba(255, 255, 255, 0.74);
   --vidro-borda: rgba(17, 24, 39, 0.08);
+  /* Realce de 1 px no topo do vidro e dos botões cheios (luz vindo de cima, como no iOS). */
+  --realce: rgba(255, 255, 255, 0.7);
+
+  /* Sombras em camadas (contato curto + difusa longa): cartão, flutuante, modal. */
+  --sombra-1: 0 1px 2px rgb(17 24 39 / 0.06), 0 2px 8px rgb(17 24 39 / 0.05);
+  --sombra-2: 0 2px 6px rgb(17 24 39 / 0.08), 0 10px 28px rgb(17 24 39 / 0.12);
+  --sombra-3: 0 4px 12px rgb(17 24 39 / 0.1), 0 24px 60px rgb(17 24 39 / 0.18);
 
   /* Selo "Nova" e barra "Em avaliação". */
   --nova: #1f74db;
@@ -113,6 +120,11 @@
   --superficie-2: #223041;
   --vidro: rgba(26, 34, 46, 0.62);
   --vidro-borda: rgba(160, 190, 230, 0.12);
+  --realce: rgba(255, 255, 255, 0.08);
+
+  --sombra-1: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.2);
+  --sombra-2: 0 2px 6px rgb(0 0 0 / 0.3), 0 10px 28px rgb(0 0 0 / 0.35);
+  --sombra-3: 0 4px 12px rgb(0 0 0 / 0.35), 0 24px 60px rgb(0 0 0 / 0.5);
 
   --voto-sim: #34c759;
   --voto-nao: #ff5a52;
@@ -147,6 +159,10 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 12px);
+
+  --shadow-1: var(--sombra-1);
+  --shadow-2: var(--sombra-2);
+  --shadow-3: var(--sombra-3);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -206,6 +222,24 @@
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--vidro-borda);
+  /* Pelas variáveis do Tailwind: o realce soma com um shadow-* no mesmo elemento. */
+  --tw-inset-shadow: inset 0 1px 0 var(--realce);
+  box-shadow: var(--tw-inset-shadow), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow, 0 0 #0000);
+}
+
+/* Resposta ao toque: encolhe um pouco enquanto pressionado (CSS puro, vale para asChild e NavLink). */
+@utility pressionavel {
+  transition-property: transform, background-color, color, box-shadow, opacity, filter;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &:active:not(:disabled) {
+      transform: none;
+    }
+  }
 }
 
 /* Controles nativos do MapLibre (zoom, atribuição) no vidro. */
@@ -258,7 +292,31 @@
   border-radius: 50%;
   animation: pulso-alerta 1.8s ease-out infinite;
 }
+/* Brilho que atravessa o esqueleto de carregamento. */
+@keyframes brilho {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+.brilho {
+  position: relative;
+  overflow: hidden;
+}
+.brilho::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--realce), transparent);
+  animation: brilho 1.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .brilho::after {
+    animation: none;
+  }
   .pulso-alerta {
     display: none;
     animation: none;
