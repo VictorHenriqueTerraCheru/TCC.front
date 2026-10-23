@@ -81,7 +81,7 @@ export function TipoPage() {
           <Link
             key={opcao.tipo}
             to={caminhoDaCategoria(opcao.tipo)}
-            className="block space-y-3.5 rounded-[20px] border border-border bg-card p-5 shadow-sm hover:border-primario focus-visible:outline-2"
+            className="block pressionavel space-y-3.5 rounded-[20px] border border-border bg-card p-5 shadow-1 hover:border-primario focus-visible:outline-2"
           >
             <div className="flex items-center">
               <div className="flex">

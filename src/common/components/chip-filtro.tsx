@@ -18,9 +18,9 @@ export function ChipFiltro({
       aria-pressed={selecionado}
       onClick={aoClicar}
       className={cn(
-        'flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold shadow-sm transition-colors focus-visible:outline-2',
+        'flex h-8 shrink-0 pressionavel items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold shadow-1 focus-visible:outline-2',
         selecionado
-          ? 'border border-primario bg-primario-suave text-primario backdrop-blur-xl'
+          ? 'border border-primario/60 bg-primario-suave text-primario backdrop-blur-xl'
           : 'text-foreground vidro hover:bg-superficie-2',
       )}
     >

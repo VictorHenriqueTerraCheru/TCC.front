@@ -68,7 +68,7 @@ export function SolicitarVerificacaoPage() {
             </p>
 
             {pendente ? (
-              <p className="rounded-2xl bg-card p-4 text-sm">
+              <p className="rounded-2xl bg-card p-4 text-sm shadow-1">
                 Você já tem um pedido em análise. Assim que a moderação responder, o resultado
                 aparece no seu perfil.
               </p>
@@ -97,7 +97,7 @@ export function SolicitarVerificacaoPage() {
                     {mensagemErroVerificacao(solicitar.error)}
                   </p>
                 )}
-                <Button type="submit" className="mt-auto w-full" disabled={solicitar.isPending}>
+                <Button type="submit" className="mt-auto w-full" carregando={solicitar.isPending}>
                   {solicitar.isPending ? 'Enviando…' : 'Enviar pedido'}
                 </Button>
               </>

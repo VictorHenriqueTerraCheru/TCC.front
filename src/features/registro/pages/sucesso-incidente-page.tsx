@@ -29,7 +29,7 @@ export function SucessoIncidentePage() {
       verNoMapa={verNoMapa}
       cartao={
         contagem && (
-          <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4">
+          <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-1">
             <span
               aria-hidden="true"
               className="size-10 shrink-0 rounded-full blur-[1px]"

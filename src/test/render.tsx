@@ -4,6 +4,7 @@ import type { ReactElement } from 'react'
 import { createMemoryRouter, type RouteObject } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 
+import { ProvedorMovimento } from '@/common/components/provedor-movimento'
 import { criarQueryClient } from '@/infrastructure/query/query-client'
 
 export function definirLargura(largura: number) {
@@ -17,7 +18,11 @@ function queryClientDeTeste() {
 }
 
 export function renderizar(ui: ReactElement) {
-  return render(<QueryClientProvider client={queryClientDeTeste()}>{ui}</QueryClientProvider>)
+  return render(
+    <QueryClientProvider client={queryClientDeTeste()}>
+      <ProvedorMovimento>{ui}</ProvedorMovimento>
+    </QueryClientProvider>,
+  )
 }
 
 export function renderizarRotas(rotas: RouteObject[], caminho = '/') {
@@ -26,7 +31,9 @@ export function renderizarRotas(rotas: RouteObject[], caminho = '/') {
     router,
     ...render(
       <QueryClientProvider client={queryClientDeTeste()}>
-        <RouterProvider router={router} />
+        <ProvedorMovimento>
+          <RouterProvider router={router} />
+        </ProvedorMovimento>
       </QueryClientProvider>,
     ),
   }

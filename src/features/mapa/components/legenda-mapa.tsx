@@ -60,7 +60,7 @@ export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): vo
   return (
     <section
       aria-label={titulo}
-      className="pointer-events-auto w-60 rounded-[22px] p-4 shadow-lg vidro"
+      className="pointer-events-auto w-60 rounded-[22px] p-4 shadow-3 vidro"
     >
       <header className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-medium">{titulo}</h2>
@@ -68,7 +68,7 @@ export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): vo
           type="button"
           onClick={aoFechar}
           aria-label="Fechar legenda"
-          className="-m-2.5 flex size-11 items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+          className="-m-2.5 flex size-11 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
           <Icone nome="close" className="text-[18px]" />
         </button>

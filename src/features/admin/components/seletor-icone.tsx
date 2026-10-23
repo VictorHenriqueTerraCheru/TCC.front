@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
+import { CampoBusca } from '@/common/components/campo-busca'
 import { Icone } from '@/common/components/icone'
 import { IconeDinamico } from '@/common/components/icone-remoto'
 import { useDebouncedValue } from '@/common/hooks/use-debounced-value'
@@ -51,17 +52,12 @@ export function SeletorIcone({ valor, aoMudar, erro }: SeletorIconeProps) {
         </span>
       </div>
 
-      <label className="flex h-11 items-center gap-2 rounded-xl bg-muted px-3 text-muted-foreground focus-within:outline-2">
-        <Icone nome="search" className="text-[20px]" />
-        <input
-          type="search"
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          placeholder="Buscar ícone (em inglês: flood, tree, fire…)"
-          aria-label="Buscar ícone"
-          className="min-w-0 flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground"
-        />
-      </label>
+      <CampoBusca
+        valor={busca}
+        aoMudar={setBusca}
+        rotulo="Buscar ícone"
+        placeholder="Buscar ícone (em inglês: flood, tree, fire…)"
+      />
 
       {termo.length >= MINIMO_LETRAS && resultado.isPending && (
         <p className="text-sm text-muted-foreground">Buscando…</p>
@@ -87,7 +83,7 @@ export function SeletorIcone({ valor, aoMudar, erro }: SeletorIconeProps) {
               title={nome}
               onClick={() => aoMudar(nome)}
               className={cn(
-                'flex aspect-square items-center justify-center rounded-xl border-2 text-[26px] focus-visible:outline-2',
+                'flex aspect-square pressionavel items-center justify-center rounded-xl border-2 text-[26px] focus-visible:outline-2',
                 nome === valor
                   ? 'border-primario bg-primario-suave text-primario'
                   : 'border-border bg-card hover:bg-superficie-2',

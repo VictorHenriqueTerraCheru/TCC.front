@@ -40,7 +40,7 @@ function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
       <h2 className="px-4 pb-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
         {titulo}
       </h2>
-      <div className="divide-y divide-border overflow-hidden rounded-[20px] bg-card">
+      <div className="divide-y divide-border overflow-hidden rounded-[20px] bg-card shadow-1">
         {children}
       </div>
     </section>
@@ -77,7 +77,10 @@ function Linha({
     <button
       type="button"
       onClick={aoClicar}
-      className={cn(classe, 'hover:bg-foreground/5 focus-visible:outline-2')}
+      className={cn(
+        classe,
+        'transition-colors hover:bg-foreground/5 focus-visible:outline-2 active:bg-foreground/8',
+      )}
     >
       {conteudo}
     </button>

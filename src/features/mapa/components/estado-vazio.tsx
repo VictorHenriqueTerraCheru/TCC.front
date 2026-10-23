@@ -12,13 +12,13 @@ export function EstadoVazio({ aoVerAreaMaior, aoFechar }: EstadoVazioProps) {
   return (
     <div
       role="status"
-      className="pointer-events-auto relative mx-auto w-full max-w-sm rounded-[28px] p-6 text-center shadow-lg vidro"
+      className="pointer-events-auto relative mx-auto w-full max-w-sm rounded-[28px] p-6 text-center shadow-3 vidro"
     >
       <button
         type="button"
         onClick={aoFechar}
         aria-label="Fechar aviso"
-        className="absolute top-1.5 right-1.5 flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-2"
+        className="absolute top-1.5 right-1.5 flex size-11 pressionavel items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-2"
       >
         <Icone nome="close" className="text-[20px]" />
       </button>

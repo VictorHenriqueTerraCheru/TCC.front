@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, type ReactNode } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
 
 import { CampoSenha, CampoTexto } from '@/common/components/campo-texto'
 import { TelaComVoltar } from '@/common/components/tela-com-voltar'
 import { Button } from '@/common/ui/button'
+import { Checkbox } from '@/common/ui/checkbox'
 
 import { useCadastrar } from '../api/use-entrar'
 import { AvisoDialog } from '../components/aviso-dialog'
@@ -35,7 +36,7 @@ export function CadastroPage() {
   const aposEntrar = useAposEntrar()
   const cadastrar = useCadastrar()
   const [erroGeral, setErroGeral] = useState<string | null>(null)
-  const { register, handleSubmit, setError, formState } = useForm<CadastrarForm>({
+  const { register, control, handleSubmit, setError, formState } = useForm<CadastrarForm>({
     resolver: zodResolver(cadastrarSchema),
     defaultValues: { nome: '', email: '', senha: '', aceitouTermos: false },
   })
@@ -89,13 +90,22 @@ export function CadastroPage() {
         </div>
 
         <div className="mt-6 flex items-start gap-3 text-sm">
-          <input
-            id="aceitou-termos"
-            type="checkbox"
-            aria-invalid={erroTermos ? true : undefined}
-            aria-describedby={erroTermos ? 'aceitou-termos-erro' : undefined}
-            className="mt-0.5 size-5 shrink-0 accent-primario"
-            {...register('aceitouTermos')}
+          <Controller
+            control={control}
+            name="aceitouTermos"
+            render={({ field }) => (
+              <Checkbox
+                id="aceitou-termos"
+                ref={field.ref}
+                name={field.name}
+                checked={field.value}
+                onCheckedChange={(valor) => field.onChange(valor === true)}
+                onBlur={field.onBlur}
+                aria-invalid={erroTermos ? true : undefined}
+                aria-describedby={erroTermos ? 'aceitou-termos-erro' : undefined}
+                className="mt-0.5"
+              />
+            )}
           />
           <div>
             <label htmlFor="aceitou-termos">Li e aceito os </label>
@@ -128,7 +138,7 @@ export function CadastroPage() {
         )}
 
         <div className="mt-auto pt-10">
-          <Button type="submit" className="w-full" disabled={cadastrar.isPending}>
+          <Button type="submit" className="w-full" carregando={cadastrar.isPending}>
             {cadastrar.isPending ? 'Criando conta…' : 'Criar conta'}
           </Button>
           <p className="mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground">

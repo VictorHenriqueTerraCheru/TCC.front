@@ -117,7 +117,7 @@ export function FormularioGrupo({ grupo, aoConcluir }: FormularioGrupoProps) {
         <Button type="button" variant="outline" className="flex-1" onClick={aoConcluir}>
           Cancelar
         </Button>
-        <Button type="submit" className="flex-1" disabled={mutacao.isPending}>
+        <Button type="submit" className="flex-1" carregando={mutacao.isPending}>
           {mutacao.isPending ? 'Salvando…' : 'Salvar'}
         </Button>
       </div>

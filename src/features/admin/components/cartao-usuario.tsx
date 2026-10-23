@@ -33,7 +33,7 @@ export function CartaoUsuario({ usuario, ehVoce }: CartaoUsuarioProps) {
   return (
     <article
       aria-label={`Usuário ${usuario.nome}`}
-      className="rounded-2xl border border-border/60 bg-card p-4"
+      className="rounded-2xl border border-border/60 bg-card p-4 shadow-1"
     >
       <header className="flex items-center gap-3">
         <Avatar nome={usuario.nome} verificado={usuario.perfil !== 'cidadao'} />
@@ -127,7 +127,7 @@ function FolhaPerfil({ usuario, aoFechar }: { usuario: UsuarioAdmin; aoFechar():
         <Button variant="ghost" onClick={aoFechar}>
           Cancelar
         </Button>
-        <Button disabled={alterar.isPending} onClick={salvar}>
+        <Button carregando={alterar.isPending} onClick={salvar}>
           Salvar
         </Button>
       </div>

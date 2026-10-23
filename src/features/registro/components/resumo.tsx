@@ -30,7 +30,7 @@ export function LinhaResumo({ icone, rotulo, valor, aoEditar }: LinhaResumoProps
           type="button"
           onClick={aoEditar}
           aria-label={`Editar ${rotulo.toLowerCase()}`}
-          className="flex size-10 items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+          className="flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
           <Icone nome="edit" className="text-[20px]" />
         </button>
@@ -46,7 +46,7 @@ export function Resumo({ children }: { children: ReactNode }) {
       <h2 id="titulo-resumo" className="mb-2 font-medium">
         Resumo
       </h2>
-      <ul className="rounded-2xl border border-border/60 bg-card">{children}</ul>
+      <ul className="rounded-2xl border border-border/60 bg-card shadow-1">{children}</ul>
     </section>
   )
 }

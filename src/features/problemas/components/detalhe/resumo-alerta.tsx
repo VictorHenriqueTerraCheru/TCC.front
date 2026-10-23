@@ -1,9 +1,11 @@
 import type { MaterialSymbol } from 'material-symbols'
+import { m } from 'motion/react'
 
 import { Icone } from '@/common/components/icone'
 import { IconeDinamico } from '@/common/components/icone-remoto'
 import { usePainelResponsivo } from '@/common/hooks/use-painel-responsivo'
 import { distanciaTexto } from '@/common/lib/formatacao'
+import { MOLA_RAPIDA } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
 import { iconeDe, useAparencia } from '@/features/categorias'
 
@@ -35,12 +37,20 @@ function BotaoPolegar({ polegar, desabilitado }: { polegar: Polegar; desabilitad
       disabled={desabilitado}
       onClick={polegar.votar}
       className={cn(
-        'flex size-11 items-center justify-center rounded-full bg-foreground/8 transition-colors hover:bg-foreground/12 focus-visible:outline-2 disabled:opacity-40',
+        'flex size-11 pressionavel items-center justify-center rounded-full bg-foreground/8 hover:bg-foreground/12 focus-visible:outline-2 disabled:opacity-40',
         polegar.marcado && 'ring-2 ring-current',
       )}
       style={{ color: polegar.cor }}
     >
-      <Icone nome={polegar.icone} preenchido={polegar.marcado} className="text-[21px]" />
+      {/* Ao marcar, o polegar dá um pulo curto (inclinado, como um "curtir"). */}
+      <m.span
+        initial={false}
+        animate={polegar.marcado ? { scale: [1, 1.3, 1], rotate: [0, -12, 0] } : { scale: 1 }}
+        transition={polegar.marcado ? { duration: 0.4, ease: 'easeOut' } : MOLA_RAPIDA}
+        className="flex"
+      >
+        <Icone nome={polegar.icone} preenchido={polegar.marcado} className="text-[21px]" />
+      </m.span>
     </button>
   )
 }

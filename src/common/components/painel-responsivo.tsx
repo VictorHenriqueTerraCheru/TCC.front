@@ -72,7 +72,8 @@ export function PainelResponsivo({
     return (
       <aside
         aria-label={titulo}
-        className="absolute inset-y-0 left-0 z-[1001] flex w-[420px] flex-col border-y-0 border-l-0 shadow-xl vidro"
+        // Entra deslizando da borda do trilho, com a curva de mola dos diálogos.
+        className="absolute inset-y-0 left-0 z-[1001] flex w-[420px] animate-in flex-col border-y-0 border-l-0 shadow-3 vidro duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] fade-in-0 slide-in-from-left-6 motion-reduce:animate-none"
       >
         <div className="flex-1 overflow-y-auto p-4 pt-5">{children}</div>
         <BotaoFechar aoFechar={aoFechar} className="absolute top-4 right-4" />
@@ -133,9 +134,9 @@ function BotaoFechar({ aoFechar, className }: { aoFechar(): void; className: str
       type="button"
       onClick={aoFechar}
       aria-label="Fechar"
-      className={`flex size-10 items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2 ${className}`}
+      className={`flex size-9 pressionavel items-center justify-center rounded-full bg-foreground/6 text-muted-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:outline-2 ${className}`}
     >
-      <Icone nome="close" />
+      <Icone nome="close" className="text-[20px]" />
     </button>
   )
 }

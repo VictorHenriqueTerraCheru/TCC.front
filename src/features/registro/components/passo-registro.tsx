@@ -30,7 +30,7 @@ function Cabecalho({
           type="button"
           onClick={aoTopo}
           aria-label={acaoTopo === 'fechar' ? 'Fechar registro' : 'Voltar'}
-          className="flex size-12 items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+          className="flex size-12 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
           <Icone nome={acaoTopo === 'fechar' ? 'close' : 'arrow_back'} />
         </button>
@@ -68,7 +68,7 @@ export function PassoRegistro({ mapa, rodape, children, ...cabecalho }: PassoReg
   if (desktop) {
     return (
       <div className="grid h-full grid-cols-[420px_1fr]">
-        <section className="flex min-h-0 flex-col bg-card shadow-xl">
+        <section className="flex min-h-0 flex-col bg-card shadow-3">
           <Cabecalho {...cabecalho} />
           <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">{children}</div>
           <div className="p-4">{rodape}</div>

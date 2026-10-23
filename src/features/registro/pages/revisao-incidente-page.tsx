@@ -55,7 +55,7 @@ export function RevisaoIncidentePage() {
       acaoTopo="voltar"
       aoTopo={() => navigate('/registrar/incidente/local')}
       rodape={
-        <Button className="w-full" disabled={registrar.isPending} onClick={enviar}>
+        <Button className="w-full" carregando={registrar.isPending} onClick={enviar}>
           <Icone nome="send" className="text-[18px]" />
           {registrar.isPending ? 'Enviando…' : 'Enviar registro'}
         </Button>

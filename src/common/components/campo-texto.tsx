@@ -1,7 +1,40 @@
-import { useId, useState, type ComponentProps } from 'react'
+import { AnimatePresence, m } from 'motion/react'
+import { useId, useState, type ComponentProps, type ReactNode } from 'react'
 
 import { Icone } from '@/common/components/icone'
+import { SURGIR } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
+
+// Base comum dos campos: superfície preenchida, borda que acende no foco com um halo suave.
+const caixa = cn(
+  'peer w-full rounded-2xl border border-input bg-superficie-2 text-base outline-none',
+  'transition-[border-color,box-shadow,background-color] duration-200 ease-out',
+  'hover:border-muted-foreground/40 focus:border-ring focus:bg-card focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_18%,transparent)]',
+  'aria-invalid:border-destructive aria-invalid:focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--destructive)_18%,transparent)]',
+)
+
+// Rótulo flutuante: pequeno no topo; com o campo vazio, fora de foco e sem placeholder próprio,
+// desce para o meio como se fosse o placeholder.
+const rotuloFlutuante = cn(
+  'pointer-events-none absolute left-4 origin-left text-[11px] font-medium text-muted-foreground',
+  'transition-[top,font-size,color] duration-200 ease-out',
+  'peer-focus:text-primario peer-aria-invalid:text-destructive',
+)
+
+function Descricao({ id, erro, children }: { id: string; erro?: string; children?: ReactNode }) {
+  return (
+    <p
+      id={id}
+      className={cn(
+        'mt-1.5 flex items-start gap-1 px-4 text-xs',
+        erro ? 'text-destructive' : 'text-muted-foreground',
+      )}
+    >
+      {erro && <Icone nome="error" preenchido className="mt-px text-[14px]" />}
+      {children}
+    </p>
+  )
+}
 
 interface CampoTextoProps extends ComponentProps<'input'> {
   rotulo: string
@@ -10,8 +43,16 @@ interface CampoTextoProps extends ComponentProps<'input'> {
   ajuda?: string
 }
 
-/** Campo "outlined" do Material 3, com o rótulo sobre a borda (telas 11, 15, 16). */
-export function CampoTexto({ rotulo, erro, ajuda, className, id, ...props }: CampoTextoProps) {
+/** Campo preenchido com o rótulo flutuante (telas 11, 15, 16). */
+export function CampoTexto({
+  rotulo,
+  erro,
+  ajuda,
+  className,
+  id,
+  placeholder,
+  ...props
+}: CampoTextoProps) {
   const idGerado = useId()
   const idCampo = id ?? idGerado
   const idDescricao = `${idCampo}-descricao`
@@ -24,30 +65,27 @@ export function CampoTexto({ rotulo, erro, ajuda, className, id, ...props }: Cam
           id={idCampo}
           aria-invalid={erro ? true : undefined}
           aria-describedby={descricao ? idDescricao : undefined}
-          className={cn(
-            'h-14 w-full rounded-2xl border border-input bg-superficie-2 px-4 pt-5 pb-1 text-base transition-colors outline-none',
-            'focus:border-ring focus:ring-2 focus:ring-ring/40',
-            erro && 'border-destructive focus:border-destructive focus:ring-destructive/40',
-          )}
+          // O espaço deixa o :placeholder-shown dizer se o campo está vazio.
+          placeholder={placeholder ?? ' '}
+          className={cn(caixa, 'h-14 px-4 pt-5 pb-1')}
           {...props}
         />
         <label
           htmlFor={idCampo}
           className={cn(
-            'pointer-events-none absolute top-2 left-4 text-[11px] font-medium text-muted-foreground',
-            erro && 'text-destructive',
+            rotuloFlutuante,
+            'top-2',
+            !placeholder &&
+              'peer-[:placeholder-shown:not(:focus)]:top-[17px] peer-[:placeholder-shown:not(:focus)]:text-base peer-[:placeholder-shown:not(:focus)]:font-normal',
           )}
         >
           {rotulo}
         </label>
       </div>
       {descricao && (
-        <p
-          id={idDescricao}
-          className={cn('mt-1 px-4 text-xs', erro ? 'text-destructive' : 'text-muted-foreground')}
-        >
+        <Descricao id={idDescricao} erro={erro}>
           {descricao}
-        </p>
+        </Descricao>
       )}
     </div>
   )
@@ -68,9 +106,23 @@ export function CampoSenha(props: Omit<CampoTextoProps, 'type'>) {
         onClick={() => setVisivel((v) => !v)}
         aria-label={visivel ? 'Ocultar senha' : 'Mostrar senha'}
         aria-pressed={visivel}
-        className="absolute top-2 right-2 flex size-10 items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+        className="absolute top-2 right-2 flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
       >
-        <Icone nome={visivel ? 'visibility' : 'visibility_off'} className="text-muted-foreground" />
+        <AnimatePresence mode="popLayout" initial={false}>
+          <m.span
+            key={visivel ? 'visivel' : 'oculto'}
+            initial={{ opacity: 0, scale: 0.7, rotate: -20 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            exit={{ opacity: 0, scale: 0.7, rotate: 20 }}
+            transition={SURGIR}
+            className="flex"
+          >
+            <Icone
+              nome={visivel ? 'visibility' : 'visibility_off'}
+              className="text-muted-foreground"
+            />
+          </m.span>
+        </AnimatePresence>
       </button>
     </div>
   )
@@ -85,7 +137,7 @@ interface CampoAreaTextoProps extends ComponentProps<'textarea'> {
   valorAtual?: string
 }
 
-/** Texto longo "outlined" com contador (telas 8, 11, 13). */
+/** Texto longo com rótulo flutuante e contador (telas 8, 11, 13). */
 export function CampoAreaTexto({
   rotulo,
   erro,
@@ -94,11 +146,13 @@ export function CampoAreaTexto({
   valorAtual = '',
   className,
   id,
+  placeholder,
   ...props
 }: CampoAreaTextoProps) {
   const idGerado = useId()
   const idCampo = id ?? idGerado
   const idDescricao = `${idCampo}-descricao`
+  const pertoDoLimite = maximo !== undefined && valorAtual.length >= maximo * 0.9
   return (
     <div className={className}>
       <div className="relative">
@@ -108,37 +162,35 @@ export function CampoAreaTexto({
           maxLength={maximo}
           aria-invalid={erro ? true : undefined}
           aria-describedby={idDescricao}
-          className={cn(
-            'w-full resize-none rounded-2xl border border-input bg-superficie-2 px-4 pt-7 pb-3 text-base transition-colors outline-none',
-            'focus:border-ring focus:ring-2 focus:ring-ring/40',
-            erro && 'border-destructive focus:border-destructive focus:ring-destructive/40',
-          )}
+          placeholder={placeholder ?? ' '}
+          className={cn(caixa, 'resize-none px-4 pt-7 pb-3')}
           {...props}
         />
         <label
           htmlFor={idCampo}
           className={cn(
-            'pointer-events-none absolute top-2 left-4 text-[11px] font-medium text-muted-foreground',
-            erro && 'text-destructive',
+            rotuloFlutuante,
+            'top-2',
+            !placeholder &&
+              'peer-[:placeholder-shown:not(:focus)]:top-4 peer-[:placeholder-shown:not(:focus)]:text-base peer-[:placeholder-shown:not(:focus)]:font-normal',
           )}
         >
           {rotulo}
         </label>
       </div>
-      <p
-        id={idDescricao}
-        className={cn(
-          'mt-1 flex justify-between gap-4 px-4 text-xs',
-          erro ? 'text-destructive' : 'text-muted-foreground',
-        )}
-      >
-        <span>{erro ?? ajuda}</span>
+      <Descricao id={idDescricao} erro={erro}>
+        <span className="flex-1">{erro ?? ajuda}</span>
         {maximo !== undefined && (
-          <span className="shrink-0 text-muted-foreground">
+          <span
+            className={cn(
+              'shrink-0 tabular-nums transition-colors',
+              pertoDoLimite ? 'font-semibold text-foreground' : 'text-muted-foreground',
+            )}
+          >
             {valorAtual.length}/{maximo}
           </span>
         )}
-      </p>
+      </Descricao>
     </div>
   )
 }
@@ -148,7 +200,7 @@ interface CampoSelecaoProps extends ComponentProps<'select'> {
   erro?: string
 }
 
-/** Seleção nativa "outlined" (tipo de vínculo, tela 11). */
+/** Seleção nativa no mesmo visual dos outros campos (tipo de vínculo, tela 11). */
 export function CampoSelecao({
   rotulo,
   erro,
@@ -159,33 +211,32 @@ export function CampoSelecao({
 }: CampoSelecaoProps) {
   const idGerado = useId()
   const idCampo = id ?? idGerado
+  const idDescricao = `${idCampo}-descricao`
   return (
     <div className={className}>
       <div className="relative">
         <select
           id={idCampo}
           aria-invalid={erro ? true : undefined}
-          className={cn(
-            'h-14 w-full appearance-none rounded-md border border-input bg-background pr-12 pl-4 text-base outline-none',
-            'focus:border-2 focus:border-primario focus:pl-[15px]',
-            erro && 'border-destructive',
-          )}
+          aria-describedby={erro ? idDescricao : undefined}
+          className={cn(caixa, 'h-14 appearance-none pt-5 pr-12 pb-1 pl-4')}
           {...props}
         >
           {children}
         </select>
-        <label
-          htmlFor={idCampo}
-          className="pointer-events-none absolute -top-2 left-3 bg-background px-1 text-xs text-muted-foreground"
-        >
+        <label htmlFor={idCampo} className={cn(rotuloFlutuante, 'top-2')}>
           {rotulo}
         </label>
         <Icone
-          nome="arrow_drop_down"
-          className="pointer-events-none absolute top-4 right-3 text-muted-foreground"
+          nome="keyboard_arrow_down"
+          className="pointer-events-none absolute top-4 right-4 text-muted-foreground transition-transform peer-focus:rotate-180"
         />
       </div>
-      {erro && <p className="mt-1 px-4 text-xs text-destructive">{erro}</p>}
+      {erro && (
+        <Descricao id={idDescricao} erro={erro}>
+          {erro}
+        </Descricao>
+      )}
     </div>
   )
 }

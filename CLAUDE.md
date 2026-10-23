@@ -22,6 +22,7 @@ Se a implementação exigir mudar o contrato da API, **pare e pergunte**.
 - Cliente HTTP tipado: **openapi-typescript** (gera `src/infrastructure/api/schema.d.ts` a partir de `docs/openapi.json` ou da API rodando em `http://localhost:5080/openapi/v1.json`) + **openapi-fetch**, com middleware de JWT e conversão do ProblemDetails em `ApiError { type, status, title, errors }`. Não escreva tipos da API à mão: os schemas têm nomes estáveis (`ObterDetalheProblemaResponse`, `PaginadoListarProblemasRecentesItem`, `RegistrarProblemaRequest`…), enums como uniões de string e campos anuláveis como `T | null`.
 - Formulários: **React Hook Form + Zod**
 - UI: **Tailwind CSS v4** + **shadcn/ui** (Radix). Folha inferior no mobile: **vaul** (Drawer com _snap points_). Painel lateral no desktop: `Sheet` do shadcn ou um painel fixo.
+- Movimento: **Motion** (`motion`, antigo Framer Motion), sutil no estilo do iOS. Ver "Movimento" abaixo.
 - Ícones: **Material Symbols Rounded** (pacote `material-symbols`), os mesmos do protótipo. Fonte: Inter (`@fontsource-variable/inter`).
 - Mapa: **MapLibre GL** (`maplibre-gl`) + **`@vis.gl/react-maplibre`** (o react-map-gl só para MapLibre), mapa vetorial com tiles do **OpenFreeMap** (gratuito, sem chave, dados do OpenStreetMap) e atribuição visível. Estilos versionados em `src/assets/mapa/estilo-claro.json` e `estilo-escuro.json` (`npm run gen:estilo-mapa`); o `MapaVetorial` troca conforme o tema. Mapa de calor: camada `heatmap` nativa. Marcadores: `<Marker>` com o componente React como filho.
 - Datas: **date-fns** com `ptBR` ("há 2 dias", "ontem, 19:40")
@@ -98,6 +99,18 @@ Nomes de arquivo em kebab-case (`categoria-icone.tsx`); componentes e hooks em p
 - Clique no marcador: `e.originalEvent.stopPropagation()` no `onClick` do `<Marker>`, senão o `click` do mapa também dispara e abre a área de incidentes (regra 7).
 - A página do mapa usa `isolate`: os controles sobre o mapa (`z-[1000]`) ficam presos nela e não cobrem `Dialog`/Drawer (`z-50`).
 - Testes: o jsdom não tem WebGL. O `src/test/setup.ts` troca `@vis.gl/react-maplibre` por `src/test/maplibre-falso.tsx`, que imita `<Map>` (ref, `useMap`, eventos), `<Marker>`, `<Source>` (`data-testid="fonte-{id}"`) e `<Layer>` (`camada-{id}`). Os testes mexem no mapa com `mapaFalso.tocar()` e `mapaFalso.mover()`. A renderização real é conferida no `npm run prints`.
+
+### Movimento
+
+- `ProvedorMovimento` (`common/components/provedor-movimento.tsx`, nos `Providers` e nos helpers de render dos testes): `LazyMotion strict` + `MotionConfig reducedMotion="user"`. Use sempre `m.div`/`m.span` (o `strict` barra `motion.*`). Os recursos (`domMax`, por causa do `layoutId`) vêm num chunk à parte (`common/lib/recursos-movimento.ts`).
+- Molas e durações em `common/lib/movimento.ts` (`MOLA_SUAVE`, `MOLA_RAPIDA`, `SURGIR`, `ATRASO_LISTA`); não invente valores no componente.
+- Toque: utilitário CSS `pressionavel` (encolhe para 97 % no `:active`, desligado com movimento reduzido); funciona com `asChild`, `NavLink` e botões crus. Linhas de lista dentro de um cartão não encolhem, só realçam.
+- Indicador que desliza (`Segmentado`, abas da barra e do trilho, seletores de tema e horário): `m.span` com `layoutId` vindo de `useId()`, para duas instâncias não trocarem pílulas.
+- Sombras em camadas: `shadow-1` (cartão), `shadow-2` (flutuante), `shadow-3` (modal/painel), tokens `--sombra-*` nos dois temas. Não use `shadow-sm/md/lg`.
+- Botões cheios: gradiente que só escurece a base (`to-black/12`) e realce de 1 px no topo; nunca clareie o fundo do `--primary`, senão o texto branco sai do AA. `Button` aceita `carregando` (indicador + `aria-busy` + desabilitado).
+- Números: `NumeroAnimado` conta até o valor novo (confiança); `NumeroComPulso` troca na hora e pulsa (votos, que precisam aparecer no mesmo instante do toque).
+- Testes: o `setup.ts` liga `MotionGlobalConfig.skipAnimations` (sem isso o `AnimatePresence` segura elementos na saída) e um `ResizeObserver` vazio (o Checkbox do Radix o usa).
+- Referências de componentes: Animate UI (`animate-ui.com/r/<nome>.json`) e beUI. Leia o JSON do registry e reescreva no nosso padrão (`cn`, `<Icone>`, tokens, PT-BR); não use `shadcn add` direto deles.
 
 ### CSS dos ícones
 
