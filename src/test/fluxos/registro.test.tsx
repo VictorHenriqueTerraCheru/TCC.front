@@ -11,7 +11,7 @@ import { server } from '@/infrastructure/mocks/server'
 import { definirLargura, renderizarRotas } from '@/test/render'
 import { entrarComoCidadao, sair } from '@/test/sessao'
 
-// O mapa do jsdom não tem tamanho nem GPS: o centro fica em Botafogo (-22.9519, -43.1866),
+// O mapa do jsdom não tem tamanho nem GPS: o centro fica em Icaraí (-22.905, -43.109),
 // exatamente onde a fixture tem um "Buraco na via" — o caso da duplicata.
 function abrir(caminho = '/registrar') {
   definirLargura(390)

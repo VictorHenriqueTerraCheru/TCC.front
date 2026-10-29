@@ -99,7 +99,7 @@ export function MapaPage() {
     retangulo && camadas.calor ? { ...retangulo, ...camadas.calor, dias: 7 } : null,
   )
 
-  // Centro inicial: a posição já conhecida ou Botafogo. Depois, centraliza uma vez quando a
+  // Centro inicial: a posição já conhecida ou Icaraí. Depois, centraliza uma vez quando a
   // primeira posição chegar (permissão já concedida em visita anterior).
   const [centroInicial] = useState<[number, number]>(() =>
     localizacao.posicao ? [localizacao.posicao.lat, localizacao.posicao.lng] : CENTRO_PADRAO,

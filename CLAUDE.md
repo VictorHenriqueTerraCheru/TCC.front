@@ -44,7 +44,7 @@ src/
   infrastructure/         # ≈ Infrastructure/ do back
     api/                  # schema.d.ts (gerado), client.ts (openapi-fetch + JWT + dados()), api-error.ts, autenticacao.ts
     query/                # QueryClient
-    mocks/                # MSW: handlers/<area>.ts (um por module do back) + fixtures/ (Botafogo/Niterói)
+    mocks/                # MSW: handlers/<area>.ts (um por module do back) + fixtures/ (Icaraí, Niterói)
     env.ts
   common/                 # ≈ Common/ do back: ui/ (shadcn), components/ (Icone, Pagina…), hooks/, lib/
   features/<area>/        # ≈ Feature/<Area>/ do back
