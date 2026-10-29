@@ -43,3 +43,9 @@
 - Busca obrigatória de valores antigos: as ocorrências restantes são as chaves de query de rota do app `nova` (Task 5), textos visíveis `voto`/`votos`, e o mapeamento temporário de cores inglesas do contrato para tokens CSS portugueses (Task 4). Dados de grupos, endereços, nomes e credenciais de fixture foram mantidos em português.
 - Gate: `npm run typecheck` passou; `npm run lint` passou; `npm run format:check` passou; `npm test -- --reporter=dot --silent` passou com `Tests 340 passed`; `node scripts/ui-strings.mjs --check` passou; `node scripts/compare-prints.mjs` passou, sem `prints-diff/`.
 - Pendências: nenhuma.
+
+## Task 4 — Identificadores, arquivos e pastas
+
+- Criado `scripts/inventory.mjs` com `ts-morph`. Ele coleta declarações, títulos de `describe`/`it`/`test` e caminhos de `src/` e `scripts/`, e gera `mapa-identificadores-front.tsv` a partir do dicionário do plano.
+- Decisão: o arquivo versionado neste commit é o inventário inicial, não a aplicação do mapa — a primeira tentativa semântica revelou que uma tradução palavra a palavra confunde propriedades de bibliotecas/contrato com identificadores próprios. Custo se estiver errado: a Task 4 leva mais tempo porque a lista precisa de revisão explícita por símbolo, mas evita quebrar serialização, props externas ou dados em português.
+- Pendências: revisão explícita do mapa antes de sua aplicação semântica, movimentação de arquivos/pastas, tradução dos títulos de teste e migração AST/PostCSS de CSS nesta task.
