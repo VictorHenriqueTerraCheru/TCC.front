@@ -21,10 +21,8 @@ const enderecos = [
 
 const horasAtras = (horas: number) => new Date(Date.now() - horas * 3_600_000).toISOString()
 
-/** Problema registrado pelo próprio usuário logado no mock (para o estado souAutor). */
 export const ID_DO_AUTOR = problemasNaArea[8]!.id
 
-/** Detalhes coerentes com os marcadores; os três primeiros de cada status imitam as telas 3, 22 e 23. */
 export function criarDetalhes(): Map<string, Detalhe> {
   return new Map(
     problemasNaArea.map((p, i) => {

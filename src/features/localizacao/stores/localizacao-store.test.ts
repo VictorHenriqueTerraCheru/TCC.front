@@ -27,7 +27,6 @@ function instalarNavegador(estadoPermissao: PermissionState | null) {
   vi.stubGlobal('isSecureContext', true)
   vi.stubGlobal('navigator', { ...navigator, geolocation, permissions })
   return Object.assign(geolocation, {
-    /** Simula o navegador mudando a permissão (evento `change` do PermissionStatus). */
     mudarPermissao(estado: PermissionState) {
       status.state = estado
       for (const [, ouvinte] of status.addEventListener.mock.calls) ouvinte()
@@ -95,7 +94,6 @@ describe('localizacao-store', () => {
     limpar = iniciarMonitoramento()
 
     await vi.waitFor(() => expect(geo.getCurrentPosition).toHaveBeenCalledOnce())
-    // Enquanto o navegador responde, o banner de "Localização desativada" não aparece.
     expect(useLocalizacaoStore.getState().estado).toBe('verificando')
 
     geo.getCurrentPosition.mock.calls[0]![0](posicao)
@@ -115,8 +113,6 @@ describe('localizacao-store', () => {
 
     expect(geo.getCurrentPosition).toHaveBeenCalledOnce()
     expect(useLocalizacaoStore.getState().estado).not.toBe('prompt')
-    // O acompanhamento antigo para antes do pedido: um PERMISSION_DENIED dele não pode marcar
-    // denied (e apagar a concessão) enquanto o pedido novo está em andamento.
     expect(geo.clearWatch).toHaveBeenCalledWith(1)
     expect(geo.clearWatch.mock.invocationCallOrder[0]).toBeLessThan(
       geo.getCurrentPosition.mock.invocationCallOrder[0]!,

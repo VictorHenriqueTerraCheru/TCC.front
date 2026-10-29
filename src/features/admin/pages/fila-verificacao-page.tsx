@@ -43,14 +43,12 @@ function Fila({ status }: { status: StatusVerificacao }) {
   )
 }
 
-/** Contagem da aba "Pendentes · 4". */
 function TotalPendentes() {
   const { data } = useFila('pendente')
   const total = data?.pages[0]?.total
   return total !== undefined ? <> · {total}</> : null
 }
 
-/** Tela 13: só para administrador (perfil atual de GET /me, regra 14). */
 export function FilaVerificacaoPage() {
   const [aba, setAba] = useState<StatusVerificacao>('pendente')
 

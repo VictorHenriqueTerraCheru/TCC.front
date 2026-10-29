@@ -12,7 +12,6 @@ interface SegmentadoProps<T extends string> {
   className?: string
 }
 
-/** Controle segmentado de vidro (seletor de modo do mapa, abas do histórico); a pílula desliza. */
 export function Segmentado<T extends string>({
   rotulo,
   opcoes,
@@ -20,7 +19,6 @@ export function Segmentado<T extends string>({
   aoMudar,
   className,
 }: SegmentadoProps<T>) {
-  // Um layoutId por instância: dois segmentados na mesma tela não trocam pílulas entre si.
   const idPilula = useId()
   return (
     <div

@@ -92,13 +92,11 @@ function Cartao({ item }: { item: ItemRecente }) {
   )
 }
 
-/** Tela 9: problemas não resolvidos num raio de 10 km, mais recentes primeiro. */
 export function RecentesPage() {
   const { estado, posicao } = useLocalizacao()
   const { grupos: todos, carregado } = useAparencia()
   const gruposQuery = useGrupos()
   const [escolhidos, setGrupos] = useState<string[]>([])
-  // Grupo apagado pelo admin enquanto a tela está aberta sai da seleção (e do filtro enviado).
   const grupos = carregado ? escolhidos.filter((g) => todos.some((t) => t.chave === g)) : escolhidos
   const centro =
     estado === 'granted' && posicao ? posicao : { lat: CENTRO_PADRAO[0], lng: CENTRO_PADRAO[1] }
@@ -110,7 +108,6 @@ export function RecentesPage() {
       grupos.includes(grupo) ? grupos.filter((g) => g !== grupo) : [...grupos, grupo],
     )
 
-  // Sem os grupos a lista sairia sem filtros e sem aviso: melhor o erro, com a nova tentativa.
   if (gruposQuery.isError) {
     return (
       <Pagina titulo="Recentes">

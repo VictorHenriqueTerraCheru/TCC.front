@@ -6,7 +6,6 @@ import type { FiltroHistorico } from '../models/historico'
 
 const TAMANHO_PAGINA = 20
 
-// GET /me/historico — mais recentes primeiro, paginado.
 export function historicoQuery(filtro: FiltroHistorico) {
   return infiniteQueryOptions({
     queryKey: ['me', 'historico', filtro],
@@ -27,7 +26,6 @@ export function useHistorico(filtro: FiltroHistorico) {
   return useInfiniteQuery(historicoQuery(filtro))
 }
 
-/** Os 3 últimos itens, para o perfil (tela 10). */
 export function useHistoricoResumo() {
   return useQuery({
     queryKey: ['me', 'historico', 'resumo'],

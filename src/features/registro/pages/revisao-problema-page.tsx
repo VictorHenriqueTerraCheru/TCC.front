@@ -23,7 +23,6 @@ import { caminhoDaCategoria } from '../models/rotas'
 
 const LIMITE_DESCRICAO = 280
 
-/** Tela 8: passo 4 — descrição opcional, resumo e envio. */
 export function RevisaoProblemaPage() {
   const navigate = useNavigate()
   const idDescricao = useId()
@@ -33,7 +32,6 @@ export function RevisaoProblemaPage() {
   useExigirCategoria('problema')
   useExigirPasso(local !== null, '/registrar/local')
 
-  // Sucesso: a tela de sucesso recebe o problema criado (e limpa o rascunho ao abrir).
   const envio = useEnvio(registrar.mutateAsync, (problema) => {
     navigate('/registrar/sucesso', { replace: true, state: { problema } })
   })

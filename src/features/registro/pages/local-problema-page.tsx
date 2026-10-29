@@ -14,7 +14,6 @@ import { useExigirCategoria, useRascunho } from '../hooks/use-rascunho'
 import { useRetomarRegistro } from '../hooks/use-retomar-registro'
 import { caminhoDaCategoria } from '../models/rotas'
 
-/** Tela 6: passo 2 — pino fixo no centro, mapa que se move. */
 export function LocalProblemaPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -31,14 +30,12 @@ export function LocalProblemaPage() {
       navigate(duplicatas.length > 0 ? '/registrar/conferencia' : '/registrar/revisao')
     } catch (erro) {
       if (isApiError(erro) && erro.status === 401) {
-        // Sessão expirou: login e, de volta aqui, a conferência roda de novo (não é pulada).
         exigirConta('registrar', () => {}, {
           retorno: '/registrar/local',
           pendente: { tipo: 'continuarRegistro', passo: 'conferir' },
         })
         return
       }
-      // A conferência é um aviso: se falhar por outro motivo, o registro segue.
       navigate('/registrar/revisao')
     } finally {
       setConferindo(false)

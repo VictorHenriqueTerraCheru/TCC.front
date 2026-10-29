@@ -3,7 +3,6 @@ import type { ComponentProps } from 'react'
 
 import { ATRASO_LISTA, SURGIR } from '@/common/lib/movimento'
 
-/** Item de lista que sobe e aparece em sequência na primeira carga (o atraso para no 8º item). */
 export function ItemAnimado({
   indice,
   ...props

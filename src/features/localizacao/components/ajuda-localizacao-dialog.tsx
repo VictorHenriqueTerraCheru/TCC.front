@@ -16,10 +16,6 @@ interface AjudaLocalizacaoDialogProps {
   estado: EstadoLocalizacao
 }
 
-/**
- * "Como liberar a localização": o navegador não reabre o pedido depois de negado (regra 2),
- * então o caminho é a permissão do site na barra de endereço.
- */
 export function AjudaLocalizacaoDialog({
   aberto,
   aoMudarAberto,

@@ -5,7 +5,6 @@ import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 
 interface BotaoVotoProps extends Omit<ComponentProps<typeof Button>, 'variant'> {
-  /** Voto atual do usuário (meusVotos): fica cheio e com check. */
   selecionado: boolean
   variante: 'tonal' | 'outline' | 'default'
 }

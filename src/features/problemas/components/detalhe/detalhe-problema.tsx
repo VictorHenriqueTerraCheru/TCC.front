@@ -50,7 +50,6 @@ function ChipStatus({ status }: { status: StatusProblema }) {
   )
 }
 
-/** O endereço fica no resumo, que continua à vista com a folha aberta. */
 function Informacoes({ problema }: { problema: Detalhe }) {
   return (
     <div className="mb-4 space-y-3 text-sm">
@@ -71,10 +70,7 @@ function legendaConfianca({ votos: { sim, nao } }: Detalhe) {
   return `Calculada com ${votos} ${votos === 1 ? 'voto' : 'votos'}, ponderados por proximidade e histórico de quem votou.`
 }
 
-/** Corpo por status: Ativa (tela 3), Nova (22), Possivelmente resolvida (23) e Resolvida. */
 function Corpo({ problema }: { problema: Detalhe }) {
-  // Resolvida sai do mapa, mas o detalhe ainda abre por link salvo ou logo após o voto que a
-  // resolveu. A API recusa votos nesse estado (problema-resolvido): só leitura.
   if (problema.status === 'resolvida') {
     const { nao: resolvido } = problema.votos
     return (
@@ -171,10 +167,8 @@ export function DetalheProblema({ id }: { id: string }) {
 
   return (
     <article className="space-y-4">
-      {/* No celular, a folha abre só com o resumo; arrastar mostra o resto. */}
       <ResumoAlerta problema={problema} />
-      {/* Recolhida, a folha para um pouco abaixo do resumo (área segura): o resto só aparece
-          ao abrir, para não espiar cortado na borda. */}
+
       <div className={cn('space-y-4 transition-opacity duration-300', recolhido && 'opacity-0')}>
         <Informacoes problema={problema} />
         <Corpo problema={problema} />

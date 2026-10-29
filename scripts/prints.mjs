@@ -1,16 +1,3 @@
-// Prints do app para a Seção 5.3.3 do TCC (Playwright; não é suíte de testes).
-//
-//   npm run prints                                  → sobe o Vite com a API falsa (MSW) e captura
-//   PRINTS_URL=https://app.exemplo npm run prints   → captura o ambiente publicado
-//
-// Variáveis opcionais:
-//   PRINTS_API        base da API vista pelo navegador (padrão: /api/v1 na mesma origem;
-//                     no ambiente publicado, o mesmo valor do VITE_API_URL)
-//   PRINTS_SENHA      senha dos usuários do seed (padrão: tcc12345)
-//   PRINTS_NAVEGADOR  canal do Playwright (padrão: chrome, o Google Chrome instalado;
-//                     use "chromium" depois de `npx playwright install chromium`)
-//
-// Saída: prints/claro/ e prints/escuro/ (fora do git), uma volta por tema. Usa só os usuários e dados do seed, sem dados pessoais reais.
 import { spawn } from 'node:child_process'
 import { mkdir } from 'node:fs/promises'
 import { setTimeout as esperar } from 'node:timers/promises'
@@ -21,7 +8,6 @@ const SAIDA = 'prints'
 const API = process.env.PRINTS_API ?? '/api/v1'
 const SENHA = process.env.PRINTS_SENHA ?? 'tcc12345'
 const NAVEGADOR = process.env.PRINTS_NAVEGADOR ?? 'chrome'
-// Icaraí (CENTRO_PADRAO do app); o usuário fica ~130 m ao sul para aparecer "você está a X m".
 const CENTRO = { lat: -22.905, lng: -43.109 }
 const POSICAO = { latitude: -22.9062, longitude: -43.1086, accuracy: 15 }
 const CELULAR = { width: 390, height: 844 }
@@ -54,7 +40,6 @@ try {
   servidor?.parar()
 }
 
-/** As telas do TCC num tema; os arquivos vão para prints/<tema>/. */
 async function capturarTudo(dados, tema) {
   const capturar = (nome, rota, opcoes = {}) =>
     capturarTela(`${tema}/${nome}`, rota, { ...opcoes, tema })
@@ -65,12 +50,10 @@ async function capturarTudo(dados, tema) {
     '04-area-incidentes',
     `/mapa/area?modo=ambos&lat=${dados.calor.lat}&lng=${dados.calor.lng}`,
   )
-  // Registro: o rascunho (sessionStorage) já vem preenchido, como se o usuário tivesse feito os passos.
   await capturar('05-registro-duplicata', '/registrar/conferencia', {
     usuario: 'cidadao1',
     rascunho: {
       categoriaId: dados.alta.categoriaId,
-      // ~15 m do problema existente da mesma categoria: cai no raio de duplicatas (50 m).
       local: { lat: dados.alta.lat + 0.0001, lng: dados.alta.lng + 0.0001 },
     },
   })
@@ -92,12 +75,10 @@ async function capturarTudo(dados, tema) {
   })
 }
 
-/** Primeira abertura (escolha do tema), fora das voltas por tema. */
 function capturar(nome, rota, opcoes) {
   return capturarTela(nome, rota, opcoes)
 }
 
-/** Abre uma rota com sessão, posição, rascunho e tema prontos e salva o print. */
 async function capturarTela(
   nome,
   rota,
@@ -218,7 +199,6 @@ async function novoContexto(tela) {
   return contexto
 }
 
-/** Login pela página (a API falsa só existe dentro do navegador, no service worker do MSW). */
 async function entrar(contexto, usuario) {
   const pagina = await abrirApp(contexto)
   const resposta = await chamarApi(pagina, '/auth/login', {
@@ -231,7 +211,6 @@ async function entrar(contexto, usuario) {
   return { token, expiraEm, usuario: dados }
 }
 
-/** Escolhe os problemas, a categoria de incidente e a área mais quente a partir dos dados da API. */
 async function descobrirDados() {
   const contexto = await novoContexto(CELULAR)
   const pagina = await abrirApp(contexto)
@@ -258,10 +237,6 @@ async function descobrirDados() {
   return { alta, nova, calor, incidente }
 }
 
-/**
- * Abre o app e espera ele renderizar. No modo com mocks o main.tsx só renderiza depois de o MSW
- * subir; antes disso, um fetch passaria direto para o proxy do Vite (API real).
- */
 async function abrirApp(contexto) {
   const pagina = await contexto.newPage()
   await pagina.goto(BASE + '/login')
@@ -281,7 +256,6 @@ async function chamarApi(pagina, caminho, init) {
   return JSON.parse(corpo)
 }
 
-/** Vite em outra porta, com VITE_USE_MOCKS=true, para não depender da API nem do banco local. */
 async function subirViteComMocks() {
   const porta = 5199
   const processo = spawn(

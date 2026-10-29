@@ -8,16 +8,11 @@ function lerModo(valor: string | null): ModoMapa {
   return valor === 'incidentes' || valor === 'ambos' ? valor : 'problemas'
 }
 
-/** Modo e chips ficam na URL (`/mapa?modo=ambos&grupos=eletrica&nova=1`), como em docs/TELAS.md. */
 export function useFiltrosMapa() {
   const [params, setParams] = useSearchParams()
   const { grupos: todos, carregado } = useAparencia()
 
   const modo = lerModo(params.get('modo'))
-  // Link com chip de outro modo (`?grupos=seguranca` sem modo): ignorado. Sem isso, as duas
-  // camadas desligariam e o mapa ficaria vazio sem nenhum chip marcado para desfazer.
-  // Também descarta chave de grupo que não existe (mais). Com os grupos ainda carregando não dá
-  // para saber: a lista da URL passa como está (e sobrevive a um gravar() nesse intervalo).
   const disponiveis = gruposDoModo(todos, modo).map((g) => g.chave)
   const filtros: FiltrosMapa = {
     modo,
@@ -46,8 +41,6 @@ export function useFiltrosMapa() {
   return {
     ...filtros,
     alterarModo(modo: ModoMapa) {
-      // Chips que não existem no novo modo saem do filtro, mas só com os grupos carregados: antes disso
-      // não dá para saber quais existem, e a lista da URL (deep link) é mantida.
       const disponiveis = gruposDoModo(todos, modo).map((g) => g.chave)
       gravar({
         modo,

@@ -8,12 +8,10 @@ interface FolhaResponsivaProps {
   aberto: boolean
   aoMudarAberto(aberto: boolean): void
   titulo: string
-  /** Ilustração acima do título (ícone no círculo, como nas telas 14 e 27). */
   icone?: ReactNode
   children: ReactNode
 }
 
-/** Folha modal (telas 14 e 27): Drawer no celular, Dialog centralizado no desktop. Foco preso nos dois. */
 export function FolhaResponsiva({
   aberto,
   aoMudarAberto,

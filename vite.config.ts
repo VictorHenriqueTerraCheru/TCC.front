@@ -8,7 +8,6 @@ import { defineConfig } from 'vite'
 import pacote from './package.json' with { type: 'json' }
 
 export default defineConfig(({ command }) => ({
-  // msw/vite só serve o mockServiceWorker.js em dev (VITE_USE_MOCKS=true); o build não leva o worker.
   plugins: [react(), tailwindcss(), command === 'serve' && msw({ mode: 'worker-only' })],
   define: { __VERSAO_APP__: JSON.stringify(pacote.version) },
   resolve: {
@@ -17,7 +16,6 @@ export default defineConfig(({ command }) => ({
   server: {
     port: 5173,
     strictPort: true,
-    // Front e API na mesma origem em dev: sem CORS e o túnel HTTPS do celular expõe só esta porta.
     proxy: {
       '/api': 'http://localhost:5080',
     },

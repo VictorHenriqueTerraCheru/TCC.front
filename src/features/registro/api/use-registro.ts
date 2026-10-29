@@ -4,10 +4,8 @@ import { api, dados } from '@/infrastructure/api'
 
 import type { Ponto } from '../stores/rascunho-store'
 
-/** Sem resposta em 20 s, o envio vira falha de rede (tela 26) e o rascunho continua. */
 const TEMPO_LIMITE_ENVIO_MS = 20_000
 
-// GET /problemas/duplicatas — mesma categoria, não resolvidos, até 50 m.
 export function duplicatasQuery(categoriaId: number, { lat, lng }: Ponto) {
   return queryOptions({
     queryKey: ['problemas', 'duplicatas', { categoriaId, lat, lng }],
@@ -24,7 +22,6 @@ interface NovoProblema extends Ponto {
   descricao: string
 }
 
-// POST /problemas — o endereço é obtido pela API (não vai no corpo).
 export function useRegistrarProblema() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -47,7 +44,6 @@ interface NovoIncidente extends Ponto {
   ocorridoEm: Date
 }
 
-// POST /incidentes — devolve o resumo da área (GET /incidentes/area do ponto arredondado).
 export function useRegistrarIncidente() {
   const queryClient = useQueryClient()
   return useMutation({

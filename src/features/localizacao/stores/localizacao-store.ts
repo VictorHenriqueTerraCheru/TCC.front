@@ -1,18 +1,10 @@
 import { create } from 'zustand'
 
-/**
- * Estado da permissão de localização do navegador.
- * - verificando: consultando a Permissions API na abertura;
- * - prompt: ainda não perguntado (ou o navegador não informa);
- * - granted / denied: resposta do usuário (o navegador não reabre o pedido depois de negado);
- * - indisponivel: sem Geolocation API ou fora de contexto seguro (HTTPS).
- */
 export type EstadoLocalizacao = 'verificando' | 'prompt' | 'granted' | 'denied' | 'indisponivel'
 
 export interface Posicao {
   lat: number
   lng: number
-  /** Raio de incerteza em metros (coords.accuracy). */
   precisao: number
 }
 
@@ -21,7 +13,6 @@ interface LocalizacaoState {
   posicao: Posicao | null
 }
 
-// Nunca logue a posição (regra 11).
 export const useLocalizacaoStore = create<LocalizacaoState>()(() => ({
   estado: 'verificando',
   posicao: null,
@@ -56,9 +47,6 @@ function pararDeAcompanhar() {
   idMonitoramento = null
 }
 
-// O iOS esquece a permissão (Safari com "Perguntar", sobretudo o app na tela inicial): na volta a
-// Permissions API diz 'prompt' mesmo para quem já liberou. Guardamos que liberou para, na
-// abertura, pedir de novo sozinho em vez de mostrar "Localização desativada".
 const CHAVE_CONCEDIDA = 'ocorrencias.localizacaoConcedida'
 
 function concedeuAntes(): boolean {
@@ -74,7 +62,7 @@ function lembrarConcessao(concedida: boolean) {
     if (concedida) localStorage.setItem(CHAVE_CONCEDIDA, '1')
     else localStorage.removeItem(CHAVE_CONCEDIDA)
   } catch {
-    // Sem storage: na próxima visita o banner pede o "Ativar" de novo.
+    void 0
   }
 }
 
@@ -90,10 +78,6 @@ function aplicarEstado(estado: EstadoLocalizacao) {
   }
 }
 
-/**
- * Lê a permissão sem disparar o pedido do navegador e, se já liberada, acompanha a posição.
- * Chamado uma vez pelo layout do app; devolve a limpeza.
- */
 export function iniciarMonitoramento(): () => void {
   if (!disponivel()) {
     aplicarEstado('indisponivel')
@@ -102,13 +86,8 @@ export function iniciarMonitoramento(): () => void {
 
   let status: PermissionStatus | null = null
   let cancelado = false
-  // 'prompt' de quem já liberou: pede de novo (fica em 'verificando' até o navegador responder).
-  // Vale na abertura e no evento `change`: com o app aberto em segundo plano, o iOS também pode
-  // voltar a permissão para 'prompt'.
   const aplicarPermissao = (estado: PermissionState) => {
     if (estado !== 'prompt' || !concedeuAntes()) return aplicarEstado(estado)
-    // O acompanhamento de quando estava liberada para antes: um PERMISSION_DENIED dele marcaria
-    // denied (e apagaria a concessão) no meio do pedido novo. O sucesso o liga de novo.
     pararDeAcompanhar()
     useLocalizacaoStore.setState({ estado: 'verificando' })
     void solicitarLocalizacao().then((posicao) => {
@@ -139,7 +118,6 @@ export function iniciarMonitoramento(): () => void {
   }
 }
 
-/** Dispara o pedido do navegador (só faz sentido em 'prompt'). Resolve com a posição ou null. */
 export function solicitarLocalizacao(): Promise<Posicao | null> {
   if (!disponivel()) return Promise.resolve(null)
   return new Promise((resolve) => {

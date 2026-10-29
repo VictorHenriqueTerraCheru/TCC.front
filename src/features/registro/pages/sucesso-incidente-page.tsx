@@ -4,10 +4,8 @@ import type { AreaIncidentesDados } from '@/features/incidentes'
 
 import { TelaSucesso } from './sucesso-page'
 
-// Rótulo no plural por categoria de incidente (seed fixo).
 const plural: Record<number, string> = { 7: 'Roubos', 8: 'Acidentes' }
 
-/** Tela 21c: o relato entra no calor da área (resumo da resposta do POST). */
 export function SucessoIncidentePage() {
   const { state } = useLocation()
   const { area, categoriaId, rotuloArea, bairro, ponto } = (state ?? {}) as {

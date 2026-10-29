@@ -16,7 +16,6 @@ const tamanhos = {
   lg: 'size-12 text-[26px]',
 }
 
-/** Ícone circular da categoria: fundo claro + ícone na cor forte do grupo. */
 export function CategoriaIcone({ categoria, tamanho = 'md', className }: CategoriaIconeProps) {
   const { aparenciaDe } = useAparencia()
   const aparencia = aparenciaDe(categoria)

@@ -18,7 +18,6 @@ import { ALTURA_RESUMO, ResumoAlerta } from './resumo-alerta'
 const ATIVA = criarDetalhes().get(problemasNaArea[0]!.id)!
 const NOVA = criarDetalhes().get(problemasNaArea[10]!.id)!
 
-/** Por padrão, na folha recolhida do celular: é só nela que o card tem os polegares. */
 function renderizar(problema: DetalheProblema, { recolhido = true } = {}) {
   definirLargura(390)
   return renderizarRotas([

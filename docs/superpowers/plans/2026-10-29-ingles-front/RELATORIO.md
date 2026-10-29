@@ -19,3 +19,14 @@
 - `node scripts/compare-prints.mjs --baseline` e duas comparações independentes sem alteração de fonte passaram com zero pixels diferentes.
 - Gate: `npm run typecheck` passou; `npm run lint` passou; `npm run format:check` passou; `npm test` passou com `Tests 340 passed`; `node scripts/ui-strings.mjs --check` passou; `node scripts/compare-prints.mjs` passou.
 - Pendências: nenhuma.
+
+## Task 2 — Remover comentários
+
+- Adicionado `scripts/strip-comments.mjs`, com scanner do TypeScript e faixas de literais da AST para não confundir `//` em URL, regex ou template com comentário; a remoção de CSS usa PostCSS.
+- Adicionada a devDependency direta `postcss@8.5.6` para a remoção sintática de comentários CSS.
+- Removidos comentários de `src/`, `scripts/`, `eslint.config.js`, `vite.config.ts`, `index.html`, `Dockerfile` e `Caddyfile`; as três diretivas funcionais preservadas são `/// <reference types="vite/client" />`, `/// <reference types="vitest/config" />` e o `eslint-disable` do falso MapLibre.
+- Decisão: preservei o comentário em `src/assets/material-symbols/rounded.css` — a regra 8 proíbe mexer em `src/assets/`, que contém fonte gerada. Custo se estiver errado: permanece um comentário em artefato gerado, mas a árvore de código e CSS editável fica sem comentários.
+- Decisão: substituí cinco `catch` deliberadamente vazios por `void 0` — eles continham somente comentários e o ESLint proíbe bloco vazio. Custo se estiver errado: nenhum efeito observável; `void 0` é um no-op explícito.
+- Verificação extra: `npx tsc --noEmit -p tsconfig.app.json` passou; a busca por `//`, `/*`, `<!--` e `#` só encontrou URLs, regex, seletores, globs, a diretiva `eslint-disable` e as duas diretivas `reference` permitidas.
+- Gate: `npm run typecheck` passou; `npm run lint` passou; `npm run format:check` passou; `npm test` passou com `Tests 340 passed`; `node scripts/ui-strings.mjs --check` passou; `node scripts/compare-prints.mjs` passou.
+- Pendências: nenhuma.

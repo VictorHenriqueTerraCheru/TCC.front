@@ -5,26 +5,18 @@ import { banco, metrosEntre } from '../banco'
 import { rota } from '../rota'
 import { erroDeRegra, lista, noRetangulo, retanguloDaUrl } from './comum'
 
-/**
- * GET /incidentes/area: contagens num raio de 400 m. As células do mock valem como roubo (e um quarto
- * delas como acidente); o que foi registrado na sessão conta na categoria que o usuário escolheu.
- */
 function resumoDaArea(ponto: { lat: number; lng: number }) {
   const celulas = banco
     .calor()
     .filter((c) => metrosEntre(ponto, c) <= 400)
     .reduce((soma, c) => soma + c.quantidade, 0)
   const novos = banco.incidentesNovos().filter((i) => metrosEntre(ponto, i) <= 400)
-  // Como na API, categoria desativada some das contagens da área.
   const ativos = novos.filter((i) => banco.categoriaPorId(i.categoriaId)?.ativa)
   const doNovo = (categoriaId: number) => ativos.filter((i) => i.categoriaId === categoriaId).length
 
-  // Todo registro da sessão também entrou em `celulas`: sai do bolo de roubos e volta na sua categoria,
-  // e a estimativa de acidentes parte só das células de exemplo.
   const deExemplo = celulas - novos.length
   const roubos = deExemplo + doNovo(7)
   const acidentes = Math.floor(deExemplo / 4) + doNovo(8)
-  // Como na API: toda categoria de incidente ativa aparece, com zero se não houve registro por perto.
   const contagens = banco
     .categoriasAtivas()
     .filter((c) => c.tipo === 'incidente')

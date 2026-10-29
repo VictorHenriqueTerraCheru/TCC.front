@@ -9,13 +9,10 @@ export interface FiltroProblemasNaArea {
   minLng: number
   maxLat: number
   maxLng: number
-  /** Vazio = todos os grupos. */
   grupos: string[]
-  /** Vazio = todos os não resolvidos. */
   status: StatusProblema[]
 }
 
-// GET /problemas — marcadores do retângulo visível (já limitado e arredondado pelo mapa).
 export function problemasNaAreaQuery({ grupos, status, ...retangulo }: FiltroProblemasNaArea) {
   return queryOptions({
     queryKey: ['problemas', 'area', retangulo, { grupos, status }],
@@ -35,14 +32,12 @@ export function problemasNaAreaQuery({ grupos, status, ...retangulo }: FiltroPro
   })
 }
 
-/** `filtro` null = camada desligada (modo Incidentes ou mapa ainda sem retângulo). */
 export function useProblemasNaArea(filtro: FiltroProblemasNaArea | null) {
   return useQuery({
     ...problemasNaAreaQuery(
       filtro ?? { minLat: 0, minLng: 0, maxLat: 0, maxLng: 0, grupos: [], status: [] },
     ),
     enabled: filtro !== null,
-    // Ao arrastar, os marcadores antigos ficam até chegarem os novos (sem piscar).
     placeholderData: keepPreviousData,
   })
 }

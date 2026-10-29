@@ -2,7 +2,6 @@ import { act, render, renderHook } from '@testing-library/react'
 
 import { useAplicarTema, useTema, useTemaStore } from './use-tema'
 
-/** Simula o tema do celular/computador (prefers-color-scheme). */
 function sistemaEscuro(escuro: boolean) {
   const original = window.matchMedia
   vi.stubGlobal('matchMedia', (consulta: string) => ({

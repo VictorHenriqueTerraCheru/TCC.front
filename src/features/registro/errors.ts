@@ -1,6 +1,5 @@
 import { isApiError } from '@/infrastructure/api'
 
-// type da API → mensagem (docs/API.md, "Códigos de erro").
 const mensagens: Record<string, string> = {
   'categoria-nao-e-problema': 'Essa categoria é de incidente. Volte e escolha de novo.',
   'categoria-nao-e-incidente': 'Essa categoria é de problema. Volte e escolha de novo.',
@@ -11,7 +10,6 @@ const mensagens: Record<string, string> = {
   'autor-nao-vota': 'Esse registro é seu: quem registra não vota nele.',
 }
 
-/** Mensagem para erros de regra (4xx). Falha de rede é tratada à parte (tela 26). */
 export function mensagemErroRegistro(erro: unknown): string {
   if (isApiError(erro)) {
     if (erro.type && mensagens[erro.type]) return mensagens[erro.type]!

@@ -8,10 +8,6 @@ interface ConsultaPaginada {
   fetchNextPage(): Promise<unknown>
 }
 
-/**
- * Lista com paginação infinita (useInfiniteQuery): carrega a próxima página ao chegar ao fim
- * (IntersectionObserver) e mantém o botão "Carregar mais" como alternativa acessível.
- */
 export function ListaInfinita({
   consulta,
   children,

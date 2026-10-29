@@ -5,7 +5,6 @@ import { incidentesHandlers } from './incidentes'
 import { problemasHandlers } from './problemas'
 import { adminHandlers, usuariosHandlers } from './usuarios'
 
-// Um arquivo por área da API, na mesma divisão dos modules do back.
 export const handlers = [
   ...authHandlers,
   ...categoriasHandlers,

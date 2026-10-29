@@ -3,10 +3,6 @@ export interface Ponto {
   lng: number
 }
 
-/**
- * Ponto de `/mapa/area?lat&lng`. Link digitado ou corrompido (`lat=x`, `lat=200`) vira `null`:
- * um LatLng inválido faz o Leaflet lançar erro e derrubar o mapa inteiro.
- */
 export function pontoDaUrl(params: URLSearchParams): Ponto | null {
   const lat = params.get('lat')?.trim()
   const lng = params.get('lng')?.trim()

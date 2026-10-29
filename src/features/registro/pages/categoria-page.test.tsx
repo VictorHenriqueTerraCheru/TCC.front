@@ -108,7 +108,7 @@ describe('passo 1: tipo e categoria', () => {
   })
 
   it('rascunho de outro tipo não conta como escolha', async () => {
-    useRascunhoStore.getState().escolherCategoria(7) // Roubo (incidente)
+    useRascunhoStore.getState().escolherCategoria(7)
     abrir('/registrar/categoria?tipo=problema')
 
     expect(await screen.findByRole('button', { name: 'Continuar' })).toBeDisabled()
@@ -177,7 +177,7 @@ describe('passo 1: tipo e categoria', () => {
   })
 
   it('passo de local com categoria de outro tipo volta para a lista do tipo certo', async () => {
-    useRascunhoStore.getState().escolherCategoria(7) // Roubo (incidente)
+    useRascunhoStore.getState().escolherCategoria(7)
     const { router } = abrir('/registrar/local')
 
     await waitFor(() =>

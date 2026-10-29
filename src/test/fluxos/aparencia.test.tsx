@@ -39,7 +39,7 @@ describe('aparência (claro, escuro ou automático)', () => {
 
     await usuario.click(opcao('Escuro'))
     expect(opcao('Escuro')).toHaveAttribute('aria-checked', 'true')
-    expect(document.documentElement.dataset.tema).toBe('escuro') // já mostra como fica
+    expect(document.documentElement.dataset.tema).toBe('escuro')
 
     await usuario.click(screen.getByRole('button', { name: 'Continuar' }))
     expect(router.state.location.pathname).toBe('/mapa')

@@ -8,7 +8,6 @@ import { useNavegacaoMapa } from '../hooks/use-navegacao-mapa'
 import type { ContextoMapa } from '../models/contexto'
 import { pontoDaUrl } from '../models/ponto'
 
-/** Tela 4: /mapa/area?lat&lng. */
 export function AreaIncidentesPage() {
   const [params] = useSearchParams()
   const { focar } = useOutletContext<ContextoMapa>()

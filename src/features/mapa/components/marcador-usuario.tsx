@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import { circuloGeoJson } from '@/common/lib/geo'
 import type { Posicao } from '@/features/localizacao'
 
-/** Ponto azul da posição atual com halo + círculo de precisão (quando passa de 20 m). */
 export function MarcadorUsuario({ posicao }: { posicao: Posicao }) {
   const precisao = useMemo(
     () => (posicao.precisao > 20 ? circuloGeoJson(posicao, posicao.precisao) : null),

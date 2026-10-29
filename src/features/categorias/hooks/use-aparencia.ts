@@ -11,10 +11,6 @@ import {
 
 const SEM_GRUPOS: Grupo[] = []
 
-/**
- * Grupos carregados + funções que resolvem cor e rótulo de uma categoria. Enquanto os grupos
- * não chegam (ou se o grupo foi removido), a categoria aparece em cinza neutro.
- */
 export function useAparencia() {
   const { data } = useGrupos()
   const grupos = data ?? SEM_GRUPOS

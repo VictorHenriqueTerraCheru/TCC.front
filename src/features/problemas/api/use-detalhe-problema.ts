@@ -2,7 +2,6 @@ import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { api, dados } from '@/infrastructure/api'
 
-// GET /problemas/{id} — meusVotos/souAutor só vêm com token.
 export function detalheProblemaQuery(id: string) {
   return queryOptions({
     queryKey: ['problemas', 'detalhe', id],

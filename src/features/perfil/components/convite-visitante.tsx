@@ -3,7 +3,6 @@ import { Link } from 'react-router'
 import { Icone } from '@/common/components/icone'
 import { Button } from '@/common/ui/button'
 
-/** Perfil para visitante: o mesmo convite das folhas "Entre para…". */
 export function ConviteVisitante() {
   return (
     <section className="rounded-2xl bg-card p-6 shadow-1">

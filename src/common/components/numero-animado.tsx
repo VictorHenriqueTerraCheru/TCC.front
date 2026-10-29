@@ -5,12 +5,10 @@ import { MOLA_RAPIDA } from '@/common/lib/movimento'
 
 interface NumeroAnimadoProps {
   valor: number
-  /** Texto exibido para cada passo (ex.: `n => \`${n} / 100\``); o padrão é só o número. */
   formatar?(n: number): string
   className?: string
 }
 
-/** Número que conta até o valor novo quando ele muda (confiança, votos). Abre já no valor certo. */
 export function NumeroAnimado({ valor, formatar = String, className }: NumeroAnimadoProps) {
   const atual = useMotionValue(valor)
   const texto = useTransform(atual, (n) => formatar(Math.round(n)))
@@ -30,10 +28,6 @@ export function NumeroAnimado({ valor, formatar = String, className }: NumeroAni
   )
 }
 
-/**
- * Número que troca na hora e dá um pulso curto (votos: o otimista aparece no mesmo instante do
- * toque, sem contagem no meio).
- */
 export function NumeroComPulso({ valor, className }: { valor: number; className?: string }) {
   return (
     <m.span

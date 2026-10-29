@@ -4,7 +4,6 @@ type ProblemaNaArea = Schema<'ListarProblemasNaAreaResponse'>
 
 const id = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
 
-// Icaraí (Niterói), espalhados como nos prints 1, 2 e 24 (todas as faixas e estados).
 export const problemasNaArea: ProblemaNaArea[] = [
   {
     id: id(1),
@@ -116,7 +115,6 @@ export const problemasNaArea: ProblemaNaArea[] = [
   },
 ]
 
-// Incidentes agregados (pontos já arredondados em 3 casas, como a API grava).
 export const calorIncidentes: Schema<'ObterCalorIncidentesResponse'>[] = [
   { lat: -22.903, lng: -43.115, quantidade: 6 },
   { lat: -22.904, lng: -43.114, quantidade: 4 },
@@ -127,5 +125,4 @@ export const calorIncidentes: Schema<'ObterCalorIncidentesResponse'>[] = [
   { lat: -22.9, lng: -43.103, quantidade: 2 },
 ]
 
-/** Grupo de incidente de cada célula (para o filtro do mock): só roubo em Icaraí. */
 export const grupoDasCelulas = 'seguranca'

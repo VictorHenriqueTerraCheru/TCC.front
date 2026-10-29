@@ -3,7 +3,6 @@ import { cn } from '@/common/lib/utils'
 
 import { iniciais } from '../models/usuario'
 
-/** Círculo com as iniciais (perfil, fila do admin); selo de verificado opcional. */
 export function Avatar({
   nome,
   verificado = false,

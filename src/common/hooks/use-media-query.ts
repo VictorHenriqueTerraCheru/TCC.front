@@ -12,7 +12,6 @@ export function useMediaQuery(consulta: string): boolean {
   )
 }
 
-/** Breakpoint único do layout (regra 8 do CLAUDE.md): lg, ≥ 1024 px. */
 export function useDesktop(): boolean {
   return useMediaQuery('(min-width: 1024px)')
 }

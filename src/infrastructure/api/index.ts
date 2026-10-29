@@ -5,5 +5,4 @@ export type { components, paths } from './schema'
 
 import type { components } from './schema'
 
-/** Atalho para os schemas gerados: `Schema<'ObterDetalheProblemaResponse'>`. */
 export type Schema<Nome extends keyof components['schemas']> = components['schemas'][Nome]

@@ -10,7 +10,6 @@ import { useRascunho } from '../hooks/use-rascunho'
 import { lerTipo } from '../models/rotas'
 import { useRecentesStore } from '../stores/recentes-store'
 
-/** Tela 5, passo 1b: a categoria do tipo escolhido em `/registrar`. */
 export function CategoriaPage() {
   const tipo = lerTipo(useSearchParams()[0].get('tipo'))
   if (!tipo) return <Navigate to="/registrar" replace />
@@ -26,7 +25,6 @@ function CategoriaDoTipo({ tipo }: { tipo: NonNullable<ReturnType<typeof lerTipo
   const registrarRecente = useRecentesStore((s) => s.registrar)
 
   const doTipo = categorias.data?.filter((c) => c.tipo === tipo) ?? []
-  // Rascunho de outro tipo (voltou e trocou de ideia): conta como sem escolha.
   const escolhida = categoria?.tipo === tipo ? categoria : null
 
   function continuar() {

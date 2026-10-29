@@ -11,7 +11,6 @@ const categoria = (id: number) => {
 }
 const horasAtras = (horas: number) => new Date(Date.now() - horas * 3_600_000).toISOString()
 
-/** Histórico do usuário do mock, imitando o print 29 (mais recentes primeiro). */
 export function historicoInicial(): ItemHistorico[] {
   return [
     {
@@ -89,7 +88,6 @@ export function historicoInicial(): ItemHistorico[] {
   ]
 }
 
-/** Fila do admin (print 13) + uma aprovada e uma recusada. */
 export function verificacoesIniciais(): Verificacao[] {
   return [
     {

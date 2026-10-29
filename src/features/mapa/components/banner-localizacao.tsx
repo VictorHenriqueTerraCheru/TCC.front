@@ -1,7 +1,6 @@
 import { Icone } from '@/common/components/icone'
 import { Button } from '@/common/ui/button'
 
-/** Tela 18: aviso de localização desativada sobre o mapa. */
 export function BannerLocalizacao({ aoAtivar }: { aoAtivar(): void }) {
   return (
     <div

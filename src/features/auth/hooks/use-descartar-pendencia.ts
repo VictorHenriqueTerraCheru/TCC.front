@@ -6,10 +6,6 @@ import { useSessaoStore } from '../stores/sessao-store'
 
 const TELAS_DE_LOGIN = new Set(['/login', '/cadastro'])
 
-/**
- * Saiu do login/cadastro sem entrar (ex.: "voltar" do navegador ou do celular, que não passam
- * pelo "←" da tela): a ação pendente é descartada, senão um login futuro qualquer a executaria.
- */
 export function useDescartarPendenciaAoSairDoLogin() {
   const { pathname } = useLocation()
   const anteriorRef = useRef(pathname)

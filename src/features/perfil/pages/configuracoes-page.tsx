@@ -35,7 +35,6 @@ const permissao: Record<EstadoLocalizacao, { rotulo: string; classe: string }> =
 
 function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
-    // Grupo em cartão, como nos Ajustes do iOS.
     <section className="py-2">
       <h2 className="px-4 pb-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
         {titulo}
@@ -89,7 +88,6 @@ function Linha({
   )
 }
 
-/** Tela 28. "Abrir configurações do Android" vira "Como liberar a localização" (docs/TELAS.md). */
 export function ConfiguracoesPage() {
   const navigate = useNavigate()
   const autenticado = useAutenticado()
@@ -99,7 +97,6 @@ export function ConfiguracoesPage() {
   const sair = useSessaoStore((s) => s.sair)
   const [editandoNome, setEditandoNome] = useState(false)
   const [sobreAberto, setSobreAberto] = useState(false)
-  // Ao sair, a página ainda re-renderiza como visitante: não pode mandar para o login.
   const [saindo, setSaindo] = useState(false)
 
   if (!autenticado) {

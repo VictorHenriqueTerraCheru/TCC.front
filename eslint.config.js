@@ -6,9 +6,6 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
-// Fronteiras da arquitetura (ver "Arquitetura" no CLAUDE.md):
-// - uma feature só enxerga outra pelo index.ts dela;
-// - common/ e infrastructure/ não conhecem features/ nem app/.
 const importarFeaturePorDentro = {
   group: ['@/features/*/*'],
   message: 'Importe outra feature só pelo index.ts dela (@/features/<area>).',
@@ -54,7 +51,6 @@ export default defineConfig([
     },
   },
   {
-    // Componentes do shadcn exportam variantes junto do componente.
     files: ['src/common/ui/**/*.tsx'],
     rules: { 'react-refresh/only-export-components': 'off' },
   },

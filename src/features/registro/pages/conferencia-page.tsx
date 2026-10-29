@@ -61,7 +61,6 @@ function CartaoDuplicata({
   )
 }
 
-/** Tela 7: passo 3 — "Já existe um registro… É o mesmo?". */
 export function ConferenciaPage() {
   const navigate = useNavigate()
   const { categoria, categoriaId, local } = useRascunho()
@@ -75,13 +74,11 @@ export function ConferenciaPage() {
   const [escolhidaId, setEscolhidaId] = useState<string | null>(null)
   const escolhida = duplicatas?.find((d) => d.id === escolhidaId) ?? duplicatas?.[0]
   const confirmar = useVotar(escolhida?.id ?? '')
-  // /problemas/duplicatas não traz coordenadas: o ponto do vizinho vem do detalhe.
   const { data: vizinho } = useQuery({
     ...detalheProblemaQuery(escolhida?.id ?? ''),
     enabled: escolhida !== undefined,
   })
 
-  // Nada perto (ex.: recarregou e o vizinho foi resolvido): segue para a revisão.
   useExigirPasso(duplicatas === undefined || duplicatas.length > 0, '/registrar/revisao')
 
   function confirmarExistente() {

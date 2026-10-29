@@ -9,12 +9,10 @@ import { useMe } from '@/features/usuarios'
 
 interface GuardaAdminProps {
   titulo: string
-  /** Rota da tela, para o login devolver para cá. */
   caminho: string
   children: ReactNode
 }
 
-/** Casca das telas de admin: só entra quem é administrador no perfil atual de GET /me (regra 14). */
 export function GuardaAdmin({ titulo, caminho, children }: GuardaAdminProps) {
   const navigate = useNavigate()
   const autenticado = useAutenticado()
@@ -28,7 +26,6 @@ export function GuardaAdmin({ titulo, caminho, children }: GuardaAdminProps) {
         {isPending ? (
           <Skeleton className="h-60 rounded-2xl bg-muted" />
         ) : isError ? (
-          // Falha de rede/servidor no /me não é falta de permissão: oferece tentar de novo.
           <div role="alert" className="space-y-3 py-10 text-center">
             <p>Não foi possível confirmar seu perfil.</p>
             <Button variant="outline" onClick={() => void refetch()}>

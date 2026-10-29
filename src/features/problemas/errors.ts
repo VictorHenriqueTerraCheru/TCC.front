@@ -1,6 +1,5 @@
 import { isApiError, isErroDeRede } from '@/infrastructure/api'
 
-// type da API (docs/API.md, "Códigos de erro") → mensagem para o usuário.
 const mensagens: Record<string, string> = {
   'autor-nao-vota': 'Você registrou este problema; quem registra não vota nele.',
   'problema-resolvido': 'Este problema já foi resolvido.',

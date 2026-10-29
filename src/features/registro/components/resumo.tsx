@@ -7,7 +7,6 @@ interface LinhaResumoProps {
   icone: ReactNode | MaterialSymbol
   rotulo: string
   valor: ReactNode
-  /** Leva de volta ao passo para editar (lápis). */
   aoEditar?(): void
 }
 
@@ -39,7 +38,6 @@ export function LinhaResumo({ icone, rotulo, valor, aoEditar }: LinhaResumoProps
   )
 }
 
-/** Cartão "Resumo" das revisões (telas 8 e 21b). */
 export function Resumo({ children }: { children: ReactNode }) {
   return (
     <section aria-labelledby="titulo-resumo">

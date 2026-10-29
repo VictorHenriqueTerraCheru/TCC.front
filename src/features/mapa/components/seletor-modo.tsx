@@ -7,7 +7,6 @@ interface SeletorModoProps {
   aoMudar(modo: ModoMapa): void
 }
 
-/** Problemas | Incidentes | Ambos (telas 1, 2). */
 export function SeletorModo({ modo, aoMudar }: SeletorModoProps) {
   return (
     <Segmentado

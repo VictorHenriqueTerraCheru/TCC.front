@@ -15,7 +15,6 @@ interface FalhaEnvioDialogProps {
   aoTentarNovamente(): void
 }
 
-/** Tela 26: falha de rede/timeout no envio. Os dados continuam no rascunho (regra 5). */
 export function FalhaEnvioDialog({
   aberto,
   aoMudarAberto,

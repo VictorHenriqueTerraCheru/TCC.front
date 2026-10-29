@@ -80,7 +80,7 @@ test('aplicarReceita remove prédios e POIs, engrossa vias e escurece cores, inc
     'hsla(0, 0%, 0%, 1)',
   ])
   expect(r.layers[1].paint['fill-color']).toBe('hsla(210, 36%, 33%, 1)')
-  expect(estilo.layers).toHaveLength(4) // não muta a entrada
+  expect(estilo.layers).toHaveLength(4)
 })
 
 test('a receita clara deixa as vias suaves e as bordas quase brancas, sem mexer no resto', () => {

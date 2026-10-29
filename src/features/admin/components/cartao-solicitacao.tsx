@@ -12,7 +12,6 @@ import { useAnalisarVerificacao } from '../api/use-fila'
 
 type Solicitacao = Schema<'ListarVerificacoesItem'>
 
-/** Cartão da fila (tela 13). Recusar abre o motivo inline, obrigatório. */
 export function CartaoSolicitacao({ solicitacao }: { solicitacao: Solicitacao }) {
   const analisar = useAnalisarVerificacao()
   const [recusando, setRecusando] = useState(false)

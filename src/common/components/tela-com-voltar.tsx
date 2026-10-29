@@ -5,12 +5,10 @@ import { Icone } from '@/common/components/icone'
 
 interface TelaComVoltarProps {
   titulo: string
-  /** Padrão: voltar no histórico. */
   aoVoltar?(): void
   children: ReactNode
 }
 
-/** Tela cheia com a barra "← Título" do protótipo (login, cadastro, fluxos). */
 export function TelaComVoltar({ titulo, aoVoltar, children }: TelaComVoltarProps) {
   const navigate = useNavigate()
   return (

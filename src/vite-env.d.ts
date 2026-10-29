@@ -9,5 +9,4 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
-/** Versão do package.json (vite.config.ts → define). */
 declare const __VERSAO_APP__: string

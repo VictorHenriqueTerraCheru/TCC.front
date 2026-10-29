@@ -5,10 +5,6 @@ import { useAtivarLocalizacao, useLocalizacao } from '@/features/localizacao'
 
 import { DISTANCIA_MAXIMA_RODAPE_M, useDistanciaAte } from '../../hooks/use-distancia-ate'
 
-/**
- * Rodapé do detalhe: "Você está a X m — seu voto pesa mais por estar perto" (até 2 km) ou,
- * sem permissão, o aviso da tela 19.
- */
 export function RodapeLocalizacao({
   ponto,
   mostrarDistancia = true,

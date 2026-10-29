@@ -12,7 +12,6 @@ import { CategoriasAdminPage } from './categorias-admin-page'
 
 const ICONIFY = 'https://api.iconify.design'
 
-/** Iconify falso: a busca devolve `ico_a` (e um de outro estilo, que a tela descarta). */
 function iconifyFalso() {
   server.use(
     http.get(`${ICONIFY}/search`, () =>
@@ -113,7 +112,7 @@ describe('administração de categorias e grupos', () => {
     )
     await usuario.type(screen.getByRole('searchbox', { name: 'Buscar ícone' }), 'inundacao')
     const resultados = await screen.findByRole('group', { name: 'Resultados da busca' })
-    expect(within(resultados).getAllByRole('button')).toHaveLength(1) // só o Rounded sólido
+    expect(within(resultados).getAllByRole('button')).toHaveLength(1)
     await usuario.click(within(resultados).getByRole('button', { name: 'ico_a' }))
     await usuario.click(screen.getByRole('button', { name: 'Salvar' }))
 
@@ -267,7 +266,6 @@ describe('administração de categorias e grupos', () => {
       await usuario.click(chips.getByRole('button', { name: 'Trânsito' }))
       expect(nomesVisiveis()).toEqual(['Acidente de trânsito'])
 
-      // Trocar para Estado tira o chip de grupo de Evento do filtro.
       await usuario.click(screen.getByRole('radio', { name: 'Estado' }))
       expect(nomesVisiveis()).toHaveLength(6)
     })

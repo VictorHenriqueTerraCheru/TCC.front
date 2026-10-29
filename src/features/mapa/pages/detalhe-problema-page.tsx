@@ -7,7 +7,6 @@ import { ALTURA_RESUMO, DetalheProblema, useDetalheProblema } from '@/features/p
 import { useNavegacaoMapa } from '../hooks/use-navegacao-mapa'
 import type { ContextoMapa } from '../models/contexto'
 
-/** Telas 3, 19, 22 e 23: /mapa/problema/:id. */
 export function DetalheProblemaPage() {
   const { id = '' } = useParams()
   const { focar } = useOutletContext<ContextoMapa>()

@@ -12,13 +12,11 @@ const OPCOES: { valor: PreferenciaTema; rotulo: string; descricao?: string }[] =
   { valor: 'automatico', rotulo: 'Automático', descricao: 'Igual ao celular' },
 ]
 
-/** Cores fixas da miniatura: mostram cada tema como ele é, seja qual for o tema atual. */
 const CORES: Record<Tema, { chao: string; via: string; cartao: string; linha: string }> = {
   claro: { chao: '#efe9df', via: '#ffffff', cartao: '#ffffff', linha: '#d5d9e0' },
   escuro: { chao: '#1b2735', via: '#3a4b60', cartao: '#1a2431', linha: '#33445a' },
 }
 
-/** Telinha do app (mapa, um alerta e o card de baixo) nas cores de um tema. */
 function Tela({ tema }: { tema: Tema }) {
   const cor = CORES[tema]
   return (
@@ -54,10 +52,6 @@ function Miniatura({ preferencia }: { preferencia: PreferenciaTema }) {
   )
 }
 
-/**
- * Claro, Escuro ou Automático (segue o celular), como nos Ajustes do iOS. Aplica na hora: quem
- * usa decide se é só prévia (primeira abertura) ou escolha final (Configurações).
- */
 export function SeletorTema({ className }: { className?: string }) {
   const preferencia = useTemaStore((s) => s.preferencia)
   const definirPreferencia = useTemaStore((s) => s.definirPreferencia)
@@ -77,7 +71,6 @@ export function SeletorTema({ className }: { className?: string }) {
             className="flex pressionavel flex-col items-center gap-2 rounded-2xl py-3 focus-visible:outline-2"
           >
             <span className="relative rounded-[14px] p-[3px]">
-              {/* O anel desliza até a miniatura escolhida. */}
               {selecionado && (
                 <m.span
                   layoutId={idAnel}

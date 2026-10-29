@@ -40,7 +40,6 @@ function DrawerContent({
   semFundo = false,
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Content> & {
-  /** Sem a camada escura: o mapa continua visível e tocável (folhas não modais do mapa). */
   semFundo?: boolean
 }) {
   return (

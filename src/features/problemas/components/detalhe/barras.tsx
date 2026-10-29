@@ -13,7 +13,6 @@ const rotuloFaixa: Record<FaixaConfianca, string> = {
   baixa: 'Confiança baixa',
 }
 
-/** Telas 3 e 23: "Confiança alta · 82 / 100". */
 export function BarraConfianca({
   confianca,
   faixa,
@@ -55,7 +54,6 @@ export function BarraConfianca({
   )
 }
 
-/** Tela 22: "Em avaliação · 2 de 5 votos" com barra segmentada. */
 export function BarraAvaliacao({
   avaliacao,
 }: {

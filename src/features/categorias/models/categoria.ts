@@ -4,16 +4,13 @@ export type Categoria = Schema<'ListarCategoriasResponse'>
 export type CategoriaResumo = Schema<'CategoriaResumo'>
 export type Grupo = Schema<'GrupoResponse'>
 
-/** Slot da paleta de cores de grupo (enum CorGrupo da API; os tokens `--cat-*` estão em src/index.css). */
 export type CorGrupo = Grupo['cor']
 
 export type TipoGrupo = Categoria['tipo']
 
 export interface AparenciaDaCor {
-  /** Classes Tailwind com os tokens de src/index.css. Literais, para o Tailwind gerá-las. */
   forte: string
   claro: string
-  /** Cor forte como valor CSS, para HTML fora do Tailwind (marcadores do mapa). */
   corForte: string
 }
 
@@ -50,10 +47,8 @@ export const aparenciaDaCor: Record<CorGrupo, AparenciaDaCor> = {
   cinza: { forte: 'text-cat-cinza', claro: 'bg-cat-cinza-claro', corForte: 'var(--cat-cinza)' },
 }
 
-/** Ordem de exibição dos swatches no formulário de grupo. */
 export const coresGrupo = Object.keys(aparenciaDaCor) as CorGrupo[]
 
-/** Nome legível de cada slot (rótulo do swatch). */
 export const nomeDaCor: Record<CorGrupo, string> = {
   laranja: 'Laranja',
   ocre: 'Ocre',
@@ -67,7 +62,6 @@ export const nomeDaCor: Record<CorGrupo, string> = {
   cinza: 'Cinza',
 }
 
-/** Chaves do seed antigo (`icone` guardava um apelido); as novas já são o nome Material Symbols. */
 const iconeLegado: Record<string, string> = {
   buraco: 'edit_road',
   calcada: 'directions_walk',
@@ -79,7 +73,6 @@ const iconeLegado: Record<string, string> = {
   acidente: 'car_crash',
 }
 
-/** Ícone usado quando a categoria não tem ícone resolvido (carregando, falha de rede). */
 export const ICONE_PADRAO = 'category'
 
 export function gruposDoTipo(grupos: Grupo[], tipo: TipoGrupo): Grupo[] {
@@ -93,7 +86,6 @@ export function grupoDe(
   return grupos.find((g) => g.chave === categoria.grupo)
 }
 
-/** Grupo ainda não carregado ou removido: cinza neutro, com a chave no lugar do rótulo. */
 export function aparenciaDe(
   grupos: Grupo[],
   categoria: Pick<CategoriaResumo, 'grupo'>,
@@ -102,7 +94,6 @@ export function aparenciaDe(
   return { rotulo: grupo?.rotulo ?? categoria.grupo, ...aparenciaDaCor[grupo?.cor ?? 'cinza'] }
 }
 
-/** Nome do ícone (Material Symbols): resolve as chaves legadas; o resto já é o nome. */
 export function iconeDe(categoria: Pick<CategoriaResumo, 'icone'>): string {
   return iconeLegado[categoria.icone] ?? categoria.icone
 }

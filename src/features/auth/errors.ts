@@ -2,10 +2,6 @@ import type { FieldValues, Path, UseFormSetError } from 'react-hook-form'
 
 import { isApiError, isErroDeRede } from '@/infrastructure/api'
 
-/**
- * Leva o erro da API para o formulário: validação (400) e e-mail em uso (409) vão para o
- * campo; o resto vira mensagem geral (devolvida).
- */
 export function aplicarErroAuth<T extends FieldValues>(
   erro: unknown,
   setError: UseFormSetError<T>,

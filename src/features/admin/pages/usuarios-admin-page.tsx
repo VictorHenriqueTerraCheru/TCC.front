@@ -82,7 +82,6 @@ function ListaUsuarios() {
   )
 }
 
-/** Usuários cadastrados: busca, filtro por perfil e troca de perfil. Só para administrador. */
 export function UsuariosAdminPage() {
   return (
     <GuardaAdmin titulo="Usuários" caminho="/admin/usuarios">

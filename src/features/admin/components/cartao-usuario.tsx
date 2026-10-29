@@ -21,11 +21,9 @@ const descricaoPerfil: Record<Perfil, string> = {
 
 interface CartaoUsuarioProps {
   usuario: UsuarioAdmin
-  /** O admin não altera o próprio perfil (a API recusa com 422). */
   ehVoce: boolean
 }
 
-/** Cartão de um usuário na administração; "Alterar perfil" abre a folha com os três perfis. */
 export function CartaoUsuario({ usuario, ehVoce }: CartaoUsuarioProps) {
   const [aberta, setAberta] = useState(false)
   const { rotulo, icone } = aparenciaPerfil[usuario.perfil]

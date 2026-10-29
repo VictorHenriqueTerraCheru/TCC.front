@@ -2,7 +2,6 @@ import type { Schema } from '../../api'
 
 type Usuario = Schema<'RespostaAuthUsuarioResumo'> & { senha: string }
 
-// Mesmos usuários do seed da API (senha tcc12345).
 export const usuariosIniciais: Usuario[] = [
   {
     id: 'u-admin',

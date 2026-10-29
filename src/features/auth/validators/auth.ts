@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-// Mesmas regras da API (docs/API.md, Auth): senha ≥ 8, termos aceitos, nome de 1 a 120.
 const email = z
   .string()
   .trim()

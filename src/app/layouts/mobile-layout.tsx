@@ -7,16 +7,12 @@ import { cn } from '@/common/lib/utils'
 
 import { itensNavegacao } from './navegacao'
 
-/** < 1024 px: conteúdo + barra de abas flutuante de vidro (Mapa / Recentes / Perfil). */
 export function MobileLayout() {
-  // Registro e subpáginas com "←" (verificação, histórico, configurações, fila do admin) ocupam a
-  // tela inteira, como nos prints 5–8, 11, 13, 28 e 29.
   const { pathname } = useLocation()
   const telaCheia = /^\/(registrar|admin)(\/|$)|^\/perfil\/.+/.test(pathname)
   const noMapa = pathname.startsWith('/mapa')
   return (
     <div data-layout-celular className="relative h-dvh">
-      {/* O mapa passa por baixo da barra; nas outras páginas o conteúdo termina acima dela. */}
       <main className={cn('relative h-full overflow-y-auto', !telaCheia && !noMapa && 'pb-24')}>
         <Outlet />
       </main>
@@ -39,7 +35,6 @@ function BarraInferior() {
         >
           {({ isActive }) => (
             <>
-              {/* A pílula da aba ativa desliza até a aba tocada. */}
               {isActive && (
                 <m.span
                   layoutId="aba-ativa-celular"

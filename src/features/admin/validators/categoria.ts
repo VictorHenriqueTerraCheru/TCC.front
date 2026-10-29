@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-// Mesmas regras da API (CategoriaValidators.cs).
 export const categoriaSchema = z.object({
   nome: z.string().trim().min(1, 'Informe o nome.').max(60, 'Use até 60 caracteres.'),
   tipo: z.enum(['problema', 'incidente']),

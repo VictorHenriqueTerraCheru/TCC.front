@@ -94,7 +94,6 @@ function HistoricoResumo() {
   )
 }
 
-/** Telas 10 (cidadão) e 12 (verificado). O perfil atual vem de GET /me (regra 14). */
 export function PerfilPage() {
   const autenticado = useAutenticado()
   const { data: me, isPending, isError, refetch } = useMe()

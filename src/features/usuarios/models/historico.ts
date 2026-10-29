@@ -6,7 +6,6 @@ import type { Schema } from '@/infrastructure/api'
 export type ItemHistorico = Schema<'ObterHistoricoItem'>
 export type FiltroHistorico = 'tudo' | 'registros' | 'votos'
 
-/** "Disse que está lá · Buraco na pista" — textos do print 29, com o voto único. */
 export function tituloItem({ tipo, valor, categoria }: ItemHistorico): string {
   const acao = {
     registroProblema: 'Registrou',
@@ -17,7 +16,6 @@ export function tituloItem({ tipo, valor, categoria }: ItemHistorico): string {
   return `${acao} · ${categoria.nome}${anonimo}`
 }
 
-/** Hora para hoje/ontem ("09:41"); dia para os mais antigos ("22 set."). */
 export function quandoItem(iso: string): string {
   const data = new Date(iso)
   return isToday(data) || isYesterday(data)
@@ -25,7 +23,6 @@ export function quandoItem(iso: string): string {
     : format(data, 'd MMM.', { locale: ptBR })
 }
 
-/** Versão do resumo no perfil: "hoje, 08:12", "ontem, 19:40", "22 set.". */
 export function quandoItemResumo(iso: string): string {
   const data = new Date(iso)
   if (isToday(data)) return `hoje, ${format(data, 'HH:mm')}`
@@ -38,7 +35,6 @@ export interface GrupoHistorico {
   itens: ItemHistorico[]
 }
 
-/** Print 29: Hoje / Ontem / Esta semana (até 7 dias) / Anteriores, na ordem da API. */
 export function agruparPorPeriodo(
   itens: ItemHistorico[],
   agora: Date = new Date(),

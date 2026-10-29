@@ -4,9 +4,6 @@ import { Slot } from 'radix-ui'
 
 import { cn } from '@/common/lib/utils'
 
-// Botões em pílula. Cheio = --primary (#1f74db, texto branco AA); tonal/contorno/ghost em --primario.
-// Os cheios ganham um gradiente que só escurece a base (o contraste com o texto branco não cai),
-// o realce de 1 px no topo e uma sombra da própria cor.
 const cheio =
   'bg-linear-to-b from-black/0 to-black/12 shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_1px_2px_rgb(0_0_0/0.18)]'
 
@@ -49,7 +46,6 @@ function Button({
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
-    /** Mostra o indicador girando ao lado do texto e desabilita o botão (envio em andamento). */
     carregando?: boolean
   }) {
   const Comp = asChild ? Slot.Root : 'button'

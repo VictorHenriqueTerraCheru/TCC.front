@@ -19,12 +19,9 @@ const ESTILOS: Record<Tema, StyleSpecification> = {
 }
 
 interface MapaVetorialProps {
-  /** [lat, lng]; só vale na criação. */
   centro: [number, number]
   zoom?: number
-  /** false = sem arrastar, zoom nem girar (conferência, estático). */
   interativo?: boolean
-  /** Botões de zoom no canto superior direito (desktop). */
   mostrarZoom?: boolean
   ref?: Ref<MapRef>
   aoMover?(): void
@@ -35,11 +32,6 @@ interface MapaVetorialProps {
   children?: ReactNode
 }
 
-/**
- * Mapa vetorial (MapLibre) com o estilo do tema (claro ou escuro, versionados por
- * npm run gen:estilo-mapa) e a atribuição do OpenFreeMap/OpenStreetMap. O app usa [lat, lng]; a
- * conversão para [lng, lat] fica aqui.
- */
 export function MapaVetorial({
   centro,
   zoom = ZOOM_PADRAO,
@@ -71,8 +63,6 @@ export function MapaVetorial({
         onMoveEnd={aoParar && (() => aoParar())}
         onClick={aoTocar && ((e) => aoTocar({ lat: e.lngLat.lat, lng: e.lngLat.lng }))}
         onLoad={(e) => {
-          // A atribuição compacta abre expandida e cobre o rodapé no celular: começa recolhida
-          // (o ⓘ continua visível e abre o texto). No desktop fica aberta.
           if (window.innerWidth < 1024) {
             e.target
               .getContainer()

@@ -11,12 +11,10 @@ import { useRascunhoStore } from '../stores/rascunho-store'
 interface Opcao {
   tipo: TipoGrupo
   titulo: string
-  /** Em uma frase, o que o nome quer dizer. */
   significado: string
   exemplos: string
   consequencia: string
   iconeConsequencia: MaterialSymbol
-  /** Três ícones sobrepostos, com o fundo claro e a cor forte de cada um. */
   icones: { nome: MaterialSymbol; fundo: string; cor: string }[]
 }
 
@@ -49,7 +47,6 @@ const opcoes: Opcao[] = [
   },
 ]
 
-/** Tela 5, passo 1a: o rascunho nasce aqui; o tipo decide o resto do fluxo. */
 export function TipoPage() {
   const navigate = useNavigate()
   const limpar = useRascunhoStore((s) => s.limpar)

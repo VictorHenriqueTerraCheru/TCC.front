@@ -10,7 +10,6 @@ export interface Ponto {
 
 interface RascunhoState {
   categoriaId: number | null
-  /** Centro do mapa no passo "Onde fica?" (ponto exato; a API arredonda o de incidentes). */
   local: Ponto | null
   descricao: string
   horario: Horario
@@ -28,18 +27,11 @@ const vazio = {
   horario: { modo: 'agora', outroEm: null } satisfies Horario,
 }
 
-/**
- * Rascunho do registro (regra 5): persistido em sessionStorage, sobrevive a recarregar a página
- * e à falha de envio. Só é limpo depois do envio com sucesso ou ao fechar o fluxo.
- */
 export const useRascunhoStore = create<RascunhoState>()(
   persist(
     (set) => ({
       ...vazio,
       escolherCategoria: (categoriaId) => set({ categoriaId }),
-      // O mapa dispara moveend também ao redimensionar, com o mesmo centro. Um objeto novo
-      // reiniciaria o debounce do endereço, que troca a altura do cartão e redimensiona o mapa
-      // de novo: o endereço nunca chegava e o arrasto travava.
       definirLocal: (local) =>
         set((s) => (s.local?.lat === local.lat && s.local.lng === local.lng ? s : { local })),
       definirDescricao: (descricao) => set({ descricao }),

@@ -44,7 +44,7 @@ describe('IconeDinamico', () => {
     )
     const { container } = renderizar(<IconeDinamico nome="ico_a" alternativo="category" />)
 
-    expect(await carregarIcone('ico_a')).toBeNull() // a falha já foi processada
+    expect(await carregarIcone('ico_a')).toBeNull()
     expect(container.querySelector('.material-symbols-rounded')).toHaveTextContent('category')
     expect(container.querySelector('svg')).toBeNull()
   })

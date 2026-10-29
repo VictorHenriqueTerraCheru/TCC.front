@@ -12,13 +12,10 @@ interface EditarNomeDialogProps {
   aoMudarAberto(aberto: boolean): void
 }
 
-/** PATCH /me: nome de 1 a 120 caracteres (espaços nas pontas são removidos pela API). */
 export function EditarNomeDialog({ nomeAtual, aberto, aoMudarAberto }: EditarNomeDialogProps) {
   return (
     <Dialog open={aberto} onOpenChange={aoMudarAberto}>
       <DialogContent showCloseButton={false}>
-        {/* O conteúdo só existe com o diálogo aberto: cada abertura começa do nome atual, sem o
-            rascunho nem o erro da vez anterior (inclusive depois de "Cancelar"). */}
         <FormularioNome nomeAtual={nomeAtual} aoFechar={() => aoMudarAberto(false)} />
       </DialogContent>
     </Dialog>

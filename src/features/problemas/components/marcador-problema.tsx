@@ -4,22 +4,13 @@ import { dimensoesMarcador, PONTA, varianteDo } from '../models/marcador'
 import type { FaixaConfianca, StatusProblema } from '../models/problema'
 
 interface MarcadorProblemaProps {
-  /** Cor forte da categoria como valor CSS (ex.: var(--cat-ocre)). */
   cor: string
-  /** Nome Material Symbols da categoria (pode estar fora do pacote embutido). */
   icone: string
   status: StatusProblema
   faixa: FaixaConfianca | null
-  /** Problema aberto no painel: maior e com sombra no chão. */
   selecionado?: boolean
 }
 
-/**
- * Alerta do problema no mapa, em balão estilo Waze: círculo na cor da categoria, ícone branco,
- * borda branca e ponta embaixo. Filho do <Marker> do MapLibre (camada de problemas e mapa do
- * registro). Tela 24: possivelmenteResolvida = borda tracejada + selo de check. `resolvida`
- * nunca chega aqui (a API não devolve).
- */
 export function MarcadorProblema({
   cor,
   icone,
@@ -66,7 +57,7 @@ export function MarcadorProblema({
           style={{ position: 'absolute', left: 0, top: 0, width: d, height: d, background: cor }}
         />
       )}
-      {/* Ponta: triângulo branco embaixo do círculo. */}
+
       <span
         aria-hidden="true"
         style={{

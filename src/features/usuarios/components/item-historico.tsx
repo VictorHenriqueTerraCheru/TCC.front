@@ -37,7 +37,6 @@ function IconeItem({ item }: { item: ItemHistorico }) {
   )
 }
 
-/** Linha do histórico (telas 10 e 29). Problemas abrem o detalhe; incidentes não são navegáveis. */
 export function ItemHistoricoLinha({ item, quando }: { item: ItemHistorico; quando: string }) {
   const chip =
     item.tipo === 'registroProblema' && item.statusProblema ? chips[item.statusProblema] : undefined

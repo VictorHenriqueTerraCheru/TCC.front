@@ -13,20 +13,13 @@ import {
 } from '@/features/categorias'
 
 interface SeletorCategoriaProps {
-  /** Categorias do tipo escolhido. */
   categorias: Categoria[]
-  /** Grupos do mesmo tipo, em ordem de exibição. */
   grupos: Grupo[]
   selecionadaId: number | null
-  /** Ids das últimas categorias usadas neste aparelho, a mais nova primeiro. */
   recentesIds: number[]
   aoEscolher(id: number): void
 }
 
-/**
- * Escolha da categoria numa tela só: busca, recentes, chips de grupo e grade 3 colunas por
- * grupo. Sem passo extra de grupo: com 10 a 20 categorias por tipo, rolar custa menos que um toque.
- */
 export function SeletorCategoria({
   categorias,
   grupos,
@@ -52,7 +45,6 @@ export function SeletorCategoria({
     }))
     .filter((s) => s.itens.length > 0)
 
-  // Categoria cujo grupo não está na lista (removido, ou de outro tipo): não some, vai em "Outras".
   const orfas = categorias.filter(
     (c) =>
       !grupos.some((g) => g.chave === c.grupo) &&

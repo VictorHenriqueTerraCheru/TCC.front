@@ -19,7 +19,6 @@ import { categoriaSchema, type CategoriaForm } from '../validators/categoria'
 import { SeletorIcone } from './seletor-icone'
 
 interface FormularioCategoriaProps {
-  /** Sem categoria = criar. */
   categoria?: CategoriaAdmin
   grupos: Grupo[]
   aoConcluir(): void
@@ -75,7 +74,7 @@ export function FormularioCategoria({ categoria, grupos, aoConcluir }: Formulari
             valor={tipo}
             aoMudar={(valor) => {
               setValue('tipo', valor)
-              setValue('grupo', '') // o grupo escolhido pode ser do outro tipo
+              setValue('grupo', '')
             }}
           />
         )}

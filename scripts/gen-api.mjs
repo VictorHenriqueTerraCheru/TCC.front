@@ -1,12 +1,3 @@
-// Gera src/infrastructure/api/schema.d.ts a partir do OpenAPI da API.
-// Uso: node scripts/gen-api.mjs [arquivo-ou-url]   (padrão: docs/openapi.json)
-//
-// Ajustes antes de gerar (o contrato não muda, só a descrição de máquina):
-// 1. Tira o prefixo /api/v1 dos paths: ele já está em VITE_API_URL, e as chamadas ficam
-//    iguais às do docs/API.md (client.GET('/categorias')).
-// 2. Datas: o conversor de DateTimeOffset da API faz o OpenAPI do .NET emitir só
-//    { format: 'date-time' }, sem type e sem nulidade. Viram string; as anuláveis
-//    (DateTimeOffset? no back) estão listadas em DATAS_ANULAVEIS.
 import { readFile, writeFile } from 'node:fs/promises'
 import openapiTS, { astToString } from 'openapi-typescript'
 

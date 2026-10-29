@@ -2,7 +2,6 @@ import type { Feature, LineString, Polygon } from 'geojson'
 
 const RAIO_TERRA_M = 6_371_000
 
-/** Distância em metros entre dois pontos (haversine) — regra 3: calculada no front. */
 export function distanciaMetros(
   a: { lat: number; lng: number },
   b: { lat: number; lng: number },
@@ -20,10 +19,6 @@ export interface Ponto {
   lng: number
 }
 
-/**
- * Círculo de `raioMetros` como polígono GeoJSON ([lng, lat], anel fechado). O MapLibre não tem
- * círculo em metros: o raio da área de incidentes (400 m) e o do registro (150 m) viram polígono.
- */
 export function circuloGeoJson(centro: Ponto, raioMetros: number, passos = 64): Feature<Polygon> {
   const rad = (graus: number) => (graus * Math.PI) / 180
   const graus = (radianos: number) => (radianos * 180) / Math.PI
@@ -48,7 +43,6 @@ export function circuloGeoJson(centro: Ponto, raioMetros: number, passos = 64): 
   return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [anel] } }
 }
 
-/** Segmento entre dois pontos como LineString GeoJSON ([lng, lat]). */
 export function linhaGeoJson(a: Ponto, b: Ponto): Feature<LineString> {
   return {
     type: 'Feature',

@@ -10,7 +10,6 @@ import { SeletorHorario } from '../components/seletor-horario'
 import { useEnderecoDoRascunho, useExigirCategoria, useRascunho } from '../hooks/use-rascunho'
 import { caminhoDaCategoria } from '../models/rotas'
 
-/** Tela 21a: incidente, passo 2 de 3 — área de 150 m + "Quando aconteceu?". */
 export function LocalIncidentePage() {
   const navigate = useNavigate()
   const { categoria, local, horario, definirHorario } = useRascunho()

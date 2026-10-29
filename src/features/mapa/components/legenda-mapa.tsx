@@ -7,7 +7,6 @@ import { dimensoesMarcador, MarcadorProblema } from '@/features/problemas'
 
 import type { ModoMapa } from '../models/filtros'
 
-/** Balão em miniatura (o mesmo do mapa) para os itens da legenda. */
 function Balao({
   status = 'ativa',
   faixa = 'alta',
@@ -50,9 +49,6 @@ function Item({ simbolo, titulo, texto }: { simbolo: ReactNode; titulo: string; 
   )
 }
 
-/**
- * Tela 2 ("Como ler o mapa", quando há calor) e tela 24 ("Estado do problema", modo Problemas).
- */
 export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): void }) {
   const comCalor = modo !== 'problemas'
   const titulo = comCalor ? 'Como ler o mapa' : 'Estado do problema'

@@ -11,7 +11,6 @@ import {
   DialogTrigger,
 } from '@/common/ui/dialog'
 
-/** Diálogo informativo curto (termos, recuperação de senha). */
 export function AvisoDialog({
   gatilho,
   titulo,

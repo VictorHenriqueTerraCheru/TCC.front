@@ -10,20 +10,13 @@ import { Icone } from './icone'
 const NO_PACOTE = new Set<string>(iconesDoPacote)
 
 interface IconeDinamicoProps {
-  /** Nome Material Symbols (ex.: flood). Qualquer um: o que não está no pacote vem do Iconify. */
   nome: string
-  /** Ícone mostrado enquanto o remoto carrega ou se ele falhar. */
   alternativo?: MaterialSymbol
-  /** Só vale para ícones da fonte; o SVG remoto já é sólido. */
   preenchido?: boolean
   className?: string
   style?: CSSProperties
 }
 
-/**
- * Ícone cujo nome vem da API (categoria criada pelo admin). Do pacote embutido, usa a fonte como
- * o resto do app; fora dele, desenha o SVG buscado no Iconify, com o `alternativo` até chegar.
- */
 export function IconeDinamico({
   nome,
   alternativo = 'category',

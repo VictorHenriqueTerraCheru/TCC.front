@@ -19,7 +19,6 @@ import {
 import { descreverHorario, ocorridoEm } from '../models/horario'
 import { caminhoDaCategoria } from '../models/rotas'
 
-/** Tela 21b: incidente, passo 3 de 3 — aviso de anonimato, resumo e envio. */
 export function RevisaoIncidentePage() {
   const navigate = useNavigate()
   const { categoria, categoriaId, local, horario } = useRascunho()
@@ -43,7 +42,6 @@ export function RevisaoIncidentePage() {
 
   function enviar() {
     if (categoriaId === null || !local) return
-    // O instante é calculado agora, no envio (regra 16).
     envio.enviar({ categoriaId, ...local, ocorridoEm: ocorridoEm(horario) })
   }
   useRetomarRegistro('enviar', enviar)

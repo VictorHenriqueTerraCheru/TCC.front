@@ -90,7 +90,7 @@ describe('carregarIcone', () => {
     await carregarIcone('ico_a')
     const salvo = localStorage.getItem('ocorrencias.iconesRemotos')
 
-    server.resetHandlers() // qualquer pedido agora falharia (onUnhandledFrame: 'error')
+    server.resetHandlers()
     expect(salvo).toContain('ico_a')
     expect(await carregarIcone('ico_a')).not.toBeNull()
   })
@@ -144,7 +144,6 @@ describe('carregarIcone: entradas hostis', () => {
   it.each(['a,b', 'Maiuscula', 'com espaço', 'a/b', ''])(
     'nome "%s" nem chega à rede',
     async (nome) => {
-      // Sem handler: qualquer requisição derrubaria o teste (onUnhandledFrame: 'error').
       expect(await carregarIcone(nome)).toBeNull()
     },
   )

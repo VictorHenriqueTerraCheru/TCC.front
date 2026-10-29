@@ -3,11 +3,9 @@ import { Button } from '@/common/ui/button'
 
 interface EstadoVazioProps {
   aoVerAreaMaior(): void
-  /** X do card: fecha de vez (a página guarda a escolha). */
   aoFechar(): void
 }
 
-/** Tela 25: nada na área visível. */
 export function EstadoVazio({ aoVerAreaMaior, aoFechar }: EstadoVazioProps) {
   return (
     <div

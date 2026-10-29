@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@/common/lib/utils'
 
-/** Chip de filtro em pílula de vidro (mapa e recentes); marcado em azul. */
 export function ChipFiltro({
   selecionado,
   aoClicar,

@@ -11,7 +11,6 @@ import { definirLargura, renderizarRotas } from '@/test/render'
 
 import { MapaPage } from './mapa-page'
 
-// O layout do app liga o monitor de localização; aqui a página é montada sozinha.
 function MapaComLocalizacao() {
   useMonitorarLocalizacao()
   return <MapaPage />

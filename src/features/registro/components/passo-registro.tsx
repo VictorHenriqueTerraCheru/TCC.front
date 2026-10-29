@@ -8,10 +8,8 @@ import { MapaRegistro } from './mapa-registro'
 interface PassoRegistroProps {
   titulo: string
   passo: { atual: number; total: number; rotulo: string }
-  /** Passo 1 fecha (X); os outros voltam (←). */
   acaoTopo: 'fechar' | 'voltar'
   aoTopo(): void
-  /** Mapa do passo (local, conferência). Sem mapa, o desktop mostra o ponto escolhido. */
   mapa?: ReactNode
   rodape: ReactNode
   children: ReactNode
@@ -58,10 +56,6 @@ function Cabecalho({
   )
 }
 
-/**
- * Casca de cada passo do registro. Celular: tela cheia, com o mapa em cima e o cartão embaixo
- * nos passos de local. Desktop: o passo no painel de 420 px e o mapa à direita (docs/TELAS.md).
- */
 export function PassoRegistro({ mapa, rodape, children, ...cabecalho }: PassoRegistroProps) {
   const desktop = useDesktop()
 

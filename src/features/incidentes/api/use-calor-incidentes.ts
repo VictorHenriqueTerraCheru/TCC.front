@@ -7,12 +7,10 @@ export interface FiltroCalorIncidentes {
   minLng: number
   maxLat: number
   maxLng: number
-  /** Vazio = todos os grupos de incidente. */
   grupos: string[]
   dias: number
 }
 
-// GET /incidentes/calor — células agregadas do retângulo visível.
 export function calorIncidentesQuery({ grupos, dias, ...retangulo }: FiltroCalorIncidentes) {
   return queryOptions({
     queryKey: ['incidentes', 'calor', retangulo, { grupos, dias }],
@@ -28,7 +26,6 @@ export function calorIncidentesQuery({ grupos, dias, ...retangulo }: FiltroCalor
   })
 }
 
-/** `filtro` null = camada desligada (modo Problemas ou mapa ainda sem retângulo). */
 export function useCalorIncidentes(filtro: FiltroCalorIncidentes | null) {
   return useQuery({
     ...calorIncidentesQuery(

@@ -8,7 +8,6 @@ import { useExigirConta } from '@/features/auth'
 
 import { itensNavegacao } from './navegacao'
 
-/** ≥ 1024 px: trilho de navegação de 72 px à esquerda + conteúdo (mapa em tela cheia ou página centralizada). */
 export function DesktopLayout() {
   const exigirConta = useExigirConta()
   const navigate = useNavigate()

@@ -6,10 +6,6 @@ import { Button } from '@/common/ui/button'
 
 import { SeletorTema } from '../components/seletor-tema'
 
-/**
- * Primeira abertura: escolha do tema antes da pré-permissão de localização. Já vem com
- * Automático marcado e cada toque mostra o tema na hora; "Continuar" grava a escolha.
- */
 export function EscolherTemaPage() {
   const navigate = useNavigate()
   const location = useLocation()

@@ -26,7 +26,6 @@ import { RaizLayout } from './layouts/raiz-layout'
 import { TelaCheiaLayout } from './layouts/tela-cheia-layout'
 import { PaginaNaoEncontrada } from './pagina-nao-encontrada'
 
-// Rotas de docs/TELAS.md. Cada page é a "borda" da feature, como um module no back.
 export const rotas: RouteObject[] = [
   {
     element: <RaizLayout />,

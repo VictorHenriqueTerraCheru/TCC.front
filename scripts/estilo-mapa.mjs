@@ -1,9 +1,3 @@
-// Receitas dos estilos do mapa (docs/superpowers/specs/2026-10-17-redesign-mapa-vetorial-design.md).
-// Escuro, "M2 · Equilíbrio": parte do fiord do OpenFreeMap, escurece as cores mantendo o matiz,
-// tira prédios e pontos de interesse e engrossa as vias, como no Waze. Claro, estilo Apple Maps:
-// parte do liberty, mantém chão, parques e água e suaviza as vias (amarelo-claro, bordas quase
-// brancas). Funções puras; scripts/gen-estilo-mapa.mjs aplica.
-
 const SEM_CAMADAS = /building|poi|housenumber|aeroway/
 const VIAS = /highway|road|tunnel|bridge|transportation/
 
@@ -21,9 +15,7 @@ export const RECEITA_CLARA = {
   fatorVias: 1.7,
   semCamadas: SEM_CAMADAS,
   vias: VIAS,
-  /** Cor das linhas das vias (sobrepõe escala/saturação nelas). */
   coresVias: { escala: 1, saturacao: 0.7 },
-  /** Bordas (casing) das vias: o laranja do liberty vira um cinza quente claro. */
   coresBordas: { escala: 1.1, saturacao: 0.15 },
 }
 
@@ -42,7 +34,6 @@ function rgbParaHsl(r, g, b) {
   return [h * 60, s, l]
 }
 
-/** Cor CSS → [h (graus), s (0–1), l (0–1), alfa]; null se não for #hex, rgb(a) ou hsl(a). */
 function lerCor(cor) {
   const texto = cor.trim().toLowerCase()
   if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/.test(texto)) {
@@ -61,7 +52,6 @@ function lerCor(cor) {
   return null
 }
 
-/** Ajusta mantendo o matiz: l × escala, s × saturacao (até 100%). Outras strings voltam como estão. */
 export function ajustarCor(cor, { escala, saturacao }) {
   if (typeof cor !== 'string') return cor
   const hsl = lerCor(cor)
@@ -71,7 +61,6 @@ export function ajustarCor(cor, { escala, saturacao }) {
   return `hsla(${Math.round(h) % 360}, ${pct(s * saturacao)}%, ${pct(l * escala)}%, ${Number(a)})`
 }
 
-/** Multiplica larguras: número, { stops }, interpolate (só os valores) e step (só os valores). */
 export function escalarLargura(valor, fator) {
   if (typeof valor === 'number') return valor * fator
   if (valor && !Array.isArray(valor) && Array.isArray(valor.stops)) {
@@ -97,14 +86,12 @@ function ajustarTudo(valor, ajuste) {
   return ajustarCor(valor, ajuste)
 }
 
-/** Ajuste de cor de uma camada: as vias podem ter o próprio (coresVias/coresBordas). */
 function ajusteDa(camada, receita) {
   if (camada.type !== 'line' || !receita.vias.test(camada.id)) return receita
   const proprio = /casing/.test(camada.id) ? receita.coresBordas : receita.coresVias
   return proprio ?? receita
 }
 
-/** Aplica a receita a uma cópia do estilo MapLibre. */
 export function aplicarReceita(estilo, receita = RECEITA_M2) {
   const copia = structuredClone(estilo)
   copia.layers = copia.layers

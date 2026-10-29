@@ -62,7 +62,6 @@ function Lista({ filtro }: { filtro: FiltroHistorico }) {
   )
 }
 
-/** Tela 29. */
 export function HistoricoPage() {
   const navigate = useNavigate()
   const autenticado = useAutenticado()

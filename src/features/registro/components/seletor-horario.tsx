@@ -24,7 +24,6 @@ interface SeletorHorarioProps {
   aoMudar(horario: Horario): void
 }
 
-/** "Quando aconteceu?" da tela 21a, com o stepper de 15 min limitado à janela (regra 16). */
 export function SeletorHorario({ horario, aoMudar }: SeletorHorarioProps) {
   const agora = new Date()
   const escolhido = horario.outroEm ? new Date(horario.outroEm) : horarioInicialOutro(agora)

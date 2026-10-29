@@ -9,7 +9,6 @@ interface ChipsFiltroProps extends FiltrosMapa {
   aoAlternarNovas(): void
 }
 
-/** Chips de filtro por grupo + "Em avaliação"; mudam conforme o modo. */
 export function ChipsFiltro({
   modo,
   grupos,

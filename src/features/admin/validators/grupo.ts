@@ -2,7 +2,6 @@ import { z } from 'zod'
 
 import { coresGrupo, type CorGrupo } from '@/features/categorias'
 
-// Mesmas regras da API (GrupoValidators.cs).
 export const grupoSchema = z.object({
   rotulo: z.string().trim().min(1, 'Informe o nome.').max(40, 'Use até 40 caracteres.'),
   tipo: z.enum(['problema', 'incidente']),

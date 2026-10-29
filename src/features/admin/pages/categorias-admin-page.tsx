@@ -13,7 +13,6 @@ const secoes: { valor: Secao; rotulo: string }[] = [
   { valor: 'grupos', rotulo: 'Grupos' },
 ]
 
-/** Administração de categorias e grupos: o que o cidadão pode registrar e como aparece. */
 export function CategoriasAdminPage() {
   const [secao, setSecao] = useState<Secao>('categorias')
 

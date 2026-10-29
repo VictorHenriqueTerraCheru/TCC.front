@@ -2,10 +2,6 @@ import { useSessaoStore } from '@/features/auth'
 
 type Perfil = 'cidadao' | 'cidadaoVerificado' | 'administrador'
 
-/**
- * Simula login. O MSW identifica o usuário pelo token "mock-jwt-<id>" (outros tokens = cidadao1);
- * ids e nomes iguais a src/infrastructure/mocks/fixtures/usuarios.ts.
- */
 export function entrarComo(id: string, nome: string, perfil: Perfil = 'cidadao') {
   useSessaoStore.getState().entrar({
     token: `mock-jwt-${id}`,

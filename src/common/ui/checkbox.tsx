@@ -4,7 +4,6 @@ import { useState, type ComponentProps } from 'react'
 
 import { cn } from '@/common/lib/utils'
 
-// Adaptado do checkbox do Animate UI (animate-ui.com): o check é desenhado (pathLength) ao marcar.
 function Checkbox({
   className,
   checked,

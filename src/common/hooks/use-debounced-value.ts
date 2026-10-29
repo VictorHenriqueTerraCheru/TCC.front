@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 
-/** `valor` só depois de `atrasoMs` sem mudanças. */
 export function useDebouncedValue<T>(valor: T, atrasoMs: number): T {
   const [atrasado, setAtrasado] = useState(valor)
   useEffect(() => {

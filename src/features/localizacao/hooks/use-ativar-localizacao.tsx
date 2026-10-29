@@ -3,10 +3,6 @@ import { useState } from 'react'
 import { AjudaLocalizacaoDialog } from '../components/ajuda-localizacao-dialog'
 import { useLocalizacao } from './use-localizacao'
 
-/**
- * "Ativar" das telas 18/19: em `prompt` dispara o pedido do navegador; negada ou indisponível,
- * abre a ajuda (o navegador não reabre o pedido). Renderize `dialogo` junto do botão.
- */
 export function useAtivarLocalizacao() {
   const { estado, solicitar } = useLocalizacao()
   const [ajudaAberta, setAjudaAberta] = useState(false)

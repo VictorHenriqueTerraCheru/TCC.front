@@ -11,7 +11,6 @@ import { api, dados, semConteudo } from '@/infrastructure/api'
 
 const TAMANHO_PAGINA = 20
 
-// GET /admin/verificacoes?status — pendentes da mais antiga para a mais nova (fila).
 export function filaQuery(status: StatusVerificacao) {
   return infiniteQueryOptions({
     queryKey: ['admin', 'verificacoes', status],
@@ -35,7 +34,6 @@ export function useFila(status: StatusVerificacao) {
 type Analise =
   { id: string; decisao: 'aprovar' } | { id: string; decisao: 'recusar'; motivo: string }
 
-// POST /admin/verificacoes/{id}/aprovar | recusar → 204
 export function useAnalisarVerificacao() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -52,7 +50,6 @@ export function useAnalisarVerificacao() {
             .then(semConteudo),
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: ['admin', 'verificacoes'] })
-      // Regra 14: depois de uma aprovação, o /me é recarregado.
       void queryClient.invalidateQueries({ queryKey: meQuery.queryKey })
     },
   })

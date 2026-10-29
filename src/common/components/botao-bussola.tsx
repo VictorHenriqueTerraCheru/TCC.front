@@ -3,24 +3,15 @@ import { useEffect, useState } from 'react'
 
 import { cn } from '@/common/lib/utils'
 
-/** Abaixo disso o mapa conta como "no norte" (o gesto deixa frações de grau). */
 const TOLERANCIA_GRAUS = 0.5
 const PONTOS_CARDEAIS = ['N', 'L', 'S', 'O'] as const
-/** Tracinhos do mostrador a cada 30°; o do norte (0°) dá lugar ao triângulo vermelho. */
 const TRACOS = Array.from({ length: 11 }, (_, i) => (i + 1) * 30)
 
-/** Ponto cardeal para onde o topo da tela aponta (o giro do MapLibre é horário a partir do norte). */
 function pontoCardeal(giro: number) {
   const graus = ((giro % 360) + 360) % 360
   return PONTOS_CARDEAIS[Math.round(graus / 90) % 4]
 }
 
-/**
- * Bússola estilo Apple Maps (filha do `MapaVetorial`): aparece quando o mapa está girado ou
- * inclinado. A letra no centro diz para onde o topo da tela aponta (N, L, S, O); o mostrador
- * gira com o mapa e o triângulo vermelho marca o norte. O toque endireita o mapa. A posição
- * vem do `className` de quem usa.
- */
 export function BotaoBussola({ className }: { className?: string }) {
   const { current: mapa } = useMap()
   const [vista, setVista] = useState({ giro: 0, inclinacao: 0 })

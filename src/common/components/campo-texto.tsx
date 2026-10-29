@@ -5,7 +5,6 @@ import { Icone } from '@/common/components/icone'
 import { SURGIR } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
 
-// Base comum dos campos: superfície preenchida, borda que acende no foco com um halo suave.
 const caixa = cn(
   'peer w-full rounded-2xl border border-input bg-superficie-2 text-base outline-none',
   'transition-[border-color,box-shadow,background-color] duration-200 ease-out',
@@ -13,8 +12,6 @@ const caixa = cn(
   'aria-invalid:border-destructive aria-invalid:focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--destructive)_18%,transparent)]',
 )
 
-// Rótulo flutuante: pequeno no topo; com o campo vazio, fora de foco e sem placeholder próprio,
-// desce para o meio como se fosse o placeholder.
 const rotuloFlutuante = cn(
   'pointer-events-none absolute left-4 origin-left text-[11px] font-medium text-muted-foreground',
   'transition-[top,font-size,color] duration-200 ease-out',
@@ -38,12 +35,10 @@ function Descricao({ id, erro, children }: { id: string; erro?: string; children
 
 interface CampoTextoProps extends ComponentProps<'input'> {
   rotulo: string
-  /** Mensagem de erro (substitui a ajuda e deixa o campo vermelho). */
   erro?: string
   ajuda?: string
 }
 
-/** Campo preenchido com o rótulo flutuante (telas 11, 15, 16). */
 export function CampoTexto({
   rotulo,
   erro,
@@ -65,7 +60,6 @@ export function CampoTexto({
           id={idCampo}
           aria-invalid={erro ? true : undefined}
           aria-describedby={descricao ? idDescricao : undefined}
-          // O espaço deixa o :placeholder-shown dizer se o campo está vazio.
           placeholder={placeholder ?? ' '}
           className={cn(caixa, 'h-14 px-4 pt-5 pb-1')}
           {...props}
@@ -91,7 +85,6 @@ export function CampoTexto({
   )
 }
 
-/** Campo de senha com o botão de olho. */
 export function CampoSenha(props: Omit<CampoTextoProps, 'type'>) {
   const [visivel, setVisivel] = useState(false)
   return (
@@ -132,12 +125,10 @@ interface CampoAreaTextoProps extends ComponentProps<'textarea'> {
   rotulo: string
   erro?: string
   ajuda?: string
-  /** Mostra "N/max" à direita da ajuda. */
   maximo?: number
   valorAtual?: string
 }
 
-/** Texto longo com rótulo flutuante e contador (telas 8, 11, 13). */
 export function CampoAreaTexto({
   rotulo,
   erro,
@@ -200,7 +191,6 @@ interface CampoSelecaoProps extends ComponentProps<'select'> {
   erro?: string
 }
 
-/** Seleção nativa no mesmo visual dos outros campos (tipo de vínculo, tela 11). */
 export function CampoSelecao({
   rotulo,
   erro,

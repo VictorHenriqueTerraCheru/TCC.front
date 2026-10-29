@@ -13,7 +13,6 @@ const itens: [MaterialSymbol, string][] = [
   ['settings', 'Você pode mudar isso a qualquer momento em Configurações.'],
 ]
 
-/** Tela 17: explica o uso da localização antes do pedido do navegador. */
 export function PermissaoLocalizacaoPage() {
   const navigate = useNavigate()
   const location = useLocation()

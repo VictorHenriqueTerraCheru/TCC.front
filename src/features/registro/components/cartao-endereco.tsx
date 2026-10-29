@@ -5,17 +5,14 @@ import { distanciaMetros, useLocalizacao } from '@/features/localizacao'
 import { useEnderecoDoRascunho } from '../hooks/use-rascunho'
 import { useRascunhoStore } from '../stores/rascunho-store'
 
-/** "Precisão de ±15 m" só quando o pino está onde o GPS pôs a pessoa. */
 function usePrecisao(): number | null {
   const local = useRascunhoStore((s) => s.local)
   const { estado, posicao } = useLocalizacao()
   if (estado !== 'granted' || !posicao || !local) return null
-  // Precisão 0 não é real (GPS simulado/desktop): não mostra.
   const perto = distanciaMetros(local, posicao) <= Math.max(posicao.precisao, 30)
   return perto && posicao.precisao >= 1 ? posicao.precisao : null
 }
 
-/** Tela 6: "Endereço aproximado" do centro do mapa. */
 export function CartaoEndereco() {
   const { data, atualizando } = useEnderecoDoRascunho()
   const precisao = usePrecisao()
@@ -28,8 +25,7 @@ export function CartaoEndereco() {
       <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
         <Icone nome="location_on" preenchido className="text-[22px]" />
       </span>
-      {/* Altura mínima: o esqueleto e o endereço ocupam o mesmo espaço e o mapa acima não muda de
-          tamanho a cada consulta. */}
+
       <div className="min-h-[84px] min-w-0 flex-1">
         <p className="text-xs text-muted-foreground">Endereço aproximado</p>
         {atualizando || !data ? (

@@ -17,7 +17,6 @@ export interface FiltroUsuarios {
   perfil: Perfil | null
 }
 
-// GET /admin/usuarios?busca&perfil — cadastro mais novo primeiro.
 export function usuariosAdminQuery({ busca, perfil }: FiltroUsuarios) {
   return infiniteQueryOptions({
     queryKey: ['admin', 'usuarios', { busca, perfil }],
@@ -45,7 +44,6 @@ export function useUsuariosAdmin(filtro: FiltroUsuarios) {
   return useInfiniteQuery(usuariosAdminQuery(filtro))
 }
 
-// PATCH /admin/usuarios/{id}/perfil → 204
 export function useAlterarPerfilUsuario() {
   const queryClient = useQueryClient()
   return useMutation({

@@ -5,7 +5,6 @@ import { ApiError } from './api-error'
 import { obterProvedorAutenticacao } from './autenticacao'
 import type { paths } from './schema'
 
-// openapi-fetch monta `new Request(baseUrl + path)`; no Node (testes) a URL precisa ser absoluta.
 const baseUrl = new URL(env.apiUrl, globalThis.location?.origin ?? 'http://localhost').href.replace(
   /\/$/,
   '',
@@ -21,7 +20,6 @@ const autenticacao: Middleware = {
     return request
   },
   onResponse({ request, response }) {
-    // Só expira se o token enviado ainda é o da sessão: um 401 atrasado de outra conta não a derruba.
     const enviado = request.headers.get('Authorization')
     if (
       response.status === 401 &&
@@ -33,7 +31,6 @@ const autenticacao: Middleware = {
   },
 }
 
-// fetch resolvido a cada chamada: interceptadores (MSW) instalados depois da importação continuam valendo.
 export const api = createClient<paths>({ baseUrl, fetch: (request) => globalThis.fetch(request) })
 api.use(autenticacao)
 
@@ -43,17 +40,11 @@ interface Resultado {
   response: Response
 }
 
-/**
- * Devolve o corpo de sucesso ou lança ApiError. Os hooks de api/ das features usam assim:
- * `queryFn: () => api.GET('/categorias').then(dados)`.
- * Para respostas 204 (sem corpo), use `semConteudo`.
- */
 export function dados<R extends Resultado>(resultado: R): Exclude<R['data'], undefined> {
   verificar(resultado)
   return resultado.data as Exclude<R['data'], undefined>
 }
 
-/** Para endpoints 204: lança ApiError em falha e não devolve nada. */
 export function semConteudo(resultado: Resultado): void {
   verificar(resultado)
 }

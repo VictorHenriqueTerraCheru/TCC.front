@@ -13,16 +13,11 @@ const MINIMO_LETRAS = 2
 const MAXIMO_RESULTADOS = 48
 
 interface SeletorIconeProps {
-  /** Nome Material Symbols escolhido; vazio = nenhum ainda. */
   valor: string
   aoMudar(nome: string): void
   erro?: string
 }
 
-/**
- * Busca ícones Material Symbols (estilo Rounded) no catálogo do Iconify. O catálogo só é
- * consultado aqui, na tela de admin; o app guarda o nome escolhido.
- */
 export function SeletorIcone({ valor, aoMudar, erro }: SeletorIconeProps) {
   const [busca, setBusca] = useState('')
   const termo = useDebouncedValue(busca.trim().toLowerCase(), 350)

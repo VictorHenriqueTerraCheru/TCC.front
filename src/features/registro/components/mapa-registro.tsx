@@ -14,7 +14,6 @@ import { MarcadorProblema } from '@/features/problemas'
 
 import { useRascunhoStore, type Ponto } from '../stores/rascunho-store'
 
-/** Raio desenhado no passo do incidente (tela 21a). A API arredonda o ponto para ~110 m. */
 const RAIO_AREA_INCIDENTE_M = 150
 
 type MapaRegistroProps =
@@ -27,7 +26,6 @@ type MapaRegistroProps =
     }
   | { modo: 'estatico' }
 
-/** O centro do mapa é o local do rascunho: grava ao parar de mover (e ao abrir). */
 function OuvinteCentro({ aoMover }: { aoMover?(centro: Ponto): void }) {
   const definirLocal = useRascunhoStore((s) => s.definirLocal)
   const { current: mapa } = useMap()
@@ -129,7 +127,6 @@ function PontoCentral({ cor, tamanho }: { cor: string; tamanho: number }) {
 function EnquadrarConferencia({ novo, existente }: { novo: Ponto; existente: Ponto }) {
   const { current: mapa } = useMap()
   useEffect(() => {
-    // Vizinhos a poucos metros: zoom alto para os dois pinos não se sobreporem.
     mapa?.fitBounds(
       [
         [Math.min(novo.lng, existente.lng), Math.min(novo.lat, existente.lat)],
@@ -143,11 +140,9 @@ function EnquadrarConferencia({ novo, existente }: { novo: Ponto; existente: Pon
 
 interface CentroInicial {
   centro: [number, number]
-  /** Abriu em Icaraí só porque a posição ainda não tinha chegado. */
   provisorio: boolean
 }
 
-/** Ponto inicial: o já escolhido, senão a posição atual, senão Icaraí (provisório). */
 function useCentroInicial(): CentroInicial {
   const local = useRascunhoStore((s) => s.local)
   const { posicao } = useLocalizacao()
@@ -160,10 +155,6 @@ function useCentroInicial(): CentroInicial {
   return inicial
 }
 
-/**
- * A primeira posição do GPS costuma chegar depois de o mapa abrir: centraliza nela uma vez, para
- * o local não ficar em Icaraí sem a pessoa perceber. Se ela já arrastou o mapa, não mexe.
- */
 function CentrarNaPrimeiraPosicao() {
   const { posicao } = useLocalizacao()
   const resolvidoRef = useRef(false)
@@ -214,7 +205,6 @@ export function MapaRegistro(props: MapaRegistroProps) {
           <MarcadorProblema cor={cor} icone={icone} status="ativa" faixa="alta" selecionado />
         </Marker>
         <Marker latitude={meio.lat} longitude={meio.lng} anchor="center">
-          {/* Etiqueta "30 m" sobre a linha da conferência (tela 7), por cima dos pinos. */}
           <span className="rounded-md bg-foreground px-1.5 py-0.5 text-[11px] font-medium text-background">
             {distanciaTexto(existente.distanciaMetros)}
           </span>
@@ -260,7 +250,7 @@ export function MapaRegistro(props: MapaRegistroProps) {
         <BotaoBussola className="right-3 bottom-[92px]" />
       </MapaVetorial>
       <DicaArrastar texto="Arraste o mapa para ajustar" />
-      {/* Pino fixo no centro: quem se move é o mapa. A ponta do pino marca o ponto. */}
+
       <div className="pointer-events-none absolute top-1/2 left-1/2 z-[1000] -translate-x-1/2 -translate-y-full">
         {categoria && (
           <MarcadorProblema

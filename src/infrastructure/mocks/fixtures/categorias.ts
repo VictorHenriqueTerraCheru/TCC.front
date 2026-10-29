@@ -1,6 +1,5 @@
 import type { Schema } from '../../api'
 
-// Seed fixo da API (docs/API.md, "Categorias").
 export const categorias: Schema<'ListarCategoriasResponse'>[] = [
   { id: 1, nome: 'Buraco na via', grupo: 'viaPublica', tipo: 'problema', icone: 'buraco' },
   { id: 2, nome: 'Calçada danificada', grupo: 'viaPublica', tipo: 'problema', icone: 'calcada' },

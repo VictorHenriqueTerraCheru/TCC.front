@@ -26,7 +26,6 @@ export function ListaGrupos() {
   if (grupos.isPending || categorias.isPending) {
     return <Skeleton className="h-60 rounded-2xl bg-muted" />
   }
-  // Sem a lista de categorias não há contagem, e sem ela nenhum grupo vazio poderia ser apagado.
   if (grupos.isError || categorias.isError) {
     return (
       <div role="alert" className="space-y-3 py-6">

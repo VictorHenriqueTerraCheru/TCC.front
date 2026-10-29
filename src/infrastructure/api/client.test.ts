@@ -65,7 +65,7 @@ describe('cliente da API', () => {
     )
 
     const pendente = api.GET('/me')
-    token = 'jwt-b' // saiu e entrou com outra conta enquanto a resposta não voltava
+    token = 'jwt-b'
     await pendente
 
     expect(aoExpirarSessao).not.toHaveBeenCalled()

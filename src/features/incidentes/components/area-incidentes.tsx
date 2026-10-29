@@ -16,13 +16,11 @@ const nivel: Record<NivelConcentracao, { rotulo: string; cor: string }> = {
   alta: { rotulo: 'Concentração alta', cor: gradienteCalor[1]! },
 }
 
-// Rótulo no plural e ícone por categoria de incidente (seed fixo).
 const linhas: Record<number, { rotulo: string; icone: MaterialSymbol }> = {
   7: { rotulo: 'Roubos', icone: 'error' },
   8: { rotulo: 'Acidentes', icone: 'car_crash' },
 }
 
-/** Tela 4: resumo dos incidentes num raio de 400 m. Área e endereço são buscados em paralelo. */
 export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
   const area = useAreaIncidentes(lat, lng)
   const endereco = useEnderecoReverso({ lat, lng })

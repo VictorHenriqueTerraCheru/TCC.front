@@ -1,9 +1,5 @@
 import { readFile } from 'node:fs/promises'
 
-// Contraste AA (WCAG 2.x) dos pares de tokens dos dois temas (src/index.css): o claro no :root e
-// o escuro em :root[data-tema='escuro'], que só sobrescreve. Texto normal ≥ 4,5:1. Tokens com
-// alfa (vidro, suaves) ficam de fora: dependem do fundo.
-
 async function tokens(tema) {
   const css = await readFile('src/index.css', 'utf8')
   const bloco = (seletor) => {
@@ -42,7 +38,6 @@ const PARES = [
   ['--primario', '--card'],
   ['--destructive', '--background'],
   ['--foreground', '--superficie-2'],
-  // Rótulo da categoria em texto (chips, card rápido, histórico): um par por slot de cor de grupo.
   ['--cat-laranja', '--card'],
   ['--cat-ocre', '--card'],
   ['--cat-marrom', '--card'],

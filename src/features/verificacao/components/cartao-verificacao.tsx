@@ -10,7 +10,6 @@ import { rotuloVinculo } from '../models/verificacao'
 
 const data = (iso: string) => format(new Date(iso), 'd MMM. yyyy', { locale: ptBR })
 
-/** Cartão do perfil: convite (tela 10), pedido em análise, ou "Seu voto tem peso maior" (tela 12). */
 export function CartaoVerificacao({ me }: { me: Me }) {
   if (me.perfil === 'cidadaoVerificado') {
     return (

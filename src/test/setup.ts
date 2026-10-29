@@ -8,18 +8,13 @@ import { registrarAutenticacao } from '@/infrastructure/api'
 import { banco } from '@/infrastructure/mocks/banco'
 import { server } from '@/infrastructure/mocks/server'
 
-// jsdom não tem WebGL: o mapa vira um falso que imita a API usada pelo app.
 vi.mock('@vis.gl/react-maplibre', () => import('./maplibre-falso'))
 
-// Sem animações: o AnimatePresence só tiraria os elementos do DOM depois da saída animada.
 MotionGlobalConfig.skipAnimations = true
 
-// Mesma composição do main.tsx.
 registrarAutenticacao(provedorAutenticacao)
 
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }))
-// A escolha do tema da primeira abertura tem teste próprio (fluxos/aparencia.test.tsx); nos
-// outros, o tema já foi escolhido.
 beforeEach(() => useTemaStore.setState({ preferencia: 'automatico', escolhido: true }))
 afterEach(() => {
   cleanup()
@@ -29,7 +24,6 @@ afterEach(() => {
 })
 afterAll(() => server.close())
 
-// jsdom não tem matchMedia. Os testes escolhem a largura com definirLargura() (src/test/render.tsx).
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: (consulta: string) => {
@@ -47,12 +41,10 @@ Object.defineProperty(window, 'matchMedia', {
   },
 })
 
-// vaul (Drawer) usa pointer capture, que o jsdom não implementa.
 Element.prototype.setPointerCapture ??= () => {}
 Element.prototype.releasePointerCapture ??= () => {}
 Element.prototype.hasPointerCapture ??= () => false
 
-// O Checkbox do Radix mede o input escondido com ResizeObserver, que o jsdom não tem.
 globalThis.ResizeObserver ??= class {
   observe() {}
   unobserve() {}

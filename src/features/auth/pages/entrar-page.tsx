@@ -15,7 +15,6 @@ import { useAposEntrar } from '../hooks/use-apos-entrar'
 import { useGuardaStore } from '../stores/guarda-store'
 import { entrarSchema, type EntrarForm } from '../validators/auth'
 
-/** Tela 16. */
 export function EntrarPage() {
   const navigate = useNavigate()
   const aposEntrar = useAposEntrar()
@@ -36,7 +35,6 @@ export function EntrarPage() {
   })
 
   function voltar() {
-    // Desistiu do login: a ação pendente não deve disparar num login futuro.
     useGuardaStore.getState().descartar()
     navigate(-1)
   }

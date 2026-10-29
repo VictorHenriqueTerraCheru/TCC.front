@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { api, dados, semConteudo, type Schema } from '@/infrastructure/api'
 
-/** Os grupos aparecem no mapa, nos filtros e no registro: tudo que os lê é recarregado. */
 function useInvalidarGrupos() {
   const queryClient = useQueryClient()
   return () => {
@@ -13,7 +12,6 @@ function useInvalidarGrupos() {
   }
 }
 
-// POST /admin/grupos → 201 (a chave é gerada pela API)
 export function useCriarGrupo() {
   const invalidar = useInvalidarGrupos()
   return useMutation({
@@ -23,7 +21,6 @@ export function useCriarGrupo() {
   })
 }
 
-// PUT /admin/grupos/{chave} → 200 (tipo e chave não mudam)
 export function useEditarGrupo() {
   const invalidar = useInvalidarGrupos()
   return useMutation({
@@ -33,7 +30,6 @@ export function useEditarGrupo() {
   })
 }
 
-// DELETE /admin/grupos/{chave} → 204; 409 grupo-em-uso se tiver categorias
 export function useApagarGrupo() {
   const invalidar = useInvalidarGrupos()
   return useMutation({

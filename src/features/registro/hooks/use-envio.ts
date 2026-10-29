@@ -6,13 +6,7 @@ import { isApiError, isErroDeRede } from '@/infrastructure/api'
 
 import { mensagemErroRegistro } from '../errors'
 
-/**
- * Trata o erro do envio como a tela 26 pede: rede/timeout → diálogo "Tentar novamente";
- * 401 → guarda com o envio guardado para depois do login; regra de negócio → mensagem.
- */
 export function useEnvio<Variaveis, Resultado>(
-  // mutateAsync, não mutate: num 401 o RegistroLayout já manda ao login e desmonta a página, e
-  // os callbacks do mutate() não rodam depois disso. A promise resolve mesmo assim.
   executar: (variaveis: Variaveis) => Promise<Resultado>,
   aoSucesso: (resultado: Resultado, variaveis: Variaveis) => void,
 ) {
@@ -31,7 +25,6 @@ export function useEnvio<Variaveis, Resultado>(
       (erro: unknown) => {
         if (isErroDeRede(erro)) setFalhaAberta(true)
         else if (isApiError(erro) && erro.status === 401)
-          // Depois do login, a revisão envia de novo com o rascunho (useRetomarRegistro).
           exigirConta('registrar', () => {}, {
             retorno: pathname,
             pendente: { tipo: 'continuarRegistro', passo: 'enviar' },

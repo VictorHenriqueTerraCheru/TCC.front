@@ -15,7 +15,6 @@ function pessoas(n: number) {
   return n === 1 ? '1 pessoa disse' : `${n} pessoas disseram`
 }
 
-/** Destaque por status: o convite muda, a pergunta é a mesma. */
 function Convite({ problema }: { problema: DetalheProblema }) {
   const distancia = useDistanciaAte(problema)
 
@@ -50,11 +49,6 @@ function Convite({ problema }: { problema: DetalheProblema }) {
   return <h3 className="font-medium">Ainda está lá?</h3>
 }
 
-/**
- * A única pergunta do detalhe (telas 3, 22 e 23). A mesma resposta alimenta, na API, a confiança
- * e o ciclo de vida: "Sim" = viu no local; "Não" = foi resolvido ou não encontrou. Nova e
- * Possivelmente resolvida ganham o cartão azul de destaque; Ativa, um cartão neutro.
- */
 export function CartaoVoto({ problema }: { problema: DetalheProblema }) {
   const { erro, votar, meuVoto, votando, podeVotar } = useVotos(problema)
   const destaque = problema.status !== 'ativa'

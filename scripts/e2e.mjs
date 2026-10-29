@@ -1,21 +1,3 @@
-// Teste de ponta a ponta: usa o app no Chrome como um usuário, contra a API real e o banco.
-//
-//   (API em :5080 com o banco do docker compose; front em :5173 com `npm run dev`)
-//   npm run e2e
-//
-// Cada passo é uma ação de usuário (clicar, digitar, tocar no mapa) seguida de uma checagem na
-// tela e, quando há escrita, no PostgreSQL (docker exec + psql). Cria dados de verdade no banco
-// local: uma conta nova por execução (e2e-<horário>@tcc.local), um problema, um incidente,
-// votos e um pedido de verificação aprovado pelo admin do seed.
-//
-// Variáveis opcionais:
-//   E2E_URL           front (padrão: http://localhost:5173)
-//   E2E_DB            container do PostGIS (padrão: tccback-db-1)
-//   E2E_SENHA         senha dos usuários do seed (padrão: tcc12345)
-//   E2E_NAVEGADOR     canal do Playwright (padrão: chrome)
-//   E2E_VISIVEL=1     abre o navegador na tela, mais devagar, para acompanhar
-//
-// Saída: resumo no terminal e, em caso de falha, print da tela em prints/e2e/.
 import { execFileSync } from 'node:child_process'
 import { mkdir } from 'node:fs/promises'
 import { setTimeout as esperar } from 'node:timers/promises'
@@ -31,8 +13,6 @@ const SAIDA = 'prints/e2e'
 const CELULAR = { width: 390, height: 844 }
 const DESKTOP = { width: 1440, height: 900 }
 
-// Cada execução registra num ponto diferente de Botafogo (até ~350 m do centro), para o
-// problema novo não cair no raio de duplicatas (50 m) de execuções anteriores.
 const sorteio = () => (Math.random() - 0.5) * 0.006
 const POSICAO = { latitude: -22.9519 + sorteio(), longitude: -43.1866 + sorteio(), accuracy: 10 }
 const EXECUCAO = new Date().toISOString().replace(/\D/g, '').slice(0, 14)
@@ -57,7 +37,6 @@ const navegador = await chromium.launch({
 })
 
 try {
-  // ---------------------------------------------------------------- visitante → cadastro
   const visitante = await novaPagina('visitante', CELULAR, { primeiraVez: true })
   const p = visitante.pagina
 
@@ -95,7 +74,6 @@ try {
   })
 
   await passo('Visitante toca num alerta e vê o card rápido com dados da API', p, async () => {
-    // O primeiro marcador ainda votável por um visitante (o card esconde polegares de resolvida).
     await p.locator('[data-problema]').first().click({ force: true })
     await p.waitForURL(/\/mapa\/problema\//)
     estado.problemaSeed = p.url().split('/mapa/problema/')[1].split('?')[0]
@@ -132,7 +110,6 @@ try {
       estado.usuarioId = sql(`select id from usuarios where email = '${NOVO.email}'`)
       confere(estado.usuarioId, 'usuário novo não está no banco')
       await p.getByRole('button', { name: /^Voto rápido/, pressed: true }).waitFor()
-      // Voto único "Ainda está lá?": uma linha por usuário e problema.
       const votos = sql(
         `select count(*) from votos where usuario_id = '${estado.usuarioId}' and problema_id = '${estado.problemaSeed}'`,
       )
@@ -141,12 +118,10 @@ try {
     },
   )
 
-  // ---------------------------------------------------------------- registro de problema
   await passo('Registrar problema: categoria → local (endereço da API) → revisão', p, async () => {
     await p.goto(BASE + '/mapa')
     await p.getByRole('link', { name: 'Registrar' }).click()
     await p.waitForURL(/\/registrar$/)
-    // Passo 1: "Estado ou evento?" (problema = estado).
     await p.getByRole('link', { name: /^Estado/ }).click()
     await p.waitForURL(/\/registrar\/categoria\?tipo=problema/)
     await p.getByRole('button', { name: /Buraco na via/ }).click()
@@ -162,7 +137,6 @@ try {
       await p.waitForURL(/\/registrar\/revisao/)
     }
     await p.locator('textarea').fill(DESCRICAO)
-    // O endereço vem de GET /geocodificacao/reversa (a API consulta o Nominatim).
     await p.getByText('Buscando endereço…').waitFor({ state: 'detached', timeout: 20_000 })
   })
 
@@ -197,11 +171,9 @@ try {
     await p.waitForURL(new RegExp(`/mapa/problema/${estado.problemaNovo}`))
     const card = p.getByRole('region', { name: 'Resumo do alerta' })
     await card.getByText('Buraco na via').waitFor()
-    // O autor não vota existência no próprio problema: o card não tem polegares.
     confere((await card.getByRole('button').count()) === 0, 'autor viu polegares no próprio alerta')
   })
 
-  // ---------------------------------------------------------------- registro de incidente
   await passo('Registrar incidente (anônimo) e conferir a área no banco', p, async () => {
     await p.goto(BASE + '/registrar')
     await p.getByRole('link', { name: /^Evento/ }).click()
@@ -235,7 +207,6 @@ try {
       await p.waitForLoadState('networkidle')
       const area = p.waitForResponse((r) => /\/incidentes\/area/.test(r.url()))
       const caixa = await mapa.boundingBox()
-      // O mapa abre centrado no GPS, onde o incidente foi registrado.
       await p.mouse.click(caixa.x + caixa.width / 2, caixa.y + caixa.height / 2)
       const resposta = await area
       confere(resposta.status() === 200, `GET /incidentes/area respondeu ${resposta.status()}`)
@@ -248,7 +219,6 @@ try {
     },
   )
 
-  // ---------------------------------------------------------------- perfil, histórico, nome
   await passo('Perfil mostra os totais e o histórico vindos de GET /me', p, async () => {
     await p.goto(BASE + '/perfil')
     await p.getByText(NOVO.nome).first().waitFor()
@@ -293,7 +263,6 @@ try {
     confere(status !== '', 'pedido não está no banco')
   })
 
-  // ---------------------------------------------------------------- outro cidadão vota
   const vizinho = await novaPagina('cidadao2')
   await passo(
     'Outro cidadão entra pelo login e confirma o problema novo',
@@ -336,7 +305,6 @@ try {
   )
   await vizinho.contexto.close()
 
-  // ---------------------------------------------------------------- admin aprova
   const admin = await novaPagina('admin')
   await passo('Admin aprova o pedido na fila de verificação', admin.pagina, async () => {
     const q = admin.pagina
@@ -359,13 +327,11 @@ try {
     await p.getByText('Seu voto tem peso maior').waitFor()
   })
 
-  // ---------------------------------------------------------------- bússola
   await passo('Bússola: girar o mapa mostra a direção e o toque volta ao norte', p, async () => {
     await p.goto(BASE + '/mapa')
     const mapa = p.locator('canvas.maplibregl-canvas')
     await mapa.waitFor()
     await mapa.focus()
-    // Cada Shift+→ gira o mapa ~15° no sentido horário: o topo da tela vai para o leste (L).
     for (let i = 0; i < 6; i++) {
       await p.keyboard.press('Shift+ArrowRight')
       await esperar(250)
@@ -380,7 +346,6 @@ try {
     return `letra ${letra} com o mapa girado`
   })
 
-  // ---------------------------------------------------------------- sessão expirada
   await passo('Token inválido: o voto pede login de novo (regra 13)', p, async () => {
     await p.evaluate(() => {
       const chave = 'ocorrencias.sessao'
@@ -408,7 +373,6 @@ try {
   })
   await visitante.contexto.close()
 
-  // ---------------------------------------------------------------- desktop
   const mesa = await novaPagina('desktop', DESKTOP)
   await passo('Desktop: alerta abre no painel lateral ao lado do mapa', mesa.pagina, async () => {
     const q = mesa.pagina
@@ -421,13 +385,10 @@ try {
   })
   await mesa.contexto.close()
 } catch {
-  // O passo que falhou já foi impresso, com o print da tela.
 } finally {
   await navegador.close()
   relatorio()
 }
-
-// ------------------------------------------------------------------------------- utilitários
 
 async function passo(nome, pagina, acao) {
   const inicio = Date.now()
@@ -474,9 +435,7 @@ async function novaPagina(nome, tela = CELULAR, { primeiraVez = false } = {}) {
     permissions: ['geolocation'],
     geolocation: POSICAO,
   })
-  // A legenda abre sozinha na primeira visita e cobriria os controles; o usuário a fecharia.
   await contexto.addInitScript(() => localStorage.setItem('ocorrencias.legendaVista', '1'))
-  // Fora da primeira vez, o tema já foi escolhido (claro, o padrão de quem usa o celular de dia).
   if (!primeiraVez) {
     await contexto.addInitScript(() =>
       localStorage.setItem(
@@ -540,10 +499,8 @@ async function conferirAmbiente() {
 function relatorio() {
   const ok = resultados.filter((r) => r.ok).length
   console.log(`\n${ok}/${resultados.length} passos ok · conta ${NOVO.email}`)
-  // O 401 do token inválido é provocado pelo próprio teste.
   const inesperados = problemasRede.filter((l) => !l.endsWith('→ 401'))
   if (inesperados.length) console.log('\nRespostas de erro da API:\n  ' + inesperados.join('\n  '))
-  // Provocados de propósito: sem internet (tela 26) e o 401 do token inválido (regra 13).
   const console_ = errosConsole.filter(
     (l) => !l.includes('ERR_INTERNET_DISCONNECTED') && !l.includes('status of 401'),
   )

@@ -7,7 +7,6 @@ interface Retangulo {
   maxLng: number
 }
 
-/** Lê e valida o retângulo como a API (docs/API.md, GET /problemas). */
 export function retanguloDaUrl(url: URL): Retangulo | null {
   const [minLat, minLng, maxLat, maxLng] = ['minLat', 'minLng', 'maxLat', 'maxLng'].map((nome) =>
     Number(url.searchParams.get(nome)),
@@ -30,7 +29,6 @@ export function lista(url: URL, nome: string): string[] {
   return (url.searchParams.get(nome) ?? '').split(',').filter(Boolean)
 }
 
-/** ProblemDetails de regra de negócio (409/422/429), com o type estável de docs/API.md. */
 export function erroDeRegra(status: number, type: string, title: string) {
   return HttpResponse.json(
     { type, title, status },
@@ -38,7 +36,6 @@ export function erroDeRegra(status: number, type: string, title: string) {
   )
 }
 
-/** Paginação da API: ?pagina&tamanho → { itens, pagina, tamanho, total }. */
 export function paginar<T>(lista: T[], url: URL) {
   const pagina = Number(url.searchParams.get('pagina') ?? 1)
   const tamanho = Number(url.searchParams.get('tamanho') ?? 20)

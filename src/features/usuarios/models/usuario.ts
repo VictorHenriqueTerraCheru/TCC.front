@@ -11,7 +11,6 @@ export const aparenciaPerfil: Record<Perfil, { rotulo: string; icone: MaterialSy
   administrador: { rotulo: 'Administrador', icone: 'admin_panel_settings' },
 }
 
-/** "Mariana Souza" → "MS". */
 export function iniciais(nome: string): string {
   return nome
     .split(/\s+/)

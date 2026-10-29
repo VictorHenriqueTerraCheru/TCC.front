@@ -26,7 +26,6 @@ export function SegmentadoTipo({
   )
 }
 
-/** "12 de 30 categorias" + Limpar filtros (só aparece com algum filtro ligado). */
 export function ResumoDosFiltros({
   mostradas,
   total,
@@ -36,7 +35,6 @@ export function ResumoDosFiltros({
 }: {
   mostradas: number
   total: number
-  /** Plural: "categorias", "grupos". */
   substantivo: string
   filtrando: boolean
   aoLimpar(): void

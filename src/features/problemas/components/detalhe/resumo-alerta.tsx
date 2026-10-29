@@ -14,10 +14,6 @@ import { useDistanciaAte } from '../../hooks/use-distancia-ate'
 import { useVotos } from '../../hooks/use-votos'
 import type { DetalheProblema } from '../../models/problema'
 
-/**
- * Altura do primeiro estágio da folha no celular antes da medida: o card registra-se no painel
- * (`medirResumo`) e a folha passa a parar logo abaixo dele.
- */
 export const ALTURA_RESUMO = 236
 
 interface Polegar {
@@ -42,7 +38,6 @@ function BotaoPolegar({ polegar, desabilitado }: { polegar: Polegar; desabilitad
       )}
       style={{ color: polegar.cor }}
     >
-      {/* Ao marcar, o polegar dá um pulo curto (inclinado, como um "curtir"). */}
       <m.span
         initial={false}
         animate={polegar.marcado ? { scale: [1, 1.3, 1], rotate: [0, -12, 0] } : { scale: 1 }}
@@ -55,11 +50,6 @@ function BotaoPolegar({ polegar, desabilitado }: { polegar: Polegar; desabilitad
   )
 }
 
-/**
- * Card rápido do alerta (estilo Waze): primeiro estágio da folha do detalhe. Recolhida, tem
- * "Ainda está lá?" com os polegares, com a mesma guarda de conta do detalhe. O autor não vota;
- * `resolvida` é só leitura.
- */
 export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
   const { aparenciaDe } = useAparencia()
   const aparencia = aparenciaDe(problema.categoria)
@@ -85,7 +75,6 @@ export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
   ]
 
   return (
-    // Tocar no card (fora dos polegares) expande a folha: alternativa de um toque ao arrasto.
     <section
       ref={medirResumo}
       aria-label="Resumo do alerta"
@@ -120,8 +109,7 @@ export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
           {distancia !== null && ` · ${distanciaTexto(distancia)} de você`}
         </p>
       </div>
-      {/* Só na folha recolhida: aberta (ou no desktop), o cartão completo do detalhe já pergunta,
-          e duas perguntas iguais na mesma tela confundem. */}
+
       {podeVotar && recolhido && (
         <div className="mt-3 flex items-center gap-3 rounded-2xl bg-foreground/5 py-2 pr-2 pl-4">
           <p className="min-w-0 flex-1 text-[15px] font-semibold">Ainda está lá?</p>

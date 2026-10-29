@@ -30,7 +30,6 @@ function LinkDocumento({ titulo, children }: { titulo: string; children: ReactNo
   )
 }
 
-/** Tela 15. */
 export function CadastroPage() {
   const navigate = useNavigate()
   const aposEntrar = useAposEntrar()

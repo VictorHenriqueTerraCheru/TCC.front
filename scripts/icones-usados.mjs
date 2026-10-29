@@ -1,7 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-/** Nomes de ícone do pacote material-symbols que aparecem como literal de string em src/. */
 export async function iconesUsados(raiz = 'src') {
   const tipos = await readFile('node_modules/material-symbols/index.d.ts', 'utf8')
   const validos = new Set([...tipos.matchAll(/^\s*"([a-z0-9_]+)",?$/gm)].map((m) => m[1]))
@@ -12,12 +11,10 @@ export async function iconesUsados(raiz = 'src') {
     for (const [, nome] of codigo.matchAll(/['"`]([a-z0-9_]+)['"`]/g)) {
       if (validos.has(nome)) usados.add(nome)
     }
-    // <Icone nome="x"> em JSX e strings com vários nomes (ex.: classes) não pegam no padrão acima.
     for (const [, nome] of codigo.matchAll(/nome="([a-z0-9_]+)"/g)) {
       if (validos.has(nome)) usados.add(nome)
     }
   }
-  // O Google Fonts exige os nomes em ordem alfabética.
   return [...usados].sort()
 }
 

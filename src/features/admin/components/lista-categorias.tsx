@@ -39,7 +39,6 @@ export function ListaCategorias() {
   const gruposQuery = useGrupos()
   const { grupos, grupoDe } = useAparencia()
   const alterarAtiva = useAlterarAtivaCategoria()
-  // 'nova' abre o formulário vazio; uma categoria abre a edição dela.
   const [formulario, setFormulario] = useState<'nova' | CategoriaAdmin | null>(null)
   const [busca, setBusca] = useState('')
   const [tipo, setTipo] = useState<FiltroTipo>('todos')
@@ -49,7 +48,6 @@ export function ListaCategorias() {
   if (categorias.isPending || gruposQuery.isPending) {
     return <Skeleton className="h-60 rounded-2xl bg-muted" />
   }
-  // Sem grupos a lista mostraria chaves cruas, sem filtros, e o formulário diria que não há grupos.
   if (categorias.isError || gruposQuery.isError) {
     return (
       <div role="alert" className="space-y-3 py-6">
@@ -91,7 +89,6 @@ export function ListaCategorias() {
         semAcento(grupoDe(c)?.rotulo ?? c.grupo).includes(termo)),
   )
   const filtrando = termo !== '' || tipo !== 'todos' || situacao !== 'todas' || grupo !== null
-  // Os chips de grupo seguem o tipo escolhido (grupo de Estado não mistura com Evento).
   const gruposDoFiltro = grupos.filter((g) => tipo === 'todos' || g.tipo === tipo)
 
   function limpar() {
@@ -103,7 +100,6 @@ export function ListaCategorias() {
 
   function mudarTipo(novo: FiltroTipo) {
     setTipo(novo)
-    // O grupo marcado pode ser do outro tipo: sai do filtro.
     if (
       grupo !== null &&
       novo !== 'todos' &&

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
 
-/** Versão com atraso de `callback`: só executa depois de `atrasoMs` sem novas chamadas. */
 export function useDebouncedCallback<Args extends unknown[]>(
   callback: (...args: Args) => void,
   atrasoMs: number,

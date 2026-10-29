@@ -1,7 +1,4 @@
 /* eslint-disable react-refresh/only-export-components, react-hooks/immutability -- falso de teste: imita o pacote e a instância mutável do MapLibre */
-// Falso do @vis.gl/react-maplibre para o Vitest: o jsdom não tem WebGL e o MapLibre não renderiza.
-// Imita só o que o app usa: <Map> (com ref/useMap e os eventos), <Marker>, <Source>, <Layer> e
-// <NavigationControl>. Os testes controlam o mapa pelo `mapaFalso`.
 import {
   createContext,
   useContext,
@@ -32,7 +29,6 @@ interface Destino {
 export class InstanciaFalsa {
   centro = { lat: 0, lng: 0 }
   zoom = 16
-  /** Giro (graus) e inclinação, como no MapLibre. */
   bearing = 0
   pitch = 0
   limites: Limites | null = null
@@ -147,20 +143,16 @@ export class InstanciaFalsa {
 
 let atual: InstanciaFalsa | null = null
 
-/** Controle do mapa falso nos testes. */
 export const mapaFalso = {
   atual: () => atual,
-  /** Toque no mapa fora dos marcadores (evento click do MapLibre). */
   tocar(lat: number, lng: number) {
     atual?.emitir('click', { lngLat: { lat, lng } })
   },
-  /** Arrasta o mapa até `centro` (emite move e moveend). */
   mover(centro: { lat: number; lng: number }, limites?: Limites) {
     if (!atual) return
     atual.limites = limites ?? null
     atual.jumpTo({ center: centro })
   },
-  /** Gira (graus) e inclina o mapa, como o gesto de dois dedos. */
   girar(bearing: number, pitch = 0) {
     atual?.jumpTo({ bearing, pitch })
   },
@@ -231,8 +223,6 @@ export function Map({
         data-testid="mapa"
         data-estilo={(mapStyle as { name?: string } | undefined)?.name}
         className="maplibregl-map"
-        // Como no MapLibre de verdade: clique num marcador também chega ao mapa, a não ser que o
-        // marcador pare a propagação.
         onClick={() => instancia.emitir('click', { lngLat: instancia.getCenter() })}
       >
         {children}

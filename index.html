@@ -4,13 +4,10 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <!-- "Adicionar à tela inicial"; sem service worker (offline está fora do escopo). -->
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#f2f2f7" />
     <script>
-      // Tema antes da primeira pintura, para não piscar claro → escuro. Mesma regra de useTema
-      // (src/common/hooks/use-tema.ts): a preferência salva ou, no automático, a do sistema.
       ;(function () {
         var preferencia = 'automatico'
         try {

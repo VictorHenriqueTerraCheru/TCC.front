@@ -7,22 +7,12 @@ import { cn } from '@/common/lib/utils'
 import { Drawer, DrawerContent, DrawerTitle } from '@/common/ui/drawer'
 
 interface PainelResponsivoProps {
-  /** Nome acessível do painel (o título visível fica no conteúdo). */
   titulo: string
   aoFechar(): void
-  /**
-   * Celular: abre só com os primeiros `alturaResumo` px (card rápido); arrastar expande. Se o
-   * conteúdo registrar o resumo (`medirResumo`), a altura medida substitui este valor.
-   */
   alturaResumo?: number
   children: ReactNode
 }
 
-/**
- * Detalhe/área sobre o mapa (regra 8): folha inferior (vaul) no celular, painel lateral de 420 px
- * no desktop. Não modal: o mapa continua tocável. Montado pela rota; desmontar = fechar.
- * No desktop precisa estar dentro de um contêiner `relative` (a página do mapa).
- */
 export function PainelResponsivo({
   titulo,
   aoFechar,
@@ -32,18 +22,11 @@ export function PainelResponsivo({
   const desktop = useDesktop()
   const [alturaMedida, setAlturaMedida] = useState<number | null>(null)
   const altura = alturaResumo ? (alturaMedida ?? alturaResumo) : null
-  // O vaul calcula os estágios supondo a folha da altura da tela: ela tem h-dvh e o estágio
-  // aberto para em 85 %, deixando o mapa à vista em cima.
   const snaps = useMemo(() => (altura ? [`${altura}px`, 0.85] : undefined), [altura])
-  // O estágio fica por posição: quando a medida muda o px do resumo, a folha continua nele.
   const [aberto, setAberto] = useState(false)
   const snap = snaps ? snaps[aberto ? 1 : 0]! : null
 
   const observador = useRef<ResizeObserver | null>(null)
-  // Aberta, o resumo encolhe (os polegares saem): a medida só vale recolhida, senão a folha
-  // voltaria para um estágio baixo demais e pularia quando os polegares reaparecessem. A ref muda
-  // junto com o estado, não num efeito: o ResizeObserver entrega a mudança de altura antes dos
-  // efeitos passivos e veria o estágio anterior.
   const abertoRef = useRef(aberto)
   const mudarAberto = useCallback((valor: boolean) => {
     abertoRef.current = valor
@@ -55,8 +38,6 @@ export function PainelResponsivo({
     if (!elemento) return
     const medir = () => {
       if (abertoRef.current || elemento.offsetHeight === 0) return
-      // O resumo termina onde a folha para, mais o respiro de baixo da rolagem, que já é
-      // max(1,5 rem, área segura): o texto não encosta na barra de gestos do iPhone/Android.
       const rolagem = elemento.closest<HTMLElement>('[data-rolagem-painel]')
       const respiro = rolagem ? parseFloat(getComputedStyle(rolagem).paddingBottom) || 0 : 0
       setAlturaMedida(Math.ceil(elemento.offsetTop + elemento.offsetHeight + respiro))
@@ -72,7 +53,6 @@ export function PainelResponsivo({
     return (
       <aside
         aria-label={titulo}
-        // Entra deslizando da borda do trilho, com a curva de mola dos diálogos.
         className="absolute inset-y-0 left-0 z-[1001] flex w-[420px] animate-in flex-col border-y-0 border-l-0 shadow-3 vidro duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] fade-in-0 slide-in-from-left-6 motion-reduce:animate-none"
       >
         <div className="flex-1 overflow-y-auto p-4 pt-5">{children}</div>
@@ -105,17 +85,12 @@ export function PainelResponsivo({
           <DrawerTitle className="sr-only">{titulo}</DrawerTitle>
           <div
             data-rolagem-painel
-            // Teclado: foco num elemento abaixo da borda do resumo expande a folha (senão ele
-            // ficaria escondido fora da tela).
             onFocusCapture={(evento) => {
               if (!recolhido) return
               if (evento.target.getBoundingClientRect().bottom > window.innerHeight) expandir()
             }}
             className={cn(
-              // overscroll-contain: chegar ao fim da rolagem da folha não passa o gesto ao mapa.
               'overflow-y-auto overscroll-contain px-4 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]',
-              // Os 15 % de baixo da folha ficam fora da tela no estágio aberto: a rolagem termina
-              // na parte visível (senão o foco do teclado pode parar fora da tela). 1,25rem = alça.
               snaps && 'max-h-[calc(85dvh-1.25rem)]',
             )}
           >

@@ -16,17 +16,14 @@ interface TelaSucessoProps {
   verNoMapa: string
 }
 
-/** Telas 20 e 21c. */
 export function TelaSucesso({ titulo, texto, cartao, verNoMapa }: TelaSucessoProps) {
   const navigate = useNavigate()
   const limpar = useRascunhoStore((s) => s.limpar)
 
-  // O rascunho só some aqui, já fora dos passos: as guardas de passo não veem o rascunho vazio.
   useEffect(() => limpar(), [limpar])
 
   return (
     <div className="mx-auto flex h-full max-w-md flex-col px-6 pt-20 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:pt-16">
-      {/* O círculo cresce com mola e o check é desenhado em seguida. */}
       <m.span
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -67,7 +64,6 @@ export function TelaSucesso({ titulo, texto, cartao, verNoMapa }: TelaSucessoPro
   )
 }
 
-/** Tela 20: problema registrado — ou confirmação de um existente (tela 7). */
 export function SucessoProblemaPage() {
   const { state } = useLocation()
   const { aparenciaDe } = useAparencia()

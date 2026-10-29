@@ -17,7 +17,6 @@ import { solicitarSchema, type SolicitarForm } from '../validators/solicitar'
 
 const LIMITE = 500
 
-/** Tela 11. */
 export function SolicitarVerificacaoPage() {
   const navigate = useNavigate()
   const autenticado = useAutenticado()

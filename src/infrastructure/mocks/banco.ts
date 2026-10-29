@@ -14,17 +14,14 @@ type Perfil = Schema<'Perfil'>
 type Grupo = Schema<'GrupoResponse'>
 type CategoriaAdmin = Schema<'CategoriaAdminResponse'>
 
-/** Limite de incidentes por conta em 24 h (docs/API.md, 429 limite-diario-incidentes). */
 const LIMITE_INCIDENTES = 10
 
-/** Distância aproximada em metros (bom o bastante para o mock). */
 export function metrosEntre(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
   const dLat = (b.lat - a.lat) * 111_320
   const dLng = (b.lng - a.lng) * 111_320 * Math.cos((a.lat * Math.PI) / 180)
   return Math.hypot(dLat, dLng)
 }
 
-/** Estado em memória da API falsa (usuário logado no mock). Reiniciado a cada teste. */
 let detalhes = criarDetalhes()
 let votos = new Map<string, ValorVoto>()
 let usuarios = [...usuariosIniciais]
@@ -37,7 +34,6 @@ let perfis = new Map<string, { perfil: Perfil; verificadoEm: string | null }>()
 let grupos: Grupo[] = [...gruposIniciais]
 let categoriasAdmin: CategoriaAdmin[] = categorias.map((c) => ({ ...c, ativa: true }))
 
-/** "Água e esgoto" → "aguaEEsgoto" (mesma regra do back). */
 function chaveDe(rotulo: string) {
   const palavras = rotulo
     .normalize('NFD')
@@ -79,7 +75,6 @@ export const banco = {
     return usuario
   },
 
-  /** "Bearer mock-jwt-<id>" → usuário; outro token (testes) = cidadao1. */
   usuarioDoToken(request: Request) {
     const id = request.headers.get('Authorization')?.match(/mock-jwt-(.+)$/)?.[1] ?? 'u-cidadao1'
     const usuario =
@@ -92,7 +87,6 @@ export const banco = {
         atual?.verificadoEm ?? (usuario.perfil === 'cidadao' ? null : '2026-09-25T15:00:00Z'),
     }
   },
-  /** GET /admin/usuarios: cadastro mais novo primeiro; perfil/verificadoEm refletem trocas feitas pelo admin. */
   usuariosAdmin(busca: string | null, perfil: string | null): Schema<'ListarUsuariosItem'>[] {
     const termo = busca?.trim().toLowerCase() ?? ''
     return usuarios
@@ -118,7 +112,6 @@ export const banco = {
       )
       .reverse()
   },
-  /** PATCH /admin/usuarios/{id}/perfil: virar verificado grava a data (mantém se já era); voltar a cidadão zera. */
   alterarPerfilUsuario(adminId: string, id: string, perfil: Perfil) {
     if (id === adminId) return 'proprio-perfil' as const
     const usuario = usuarios.find((u) => u.id === id)
@@ -140,7 +133,6 @@ export const banco = {
   renomear(id: string, nome: string) {
     usuarios = usuarios.map((u) => (u.id === id ? { ...u, nome } : u))
   },
-  /** GET /me: perfil atual (do "banco"), não o do token (regra 14). */
   me(request: Request): Schema<'ObterMeResponse'> {
     const usuario = banco.usuarioDoToken(request)
     const ultima = verificacoes.find((v) => v.usuario.id === usuario.id)
@@ -171,7 +163,6 @@ export const banco = {
 
   verificacoes(status: string | null) {
     const lista = verificacoes.filter((v) => !status || v.status === status)
-    // Pendentes: mais antiga primeiro (fila); as demais: mais nova primeiro (docs/API.md).
     return [...lista].sort((a, b) =>
       status === 'pendente'
         ? a.criadaEm.localeCompare(b.criadaEm)
@@ -216,7 +207,6 @@ export const banco = {
     return 'ok' as const
   },
 
-  /** Marcadores (GET /problemas): nunca devolve resolvida. */
   problemas(): Schema<'ListarProblemasNaAreaResponse'>[] {
     return [...detalhes.values()]
       .filter((d) => d.status !== 'resolvida')
@@ -239,7 +229,6 @@ export const banco = {
       souAutor: autenticado && autoria.has(id),
     }
   },
-  /** GET /problemas/duplicatas: mesma categoria, não resolvidos, até 50 m, por distância. */
   duplicatas(categoriaId: number, ponto: { lat: number; lng: number }) {
     return [...detalhes.values()]
       .filter((d) => d.categoria.id === categoriaId && d.status !== 'resolvida')
@@ -303,13 +292,8 @@ export const banco = {
     votos.set(id, valor)
   },
 
-  /**
-   * GET /incidentes/calor: as células de exemplo (que valem como o grupo `grupoDasCelulas`) mais o que foi
-   * registrado na sessão, cada registro no grupo da sua categoria. Sem `filtroGrupos` entra tudo.
-   */
   calor(filtroGrupos: string[] = []): CelulaCalor[] {
     const entra = (grupo: string) => filtroGrupos.length === 0 || filtroGrupos.includes(grupo)
-    // O grupo sai da categoria atual (o admin pode movê-la depois do registro).
     const grupoDe = (categoriaId: number) =>
       categoriasAdmin.find((c) => c.id === categoriaId)?.grupo ?? grupoDasCelulas
     const celulas = entra(grupoDasCelulas) ? calorIncidentes.map((c) => ({ ...c })) : []
@@ -320,7 +304,6 @@ export const banco = {
     }
     return celulas
   },
-  /** POST /incidentes: arredonda o ponto em 3 casas e guarda o registro. null = limite diário. */
   registrarIncidente(categoriaId: number, lat: number, lng: number) {
     if (incidentesRegistrados >= LIMITE_INCIDENTES) return null
     incidentesRegistrados++
@@ -328,24 +311,19 @@ export const banco = {
     incidentesNovos = [...incidentesNovos, { categoriaId, ...ponto }]
     return ponto
   },
-  /** Incidentes registrados nesta sessão, com a categoria (as células do calor só guardam contagem). */
   incidentesNovos() {
     return incidentesNovos
   },
 
-  /** GET /grupos: em ordem de exibição. */
   grupos(): Grupo[] {
     return [...grupos].sort((a, b) => a.ordem - b.ordem || a.rotulo.localeCompare(b.rotulo))
   },
-  /** GET /categorias: só as ativas, sem o campo `ativa`. */
   categoriasAtivas() {
     return categoriasAdmin.filter((c) => c.ativa).map(({ ativa: _ativa, ...c }) => c)
   },
-  /** Categoria pelo id, ativa ou não (o mapa e o histórico ainda mostram as desativadas). */
   categoriaPorId(id: number): CategoriaAdmin | undefined {
     return categoriasAdmin.find((c) => c.id === id)
   },
-  /** GET /admin/categorias. */
   categoriasTodas(): CategoriaAdmin[] {
     return categoriasAdmin
   },
@@ -408,7 +386,6 @@ export const banco = {
     }
     const nova = { ...atual, nome: corpo.nome.trim(), grupo: corpo.grupo, icone: corpo.icone }
     categoriasAdmin = categoriasAdmin.map((c) => (c.id === id ? nova : c))
-    // Os problemas já registrados guardam a categoria embutida: acompanham a edição, como no join da API.
     const embutida = { id, nome: nova.nome, grupo: nova.grupo, icone: nova.icone }
     for (const [chave, d] of detalhes) {
       if (d.categoria.id === id) detalhes.set(chave, { ...d, categoria: embutida })

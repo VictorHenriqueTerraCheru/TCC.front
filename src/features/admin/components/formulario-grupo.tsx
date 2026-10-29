@@ -14,7 +14,6 @@ import { EtiquetaTipo } from './etiqueta-tipo'
 import { grupoSchema, type GrupoForm } from '../validators/grupo'
 
 interface FormularioGrupoProps {
-  /** Sem grupo = criar. */
   grupo?: Grupo
   aoConcluir(): void
 }
@@ -29,7 +28,6 @@ export function FormularioGrupo({ grupo, aoConcluir }: FormularioGrupoProps) {
       rotulo: grupo?.rotulo ?? '',
       tipo: grupo?.tipo ?? 'problema',
       cor: grupo?.cor ?? 'azul',
-      // Grupo novo vai para o fim; o valor só é enviado ao editar.
       ordem: grupo?.ordem ?? 1,
     },
   })

@@ -13,9 +13,9 @@ import { entrarComoCidadao, sair } from '@/test/sessao'
 
 import { DetalheProblema } from './detalhe-problema'
 
-const ATIVA = problemasNaArea[0]!.id // Buraco na via · alta · 82
-const POSSIVELMENTE = problemasNaArea[4]!.id // Lixo acumulado · média · 58
-const NOVA = problemasNaArea[10]!.id // Fio caído · em avaliação
+const ATIVA = problemasNaArea[0]!.id
+const POSSIVELMENTE = problemasNaArea[4]!.id
+const NOVA = problemasNaArea[10]!.id
 
 function renderizar(id: string) {
   definirLargura(390)
@@ -32,7 +32,6 @@ function renderizar(id: string) {
   ])
 }
 
-/** Valores dos votos que chegaram à API, na ordem (o handler do MSW continua respondendo). */
 function espiarVotos() {
   const votos: string[] = []
   server.events.on('request:start', ({ request }) => {

@@ -15,7 +15,6 @@ interface MapaBaseProps {
   children?: ReactNode
 }
 
-/** Mapa principal: estilo M2 + retângulo visível com debounce (regras 9 e 15). */
 export function MapaBase({
   centroInicial,
   mostrarZoom,
@@ -48,7 +47,6 @@ export function MapaBase({
       }}
       centro={centroInicial}
       mostrarZoom={mostrarZoom}
-      // Primeiro retângulo: o mapa já nasce posicionado, sem moveend.
       aoCarregar={avisar}
       aoParar={avisar}
       aoTocar={aoTocar}

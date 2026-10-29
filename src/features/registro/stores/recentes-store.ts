@@ -4,12 +4,10 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 const MAXIMO = 6
 
 interface RecentesState {
-  /** Ids das últimas categorias registradas neste aparelho, a mais nova primeiro. */
   ids: number[]
   registrar(id: number): void
 }
 
-/** "Recentes" da tela de categoria: só neste aparelho (localStorage), nada vai para a API. */
 export const useRecentesStore = create<RecentesState>()(
   persist(
     (set) => ({
@@ -20,7 +18,6 @@ export const useRecentesStore = create<RecentesState>()(
     {
       name: 'ocorrencias.categoriasRecentes',
       storage: createJSONStorage(() => localStorage),
-      // O localStorage pode ter sido editado: só ids inteiros entram.
       merge: (salvo, atual) => {
         const ids = (salvo as Partial<RecentesState> | undefined)?.ids
         return {

@@ -15,7 +15,6 @@ interface Conteudo {
   itens: [MaterialSymbol, string][]
 }
 
-// Textos das telas 14 e 27.
 const conteudos: Record<MotivoConta, Conteudo> = {
   votar: {
     icone: 'how_to_vote',
@@ -41,7 +40,6 @@ const conteudos: Record<MotivoConta, Conteudo> = {
   },
 }
 
-/** Folha única do app, aberta por useExigirConta(). Fica montada no layout. */
 export function EntreParaContinuar() {
   const motivo = useGuardaStore((s) => s.motivo)
   const expirou = useGuardaStore((s) => s.expirou)
@@ -50,7 +48,6 @@ export function EntreParaContinuar() {
   const navigate = useNavigate()
   const conteudo = conteudos[motivo ?? 'votar']
 
-  // A pendência fica guardada: depois do login a tela de origem retoma a ação.
   function irPara(rota: string) {
     fecharFolha()
     navigate(rota)

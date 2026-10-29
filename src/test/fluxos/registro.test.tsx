@@ -11,8 +11,6 @@ import { server } from '@/infrastructure/mocks/server'
 import { definirLargura, renderizarRotas } from '@/test/render'
 import { entrarComoCidadao, sair } from '@/test/sessao'
 
-// O mapa do jsdom não tem tamanho nem GPS: o centro fica em Icaraí (-22.905, -43.109),
-// exatamente onde a fixture tem um "Buraco na via" — o caso da duplicata.
 function abrir(caminho = '/registrar') {
   definirLargura(390)
   return renderizarRotas(rotas, caminho)
@@ -35,7 +33,6 @@ async function escolher(
 }
 
 async function confirmarLocal(usuario: Usuario) {
-  // Espera o endereço (consulta com debounce de 600 ms) antes de confirmar.
   await screen.findByText('Praia de Botafogo, 300 — Botafogo', {}, { timeout: 2000 })
   await usuario.click(screen.getByRole('button', { name: 'Confirmar local' }))
 }
@@ -83,8 +80,6 @@ describe('fluxo de registro', () => {
 
     expect(await screen.findByRole('heading', { name: 'Registro enviado' })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/registrar/sucesso')
-    // A tela de sucesso limpa o rascunho num efeito, que pode rodar depois de o título aparecer
-    // (no CI, mais lento, a conferência chegava antes do efeito).
     await waitFor(() =>
       expect(
         JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro')!).state.categoriaId,
@@ -162,7 +157,6 @@ describe('fluxo de registro', () => {
         version: 0,
       }),
     )
-    // Recarregar = o store nasce lendo o sessionStorage.
     await useRascunhoStore.persist.rehydrate()
     abrir('/registrar/revisao')
 

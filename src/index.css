@@ -1,20 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '@fontsource-variable/inter';
-/*
- * Ícones: subset só com os usados no app (npm run gen:icones).
- * Em layer: sem isso o font-size: 24px do pacote vence os utilitários text-[..] do Tailwind.
- */
 @import './assets/material-symbols/rounded.css' layer(base);
-
-/*
- * Dois temas (docs/superpowers/specs/2026-10-17-redesign-mapa-vetorial-design.md): claro no :root
- * (estilo Apple Maps) e escuro em [data-tema='escuro'], que só sobrescreve as cores. O <html>
- * recebe data-tema do script do index.html (antes da pintura) e de useAplicarTema.
- * Nomes do shadcn (background, primary…) + tokens próprios: azul em dois tons (o cheio passa no
- * contraste AA com texto branco), vidro sobre o mapa, superfícies e categorias. O teste
- * scripts/contraste.test.mjs confere os pares dos dois temas.
- */
 :root {
   color-scheme: light;
   --radius: 1rem;
@@ -25,8 +12,6 @@
   --card-foreground: #111827;
   --popover: #ffffff;
   --popover-foreground: #111827;
-
-  /* Azul: --primario em texto/ícones; --primario-cheio no fundo de botões com texto branco. */
   --primario: #0b67c6;
   --primario-cheio: #1f74db;
   --primario-suave: rgba(11, 103, 198, 0.12);
@@ -41,34 +26,19 @@
   --border: rgba(17, 24, 39, 0.1);
   --input: #c7cfda;
   --ring: #0b67c6;
-
-  /* Superfícies sólidas (telas sem mapa) e vidro (só sobre o mapa). */
   --superficie-1: #ffffff;
   --superficie-2: #e8ebf1;
   --vidro: rgba(255, 255, 255, 0.74);
   --vidro-borda: rgba(17, 24, 39, 0.08);
-  /* Realce de 1 px no topo do vidro e dos botões cheios (luz vindo de cima, como no iOS). */
   --realce: rgba(255, 255, 255, 0.7);
-
-  /* Sombras em camadas (contato curto + difusa longa): cartão, flutuante, modal. */
   --sombra-1: 0 1px 2px rgb(17 24 39 / 0.06), 0 2px 8px rgb(17 24 39 / 0.05);
   --sombra-2: 0 2px 6px rgb(17 24 39 / 0.08), 0 10px 28px rgb(17 24 39 / 0.12);
   --sombra-3: 0 4px 12px rgb(17 24 39 / 0.1), 0 24px 60px rgb(17 24 39 / 0.18);
-
-  /* Selo "Nova" e barra "Em avaliação". */
   --nova: #1f74db;
   --nova-foreground: #ffffff;
-
-  /* Calor dos incidentes (amostra da legenda). */
   --calor: #ff3b30;
-
-  /* Polegares do card rápido (👍 confirma/continua, 👎 não vi/resolvido). */
   --voto-sim: #1a8f3f;
   --voto-nao: #d70015;
-
-  /* Cores de grupo de categoria, um token por slot da paleta (enum CorGrupo da API): forte
-     (balão/ícone/rótulo) e clara (fundo translúcido do ícone). No claro, mais fechadas para o
-     rótulo passar no AA sobre o branco. */
   --cat-laranja: #c24e00;
   --cat-laranja-claro: rgba(194, 78, 0, 0.14);
   --cat-ocre: #946300;
@@ -215,19 +185,14 @@
   --color-cat-cinza: var(--cat-cinza);
   --color-cat-cinza-claro: var(--cat-cinza-claro);
 }
-
-/* Vidro sobre o mapa (seletor, chips, botões, barra de abas, painel). */
 @utility vidro {
   background: var(--vidro);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--vidro-borda);
-  /* Pelas variáveis do Tailwind: o realce soma com um shadow-* no mesmo elemento. */
   --tw-inset-shadow: inset 0 1px 0 var(--realce);
   box-shadow: var(--tw-inset-shadow), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow, 0 0 #0000);
 }
-
-/* Resposta ao toque: encolhe um pouco enquanto pressionado (CSS puro, vale para asChild e NavLink). */
 @utility pressionavel {
   transition-property: transform, background-color, color, box-shadow, opacity, filter;
   transition-duration: 200ms;
@@ -241,8 +206,6 @@
     }
   }
 }
-
-/* Controles nativos do MapLibre (zoom, atribuição) no vidro. */
 .maplibregl-ctrl-group,
 .maplibregl-ctrl-attrib {
   background: var(--vidro) !important;
@@ -257,7 +220,6 @@
 .maplibregl-ctrl-group button + button {
   border-top-color: var(--vidro-borda) !important;
 }
-/* Os ícones do MapLibre são escuros: no tema escuro, invertidos. */
 [data-tema='escuro'] .maplibregl-ctrl-icon,
 [data-tema='escuro'] .maplibregl-ctrl-attrib-button {
   filter: invert(1) brightness(1.4);
@@ -269,15 +231,11 @@
 .maplibregl-ctrl-attrib-inner a {
   color: var(--foreground) !important;
 }
-
-/* Celular: o ⓘ da atribuição fica acima da barra de abas flutuante. */
 @media (max-width: 1023px) {
   .mapa-principal .maplibregl-ctrl-bottom-right {
     bottom: 76px;
   }
 }
-
-/* Pulso dos alertas de confiança alta (balão estilo Waze). */
 @keyframes pulso-alerta {
   from {
     transform: scale(0.6);
@@ -292,7 +250,6 @@
   border-radius: 50%;
   animation: pulso-alerta 1.8s ease-out infinite;
 }
-/* Brilho que atravessa o esqueleto de carregamento. */
 @keyframes brilho {
   from {
     transform: translateX(-100%);
@@ -335,9 +292,6 @@
   body {
     @apply bg-background font-sans text-foreground antialiased;
   }
-  /* Celular com a barra de abas: só o <main> e as folhas rolam. As folhas do mapa não são
-     modais, então o vaul não bloqueia o touchmove; sem isto, arrastar a folha no iOS rola (ou
-     estica) o documento e leva o mapa junto, que pode ficar deslocado depois de fechar. */
   html:has([data-layout-celular]),
   html:has([data-layout-celular]) body {
     overflow: hidden;

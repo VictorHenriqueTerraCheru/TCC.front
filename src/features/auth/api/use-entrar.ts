@@ -5,7 +5,6 @@ import { api, dados } from '@/infrastructure/api'
 import { useSessaoStore } from '../stores/sessao-store'
 import type { CadastrarForm, EntrarForm } from '../validators/auth'
 
-// POST /auth/login
 export function useEntrar() {
   const entrar = useSessaoStore((s) => s.entrar)
   return useMutation({
@@ -14,7 +13,6 @@ export function useEntrar() {
   })
 }
 
-// POST /auth/cadastro — já devolve a sessão (201), sem login separado.
 export function useCadastrar() {
   const entrar = useSessaoStore((s) => s.entrar)
   return useMutation({

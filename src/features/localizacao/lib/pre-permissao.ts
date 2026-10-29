@@ -12,6 +12,6 @@ export function marcarPrePermissaoVista() {
   try {
     localStorage.setItem(CHAVE, '1')
   } catch {
-    // Sem storage: a tela pode aparecer de novo na próxima visita.
+    void 0
   }
 }

@@ -22,7 +22,6 @@ describe('perfil, verificação e fila do admin', () => {
   it('aceite da etapa 5: cidadão solicita → admin aprova → perfil mostra "Perfil verificado"', async () => {
     const usuario = userEvent.setup()
 
-    // 1. Cidadã pede a verificação.
     entrarComoCidadao()
     const cidada = abrir('/perfil')
     expect(await screen.findByRole('heading', { name: 'Ana Lima' })).toBeInTheDocument()
@@ -33,7 +32,6 @@ describe('perfil, verificação e fila do admin', () => {
     expect(await screen.findByText('Pedido em análise')).toBeInTheDocument()
     cidada.unmount()
 
-    // 2. Admin aprova na fila.
     sair()
     entrarComoAdmin()
     const admin = abrir('/admin/verificacoes')
@@ -48,7 +46,6 @@ describe('perfil, verificação e fila do admin', () => {
     )
     admin.unmount()
 
-    // 3. O perfil da cidadã (GET /me, não a claim do token) mostra a verificação.
     sair()
     entrarComoCidadao()
     abrir('/perfil')
@@ -136,8 +133,6 @@ describe('perfil, verificação e fila do admin', () => {
   })
 
   it('histórico agrupa por período e filtra por votos', async () => {
-    // A fixture usa horários relativos ("30 min atrás"): perto da meia-noite eles cairiam em
-    // "Ontem". Relógio fixo à tarde, só para Date (timers reais, por causa do userEvent).
     vi.useFakeTimers({ toFake: ['Date'] })
     vi.setSystemTime(new Date(2026, 9, 14, 15, 0))
     onTestFinished(() => {

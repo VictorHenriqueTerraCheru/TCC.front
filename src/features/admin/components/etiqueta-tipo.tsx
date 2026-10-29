@@ -3,7 +3,6 @@ import type { TipoGrupo } from '@/features/categorias'
 
 import { classeDoTipo, rotuloDoTipo } from '../models/tipo'
 
-/** Selo colorido do tipo (Estado azul, Evento roxo) para diferenciar de relance. */
 export function EtiquetaTipo({ tipo, className }: { tipo: TipoGrupo; className?: string }) {
   return (
     <span
