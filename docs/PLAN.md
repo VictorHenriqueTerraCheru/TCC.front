@@ -15,7 +15,7 @@ Cada etapa termina com `npm run lint` e `npm test` verdes, `npm run build` sem e
 **Aceite:** a aplicação abre no celular e no desktop com a navegação certa para cada largura; `GET /categorias` da API real aparece numa tela de teste via o cliente tipado.
 
 ## Etapa 1 — Mapa (≈ 2 dias) — telas 1, 2, 24, 25, 18
-- react-leaflet com tiles OSM e atribuição; centraliza na posição atual ou, sem permissão, em Botafogo (-22.9519, -43.1866).
+- react-leaflet com tiles OSM e atribuição; centraliza na posição atual ou, sem permissão, em Icaraí, Niterói (-22.905, -43.109).
 - Hook `useLocalizacao` (Permissions API + `watchPosition`, estados `prompt | granted | denied | indisponivel`).
 - Seletor de modo, chips de filtro, `moveend` com *debounce* → `GET /problemas` e `GET /incidentes/calor` via TanStack Query, com o retângulo limitado às coordenadas válidas (regra 15).
 - `MarcadorProblema` (divIcon) com as variações de faixa/status — teste de snapshot de cada variação.

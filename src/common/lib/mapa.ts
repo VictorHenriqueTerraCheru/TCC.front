@@ -1,7 +1,7 @@
 import type { Tema } from '@/common/hooks/use-tema'
 
-/** Botafogo: centro quando não há localização (docs/PLAN.md, Etapa 1). */
-export const CENTRO_PADRAO: [number, number] = [-22.9519, -43.1866]
+/** Icaraí (Niterói): centro quando não há localização. */
+export const CENTRO_PADRAO: [number, number] = [-22.905, -43.109]
 // Níveis do MapLibre (tiles de 512 px): um a menos que no Leaflet (256 px) para a mesma escala.
 export const ZOOM_PADRAO = 15
 

@@ -182,12 +182,12 @@ describe('perfil, verificação e fila do admin', () => {
 })
 
 describe('recentes', () => {
-  it('lista os problemas perto de Botafogo e filtra por grupo', async () => {
+  it('lista os problemas perto de Icaraí e filtra por grupo', async () => {
     const usuario = userEvent.setup()
     abrir('/recentes')
 
     expect(await screen.findAllByRole('link', { name: /Buraco na via/ })).not.toHaveLength(0)
-    expect(screen.getByText('Perto de Botafogo · até 10 km')).toBeInTheDocument()
+    expect(screen.getByText('Perto de Icaraí · até 10 km')).toBeInTheDocument()
 
     await usuario.click(screen.getByRole('button', { name: /Elétrica/ }))
     await waitFor(() =>

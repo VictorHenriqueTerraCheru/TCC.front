@@ -143,11 +143,11 @@ function EnquadrarConferencia({ novo, existente }: { novo: Ponto; existente: Pon
 
 interface CentroInicial {
   centro: [number, number]
-  /** Abriu em Botafogo só porque a posição ainda não tinha chegado. */
+  /** Abriu em Icaraí só porque a posição ainda não tinha chegado. */
   provisorio: boolean
 }
 
-/** Ponto inicial: o já escolhido, senão a posição atual, senão Botafogo (provisório). */
+/** Ponto inicial: o já escolhido, senão a posição atual, senão Icaraí (provisório). */
 function useCentroInicial(): CentroInicial {
   const local = useRascunhoStore((s) => s.local)
   const { posicao } = useLocalizacao()
@@ -162,7 +162,7 @@ function useCentroInicial(): CentroInicial {
 
 /**
  * A primeira posição do GPS costuma chegar depois de o mapa abrir: centraliza nela uma vez, para
- * o local não ficar em Botafogo sem a pessoa perceber. Se ela já arrastou o mapa, não mexe.
+ * o local não ficar em Icaraí sem a pessoa perceber. Se ela já arrastou o mapa, não mexe.
  */
 function CentrarNaPrimeiraPosicao() {
   const { posicao } = useLocalizacao()

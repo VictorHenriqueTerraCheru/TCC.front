@@ -127,7 +127,7 @@ export function RecentesPage() {
   return (
     <Pagina titulo="Recentes">
       <p className="-mt-2 mb-3 text-xs text-muted-foreground">
-        {estado === 'granted' && posicao ? 'Perto de você' : 'Perto de Botafogo'} · até{' '}
+        {estado === 'granted' && posicao ? 'Perto de você' : 'Perto de Icaraí'} · até{' '}
         {RAIO_RECENTES_KM} km
       </p>
       <div
