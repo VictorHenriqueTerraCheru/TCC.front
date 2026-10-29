@@ -13,10 +13,10 @@ import {
   type ModoHorario,
 } from '../models/horario'
 
-const opcoes: { modo: ModoHorario; rotulo: string }[] = [
-  { modo: 'agora', rotulo: 'Agora' },
-  { modo: 'umaHora', rotulo: 'Há 1 hora' },
-  { modo: 'outro', rotulo: 'Outro horário' },
+const opcoes: { modo: ModoHorario; label: string }[] = [
+  { modo: 'agora', label: 'Agora' },
+  { modo: 'umaHora', label: 'Há 1 hora' },
+  { modo: 'other', label: 'Outro horário' },
 ]
 
 interface SeletorHorarioProps {
@@ -37,7 +37,7 @@ export function SeletorHorario({ horario, aoMudar }: SeletorHorarioProps) {
         Quando aconteceu?
       </h2>
       <div role="radiogroup" aria-labelledby="titulo-quando" className="flex flex-wrap gap-2">
-        {opcoes.map(({ modo, rotulo }) => {
+        {opcoes.map(({ modo, label: rotulo }) => {
           const selecionado = horario.modo === modo
           return (
             <button
@@ -48,7 +48,7 @@ export function SeletorHorario({ horario, aoMudar }: SeletorHorarioProps) {
               onClick={() =>
                 aoMudar({
                   modo,
-                  outroEm: modo === 'outro' ? escolhido.toISOString() : null,
+                  outroEm: modo === 'other' ? escolhido.toISOString() : null,
                 })
               }
               className={cn(
@@ -74,7 +74,7 @@ export function SeletorHorario({ horario, aoMudar }: SeletorHorarioProps) {
                     transition={SURGIR}
                     className="relative flex overflow-hidden"
                   >
-                    <Icone nome="check" className="text-[18px]" />
+                    <Icone name="check" className="text-[18px]" />
                   </m.span>
                 )}
               </AnimatePresence>
@@ -84,7 +84,7 @@ export function SeletorHorario({ horario, aoMudar }: SeletorHorarioProps) {
         })}
       </div>
 
-      {horario.modo === 'outro' && (
+      {horario.modo === 'other' && (
         <m.div
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
@@ -103,20 +103,20 @@ export function SeletorHorario({ horario, aoMudar }: SeletorHorarioProps) {
               aria-label="15 minutos antes"
               disabled={!anterior}
               onClick={() =>
-                anterior && aoMudar({ modo: 'outro', outroEm: anterior.toISOString() })
+                anterior && aoMudar({ modo: 'other', outroEm: anterior.toISOString() })
               }
               className="flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2 disabled:opacity-30"
             >
-              <Icone nome="remove" />
+              <Icone name="remove" />
             </button>
             <button
               type="button"
               aria-label="15 minutos depois"
               disabled={!proximo}
-              onClick={() => proximo && aoMudar({ modo: 'outro', outroEm: proximo.toISOString() })}
+              onClick={() => proximo && aoMudar({ modo: 'other', outroEm: proximo.toISOString() })}
               className="flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2 disabled:opacity-30"
             >
-              <Icone nome="add" />
+              <Icone name="add" />
             </button>
           </div>
           <p className="mt-1 px-4 text-xs text-muted-foreground">

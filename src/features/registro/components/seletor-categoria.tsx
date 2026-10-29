@@ -32,28 +32,27 @@ export function SeletorCategoria({
 
   const termo = semAcento(busca.trim())
   const secoes = grupos
-    .filter((g) => grupoFiltro === null || g.chave === grupoFiltro)
+    .filter((g) => grupoFiltro === null || g.key === grupoFiltro)
     .map((grupo) => ({
-      grupo,
-      itens: categorias.filter(
+      group: grupo,
+      items: categorias.filter(
         (c) =>
-          c.grupo === grupo.chave &&
+          c.group === grupo.key &&
           (termo === '' ||
-            semAcento(c.nome).includes(termo) ||
-            semAcento(grupo.rotulo).includes(termo)),
+            semAcento(c.name).includes(termo) ||
+            semAcento(grupo.label).includes(termo)),
       ),
     }))
-    .filter((s) => s.itens.length > 0)
+    .filter((s) => s.items.length > 0)
 
   const orfas = categorias.filter(
     (c) =>
-      !grupos.some((g) => g.chave === c.grupo) &&
-      (termo === '' || semAcento(c.nome).includes(termo)),
+      !grupos.some((g) => g.key === c.group) && (termo === '' || semAcento(c.name).includes(termo)),
   )
   if (orfas.length > 0 && grupoFiltro === null) {
     secoes.push({
-      grupo: { chave: 'outras', rotulo: 'Outras', tipo: orfas[0]!.tipo, cor: 'cinza', ordem: 0 },
-      itens: orfas,
+      group: { key: 'outras', label: 'Outras', type: orfas[0]!.type, color: 'gray', sortOrder: 0 },
+      items: orfas,
     })
   }
 
@@ -65,7 +64,7 @@ export function SeletorCategoria({
 
   return (
     <div className="space-y-4">
-      <CampoBusca valor={busca} aoMudar={setBusca} rotulo="Buscar categoria" />
+      <CampoBusca value={busca} aoMudar={setBusca} label="Buscar categoria" />
 
       {grupos.length > 1 && (
         <div
@@ -78,12 +77,12 @@ export function SeletorCategoria({
           </ChipFiltro>
           {grupos.map((grupo) => (
             <ChipFiltro
-              key={grupo.chave}
-              selecionado={grupoFiltro === grupo.chave}
-              aoClicar={() => setGrupoFiltro(grupoFiltro === grupo.chave ? null : grupo.chave)}
+              key={grupo.key}
+              selecionado={grupoFiltro === grupo.key}
+              aoClicar={() => setGrupoFiltro(grupoFiltro === grupo.key ? null : grupo.key)}
             >
-              <PontoGrupo cor={aparenciaDaCor[grupo.cor]} />
-              {grupo.rotulo}
+              <PontoGrupo color={aparenciaDaCor[grupo.color]} />
+              {grupo.label}
             </ChipFiltro>
           ))}
         </div>
@@ -99,7 +98,7 @@ export function SeletorCategoria({
               <button
                 key={categoria.id}
                 type="button"
-                aria-label={`Recente: ${categoria.nome}`}
+                aria-label={`Recente: ${categoria.name}`}
                 aria-pressed={categoria.id === selecionadaId}
                 onClick={() => aoEscolher(categoria.id)}
                 className={cn(
@@ -109,21 +108,21 @@ export function SeletorCategoria({
                     : 'border-border bg-card hover:bg-superficie-2',
                 )}
               >
-                <CategoriaIcone categoria={categoria} tamanho="sm" />
-                {categoria.nome}
+                <CategoriaIcone category={categoria} pageSize="sm" />
+                {categoria.name}
               </button>
             ))}
           </div>
         </section>
       )}
 
-      {secoes.map(({ grupo, itens }) => {
-        const cor = aparenciaDaCor[grupo.cor]
+      {secoes.map(({ group: grupo, items: itens }) => {
+        const cor = aparenciaDaCor[grupo.color]
         return (
-          <section key={grupo.chave} aria-label={grupo.rotulo}>
+          <section key={grupo.key} aria-label={grupo.label}>
             <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
-              <PontoGrupo cor={cor} />
-              {grupo.rotulo}
+              <PontoGrupo color={cor} />
+              {grupo.label}
             </h3>
             <div className="grid grid-cols-3 gap-2">
               {itens.map((categoria) => {
@@ -140,8 +139,8 @@ export function SeletorCategoria({
                     )}
                     style={ativa ? { borderColor: cor.corForte } : undefined}
                   >
-                    <CategoriaIcone categoria={categoria} />
-                    {categoria.nome}
+                    <CategoriaIcone category={categoria} />
+                    {categoria.name}
                   </button>
                 )
               })}

@@ -6,16 +6,16 @@ interface Variante {
 }
 
 const variantes: Record<FaixaConfianca, Variante> = {
-  alta: { diametro: 38, opacidade: 1 },
-  media: { diametro: 31, opacidade: 1 },
-  baixa: { diametro: 25, opacidade: 0.55 },
+  high: { diametro: 38, opacidade: 1 },
+  medium: { diametro: 31, opacidade: 1 },
+  low: { diametro: 25, opacidade: 0.55 },
 }
 const varianteNova: Variante = { diametro: 28, opacidade: 0.9 }
 
 export const PONTA = 7
 
 export function varianteDo(status: StatusProblema, faixa: FaixaConfianca | null): Variante {
-  return status === 'nova' ? varianteNova : variantes[faixa ?? 'baixa']
+  return status === 'new' ? varianteNova : variantes[faixa ?? 'low']
 }
 
 export function dimensoesMarcador(status: StatusProblema, faixa: FaixaConfianca | null) {

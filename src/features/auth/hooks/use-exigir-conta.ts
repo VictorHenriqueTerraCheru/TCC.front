@@ -4,7 +4,7 @@ import { useGuardaStore, type AcaoPendente, type MotivoConta } from '../stores/g
 import { sessaoAtual } from '../stores/sessao-store'
 
 interface OpcoesGuarda {
-  pendente?: AcaoPendente
+  pending?: AcaoPendente
   retorno?: string
 }
 
@@ -21,7 +21,7 @@ export function useExigirConta() {
       motivo,
       {
         retorno: opcoes.retorno ?? `${location.pathname}${location.search}`,
-        acao: opcoes.pendente ?? null,
+        acao: opcoes.pending ?? null,
       },
       guarda.expirou,
     )

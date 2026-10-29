@@ -3,17 +3,21 @@ import { ptBR } from 'date-fns/locale'
 
 import type { Schema } from '@/infrastructure/api'
 
-export type ItemHistorico = Schema<'ObterHistoricoItem'>
-export type FiltroHistorico = 'tudo' | 'registros' | 'votos'
+export type ItemHistorico = Schema<'GetHistoryItem'>
+export type FiltroHistorico = 'all' | 'reports' | 'votes'
 
-export function tituloItem({ tipo, valor, categoria }: ItemHistorico): string {
+export function tituloItem({
+  type: tipo,
+  value: valor,
+  category: categoria,
+}: ItemHistorico): string {
   const acao = {
-    registroProblema: 'Registrou',
-    registroIncidente: 'Registrou',
-    voto: valor === 'nao' ? 'Disse que não está lá' : 'Disse que está lá',
+    issueReport: 'Registrou',
+    incidentReport: 'Registrou',
+    vote: valor === 'no' ? 'Disse que não está lá' : 'Disse que está lá',
   }[tipo]
-  const anonimo = tipo === 'registroIncidente' ? ' (anônimo)' : ''
-  return `${acao} · ${categoria.nome}${anonimo}`
+  const anonimo = tipo === 'incidentReport' ? ' (anônimo)' : ''
+  return `${acao} · ${categoria.name}${anonimo}`
 }
 
 export function quandoItem(iso: string): string {
@@ -32,7 +36,7 @@ export function quandoItemResumo(iso: string): string {
 
 export interface GrupoHistorico {
   titulo: 'Hoje' | 'Ontem' | 'Esta semana' | 'Anteriores'
-  itens: ItemHistorico[]
+  items: ItemHistorico[]
 }
 
 export function agruparPorPeriodo(
@@ -41,12 +45,12 @@ export function agruparPorPeriodo(
 ): GrupoHistorico[] {
   const grupos: GrupoHistorico[] = []
   for (const item of itens) {
-    const dias = differenceInCalendarDays(agora, new Date(item.data))
+    const dias = differenceInCalendarDays(agora, new Date(item.date))
     const titulo =
       dias <= 0 ? 'Hoje' : dias === 1 ? 'Ontem' : dias < 7 ? 'Esta semana' : 'Anteriores'
     const ultimo = grupos.at(-1)
-    if (ultimo?.titulo === titulo) ultimo.itens.push(item)
-    else grupos.push({ titulo, itens: [item] })
+    if (ultimo?.titulo === titulo) ultimo.items.push(item)
+    else grupos.push({ titulo, items: [item] })
   }
   return grupos
 }

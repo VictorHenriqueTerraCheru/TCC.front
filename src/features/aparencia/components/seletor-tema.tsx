@@ -6,10 +6,10 @@ import { useTemaStore, type PreferenciaTema, type Tema } from '@/common/hooks/us
 import { MOLA_SUAVE } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
 
-const OPCOES: { valor: PreferenciaTema; rotulo: string; descricao?: string }[] = [
-  { valor: 'claro', rotulo: 'Claro' },
-  { valor: 'escuro', rotulo: 'Escuro' },
-  { valor: 'automatico', rotulo: 'Automático', descricao: 'Igual ao celular' },
+const OPCOES: { value: PreferenciaTema; label: string; description?: string }[] = [
+  { value: 'claro', label: 'Claro' },
+  { value: 'escuro', label: 'Escuro' },
+  { value: 'automatico', label: 'Automático', description: 'Igual ao celular' },
 ]
 
 const CORES: Record<Tema, { chao: string; via: string; cartao: string; linha: string }> = {
@@ -60,14 +60,14 @@ export function SeletorTema({ className }: { className?: string }) {
   return (
     <div role="radiogroup" aria-label="Aparência" className={cn('grid grid-cols-3', className)}>
       {OPCOES.map((opcao) => {
-        const selecionado = opcao.valor === preferencia
+        const selecionado = opcao.value === preferencia
         return (
           <button
-            key={opcao.valor}
+            key={opcao.value}
             type="button"
             role="radio"
             aria-checked={selecionado}
-            onClick={() => definirPreferencia(opcao.valor)}
+            onClick={() => definirPreferencia(opcao.value)}
             className="flex pressionavel flex-col items-center gap-2 rounded-2xl py-3 focus-visible:outline-2"
           >
             <span className="relative rounded-[14px] p-[3px]">
@@ -78,14 +78,14 @@ export function SeletorTema({ className }: { className?: string }) {
                   className="absolute inset-0 rounded-[14px] ring-2 ring-primario"
                 />
               )}
-              <Miniatura preferencia={opcao.valor} />
+              <Miniatura preferencia={opcao.value} />
             </span>
-            <span className="text-sm font-medium">{opcao.rotulo}</span>
-            {opcao.descricao && (
-              <span className="-mt-2 text-xs text-muted-foreground">{opcao.descricao}</span>
+            <span className="text-sm font-medium">{opcao.label}</span>
+            {opcao.description && (
+              <span className="-mt-2 text-xs text-muted-foreground">{opcao.description}</span>
             )}
             <Icone
-              nome={selecionado ? 'check_circle' : 'radio_button_unchecked'}
+              name={selecionado ? 'check_circle' : 'radio_button_unchecked'}
               preenchido={selecionado}
               className={cn('text-[22px]', selecionado ? 'text-primario' : 'text-muted-foreground')}
             />

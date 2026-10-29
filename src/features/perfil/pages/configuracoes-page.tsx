@@ -25,12 +25,12 @@ import { useMe } from '@/features/usuarios'
 
 import { EditarNomeDialog } from '../components/editar-nome-dialog'
 
-const permissao: Record<EstadoLocalizacao, { rotulo: string; classe: string }> = {
-  granted: { rotulo: 'Permitida', classe: 'bg-primario-suave text-primario' },
-  denied: { rotulo: 'Negada', classe: 'bg-destructive/15 text-destructive' },
-  prompt: { rotulo: 'Não definida', classe: 'bg-muted text-foreground' },
-  verificando: { rotulo: 'Verificando', classe: 'bg-muted text-foreground' },
-  indisponivel: { rotulo: 'Indisponível', classe: 'bg-muted text-foreground' },
+const permissao: Record<EstadoLocalizacao, { label: string; classe: string }> = {
+  granted: { label: 'Permitida', classe: 'bg-primario-suave text-primario' },
+  denied: { label: 'Negada', classe: 'bg-destructive/15 text-destructive' },
+  prompt: { label: 'Não definida', classe: 'bg-muted text-foreground' },
+  verificando: { label: 'Verificando', classe: 'bg-muted text-foreground' },
+  indisponivel: { label: 'Indisponível', classe: 'bg-muted text-foreground' },
 }
 
 function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
@@ -47,13 +47,13 @@ function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
 }
 
 function Linha({
-  icone,
+  icon: icone,
   titulo,
   subtitulo,
   aoClicar,
   seta = true,
 }: {
-  icone: MaterialSymbol
+  icon: MaterialSymbol
   titulo: string
   subtitulo?: string
   aoClicar?(): void
@@ -61,14 +61,14 @@ function Linha({
 }) {
   const conteudo = (
     <>
-      <Icone nome={icone} className="text-primario" />
+      <Icone name={icone} className="text-primario" />
       <span className="min-w-0 flex-1 text-left">
         <span className="block">{titulo}</span>
         {subtitulo && (
           <span className="block truncate text-sm text-muted-foreground">{subtitulo}</span>
         )}
       </span>
-      {aoClicar && seta && <Icone nome="chevron_right" className="text-muted-foreground" />}
+      {aoClicar && seta && <Icone name="chevron_right" className="text-muted-foreground" />}
     </>
   )
   const classe = 'flex w-full items-center gap-4 px-4 py-3'
@@ -114,12 +114,12 @@ export function ConfiguracoesPage() {
       <TelaComVoltar titulo="Configurações" aoVoltar={() => navigate('/perfil')}>
         <Secao titulo="Conta">
           <Linha
-            icone="person"
+            icon="person"
             titulo="Nome"
-            subtitulo={me?.nome ?? '…'}
+            subtitulo={me?.name ?? '…'}
             aoClicar={me ? () => setEditandoNome(true) : undefined}
           />
-          <Linha icone="mail" titulo="E-mail" subtitulo={me?.email ?? '…'} />
+          <Linha icon="mail" titulo="E-mail" subtitulo={me?.email ?? '…'} />
         </Secao>
 
         <Secao titulo="Aparência">
@@ -128,7 +128,7 @@ export function ConfiguracoesPage() {
 
         <Secao titulo="Localização">
           <div className="flex gap-4 px-4 py-3">
-            <Icone nome="my_location" className="text-primario" />
+            <Icone name="my_location" className="text-primario" />
             <div className="flex-1">
               <div className="flex items-center justify-between gap-2">
                 <span>Permissão de localização</span>
@@ -138,7 +138,7 @@ export function ConfiguracoesPage() {
                     permissao[estado].classe,
                   )}
                 >
-                  {permissao[estado].rotulo}
+                  {permissao[estado].label}
                 </span>
               </div>
               <p className="mb-3 text-sm text-muted-foreground">
@@ -155,18 +155,18 @@ export function ConfiguracoesPage() {
 
         <Secao titulo="Geral">
           <Linha
-            icone="info"
+            icon="info"
             titulo="Sobre o app"
             subtitulo={`Versão ${__VERSAO_APP__} · termos e privacidade`}
             aoClicar={() => setSobreAberto(true)}
           />
-          <Linha icone="logout" titulo="Sair da conta" aoClicar={sairDaConta} seta={false} />
+          <Linha icon="logout" titulo="Sair da conta" aoClicar={sairDaConta} seta={false} />
         </Secao>
       </TelaComVoltar>
 
       {me && (
         <EditarNomeDialog
-          nomeAtual={me.nome}
+          nomeAtual={me.name}
           aberto={editandoNome}
           aoMudarAberto={setEditandoNome}
         />

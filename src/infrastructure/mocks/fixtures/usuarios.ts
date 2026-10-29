@@ -1,34 +1,34 @@
 import type { Schema } from '../../api'
 
-type Usuario = Schema<'RespostaAuthUsuarioResumo'> & { senha: string }
+type Usuario = Schema<'AuthResponseUserSummary'> & { password: string }
 
 export const usuariosIniciais: Usuario[] = [
   {
     id: 'u-admin',
-    nome: 'Admin TCC',
+    name: 'Admin TCC',
     email: 'admin@tcc.local',
-    perfil: 'administrador',
-    senha: 'tcc12345',
+    role: 'administrator',
+    password: 'tcc12345',
   },
   {
     id: 'u-verificado',
-    nome: 'Mariana Souza',
+    name: 'Mariana Souza',
     email: 'verificado@tcc.local',
-    perfil: 'cidadaoVerificado',
-    senha: 'tcc12345',
+    role: 'verifiedCitizen',
+    password: 'tcc12345',
   },
   {
     id: 'u-cidadao1',
-    nome: 'Ana Lima',
+    name: 'Ana Lima',
     email: 'cidadao1@tcc.local',
-    perfil: 'cidadao',
-    senha: 'tcc12345',
+    role: 'citizen',
+    password: 'tcc12345',
   },
   {
     id: 'u-cidadao2',
-    nome: 'João Pereira',
+    name: 'João Pereira',
     email: 'cidadao2@tcc.local',
-    perfil: 'cidadao',
-    senha: 'tcc12345',
+    role: 'citizen',
+    password: 'tcc12345',
   },
 ]

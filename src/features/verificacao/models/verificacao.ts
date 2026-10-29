@@ -1,13 +1,13 @@
 import type { Schema } from '@/infrastructure/api'
 
-export type TipoVinculo = Schema<'TipoVinculo'>
-export type StatusVerificacao = Schema<'StatusVerificacao'>
+export type TipoVinculo = Schema<'AffiliationType'>
+export type StatusVerificacao = Schema<'VerificationStatus'>
 
 export const rotuloVinculo: Record<TipoVinculo, string> = {
-  moradorRegiao: 'Morador(a) da região',
-  trabalhaRegiao: 'Trabalha na região',
-  servidorPublico: 'Servidor(a) público(a)',
-  outro: 'Outro vínculo',
+  livesInArea: 'Morador(a) da região',
+  worksInArea: 'Trabalha na região',
+  publicServant: 'Servidor(a) público(a)',
+  other: 'Outro vínculo',
 }
 
 export const tiposVinculo = Object.keys(rotuloVinculo) as TipoVinculo[]

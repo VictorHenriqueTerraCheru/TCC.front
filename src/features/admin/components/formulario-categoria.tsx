@@ -19,32 +19,36 @@ import { categoriaSchema, type CategoriaForm } from '../validators/categoria'
 import { SeletorIcone } from './seletor-icone'
 
 interface FormularioCategoriaProps {
-  categoria?: CategoriaAdmin
+  category?: CategoriaAdmin
   grupos: Grupo[]
   aoConcluir(): void
 }
 
-export function FormularioCategoria({ categoria, grupos, aoConcluir }: FormularioCategoriaProps) {
+export function FormularioCategoria({
+  category: categoria,
+  grupos,
+  aoConcluir,
+}: FormularioCategoriaProps) {
   const criar = useCriarCategoria()
   const editar = useEditarCategoria()
   const mutacao = categoria ? editar : criar
   const { register, handleSubmit, control, setValue, formState } = useForm<CategoriaForm>({
     resolver: zodResolver(categoriaSchema),
     defaultValues: {
-      nome: categoria?.nome ?? '',
-      tipo: categoria?.tipo ?? 'problema',
-      grupo: categoria?.grupo ?? '',
-      icone: categoria?.icone ?? '',
+      name: categoria?.name ?? '',
+      type: categoria?.type ?? 'issue',
+      group: categoria?.group ?? '',
+      icon: categoria?.icon ?? '',
     },
   })
-  const [tipo, grupo, icone] = useWatch({ control, name: ['tipo', 'grupo', 'icone'] })
+  const [tipo, grupo, icone] = useWatch({ control, name: ['type', 'group', 'icon'] })
   const doTipo = gruposDoTipo(grupos, tipo)
 
   const enviar = handleSubmit((form) => {
     const opcoes = { onSuccess: aoConcluir }
     if (categoria) {
       editar.mutate(
-        { id: categoria.id, nome: form.nome, grupo: form.grupo, icone: form.icone },
+        { id: categoria.id, name: form.name, group: form.group, icon: form.icon },
         opcoes,
       )
     } else {
@@ -55,30 +59,30 @@ export function FormularioCategoria({ categoria, grupos, aoConcluir }: Formulari
   return (
     <form onSubmit={enviar} noValidate className="mt-2 space-y-5">
       <CampoTexto
-        rotulo="Nome"
+        label="Nome"
         maxLength={60}
-        erro={formState.errors.nome?.message}
-        {...register('nome')}
+        erro={formState.errors.name?.message}
+        {...register('name')}
       />
 
       <div className="space-y-2">
         <p className="text-sm font-medium">Tipo</p>
         {categoria ? (
           <p className="text-sm text-muted-foreground">
-            <EtiquetaTipo tipo={categoria.tipo} className="mr-2" />O tipo não muda depois de criada.
+            <EtiquetaTipo type={categoria.type} className="mr-2" />O tipo não muda depois de criada.
           </p>
         ) : (
           <Segmentado
-            rotulo="Tipo"
+            label="Tipo"
             opcoes={opcoesDeTipo}
-            valor={tipo}
+            value={tipo}
             aoMudar={(valor) => {
-              setValue('tipo', valor)
-              setValue('grupo', '')
+              setValue('type', valor)
+              setValue('group', '')
             }}
           />
         )}
-        <p className="text-xs text-muted-foreground">{ajudaDoTipo[categoria?.tipo ?? tipo]}</p>
+        <p className="text-xs text-muted-foreground">{ajudaDoTipo[categoria?.type ?? tipo]}</p>
       </div>
 
       <div className="space-y-2">
@@ -91,19 +95,19 @@ export function FormularioCategoria({ categoria, grupos, aoConcluir }: Formulari
           <div role="group" aria-label="Grupo" className="flex flex-wrap gap-2">
             {doTipo.map((g) => (
               <ChipFiltro
-                key={g.chave}
-                selecionado={g.chave === grupo}
-                aoClicar={() => setValue('grupo', g.chave, { shouldValidate: true })}
+                key={g.key}
+                selecionado={g.key === grupo}
+                aoClicar={() => setValue('group', g.key, { shouldValidate: true })}
               >
-                <PontoGrupo cor={aparenciaDaCor[g.cor]} />
-                {g.rotulo}
+                <PontoGrupo color={aparenciaDaCor[g.color]} />
+                {g.label}
               </ChipFiltro>
             ))}
           </div>
         )}
-        {formState.errors.grupo && (
+        {formState.errors.group && (
           <p role="alert" className="text-xs text-destructive">
-            {formState.errors.grupo.message}
+            {formState.errors.group.message}
           </p>
         )}
       </div>
@@ -111,9 +115,9 @@ export function FormularioCategoria({ categoria, grupos, aoConcluir }: Formulari
       <div className="space-y-2">
         <p className="text-sm font-medium">Ícone</p>
         <SeletorIcone
-          valor={icone}
-          aoMudar={(nome) => setValue('icone', nome, { shouldValidate: true })}
-          erro={formState.errors.icone?.message}
+          value={icone}
+          aoMudar={(nome) => setValue('icon', nome, { shouldValidate: true })}
+          erro={formState.errors.icon?.message}
         />
       </div>
 

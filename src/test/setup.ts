@@ -30,7 +30,7 @@ Object.defineProperty(window, 'matchMedia', {
     const minimo = /min-width:\s*(\d+)px/.exec(consulta)?.[1]
     return {
       matches: minimo !== undefined && window.innerWidth >= Number(minimo),
-      media: consulta,
+      medium: consulta,
       onchange: null,
       addEventListener: () => {},
       removeEventListener: () => {},

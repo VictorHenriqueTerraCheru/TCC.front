@@ -17,7 +17,7 @@ export function useMe() {
 export function useAtualizarNome() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (nome: string) => api.PATCH('/me', { body: { nome } }).then(dados),
+    mutationFn: (nome: string) => api.PATCH('/me', { body: { name: nome } }).then(dados),
     onSuccess: (me) => queryClient.setQueryData(meQuery.queryKey, me),
   })
 }

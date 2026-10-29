@@ -32,7 +32,7 @@ describe('passo 1: tipo e categoria', () => {
     await usuario.click(await screen.findByRole('link', { name: /^Evento/ }))
 
     expect(router.state.location.pathname + router.state.location.search).toBe(
-      '/registrar/categoria?tipo=incidente',
+      '/registrar/categoria?tipo=incident',
     )
     expect(await screen.findByRole('button', { name: 'Roubo' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Buraco na via' })).not.toBeInTheDocument()
@@ -46,7 +46,7 @@ describe('passo 1: tipo e categoria', () => {
   })
 
   it('mostra as categorias do tipo agrupadas, uma seção por grupo, na ordem da API', async () => {
-    abrir('/registrar/categoria?tipo=problema')
+    abrir('/registrar/categoria?tipo=issue')
 
     for (const grupo of ['Via pública', 'Elétrica', 'Limpeza']) {
       expect(await screen.findByRole('region', { name: grupo })).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('passo 1: tipo e categoria', () => {
 
   it('chip de grupo filtra as seções; tocar de novo volta para Todas', async () => {
     const usuario = userEvent.setup()
-    abrir('/registrar/categoria?tipo=problema')
+    abrir('/registrar/categoria?tipo=issue')
 
     await usuario.click(await screen.findByRole('button', { name: 'Elétrica' }))
     expect(screen.queryByRole('region', { name: 'Limpeza' })).not.toBeInTheDocument()
@@ -74,7 +74,7 @@ describe('passo 1: tipo e categoria', () => {
 
   it('a busca ignora acento e maiúsculas e avisa quando não acha nada', async () => {
     const usuario = userEvent.setup()
-    abrir('/registrar/categoria?tipo=problema')
+    abrir('/registrar/categoria?tipo=issue')
 
     await usuario.type(
       await screen.findByRole('searchbox', { name: 'Buscar categoria' }),
@@ -90,7 +90,7 @@ describe('passo 1: tipo e categoria', () => {
 
   it('Continuar só habilita com uma categoria; segue para o local e vira "Recente" na próxima vez', async () => {
     const usuario = userEvent.setup()
-    const { router } = abrir('/registrar/categoria?tipo=problema')
+    const { router } = abrir('/registrar/categoria?tipo=issue')
 
     const continuar = await screen.findByRole('button', { name: 'Continuar' })
     expect(continuar).toBeDisabled()
@@ -100,7 +100,7 @@ describe('passo 1: tipo e categoria', () => {
     await usuario.click(continuar)
     await waitFor(() => expect(router.state.location.pathname).toBe('/registrar/local'))
 
-    await router.navigate('/registrar/categoria?tipo=problema')
+    await router.navigate('/registrar/categoria?tipo=issue')
     const recentes = await screen.findByRole('region', { name: 'Recentes' })
     expect(
       within(recentes).getByRole('button', { name: 'Recente: Poste apagado' }),
@@ -109,23 +109,23 @@ describe('passo 1: tipo e categoria', () => {
 
   it('rascunho de outro tipo não conta como escolha', async () => {
     useRascunhoStore.getState().escolherCategoria(7)
-    abrir('/registrar/categoria?tipo=problema')
+    abrir('/registrar/categoria?tipo=issue')
 
     expect(await screen.findByRole('button', { name: 'Continuar' })).toBeDisabled()
   })
 
   it('grupo e categoria criados pelo admin aparecem sem mudar o app', async () => {
     server.use(
-      http.get(rota('/grupos'), () =>
+      http.get(rota('/groups'), () =>
         HttpResponse.json([
           ...grupos,
-          { chave: 'clima', rotulo: 'Clima', tipo: 'incidente', cor: 'azul', ordem: 6 },
+          { key: 'clima', label: 'Clima', type: 'incident', color: 'blue', sortOrder: 6 },
         ]),
       ),
-      http.get(rota('/categorias'), () =>
+      http.get(rota('/categories'), () =>
         HttpResponse.json([
           ...categorias,
-          { id: 9, nome: 'Rua inundada', grupo: 'clima', tipo: 'incidente', icone: 'ico_a' },
+          { id: 9, name: 'Rua inundada', group: 'clima', type: 'incident', icon: 'ico_a' },
         ]),
       ),
       http.get('https://api.iconify.design/material-symbols.json', () =>
@@ -135,7 +135,7 @@ describe('passo 1: tipo e categoria', () => {
         }),
       ),
     )
-    abrir('/registrar/categoria?tipo=incidente')
+    abrir('/registrar/categoria?tipo=incident')
 
     const clima = await screen.findByRole('region', { name: 'Clima' })
     expect(within(clima).getByRole('button', { name: 'Rua inundada' })).toBeInTheDocument()
@@ -144,8 +144,8 @@ describe('passo 1: tipo e categoria', () => {
   })
 
   it('falha ao carregar as categorias oferece tentar de novo', async () => {
-    server.use(http.get(rota('/categorias'), () => new HttpResponse(null, { status: 500 })))
-    abrir('/registrar/categoria?tipo=problema')
+    server.use(http.get(rota('/categories'), () => new HttpResponse(null, { status: 500 })))
+    abrir('/registrar/categoria?tipo=issue')
 
     expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
@@ -153,15 +153,15 @@ describe('passo 1: tipo e categoria', () => {
 
   it('categoria cujo grupo sumiu aparece em "Outras" e continua escolhível', async () => {
     server.use(
-      http.get(rota('/categorias'), () =>
+      http.get(rota('/categories'), () =>
         HttpResponse.json([
           ...categorias,
-          { id: 9, nome: 'Sem grupo', grupo: 'removido', tipo: 'problema', icone: 'ico_a' },
+          { id: 9, name: 'Sem grupo', group: 'removido', type: 'issue', icon: 'ico_a' },
         ]),
       ),
     )
     const usuario = userEvent.setup()
-    abrir('/registrar/categoria?tipo=problema')
+    abrir('/registrar/categoria?tipo=issue')
 
     const outras = await screen.findByRole('region', { name: 'Outras' })
     await usuario.click(within(outras).getByRole('button', { name: 'Sem grupo' }))
@@ -169,8 +169,8 @@ describe('passo 1: tipo e categoria', () => {
   })
 
   it('falha em /grupos oferece tentar de novo em vez de uma lista vazia', async () => {
-    server.use(http.get(rota('/grupos'), () => new HttpResponse(null, { status: 500 })))
-    abrir('/registrar/categoria?tipo=problema')
+    server.use(http.get(rota('/groups'), () => new HttpResponse(null, { status: 500 })))
+    abrir('/registrar/categoria?tipo=issue')
 
     expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()
     expect(screen.queryByText(/Nenhuma categoria com esse nome/)).not.toBeInTheDocument()
@@ -182,7 +182,7 @@ describe('passo 1: tipo e categoria', () => {
 
     await waitFor(() =>
       expect(router.state.location.pathname + router.state.location.search).toBe(
-        '/registrar/categoria?tipo=problema',
+        '/registrar/categoria?tipo=issue',
       ),
     )
   })
@@ -193,7 +193,7 @@ describe('passo 1: tipo e categoria', () => {
 
     await waitFor(() =>
       expect(router.state.location.pathname + router.state.location.search).toBe(
-        '/registrar/categoria?tipo=incidente',
+        '/registrar/categoria?tipo=incident',
       ),
     )
   })

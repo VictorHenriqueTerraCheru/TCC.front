@@ -13,21 +13,21 @@ export function recentesQuery(centro: { lat: number; lng: number }, grupos: stri
     queryKey: ['problemas', 'recentes', ponto, { grupos }],
     queryFn: ({ pageParam, signal }) =>
       api
-        .GET('/problemas/recentes', {
+        .GET('/issues/recent', {
           params: {
             query: {
               ...ponto,
               raioKm: RAIO_RECENTES_KM,
-              grupos: grupos.length ? grupos.join(',') : undefined,
-              pagina: pageParam,
-              tamanho: TAMANHO_PAGINA,
+              groups: grupos.length ? grupos.join(',') : undefined,
+              page: pageParam,
+              pageSize: TAMANHO_PAGINA,
             },
           },
           signal,
         })
         .then(dados),
     initialPageParam: 1,
-    getNextPageParam: ({ pagina, tamanho, total }) =>
+    getNextPageParam: ({ page: pagina, pageSize: tamanho, total }) =>
       pagina * tamanho < total ? pagina + 1 : undefined,
   })
 }

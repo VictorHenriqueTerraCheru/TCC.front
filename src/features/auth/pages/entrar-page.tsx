@@ -23,14 +23,14 @@ export function EntrarPage() {
   const [erroGeral, setErroGeral] = useState<string | null>(null)
   const { register, handleSubmit, setError, formState } = useForm<EntrarForm>({
     resolver: zodResolver(entrarSchema),
-    defaultValues: { email: '', senha: '' },
+    defaultValues: { email: '', password: '' },
   })
 
   const enviar = handleSubmit((form) => {
     setErroGeral(null)
     entrar.mutate(form, {
       onSuccess: aposEntrar,
-      onError: (erro) => setErroGeral(aplicarErroAuth(erro, setError, ['email', 'senha'])),
+      onError: (erro) => setErroGeral(aplicarErroAuth(erro, setError, ['email', 'password'])),
     })
   })
 
@@ -48,7 +48,7 @@ export function EntrarPage() {
 
         <div className="space-y-6">
           <CampoTexto
-            rotulo="E-mail"
+            label="E-mail"
             type="email"
             autoComplete="email"
             inputMode="email"
@@ -56,10 +56,10 @@ export function EntrarPage() {
             {...register('email')}
           />
           <CampoSenha
-            rotulo="Senha"
+            label="Senha"
             autoComplete="current-password"
-            erro={formState.errors.senha?.message}
-            {...register('senha')}
+            erro={formState.errors.password?.message}
+            {...register('password')}
           />
         </div>
         <div className="mt-2 flex justify-end">

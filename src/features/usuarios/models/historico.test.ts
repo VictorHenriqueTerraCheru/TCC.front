@@ -4,10 +4,10 @@ import { agruparPorPeriodo, tituloItem } from './historico'
 const agora = new Date('2026-10-06T12:00:00')
 const item = (data: string, extra: Partial<ItemHistorico> = {}) =>
   ({
-    tipo: 'voto',
-    valor: 'sim',
-    categoria: { id: 1, nome: 'Buraco na via', grupo: 'viaPublica', icone: 'buraco' },
-    data,
+    type: 'vote',
+    value: 'yes',
+    category: { id: 1, name: 'Buraco na via', group: 'viaPublica', icon: 'buraco' },
+    date: data,
     ...extra,
   }) as ItemHistorico
 
@@ -22,7 +22,7 @@ describe('histórico', () => {
       ],
       agora,
     )
-    expect(grupos.map((g) => [g.titulo, g.itens.length])).toEqual([
+    expect(grupos.map((g) => [g.titulo, g.items.length])).toEqual([
       ['Hoje', 1],
       ['Ontem', 1],
       ['Esta semana', 1],
@@ -32,13 +32,13 @@ describe('histórico', () => {
 
   it('descreve cada tipo como no protótipo', () => {
     expect(tituloItem(item('x'))).toBe('Disse que está lá · Buraco na via')
-    expect(tituloItem(item('x', { valor: 'nao' }))).toBe('Disse que não está lá · Buraco na via')
+    expect(tituloItem(item('x', { value: 'no' }))).toBe('Disse que não está lá · Buraco na via')
     expect(
       tituloItem(
         item('x', {
-          tipo: 'registroIncidente',
-          valor: null,
-          categoria: { id: 7, nome: 'Roubo', grupo: 'seguranca', icone: 'roubo' },
+          type: 'incidentReport',
+          value: null,
+          category: { id: 7, name: 'Roubo', group: 'seguranca', icon: 'roubo' },
         }),
       ),
     ).toBe('Registrou · Roubo (anônimo)')

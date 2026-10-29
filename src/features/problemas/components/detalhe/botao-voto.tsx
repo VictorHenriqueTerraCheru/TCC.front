@@ -23,7 +23,7 @@ export function BotaoVoto({
       className={cn('h-auto min-h-10 py-2 whitespace-normal', className)}
       {...props}
     >
-      {selecionado && <Icone nome="check" className="text-[18px]" />}
+      {selecionado && <Icone name="check" className="text-[18px]" />}
       {children}
     </Button>
   )

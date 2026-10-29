@@ -8,27 +8,30 @@ const TEMPO_LIMITE_ENVIO_MS = 20_000
 
 export function duplicatasQuery(categoriaId: number, { lat, lng }: Ponto) {
   return queryOptions({
-    queryKey: ['problemas', 'duplicatas', { categoriaId, lat, lng }],
+    queryKey: ['problemas', 'duplicatas', { categoryId: categoriaId, lat, lng }],
     queryFn: ({ signal }) =>
       api
-        .GET('/problemas/duplicatas', { params: { query: { categoriaId, lat, lng } }, signal })
+        .GET('/issues/duplicates', {
+          params: { query: { categoryId: categoriaId, lat, lng } },
+          signal,
+        })
         .then(dados),
     staleTime: 60_000,
   })
 }
 
 interface NovoProblema extends Ponto {
-  categoriaId: number
-  descricao: string
+  categoryId: number
+  description: string
 }
 
 export function useRegistrarProblema() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ categoriaId, lat, lng, descricao }: NovoProblema) =>
+    mutationFn: ({ categoryId: categoriaId, lat, lng, description: descricao }: NovoProblema) =>
       api
-        .POST('/problemas', {
-          body: { categoriaId, lat, lng, descricao: descricao.trim() || null },
+        .POST('/issues', {
+          body: { categoryId: categoriaId, lat, lng, description: descricao.trim() || null },
           signal: AbortSignal.timeout(TEMPO_LIMITE_ENVIO_MS),
         })
         .then(dados),
@@ -40,17 +43,17 @@ export function useRegistrarProblema() {
 }
 
 interface NovoIncidente extends Ponto {
-  categoriaId: number
-  ocorridoEm: Date
+  categoryId: number
+  occurredAt: Date
 }
 
 export function useRegistrarIncidente() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ categoriaId, lat, lng, ocorridoEm }: NovoIncidente) =>
+    mutationFn: ({ categoryId: categoriaId, lat, lng, occurredAt: ocorridoEm }: NovoIncidente) =>
       api
-        .POST('/incidentes', {
-          body: { categoriaId, lat, lng, ocorridoEm: ocorridoEm.toISOString() },
+        .POST('/incidents', {
+          body: { categoryId: categoriaId, lat, lng, occurredAt: ocorridoEm.toISOString() },
           signal: AbortSignal.timeout(TEMPO_LIMITE_ENVIO_MS),
         })
         .then(dados),

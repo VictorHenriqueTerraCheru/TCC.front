@@ -10,7 +10,7 @@ export function aplicarErroAuth<T extends FieldValues>(
   if (isErroDeRede(erro)) return 'Sem conexão. Tente de novo.'
   if (!isApiError(erro)) return 'Algo deu errado. Tente de novo.'
 
-  if (erro.type === 'email-ja-cadastrado') {
+  if (erro.type === 'email-already-registered') {
     setError('email' as Path<T>, { message: 'Já existe uma conta com este e-mail.' })
     return null
   }

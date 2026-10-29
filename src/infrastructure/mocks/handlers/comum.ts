@@ -37,12 +37,12 @@ export function erroDeRegra(status: number, type: string, title: string) {
 }
 
 export function paginar<T>(lista: T[], url: URL) {
-  const pagina = Number(url.searchParams.get('pagina') ?? 1)
-  const tamanho = Number(url.searchParams.get('tamanho') ?? 20)
+  const pagina = Number(url.searchParams.get('page') ?? 1)
+  const tamanho = Number(url.searchParams.get('pageSize') ?? 20)
   return {
-    itens: lista.slice((pagina - 1) * tamanho, pagina * tamanho),
-    pagina,
-    tamanho,
+    items: lista.slice((pagina - 1) * tamanho, pagina * tamanho),
+    page: pagina,
+    pageSize: tamanho,
     total: lista.length,
   }
 }

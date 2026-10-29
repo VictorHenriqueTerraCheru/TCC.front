@@ -1,10 +1,10 @@
 import { isApiError, isErroDeRede } from '@/infrastructure/api'
 
 const mensagens: Record<string, string> = {
-  'verificacao-pendente-existente':
+  'verification-already-pending':
     'Você já tem um pedido em análise. Aguarde a resposta da moderação.',
-  'ja-verificado': 'Seu perfil já é verificado.',
-  'verificacao-ja-analisada': 'Este pedido já foi analisado por outra pessoa.',
+  'already-verified': 'Seu perfil já é verificado.',
+  'verification-already-reviewed': 'Este pedido já foi analisado por outra pessoa.',
 }
 
 export function mensagemErroVerificacao(erro: unknown): string {

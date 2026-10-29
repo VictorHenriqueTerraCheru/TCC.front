@@ -16,10 +16,10 @@ import {
   type FiltroHistorico,
 } from '@/features/usuarios'
 
-const filtros: { valor: FiltroHistorico; rotulo: string }[] = [
-  { valor: 'tudo', rotulo: 'Tudo' },
-  { valor: 'registros', rotulo: 'Registros' },
-  { valor: 'votos', rotulo: 'Votos' },
+const filtros: { value: FiltroHistorico; label: string }[] = [
+  { value: 'all', label: 'Tudo' },
+  { value: 'reports', label: 'Registros' },
+  { value: 'votes', label: 'Votos' },
 ]
 
 function Lista({ filtro }: { filtro: FiltroHistorico }) {
@@ -35,7 +35,7 @@ function Lista({ filtro }: { filtro: FiltroHistorico }) {
       </div>
     )
   }
-  const itens = historico.data.pages.flatMap((p) => p.itens)
+  const itens = historico.data.pages.flatMap((p) => p.items)
   if (itens.length === 0) {
     return <p className="py-10 text-center text-sm text-muted-foreground">Nada por aqui ainda.</p>
   }
@@ -50,9 +50,9 @@ function Lista({ filtro }: { filtro: FiltroHistorico }) {
             {grupo.titulo}
           </h2>
           <ul>
-            {grupo.itens.map((item, i) => (
-              <ItemAnimado key={`${item.data}-${i}`} indice={i}>
-                <ItemHistoricoLinha item={item} quando={quandoItem(item.data)} />
+            {grupo.items.map((item, i) => (
+              <ItemAnimado key={`${item.date}-${i}`} indice={i}>
+                <ItemHistoricoLinha item={item} quando={quandoItem(item.date)} />
               </ItemAnimado>
             ))}
           </ul>
@@ -65,7 +65,7 @@ function Lista({ filtro }: { filtro: FiltroHistorico }) {
 export function HistoricoPage() {
   const navigate = useNavigate()
   const autenticado = useAutenticado()
-  const [filtro, setFiltro] = useState<FiltroHistorico>('tudo')
+  const [filtro, setFiltro] = useState<FiltroHistorico>('all')
 
   if (!autenticado) return <Navigate to="/login" replace state={{ de: '/perfil/historico' }} />
 
@@ -73,9 +73,9 @@ export function HistoricoPage() {
     <div className="mx-auto h-full w-full lg:max-w-3xl">
       <TelaComVoltar titulo="Histórico" aoVoltar={() => navigate('/perfil')}>
         <Segmentado<FiltroHistorico>
-          rotulo="Filtrar histórico"
+          label="Filtrar histórico"
           opcoes={filtros}
-          valor={filtro}
+          value={filtro}
           aoMudar={setFiltro}
           className="mb-4"
         />

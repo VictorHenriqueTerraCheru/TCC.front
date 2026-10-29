@@ -18,24 +18,25 @@ export function useVotos(problema: DetalheProblema) {
   useEffect(() => {
     if (!autenticado) return
     const acao = consumirAcao((a) => 'problemaId' in a && a.problemaId === problema.id)
-    if (acao?.tipo === 'votar') mutar(acao.valor)
+    if (acao?.type === 'votar') mutar(acao.value)
   }, [autenticado, consumirAcao, problema.id, mutar])
 
   function votar(valor: ValorVoto) {
-    const pendente = { tipo: 'votar', problemaId: problema.id, valor } as const
+    const pendente = { type: 'votar', problemaId: problema.id, value: valor } as const
     const reabrirGuardaSeExpirou = (erro: unknown) => {
-      if (isApiError(erro) && erro.status === 401) exigirConta('votar', () => {}, { pendente })
+      if (isApiError(erro) && erro.status === 401)
+        exigirConta('votar', () => {}, { pending: pendente })
     }
     exigirConta('votar', () => mutacao.mutate(valor, { onError: reabrirGuardaSeExpirou }), {
-      pendente,
+      pending: pendente,
     })
   }
 
   return {
     erro: mutacao.error,
     votando: votosEmAndamento > 0,
-    meuVoto: problema.meuVoto ?? null,
-    podeVotar: !problema.souAutor && problema.status !== 'resolvida',
+    myVote: problema.myVote ?? null,
+    podeVotar: !problema.isAuthor && problema.status !== 'resolved',
     votar,
   }
 }

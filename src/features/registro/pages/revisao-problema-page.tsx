@@ -26,31 +26,37 @@ const LIMITE_DESCRICAO = 280
 export function RevisaoProblemaPage() {
   const navigate = useNavigate()
   const idDescricao = useId()
-  const { categoria, categoriaId, local, descricao, definirDescricao } = useRascunho()
+  const {
+    category: categoria,
+    categoryId: categoriaId,
+    local,
+    description: descricao,
+    definirDescricao,
+  } = useRascunho()
   const { data: endereco } = useEnderecoDoRascunho()
   const registrar = useRegistrarProblema()
-  useExigirCategoria('problema')
+  useExigirCategoria('issue')
   useExigirPasso(local !== null, '/registrar/local')
 
   const envio = useEnvio(registrar.mutateAsync, (problema) => {
-    navigate('/registrar/sucesso', { replace: true, state: { problema } })
+    navigate('/registrar/sucesso', { replace: true, state: { issue: problema } })
   })
 
   function enviar() {
     if (categoriaId === null || !local) return
-    envio.enviar({ categoriaId, ...local, descricao })
+    envio.enviar({ categoryId: categoriaId, ...local, description: descricao })
   }
   useRetomarRegistro('enviar', enviar)
 
   return (
     <PassoRegistro
       titulo="Revisão"
-      passo={{ atual: 4, total: 4, rotulo: 'Revisão' }}
+      passo={{ atual: 4, total: 4, label: 'Revisão' }}
       acaoTopo="voltar"
       aoTopo={() => navigate('/registrar/local')}
       rodape={
         <Button className="w-full" carregando={registrar.isPending} onClick={enviar}>
-          <Icone nome="send" className="text-[18px]" />
+          <Icone name="send" className="text-[18px]" />
           {registrar.isPending ? 'Enviando…' : 'Enviar registro'}
         </Button>
       }
@@ -87,37 +93,33 @@ export function RevisaoProblemaPage() {
 
         <Resumo>
           <LinhaResumo
-            icone={
+            icon={
               categoria ? (
-                <CategoriaIcone categoria={categoria} tamanho="sm" className="bg-transparent" />
+                <CategoriaIcone category={categoria} pageSize="sm" className="bg-transparent" />
               ) : (
                 'category'
               )
             }
-            rotulo="Categoria"
-            valor={categoria?.nome ?? '—'}
-            aoEditar={() => navigate(caminhoDaCategoria('problema'))}
+            label="Categoria"
+            value={categoria?.name ?? '—'}
+            aoEditar={() => navigate(caminhoDaCategoria('issue'))}
           />
+          <LinhaResumo icon="keep" label="Tipo" value="Problema — fica no mapa até ser resolvido" />
           <LinhaResumo
-            icone="keep"
-            rotulo="Tipo"
-            valor="Problema — fica no mapa até ser resolvido"
-          />
-          <LinhaResumo
-            icone="location_on"
-            rotulo="Local aproximado"
-            valor={endereco?.endereco ?? 'Buscando endereço…'}
+            icon="location_on"
+            label="Local aproximado"
+            value={endereco?.address ?? 'Buscando endereço…'}
             aoEditar={() => navigate('/registrar/local')}
           />
           <LinhaResumo
-            icone="schedule"
-            rotulo="Data e hora"
-            valor={format(new Date(), "'Hoje', d MMM. · HH:mm", { locale: ptBR })}
+            icon="schedule"
+            label="Data e hora"
+            value={format(new Date(), "'Hoje', d MMM. · HH:mm", { locale: ptBR })}
           />
         </Resumo>
 
         <p className="flex gap-2 text-xs text-muted-foreground">
-          <Icone nome="info" className="text-[18px]" />
+          <Icone name="info" className="text-[18px]" />
           Seu registro entra com o selo "Nova" até receber avaliações de quem está por perto.
         </p>
 

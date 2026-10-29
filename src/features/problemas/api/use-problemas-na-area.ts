@@ -18,11 +18,11 @@ export function problemasNaAreaQuery({ grupos, status, ...retangulo }: FiltroPro
     queryKey: ['problemas', 'area', retangulo, { grupos, status }],
     queryFn: ({ signal }) =>
       api
-        .GET('/problemas', {
+        .GET('/issues', {
           params: {
             query: {
               ...retangulo,
-              grupos: grupos.length ? grupos.join(',') : undefined,
+              groups: grupos.length ? grupos.join(',') : undefined,
               status: status.length ? status.join(',') : undefined,
             },
           },

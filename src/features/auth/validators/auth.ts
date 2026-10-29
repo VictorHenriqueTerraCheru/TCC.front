@@ -8,14 +8,14 @@ const email = z
 
 export const entrarSchema = z.object({
   email,
-  senha: z.string().min(1, 'Informe sua senha.'),
+  password: z.string().min(1, 'Informe sua senha.'),
 })
 export type EntrarForm = z.infer<typeof entrarSchema>
 
 export const cadastrarSchema = z.object({
-  nome: z.string().trim().min(1, 'Informe seu nome.').max(120, 'Use até 120 caracteres.'),
+  name: z.string().trim().min(1, 'Informe seu nome.').max(120, 'Use até 120 caracteres.'),
   email,
-  senha: z.string().min(8, 'Mínimo de 8 caracteres'),
-  aceitouTermos: z.boolean().refine((v) => v, 'Aceite os termos para criar a conta.'),
+  password: z.string().min(8, 'Mínimo de 8 caracteres'),
+  acceptedTerms: z.boolean().refine((v) => v, 'Aceite os termos para criar a conta.'),
 })
 export type CadastrarForm = z.infer<typeof cadastrarSchema>

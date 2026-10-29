@@ -24,25 +24,25 @@ export function ChipsFiltro({
       className="pointer-events-auto -mx-3 flex [scrollbar-width:none] gap-2 overflow-x-auto px-3 pb-1"
     >
       {gruposDoModo(todos, modo).map((grupo) => {
-        const selecionado = grupos.includes(grupo.chave)
+        const selecionado = grupos.includes(grupo.key)
         return (
           <ChipFiltro
-            key={grupo.chave}
+            key={grupo.key}
             selecionado={selecionado}
-            aoClicar={() => aoAlternarGrupo(grupo.chave)}
+            aoClicar={() => aoAlternarGrupo(grupo.key)}
           >
             {selecionado ? (
-              <Icone nome="check" preenchido className="text-[18px]" />
+              <Icone name="check" preenchido className="text-[18px]" />
             ) : (
-              <PontoGrupo cor={aparenciaDaCor[grupo.cor]} />
+              <PontoGrupo color={aparenciaDaCor[grupo.color]} />
             )}
-            {grupo.rotulo}
+            {grupo.label}
           </ChipFiltro>
         )
       })}
       {mostraProblemas(modo) && (
         <ChipFiltro selecionado={somenteNovas} aoClicar={aoAlternarNovas}>
-          <Icone nome={somenteNovas ? 'check' : 'hourglass'} className="text-[18px] text-nova" />
+          <Icone name={somenteNovas ? 'check' : 'hourglass'} className="text-[18px] text-nova" />
           Em avaliação
         </ChipFiltro>
       )}

@@ -1,10 +1,10 @@
 import { useGuardaStore, type AcaoPendente } from './guarda-store'
 
-const voto: AcaoPendente = { tipo: 'votar', problemaId: 'p-1', valor: 'sim' }
+const voto: AcaoPendente = { type: 'votar', problemaId: 'p-1', value: 'yes' }
 const pendencia = { retorno: '/problemas/p-1?aba=1', acao: voto }
 
 beforeEach(() => {
-  useGuardaStore.setState({ motivo: null, expirou: false, pendencia: null })
+  useGuardaStore.setState({ reason: null, expirou: false, pendencia: null })
   sessionStorage.clear()
 })
 
@@ -12,7 +12,7 @@ describe('guarda-store (regras 1 e 13)', () => {
   it('pedirConta abre a folha e guarda a ação com a rota de retorno', () => {
     useGuardaStore.getState().pedirConta('votar', pendencia)
 
-    expect(useGuardaStore.getState()).toMatchObject({ motivo: 'votar', expirou: false, pendencia })
+    expect(useGuardaStore.getState()).toMatchObject({ reason: 'votar', expirou: false, pendencia })
   })
 
   it('pedirConta marca a expiração quando o token venceu', () => {
@@ -25,7 +25,7 @@ describe('guarda-store (regras 1 e 13)', () => {
     useGuardaStore.getState().pedirConta('registrar', pendencia)
     useGuardaStore.getState().fecharFolha()
 
-    expect(useGuardaStore.getState().motivo).toBeNull()
+    expect(useGuardaStore.getState().reason).toBeNull()
     expect(useGuardaStore.getState().pendencia).toEqual(pendencia)
   })
 
@@ -34,7 +34,7 @@ describe('guarda-store (regras 1 e 13)', () => {
     useGuardaStore.getState().descartar()
 
     expect(useGuardaStore.getState()).toMatchObject({
-      motivo: null,
+      reason: null,
       expirou: false,
       pendencia: null,
     })
@@ -44,7 +44,7 @@ describe('guarda-store (regras 1 e 13)', () => {
     useGuardaStore.getState().pedirConta('votar', pendencia, true)
 
     expect(useGuardaStore.getState().concluirLogin()).toBe('/problemas/p-1?aba=1')
-    expect(useGuardaStore.getState()).toMatchObject({ motivo: null, expirou: false, pendencia })
+    expect(useGuardaStore.getState()).toMatchObject({ reason: null, expirou: false, pendencia })
   })
 
   it('concluirLogin sem ação pendente devolve o retorno mas não guarda nada', () => {
@@ -61,14 +61,14 @@ describe('guarda-store (regras 1 e 13)', () => {
   it('consumirAcao entrega a ação uma só vez', () => {
     useGuardaStore.getState().pedirConta('votar', pendencia)
 
-    expect(useGuardaStore.getState().consumirAcao((a) => a.tipo === 'votar')).toEqual(voto)
-    expect(useGuardaStore.getState().consumirAcao((a) => a.tipo === 'votar')).toBeNull()
+    expect(useGuardaStore.getState().consumirAcao((a) => a.type === 'votar')).toEqual(voto)
+    expect(useGuardaStore.getState().consumirAcao((a) => a.type === 'votar')).toBeNull()
   })
 
   it('consumirAcao deixa a ação quando ela não é da tela que perguntou', () => {
     useGuardaStore.getState().pedirConta('votar', pendencia)
 
-    expect(useGuardaStore.getState().consumirAcao((a) => a.tipo === 'continuarRegistro')).toBeNull()
+    expect(useGuardaStore.getState().consumirAcao((a) => a.type === 'continuarRegistro')).toBeNull()
     expect(useGuardaStore.getState().pendencia).toEqual(pendencia)
   })
 

@@ -9,9 +9,9 @@ export interface Ponto {
 }
 
 interface RascunhoState {
-  categoriaId: number | null
+  categoryId: number | null
   local: Ponto | null
-  descricao: string
+  description: string
   horario: Horario
   escolherCategoria(id: number): void
   definirLocal(local: Ponto): void
@@ -21,9 +21,9 @@ interface RascunhoState {
 }
 
 const vazio = {
-  categoriaId: null,
+  categoryId: null,
   local: null,
-  descricao: '',
+  description: '',
   horario: { modo: 'agora', outroEm: null } satisfies Horario,
 }
 
@@ -31,10 +31,10 @@ export const useRascunhoStore = create<RascunhoState>()(
   persist(
     (set) => ({
       ...vazio,
-      escolherCategoria: (categoriaId) => set({ categoriaId }),
+      escolherCategoria: (categoriaId) => set({ categoryId: categoriaId }),
       definirLocal: (local) =>
         set((s) => (s.local?.lat === local.lat && s.local.lng === local.lng ? s : { local })),
-      definirDescricao: (descricao) => set({ descricao }),
+      definirDescricao: (descricao) => set({ description: descricao }),
       definirHorario: (horario) => set({ horario }),
       limpar: () => set(vazio),
     }),

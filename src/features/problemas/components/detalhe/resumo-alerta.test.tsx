@@ -25,7 +25,7 @@ function renderizar(problema: DetalheProblema, { recolhido = true } = {}) {
       path: '/',
       element: (
         <ContextoPainel.Provider value={{ recolhido, expandir: () => {}, medirResumo: () => {} }}>
-          <ResumoAlerta problema={problema} />
+          <ResumoAlerta issue={problema} />
           <EntreParaContinuar />
         </ContextoPainel.Provider>
       ),
@@ -36,7 +36,7 @@ function renderizar(problema: DetalheProblema, { recolhido = true } = {}) {
 function espiarVotos() {
   const votos: unknown[] = []
   server.use(
-    http.put(rota('/problemas/:id/voto'), async ({ request }) => {
+    http.put(rota('/issues/:id/vote'), async ({ request }) => {
       votos.push(await request.json())
       return new HttpResponse(null, { status: 204 })
     }),
@@ -50,14 +50,14 @@ describe('ResumoAlerta', () => {
   it('mostra categoria, endereço e confirmações', () => {
     renderizar(ATIVA)
 
-    expect(screen.getByRole('heading', { name: ATIVA.categoria.nome })).toBeInTheDocument()
-    expect(screen.getByText(new RegExp(ATIVA.endereco))).toBeInTheDocument()
-    expect(screen.getByText(`${ATIVA.votos.sim} confirmaram`)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: ATIVA.category.name })).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(ATIVA.address))).toBeInTheDocument()
+    expect(screen.getByText(`${ATIVA.votes.yes} confirmaram`)).toBeInTheDocument()
   })
 
   it.each([
-    ['nova', NOVA],
-    ['ativa', ATIVA],
+    ['new', NOVA],
+    ['active', ATIVA],
   ])('%s: "Ainda está lá?" com um voto só', async (_status, problema) => {
     entrarComoCidadao()
     const votos = espiarVotos()
@@ -66,7 +66,7 @@ describe('ResumoAlerta', () => {
     expect(screen.getByText('Ainda está lá?')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Voto rápido: Não está lá' }))
 
-    expect(votos).toEqual([expect.objectContaining({ valor: 'nao' })])
+    expect(votos).toEqual([expect.objectContaining({ value: 'no' })])
   })
 
   it('aberto (folha expandida ou desktop), sem polegares: o cartão completo já pergunta', () => {
@@ -78,13 +78,13 @@ describe('ResumoAlerta', () => {
   })
 
   it('autor não vê os polegares', () => {
-    renderizar({ ...ATIVA, souAutor: true })
+    renderizar({ ...ATIVA, isAuthor: true })
 
     expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
 
   it('resolvida não tem botões', () => {
-    renderizar({ ...ATIVA, status: 'resolvida' })
+    renderizar({ ...ATIVA, status: 'resolved' })
 
     expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
@@ -106,19 +106,19 @@ describe('ResumoAlerta', () => {
         path: '/',
         element: (
           <PainelResponsivo titulo="Detalhe" aoFechar={() => {}} alturaResumo={ALTURA_RESUMO}>
-            <ResumoAlerta problema={ATIVA} />
+            <ResumoAlerta issue={ATIVA} />
           </PainelResponsivo>
         ),
       },
     ])
     const estagio = () =>
-      screen.getByRole('heading', { name: ATIVA.categoria.nome }).closest('[data-estagio]')
+      screen.getByRole('heading', { name: ATIVA.category.name }).closest('[data-estagio]')
 
     expect(estagio()).toHaveAttribute('data-estagio', 'resumo')
     await userEvent.click(screen.getByRole('button', { name: 'Voto rápido: Sim, está lá' }))
     expect(estagio()).toHaveAttribute('data-estagio', 'resumo')
 
-    await userEvent.click(screen.getByRole('heading', { name: ATIVA.categoria.nome }))
+    await userEvent.click(screen.getByRole('heading', { name: ATIVA.category.name }))
     expect(estagio()).toHaveAttribute('data-estagio', 'aberto')
     expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })

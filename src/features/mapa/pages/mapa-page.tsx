@@ -297,7 +297,7 @@ export function MapaPage() {
           aria-pressed={legendaAberta}
           onClick={alternarLegenda}
         >
-          <Icone nome="info" />
+          <Icone name="info" />
         </BotaoMapa>
         <BotaoMapa
           aria-label={
@@ -308,7 +308,7 @@ export function MapaPage() {
           onClick={() => void aoClicarGps()}
         >
           <Icone
-            nome={
+            name={
               localizacao.estado === 'denied' || localizacao.estado === 'indisponivel'
                 ? 'location_disabled'
                 : 'near_me'
@@ -327,7 +327,7 @@ export function MapaPage() {
           }}
           className="absolute bottom-[92px] left-1/2 z-[1000] flex h-12 -translate-x-1/2 pressionavel items-center gap-2 rounded-full bg-primary bg-linear-to-b from-black/0 to-black/12 px-5 font-semibold text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2"
         >
-          <Icone nome="add_location_alt" />
+          <Icone name="add_location_alt" />
           Registrar
         </Link>
       )}

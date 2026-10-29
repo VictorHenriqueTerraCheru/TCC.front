@@ -1,6 +1,5 @@
-
 export interface paths {
-    "/admin/categorias": {
+    "/admin/categories": {
         parameters: {
             query?: never;
             header?: never;
@@ -21,7 +20,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["CategoriaAdminResponse"][];
+                        "application/json": components["schemas"]["CategoryAdminResponse"][];
                     };
                 };
             };
@@ -36,7 +35,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["CriarCategoriaRequest"];
+                    "application/json": components["schemas"]["CreateCategoryRequest"];
                 };
             };
             responses: {
@@ -45,7 +44,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["CategoriaAdminResponse"];
+                        "application/json": components["schemas"]["CategoryAdminResponse"];
                     };
                 };
                 400: {
@@ -64,7 +63,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/categorias/{id}": {
+    "/admin/categories/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -83,7 +82,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["EditarCategoriaRequest"];
+                    "application/json": components["schemas"]["EditCategoryRequest"];
                 };
             };
             responses: {
@@ -92,7 +91,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["CategoriaAdminResponse"];
+                        "application/json": components["schemas"]["CategoryAdminResponse"];
                     };
                 };
                 400: {
@@ -118,7 +117,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/categorias/{id}/ativa": {
+    "/admin/categories/{id}/active": {
         parameters: {
             query?: never;
             header?: never;
@@ -142,7 +141,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["AlterarAtivaCategoriaRequest"];
+                    "application/json": components["schemas"]["SetCategoryActiveRequest"];
                 };
             };
             responses: {
@@ -162,7 +161,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/admin/grupos": {
+    "/admin/groups": {
         parameters: {
             query?: never;
             header?: never;
@@ -180,7 +179,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["CriarGrupoRequest"];
+                    "application/json": components["schemas"]["CreateGroupRequest"];
                 };
             };
             responses: {
@@ -189,7 +188,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["GrupoResponse"];
+                        "application/json": components["schemas"]["GroupResponse"];
                     };
                 };
                 400: {
@@ -208,7 +207,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/grupos/{chave}": {
+    "/admin/groups/{key}": {
         parameters: {
             query?: never;
             header?: never;
@@ -221,13 +220,13 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    chave: string;
+                    key: string;
                 };
                 cookie?: never;
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["EditarGrupoRequest"];
+                    "application/json": components["schemas"]["EditGroupRequest"];
                 };
             };
             responses: {
@@ -236,7 +235,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["GrupoResponse"];
+                        "application/json": components["schemas"]["GroupResponse"];
                     };
                 };
                 400: {
@@ -261,7 +260,7 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    chave: string;
+                    key: string;
                 };
                 cookie?: never;
             };
@@ -286,7 +285,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/usuarios": {
+    "/admin/users": {
         parameters: {
             query?: never;
             header?: never;
@@ -296,10 +295,10 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    busca?: string;
-                    perfil?: string;
-                    pagina?: number;
-                    tamanho?: number;
+                    search?: string;
+                    role?: string;
+                    page?: number;
+                    pageSize?: number;
                 };
                 header?: never;
                 path?: never;
@@ -312,7 +311,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["PaginadoListarUsuariosItem"];
+                        "application/json": components["schemas"]["PagedListUsersItem"];
                     };
                 };
                 400: {
@@ -333,7 +332,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/usuarios/{id}/perfil": {
+    "/admin/users/{id}/role": {
         parameters: {
             query?: never;
             header?: never;
@@ -357,7 +356,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["AlterarPerfilRequest"];
+                    "application/json": components["schemas"]["ChangeRoleRequest"];
                 };
             };
             responses: {
@@ -385,7 +384,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/admin/verificacoes": {
+    "/admin/verifications": {
         parameters: {
             query?: never;
             header?: never;
@@ -396,8 +395,8 @@ export interface paths {
             parameters: {
                 query?: {
                     status?: string;
-                    pagina?: number;
-                    tamanho?: number;
+                    page?: number;
+                    pageSize?: number;
                 };
                 header?: never;
                 path?: never;
@@ -410,7 +409,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["PaginadoListarVerificacoesItem"];
+                        "application/json": components["schemas"]["PagedListVerificationsItem"];
                     };
                 };
                 400: {
@@ -431,7 +430,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/verificacoes/{id}/aprovar": {
+    "/admin/verifications/{id}/approve": {
         parameters: {
             query?: never;
             header?: never;
@@ -471,7 +470,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/verificacoes/{id}/recusar": {
+    "/admin/verifications/{id}/reject": {
         parameters: {
             query?: never;
             header?: never;
@@ -491,7 +490,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["RecusarVerificacaoRequest"];
+                    "application/json": components["schemas"]["RejectVerificationRequest"];
                 };
             };
             responses: {
@@ -514,52 +513,6 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/auth/cadastro": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CadastrarRequest"];
-                };
-            };
-            responses: {
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["RespostaAuth"];
-                    };
-                };
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
                 };
             };
         };
@@ -587,7 +540,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["EntrarRequest"];
+                    "application/json": components["schemas"]["LoginRequest"];
                 };
             };
             responses: {
@@ -596,7 +549,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["RespostaAuth"];
+                        "application/json": components["schemas"]["AuthResponse"];
                     };
                 };
                 400: {
@@ -615,7 +568,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/categorias": {
+    "/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RegisterRequest"];
+                };
+            };
+            responses: {
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AuthResponse"];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/categories": {
         parameters: {
             query?: never;
             header?: never;
@@ -636,7 +635,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ListarCategoriasResponse"][];
+                        "application/json": components["schemas"]["ListCategoriesResponse"][];
                     };
                 };
             };
@@ -649,7 +648,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/geocodificacao/reversa": {
+    "/geocoding/reverse": {
         parameters: {
             query?: never;
             header?: never;
@@ -673,7 +672,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ReversaResponse"];
+                        "application/json": components["schemas"]["ReverseResponse"];
                     };
                 };
                 400: {
@@ -702,7 +701,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/grupos": {
+    "/groups": {
         parameters: {
             query?: never;
             header?: never;
@@ -723,7 +722,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["GrupoResponse"][];
+                        "application/json": components["schemas"]["GroupResponse"][];
                     };
                 };
             };
@@ -736,7 +735,83 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/incidentes": {
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["HealthStatusResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health/database": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["HealthStatusResponse"];
+                    };
+                };
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/incidents": {
         parameters: {
             query?: never;
             header?: never;
@@ -754,7 +829,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["RegistrarIncidenteRequest"];
+                    "application/json": components["schemas"]["CreateIncidentRequest"];
                 };
             };
             responses: {
@@ -763,7 +838,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ObterAreaIncidentesResponse"];
+                        "application/json": components["schemas"]["GetIncidentAreaResponse"];
                     };
                 };
                 400: {
@@ -782,7 +857,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/incidentes/area": {
+    "/incidents/area": {
         parameters: {
             query?: never;
             header?: never;
@@ -806,7 +881,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ObterAreaIncidentesResponse"];
+                        "application/json": components["schemas"]["GetIncidentAreaResponse"];
                     };
                 };
                 400: {
@@ -827,7 +902,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/incidentes/calor": {
+    "/incidents/heatmap": {
         parameters: {
             query?: never;
             header?: never;
@@ -841,8 +916,8 @@ export interface paths {
                     minLng: number;
                     maxLat: number;
                     maxLng: number;
-                    dias?: number;
-                    grupos?: string;
+                    days?: number;
+                    groups?: string;
                 };
                 header?: never;
                 path?: never;
@@ -855,7 +930,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ObterCalorIncidentesResponse"][];
+                        "application/json": components["schemas"]["GetIncidentHeatmapResponse"][];
                     };
                 };
                 400: {
@@ -869,6 +944,276 @@ export interface paths {
             };
         };
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    minLat: number;
+                    minLng: number;
+                    maxLat: number;
+                    maxLng: number;
+                    groups?: string;
+                    status?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListIssuesInAreaResponse"][];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateIssueRequest"];
+                };
+            };
+            responses: {
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GetIssueDetailResponse"];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/duplicates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    categoryId: number;
+                    lat: number;
+                    lng: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SearchDuplicatesResponse"][];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/recent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    lat: number;
+                    lng: number;
+                    radiusKm?: number;
+                    groups?: string;
+                    page?: number;
+                    pageSize?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedListRecentIssuesItem"];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GetIssueDetailResponse"];
+                    };
+                };
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/{id}/vote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VoteRequest"];
+                };
+            };
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GetIssueDetailResponse"];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;
@@ -897,7 +1242,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ObterMeResponse"];
+                        "application/json": components["schemas"]["GetMeResponse"];
                     };
                 };
             };
@@ -916,7 +1261,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["AtualizarMeRequest"];
+                    "application/json": components["schemas"]["UpdateMeRequest"];
                 };
             };
             responses: {
@@ -925,7 +1270,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ObterMeResponse"];
+                        "application/json": components["schemas"]["GetMeResponse"];
                     };
                 };
                 400: {
@@ -940,7 +1285,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/me/historico": {
+    "/me/history": {
         parameters: {
             query?: never;
             header?: never;
@@ -950,9 +1295,9 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    filtro?: string;
-                    pagina?: number;
-                    tamanho?: number;
+                    filter?: string;
+                    page?: number;
+                    pageSize?: number;
                 };
                 header?: never;
                 path?: never;
@@ -965,7 +1310,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["PaginadoObterHistoricoItem"];
+                        "application/json": components["schemas"]["PagedGetHistoryItem"];
                     };
                 };
                 400: {
@@ -986,353 +1331,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/problemas": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query: {
-                    minLat: number;
-                    minLng: number;
-                    maxLat: number;
-                    maxLng: number;
-                    grupos?: string;
-                    status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ListarProblemasNaAreaResponse"][];
-                    };
-                };
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["RegistrarProblemaRequest"];
-                };
-            };
-            responses: {
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ObterDetalheProblemaResponse"];
-                    };
-                };
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/problemas/duplicatas": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query: {
-                    categoriaId: number;
-                    lat: number;
-                    lng: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["BuscarDuplicatasResponse"][];
-                    };
-                };
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/problemas/recentes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query: {
-                    lat: number;
-                    lng: number;
-                    raioKm?: number;
-                    grupos?: string;
-                    pagina?: number;
-                    tamanho?: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["PaginadoListarProblemasRecentesItem"];
-                    };
-                };
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/problemas/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ObterDetalheProblemaResponse"];
-                    };
-                };
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/problemas/{id}/voto": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["VotarRequest"];
-                };
-            };
-            responses: {
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ObterDetalheProblemaResponse"];
-                    };
-                };
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
-                };
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/saude": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["StatusSaudeResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/saude/banco": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["StatusSaudeResponse"];
-                    };
-                };
-                503: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/verificacoes": {
+    "/verifications": {
         parameters: {
             query?: never;
             header?: never;
@@ -1350,7 +1349,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SolicitarVerificacaoRequest"];
+                    "application/json": components["schemas"]["RequestVerificationRequest"];
                 };
             };
             responses: {
@@ -1359,7 +1358,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SolicitarVerificacaoResponse"];
+                        "application/json": components["schemas"]["RequestVerificationResponse"];
                     };
                 };
                 400: {
@@ -1382,77 +1381,150 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        AlterarAtivaCategoriaRequest: {
-            ativa: boolean;
+        AffiliationType: "livesInArea" | "worksInArea" | "publicServant" | "other";
+        AuthResponse: {
+            expiresAt: string;
+            token: string;
+            user: components["schemas"]["AuthResponseUserSummary"];
         };
-        AlterarPerfilRequest: {
-            perfil: components["schemas"]["Perfil"];
-        };
-        AtualizarMeRequest: {
-            nome: string;
-        };
-        BuscarDuplicatasResponse: {
-            categoria: components["schemas"]["CategoriaResumo"];
-            confirmacoes: number;
-            criadoEm: string;
-            distanciaMetros: number;
-            endereco: string;
-            faixa: null | components["schemas"]["FaixaConfianca"];
+        AuthResponseUserSummary: {
+            email: string;
             id: string;
+            name: string;
+            role: components["schemas"]["Role"];
         };
-        CadastrarRequest: {
-            aceitouTermos: boolean;
-            email: string;
-            nome: string;
-            senha: string;
-        };
-        CategoriaAdminResponse: {
-            ativa: boolean;
-            grupo: string;
-            icone: string;
+        CategoryAdminResponse: {
+            active: boolean;
+            group: string;
+            icon: string;
             id: number;
-            nome: string;
-            tipo: components["schemas"]["TipoOcorrencia"];
+            name: string;
+            type: components["schemas"]["ReportType"];
         };
-        CategoriaResumo: {
-            grupo: string;
-            icone: string;
+        CategorySummary: {
+            group: string;
+            icon: string;
             id: number;
-            nome: string;
+            name: string;
         };
-        CorGrupo: "laranja" | "ocre" | "marrom" | "vermelho" | "terracota" | "azul" | "verdeAgua" | "roxo" | "rosa" | "cinza";
-        CriarCategoriaRequest: {
-            grupo: string;
-            icone: string;
-            nome: string;
-            tipo: components["schemas"]["TipoOcorrencia"];
+        ChangeRoleRequest: {
+            role: components["schemas"]["Role"];
         };
-        CriarGrupoRequest: {
-            cor: components["schemas"]["CorGrupo"];
-            rotulo: string;
-            tipo: components["schemas"]["TipoOcorrencia"];
+        ConcentrationLevel: "low" | "medium" | "high";
+        CreateCategoryRequest: {
+            group: string;
+            icon: string;
+            name: string;
+            type: components["schemas"]["ReportType"];
         };
-        EditarCategoriaRequest: {
-            grupo: string;
-            icone: string;
-            nome: string;
+        CreateGroupRequest: {
+            color: components["schemas"]["GroupColor"];
+            label: string;
+            type: components["schemas"]["ReportType"];
         };
-        EditarGrupoRequest: {
-            cor: components["schemas"]["CorGrupo"];
-            ordem: number;
-            rotulo: string;
+        CreateIncidentRequest: {
+            categoryId: number;
+            lat: number;
+            lng: number;
+            occurredAt: string;
         };
-        EntrarRequest: {
+        CreateIssueRequest: {
+            categoryId: number;
+            description: null | string;
+            lat: number;
+            lng: number;
+        };
+        EditCategoryRequest: {
+            group: string;
+            icon: string;
+            name: string;
+        };
+        EditGroupRequest: {
+            color: components["schemas"]["GroupColor"];
+            label: string;
+            sortOrder: number;
+        };
+        GetHistoryItem: {
+            address: null | string;
+            category: components["schemas"]["CategorySummary"];
+            date: string;
+            issueStatus: null | components["schemas"]["IssueStatus"];
+            reportId: null | string;
+            type: components["schemas"]["GetHistoryItemType"];
+            value: null | components["schemas"]["GetHistoryItemValue"];
+        };
+        GetHistoryItemType: "issueReport" | "incidentReport" | "vote";
+        GetHistoryItemValue: "yes" | "no";
+        GetIncidentAreaCount: {
+            categoryId: number;
+            days30: number;
+            days7: number;
+            name: string;
+        };
+        GetIncidentAreaResponse: {
+            counts: components["schemas"]["GetIncidentAreaCount"][];
+            level: components["schemas"]["ConcentrationLevel"];
+            radiusMeters: number;
+            updatedAt: string;
+        };
+        GetIncidentHeatmapResponse: {
+            count: number;
+            lat: number;
+            lng: number;
+        };
+        GetIssueDetailEvaluation: {
+            closesAt: string;
+            required: number;
+            voters: number;
+        };
+        GetIssueDetailResponse: {
+            address: string;
+            band: null | components["schemas"]["TrustBand"];
+            category: components["schemas"]["CategorySummary"];
+            createdAt: string;
+            description: null | string;
+            evaluation: null | components["schemas"]["GetIssueDetailEvaluation"];
+            id: string;
+            isAuthor: boolean;
+            lat: number;
+            lng: number;
+            myVote: null | components["schemas"]["VoteAnswer"];
+            status: components["schemas"]["IssueStatus"];
+            trustScore: null | number;
+            votes: components["schemas"]["GetIssueDetailVotes"];
+        };
+        GetIssueDetailVotes: {
+            no: number;
+            noLast24h: number;
+            yes: number;
+        };
+        GetMeResponse: {
+            createdAt: string;
             email: string;
-            senha: string;
+            id: string;
+            name: string;
+            role: components["schemas"]["Role"];
+            totalReports: number;
+            totalVotes: number;
+            verification: null | components["schemas"]["GetMeVerificationSummary"];
+            verifiedAt: string | null;
         };
-        FaixaConfianca: "baixa" | "media" | "alta";
-        GrupoResponse: {
-            chave: string;
-            cor: components["schemas"]["CorGrupo"];
-            ordem: number;
-            rotulo: string;
-            tipo: components["schemas"]["TipoOcorrencia"];
+        GetMeVerificationSummary: {
+            affiliationType: components["schemas"]["AffiliationType"];
+            createdAt: string;
+            rejectionReason: null | string;
+            status: components["schemas"]["VerificationStatus"];
+        };
+        GroupColor: "orange" | "ochre" | "brown" | "red" | "terracotta" | "blue" | "teal" | "purple" | "pink" | "gray";
+        GroupResponse: {
+            color: components["schemas"]["GroupColor"];
+            key: string;
+            label: string;
+            sortOrder: number;
+            type: components["schemas"]["ReportType"];
+        };
+        HealthStatusResponse: {
+            status: string;
         };
         HttpValidationProblemDetails: {
             detail?: null | string;
@@ -1464,149 +1536,81 @@ export interface components {
             title?: null | string;
             type?: null | string;
         };
-        ListarCategoriasResponse: {
-            grupo: string;
-            icone: string;
+        IssueStatus: "new" | "active" | "possiblyResolved" | "resolved";
+        ListCategoriesResponse: {
+            group: string;
+            icon: string;
             id: number;
-            nome: string;
-            tipo: components["schemas"]["TipoOcorrencia"];
+            name: string;
+            type: components["schemas"]["ReportType"];
         };
-        ListarProblemasNaAreaResponse: {
-            categoriaId: number;
-            confianca: null | number;
-            faixa: null | components["schemas"]["FaixaConfianca"];
+        ListIssuesInAreaResponse: {
+            band: null | components["schemas"]["TrustBand"];
+            categoryId: number;
             id: string;
             lat: number;
             lng: number;
-            status: components["schemas"]["StatusProblema"];
+            status: components["schemas"]["IssueStatus"];
+            trustScore: null | number;
         };
-        ListarProblemasRecentesItem: {
-            categoria: components["schemas"]["CategoriaResumo"];
-            criadoEm: string;
-            endereco: string;
-            faixa: null | components["schemas"]["FaixaConfianca"];
+        ListRecentIssuesItem: {
+            address: string;
+            band: null | components["schemas"]["TrustBand"];
+            category: components["schemas"]["CategorySummary"];
+            createdAt: string;
             id: string;
-            status: components["schemas"]["StatusProblema"];
+            status: components["schemas"]["IssueStatus"];
         };
-        ListarUsuariosItem: {
-            criadoEm: string;
+        ListUsersItem: {
+            createdAt: string;
             email: string;
             id: string;
-            nome: string;
-            perfil: components["schemas"]["Perfil"];
-            verificadoEm: string | null;
+            name: string;
+            role: components["schemas"]["Role"];
+            verifiedAt: string | null;
         };
-        ListarVerificacoesItem: {
-            criadaEm: string;
+        ListVerificationsItem: {
+            affiliationType: components["schemas"]["AffiliationType"];
+            createdAt: string;
             id: string;
-            justificativa: string;
-            motivoRecusa: null | string;
-            status: components["schemas"]["StatusVerificacao"];
-            tipoVinculo: components["schemas"]["TipoVinculo"];
-            usuario: components["schemas"]["ListarVerificacoesUsuarioResumo"];
+            justification: string;
+            rejectionReason: null | string;
+            status: components["schemas"]["VerificationStatus"];
+            user: components["schemas"]["ListVerificationsUserSummary"];
         };
-        ListarVerificacoesUsuarioResumo: {
+        ListVerificationsUserSummary: {
             id: string;
-            iniciais: string;
-            nome: string;
+            initials: string;
+            name: string;
         };
-        NivelConcentracao: "baixa" | "media" | "alta";
-        ObterAreaIncidentesContagem: {
-            categoriaId: number;
-            dias30: number;
-            dias7: number;
-            nome: string;
-        };
-        ObterAreaIncidentesResponse: {
-            atualizadoEm: string;
-            contagens: components["schemas"]["ObterAreaIncidentesContagem"][];
-            nivel: components["schemas"]["NivelConcentracao"];
-            raioMetros: number;
-        };
-        ObterCalorIncidentesResponse: {
-            lat: number;
-            lng: number;
-            quantidade: number;
-        };
-        ObterDetalheProblemaAvaliacao: {
-            encerraEm: string;
-            necessarios: number;
-            votantes: number;
-        };
-        ObterDetalheProblemaResponse: {
-            avaliacao: null | components["schemas"]["ObterDetalheProblemaAvaliacao"];
-            categoria: components["schemas"]["CategoriaResumo"];
-            confianca: null | number;
-            criadoEm: string;
-            descricao: null | string;
-            endereco: string;
-            faixa: null | components["schemas"]["FaixaConfianca"];
-            id: string;
-            lat: number;
-            lng: number;
-            meuVoto: null | components["schemas"]["ValorVotoContrato"];
-            souAutor: boolean;
-            status: components["schemas"]["StatusProblema"];
-            votos: components["schemas"]["ObterDetalheProblemaVotos"];
-        };
-        ObterDetalheProblemaVotos: {
-            nao: number;
-            naoUltimas24h: number;
-            sim: number;
-        };
-        ObterHistoricoItem: {
-            categoria: components["schemas"]["CategoriaResumo"];
-            data: string;
-            endereco: null | string;
-            ocorrenciaId: null | string;
-            statusProblema: null | components["schemas"]["StatusProblema"];
-            tipo: components["schemas"]["ObterHistoricoTipoItem"];
-            valor: null | components["schemas"]["ObterHistoricoValorItem"];
-        };
-        ObterHistoricoTipoItem: "registroProblema" | "registroIncidente" | "voto";
-        ObterHistoricoValorItem: "sim" | "nao";
-        ObterMeResponse: {
-            criadoEm: string;
+        LoginRequest: {
             email: string;
-            id: string;
-            nome: string;
-            perfil: components["schemas"]["Perfil"];
-            totalRegistros: number;
-            totalVotos: number;
-            verificacao: null | components["schemas"]["ObterMeVerificacaoResumo"];
-            verificadoEm: string | null;
+            password: string;
         };
-        ObterMeVerificacaoResumo: {
-            criadaEm: string;
-            motivoRecusa: null | string;
-            status: components["schemas"]["StatusVerificacao"];
-            tipoVinculo: components["schemas"]["TipoVinculo"];
-        };
-        PaginadoListarProblemasRecentesItem: {
-            itens: components["schemas"]["ListarProblemasRecentesItem"][];
-            pagina: number;
-            tamanho: number;
+        PagedGetHistoryItem: {
+            items: components["schemas"]["GetHistoryItem"][];
+            page: number;
+            pageSize: number;
             total: number;
         };
-        PaginadoListarUsuariosItem: {
-            itens: components["schemas"]["ListarUsuariosItem"][];
-            pagina: number;
-            tamanho: number;
+        PagedListRecentIssuesItem: {
+            items: components["schemas"]["ListRecentIssuesItem"][];
+            page: number;
+            pageSize: number;
             total: number;
         };
-        PaginadoListarVerificacoesItem: {
-            itens: components["schemas"]["ListarVerificacoesItem"][];
-            pagina: number;
-            tamanho: number;
+        PagedListUsersItem: {
+            items: components["schemas"]["ListUsersItem"][];
+            page: number;
+            pageSize: number;
             total: number;
         };
-        PaginadoObterHistoricoItem: {
-            itens: components["schemas"]["ObterHistoricoItem"][];
-            pagina: number;
-            tamanho: number;
+        PagedListVerificationsItem: {
+            items: components["schemas"]["ListVerificationsItem"][];
+            page: number;
+            pageSize: number;
             total: number;
         };
-        Perfil: "cidadao" | "cidadaoVerificado" | "administrador";
         ProblemDetails: {
             detail?: null | string;
             instance?: null | string;
@@ -1614,65 +1618,60 @@ export interface components {
             title?: null | string;
             type?: null | string;
         };
-        RecusarVerificacaoRequest: {
-            motivo: string;
-        };
-        RegistrarIncidenteRequest: {
-            categoriaId: number;
-            lat: number;
-            lng: number;
-            ocorridoEm: string;
-        };
-        RegistrarProblemaRequest: {
-            categoriaId: number;
-            descricao: null | string;
-            lat: number;
-            lng: number;
-        };
-        RespostaAuth: {
-            expiraEm: string;
-            token: string;
-            usuario: components["schemas"]["RespostaAuthUsuarioResumo"];
-        };
-        RespostaAuthUsuarioResumo: {
+        RegisterRequest: {
+            acceptedTerms: boolean;
             email: string;
+            name: string;
+            password: string;
+        };
+        RejectVerificationRequest: {
+            reason: string;
+        };
+        ReportType: "issue" | "incident";
+        RequestVerificationRequest: {
+            affiliationType: components["schemas"]["AffiliationType"];
+            justification: string;
+        };
+        RequestVerificationResponse: {
+            affiliationType: components["schemas"]["AffiliationType"];
+            createdAt: string;
             id: string;
-            nome: string;
-            perfil: components["schemas"]["Perfil"];
+            justification: string;
+            status: components["schemas"]["VerificationStatus"];
         };
-        ReversaResponse: {
-            bairro: null | string;
-            cidade: null | string;
-            disponivel: boolean;
-            endereco: string;
-            logradouro: null | string;
-            numero: null | string;
-            rotuloArea: null | string;
-            uf: null | string;
+        ReverseResponse: {
+            address: string;
+            areaLabel: null | string;
+            available: boolean;
+            city: null | string;
+            neighborhood: null | string;
+            number: null | string;
+            state: null | string;
+            street: null | string;
         };
-        SolicitarVerificacaoRequest: {
-            justificativa: string;
-            tipoVinculo: components["schemas"]["TipoVinculo"];
-        };
-        SolicitarVerificacaoResponse: {
-            criadaEm: string;
+        Role: "citizen" | "verifiedCitizen" | "administrator";
+        SearchDuplicatesResponse: {
+            address: string;
+            band: null | components["schemas"]["TrustBand"];
+            category: components["schemas"]["CategorySummary"];
+            confirmations: number;
+            createdAt: string;
+            distanceMeters: number;
             id: string;
-            justificativa: string;
-            status: components["schemas"]["StatusVerificacao"];
-            tipoVinculo: components["schemas"]["TipoVinculo"];
         };
-        StatusProblema: "nova" | "ativa" | "possivelmenteResolvida" | "resolvida";
-        StatusSaudeResponse: {
-            status: string;
+        SetCategoryActiveRequest: {
+            active: boolean;
         };
-        StatusVerificacao: "pendente" | "aprovada" | "recusada";
-        TipoOcorrencia: "problema" | "incidente";
-        TipoVinculo: "moradorRegiao" | "trabalhaRegiao" | "servidorPublico" | "outro";
-        ValorVotoContrato: "sim" | "nao";
-        VotarRequest: {
+        TrustBand: "low" | "medium" | "high";
+        UpdateMeRequest: {
+            name: string;
+        };
+        VerificationStatus: "pending" | "approved" | "rejected";
+        VoteAnswer: "yes" | "no";
+        VoteRequest: {
             lat: null | number;
             lng: null | number;
-            valor: components["schemas"]["ValorVotoContrato"];
+            value: components["schemas"]["VoteAnswer"];
         };
     };
     responses: never;

@@ -10,22 +10,22 @@ import { useAreaIncidentes } from '../api/use-area-incidentes'
 import { gradienteCalor } from '../models/calor'
 import type { NivelConcentracao } from '../models/incidente'
 
-const nivel: Record<NivelConcentracao, { rotulo: string; cor: string }> = {
-  baixa: { rotulo: 'Concentração baixa', cor: gradienteCalor[0.4]! },
-  media: { rotulo: 'Concentração média', cor: gradienteCalor[0.6]! },
-  alta: { rotulo: 'Concentração alta', cor: gradienteCalor[1]! },
+const nivel: Record<NivelConcentracao, { label: string; color: string }> = {
+  low: { label: 'Concentração baixa', color: gradienteCalor[0.4]! },
+  medium: { label: 'Concentração média', color: gradienteCalor[0.6]! },
+  high: { label: 'Concentração alta', color: gradienteCalor[1]! },
 }
 
-const linhas: Record<number, { rotulo: string; icone: MaterialSymbol }> = {
-  7: { rotulo: 'Roubos', icone: 'error' },
-  8: { rotulo: 'Acidentes', icone: 'car_crash' },
+const linhas: Record<number, { label: string; icon: MaterialSymbol }> = {
+  7: { label: 'Roubos', icon: 'error' },
+  8: { label: 'Acidentes', icon: 'car_crash' },
 }
 
 export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
   const area = useAreaIncidentes(lat, lng)
   const endereco = useEnderecoReverso({ lat, lng })
 
-  const titulo = endereco.data?.rotuloArea ?? (endereco.data ? 'Área selecionada' : null)
+  const titulo = endereco.data?.areaLabel ?? (endereco.data ? 'Área selecionada' : null)
 
   if (area.isError) {
     return (
@@ -64,15 +64,15 @@ export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
         <>
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
-              Raio aprox. {area.data.raioMetros} m · atualizado às{' '}
-              {horaCurta(area.data.atualizadoEm)}
+              Raio aprox. {area.data.radiusMeters} m · atualizado às{' '}
+              {horaCurta(area.data.updatedAt)}
             </p>
             <span className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-input px-2.5 py-1 text-xs font-medium">
               <span
                 className="size-2.5 rounded-full"
-                style={{ background: nivel[area.data.nivel].cor }}
+                style={{ background: nivel[area.data.level].color }}
               />
-              {nivel[area.data.nivel].rotulo}
+              {nivel[area.data.level].label}
             </span>
           </div>
 
@@ -85,19 +85,19 @@ export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
               </tr>
             </thead>
             <tbody>
-              {area.data.contagens.map((c) => (
-                <tr key={c.categoriaId} className="border-t border-border/60">
+              {area.data.counts.map((c) => (
+                <tr key={c.categoryId} className="border-t border-border/60">
                   <td className="px-4 py-3">
                     <span className="flex items-center gap-3">
                       <Icone
-                        nome={linhas[c.categoriaId]?.icone ?? 'error'}
+                        name={linhas[c.categoryId]?.icon ?? 'error'}
                         className="text-[20px] text-muted-foreground"
                       />
-                      {linhas[c.categoriaId]?.rotulo ?? c.nome}
+                      {linhas[c.categoryId]?.label ?? c.name}
                     </span>
                   </td>
-                  <td className="px-2 py-3 text-right text-2xl">{c.dias7}</td>
-                  <td className="px-4 py-3 text-right text-2xl">{c.dias30}</td>
+                  <td className="px-2 py-3 text-right text-2xl">{c.days7}</td>
+                  <td className="px-4 py-3 text-right text-2xl">{c.days30}</td>
                 </tr>
               ))}
             </tbody>
@@ -106,7 +106,7 @@ export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
       )}
 
       <p className="flex gap-3 rounded-2xl bg-superficie-2 p-3 text-xs text-muted-foreground">
-        <Icone nome="info" className="text-[18px]" />
+        <Icone name="info" className="text-[18px]" />
         Eventos são pontuais: aparecem apenas agregados, sem local exato, e não recebem votos de
         "Ainda está lá?".
       </p>

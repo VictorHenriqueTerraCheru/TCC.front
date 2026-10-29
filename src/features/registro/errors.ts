@@ -1,13 +1,13 @@
 import { isApiError } from '@/infrastructure/api'
 
 const mensagens: Record<string, string> = {
-  'categoria-nao-e-problema': 'Essa categoria é de incidente. Volte e escolha de novo.',
-  'categoria-nao-e-incidente': 'Essa categoria é de problema. Volte e escolha de novo.',
-  'horario-fora-da-janela':
+  'category-not-issue': 'Essa categoria é de incidente. Volte e escolha de novo.',
+  'category-not-incident': 'Essa categoria é de problema. Volte e escolha de novo.',
+  'time-outside-window':
     'O horário precisa estar dentro das últimas 24 horas. Ajuste e envie de novo.',
-  'limite-diario-incidentes':
+  'daily-incident-limit':
     'Você chegou ao limite de relatos de incidente nas últimas 24 horas. Tente mais tarde.',
-  'autor-nao-vota': 'Esse registro é seu: quem registra não vota nele.',
+  'author-cannot-vote': 'Esse registro é seu: quem registra não vota nele.',
 }
 
 export function mensagemErroRegistro(erro: unknown): string {

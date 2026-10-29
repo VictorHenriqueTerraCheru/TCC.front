@@ -9,7 +9,7 @@ import { useSincronizarCacheComSessao } from './use-sincronizar-cache'
 test('na troca de conta, o detalhe em cache (meuVoto, souAutor) não é servido à conta nova', () => {
   entrarComoAdmin()
   const queryClient = new QueryClient()
-  queryClient.setQueryData(['problemas', 'detalhe', 'p1'], { meuVoto: 'sim', souAutor: true })
+  queryClient.setQueryData(['problemas', 'detalhe', 'p1'], { myVote: 'yes', isAuthor: true })
   renderHook(useSincronizarCacheComSessao, {
     wrapper: ({ children }: { children: ReactNode }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -25,8 +25,8 @@ test('na troca de conta, o detalhe em cache (meuVoto, souAutor) não é servido 
 test('na troca de conta, /me e a fila do admin saem do cache; o resto só fica velho', () => {
   entrarComoAdmin()
   const queryClient = new QueryClient()
-  queryClient.setQueryData(['me'], { nome: 'Admin TCC' })
-  queryClient.setQueryData(['admin', 'verificacoes', 'pendente'], { itens: [] })
+  queryClient.setQueryData(['me'], { name: 'Admin TCC' })
+  queryClient.setQueryData(['admin', 'verificacoes', 'pending'], { items: [] })
   queryClient.setQueryData(['categorias'], [])
   renderHook(useSincronizarCacheComSessao, {
     wrapper: ({ children }: { children: ReactNode }) => (
@@ -37,7 +37,7 @@ test('na troca de conta, /me e a fila do admin saem do cache; o resto só fica v
   entrarComo('u-cidadao2', 'João Pereira')
 
   expect(queryClient.getQueryData(['me'])).toBeUndefined()
-  expect(queryClient.getQueryData(['admin', 'verificacoes', 'pendente'])).toBeUndefined()
+  expect(queryClient.getQueryData(['admin', 'verificacoes', 'pending'])).toBeUndefined()
   expect(queryClient.getQueryData(['categorias'])).toEqual([])
   expect(queryClient.getQueryState(['categorias'])?.isInvalidated).toBe(true)
   sair()

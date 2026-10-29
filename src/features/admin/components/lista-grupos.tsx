@@ -48,19 +48,18 @@ export function ListaGrupos() {
     )
   }
 
-  const total = (chave: string) => categorias.data.filter((c) => c.grupo === chave).length
+  const total = (chave: string) => categorias.data.filter((c) => c.group === chave).length
 
   const termo = semAcento(busca.trim())
   const visiveis = grupos.data.filter(
     (g) =>
-      (tipo === 'todos' || g.tipo === tipo) &&
-      (termo === '' || semAcento(g.rotulo).includes(termo)),
+      (tipo === 'todos' || g.type === tipo) && (termo === '' || semAcento(g.label).includes(termo)),
   )
   const filtrando = termo !== '' || tipo !== 'todos'
 
   function confirmarApagar() {
     if (!apagando) return
-    apagar.mutate(apagando.chave, { onSuccess: () => setApagando(null) })
+    apagar.mutate(apagando.key, { onSuccess: () => setApagando(null) })
   }
 
   return (
@@ -75,8 +74,8 @@ export function ListaGrupos() {
       </div>
 
       <div className="mb-3 space-y-3">
-        <CampoBusca valor={busca} aoMudar={setBusca} rotulo="Buscar grupo" />
-        <SegmentadoTipo valor={tipo} aoMudar={setTipo} />
+        <CampoBusca value={busca} aoMudar={setBusca} label="Buscar grupo" />
+        <SegmentadoTipo value={tipo} aoMudar={setTipo} />
         <ResumoDosFiltros
           mostradas={visiveis.length}
           total={grupos.data.length}
@@ -96,17 +95,17 @@ export function ListaGrupos() {
       ) : (
         <ul className="divide-y divide-border rounded-[20px] bg-card shadow-1">
           {visiveis.map((grupo) => {
-            const quantas = total(grupo.chave)
+            const quantas = total(grupo.key)
             return (
-              <li key={grupo.chave} className="flex items-center gap-3 p-3">
-                <PontoGrupo cor={aparenciaDaCor[grupo.cor]} />
+              <li key={grupo.key} className="flex items-center gap-3 p-3">
+                <PontoGrupo color={aparenciaDaCor[grupo.color]} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{grupo.rotulo}</p>
+                  <p className="truncate font-medium">{grupo.label}</p>
                   <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-                    <EtiquetaTipo tipo={grupo.tipo} />
+                    <EtiquetaTipo type={grupo.type} />
                     {quantas !== undefined && (
                       <span>
-                        {quantas} {quantas === 1 ? 'categoria' : 'categorias'}
+                        {quantas} {quantas === 1 ? 'category' : 'categorias'}
                       </span>
                     )}
                   </p>
@@ -114,7 +113,7 @@ export function ListaGrupos() {
                 <Button
                   variant="outline"
                   size="sm"
-                  aria-label={`Editar ${grupo.rotulo}`}
+                  aria-label={`Editar ${grupo.label}`}
                   onClick={() => setFormulario(grupo)}
                 >
                   Editar
@@ -122,7 +121,7 @@ export function ListaGrupos() {
                 <Button
                   variant="outline"
                   size="sm"
-                  aria-label={`Apagar ${grupo.rotulo}`}
+                  aria-label={`Apagar ${grupo.label}`}
                   disabled={quantas !== 0}
                   title={quantas === 0 ? undefined : 'Só grupos sem categorias podem ser apagados'}
                   onClick={() => {
@@ -145,8 +144,8 @@ export function ListaGrupos() {
       >
         {formulario !== null && (
           <FormularioGrupo
-            key={formulario === 'novo' ? 'novo' : formulario.chave}
-            grupo={formulario === 'novo' ? undefined : formulario}
+            key={formulario === 'novo' ? 'novo' : formulario.key}
+            group={formulario === 'novo' ? undefined : formulario}
             aoConcluir={() => setFormulario(null)}
           />
         )}
@@ -155,7 +154,7 @@ export function ListaGrupos() {
       <FolhaResponsiva
         aberto={apagando !== null}
         aoMudarAberto={(aberto) => !aberto && setApagando(null)}
-        titulo={`Apagar o grupo ${apagando?.rotulo ?? ''}?`}
+        titulo={`Apagar o grupo ${apagando?.label ?? ''}?`}
       >
         <p className="mb-4 text-sm text-muted-foreground">
           Essa ação não pode ser desfeita. O grupo some dos filtros e da escolha de categoria.

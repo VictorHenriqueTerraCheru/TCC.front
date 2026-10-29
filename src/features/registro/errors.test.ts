@@ -4,13 +4,13 @@ import { mensagemErroRegistro } from './errors'
 
 describe('mensagemErroRegistro', () => {
   it('mapeia os códigos de regra', () => {
-    expect(mensagemErroRegistro(new ApiError(422, { type: 'horario-fora-da-janela' }))).toBe(
+    expect(mensagemErroRegistro(new ApiError(422, { type: 'time-outside-window' }))).toBe(
       'O horário precisa estar dentro das últimas 24 horas. Ajuste e envie de novo.',
     )
-    expect(mensagemErroRegistro(new ApiError(429, { type: 'limite-diario-incidentes' }))).toContain(
+    expect(mensagemErroRegistro(new ApiError(429, { type: 'daily-incident-limit' }))).toContain(
       'limite de relatos de incidente',
     )
-    expect(mensagemErroRegistro(new ApiError(403, { type: 'categoria-nao-e-problema' }))).toContain(
+    expect(mensagemErroRegistro(new ApiError(403, { type: 'category-not-issue' }))).toContain(
       'categoria é de incidente',
     )
   })
@@ -18,7 +18,7 @@ describe('mensagemErroRegistro', () => {
   it('sem código conhecido, usa a primeira mensagem de validação, depois o título', () => {
     expect(
       mensagemErroRegistro(
-        new ApiError(400, { type: 'desconhecido', errors: { descricao: ['Muito longa.'] } }),
+        new ApiError(400, { type: 'desconhecido', errors: { description: ['Muito longa.'] } }),
       ),
     ).toBe('Muito longa.')
     expect(mensagemErroRegistro(new ApiError(400, { title: 'Requisição inválida' }))).toBe(

@@ -10,16 +10,16 @@ import { MapaRegistro } from './mapa-registro'
 
 const buraco: CategoriaResumo = {
   id: 1,
-  nome: 'Buraco na via',
-  grupo: 'viaPublica',
-  icone: 'buraco',
+  name: 'Buraco na via',
+  group: 'viaPublica',
+  icon: 'buraco',
 }
 
 afterEach(() => useRascunhoStore.getState().limpar())
 
 describe('MapaRegistro', () => {
   it('modo pino grava o centro do mapa como local ao parar de mover', () => {
-    renderizar(<MapaRegistro modo="pino" categoria={buraco} />)
+    renderizar(<MapaRegistro modo="pino" category={buraco} />)
 
     act(() => mapaFalso.mover({ lat: -22.95, lng: -43.18 }))
 
@@ -27,7 +27,7 @@ describe('MapaRegistro', () => {
   })
 
   it('moveend com o mesmo centro (redimensionar) não troca o local', () => {
-    renderizar(<MapaRegistro modo="pino" categoria={buraco} />)
+    renderizar(<MapaRegistro modo="pino" category={buraco} />)
     act(() => mapaFalso.mover({ lat: -22.95, lng: -43.18 }))
     const antes = useRascunhoStore.getState().local
 
@@ -47,7 +47,7 @@ describe('MapaRegistro', () => {
       <MapaRegistro
         modo="conferencia"
         novo={{ lat: -22.9519, lng: -43.1866 }}
-        existente={{ lat: -22.9521, lng: -43.1867, categoria: buraco, distanciaMetros: 30 }}
+        existente={{ lat: -22.9521, lng: -43.1867, category: buraco, distanceMeters: 30 }}
       />,
     )
 

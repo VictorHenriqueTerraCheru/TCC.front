@@ -4,24 +4,24 @@ import { dimensoesMarcador, PONTA, varianteDo } from '../models/marcador'
 import type { FaixaConfianca, StatusProblema } from '../models/problema'
 
 interface MarcadorProblemaProps {
-  cor: string
-  icone: string
+  color: string
+  icon: string
   status: StatusProblema
-  faixa: FaixaConfianca | null
+  band: FaixaConfianca | null
   selecionado?: boolean
 }
 
 export function MarcadorProblema({
-  cor,
-  icone,
+  color: cor,
+  icon: icone,
   status,
-  faixa,
+  band: faixa,
   selecionado = false,
 }: MarcadorProblemaProps) {
   const { opacidade } = varianteDo(status, faixa)
   const { largura: d, altura } = dimensoesMarcador(status, faixa)
-  const tracejado = status === 'possivelmenteResolvida'
-  const pulsa = faixa === 'alta' && status !== 'nova'
+  const tracejado = status === 'possiblyResolved'
+  const pulsa = faixa === 'high' && status !== 'new'
 
   return (
     <div
@@ -91,7 +91,7 @@ export function MarcadorProblema({
         }}
       >
         <IconeDinamico
-          nome={icone}
+          name={icone}
           preenchido
           style={{ fontSize: Math.round(d * 0.56), lineHeight: 1, color: '#ffffff' }}
         />
@@ -118,7 +118,7 @@ export function MarcadorProblema({
           check
         </span>
       )}
-      {status === 'nova' && (
+      {status === 'new' && (
         <span
           style={{
             position: 'absolute',

@@ -3,16 +3,16 @@ import { http, HttpResponse } from 'msw'
 import { rota } from '../rota'
 
 export const geocodificacaoHandlers = [
-  http.get(rota('/geocodificacao/reversa'), () =>
+  http.get(rota('/geocoding/reverse'), () =>
     HttpResponse.json({
-      disponivel: true,
-      endereco: 'Praia de Botafogo, 300 — Botafogo',
-      logradouro: 'Praia de Botafogo',
-      numero: '300',
-      bairro: 'Botafogo',
-      cidade: 'Rio de Janeiro',
-      uf: 'RJ',
-      rotuloArea: 'Praia de Botafogo, Botafogo',
+      available: true,
+      address: 'Praia de Botafogo, 300 — Botafogo',
+      street: 'Praia de Botafogo',
+      number: '300',
+      neighborhood: 'Botafogo',
+      city: 'Rio de Janeiro',
+      state: 'RJ',
+      areaLabel: 'Praia de Botafogo, Botafogo',
     }),
   ),
 ]

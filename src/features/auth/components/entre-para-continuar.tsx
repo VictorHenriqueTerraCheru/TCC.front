@@ -9,30 +9,30 @@ import { useGuardaStore, type MotivoConta } from '../stores/guarda-store'
 import { AvisoExpirou } from './aviso-expirou'
 
 interface Conteudo {
-  icone: MaterialSymbol
+  icon: MaterialSymbol
   titulo: string
   texto: string
-  itens: [MaterialSymbol, string][]
+  items: [MaterialSymbol, string][]
 }
 
 const conteudos: Record<MotivoConta, Conteudo> = {
   votar: {
-    icone: 'how_to_vote',
+    icon: 'how_to_vote',
     titulo: 'Entre para votar',
     texto:
       'Seu voto ajuda a mostrar o que é confiável no mapa. Para evitar votos repetidos, cada voto fica ligado a uma conta.',
-    itens: [
+    items: [
       ['verified', 'Confirmar que um problema existe'],
       ['autorenew', 'Dizer se ele ainda está lá'],
       ['near_me', 'Ter mais peso quando estiver perto'],
     ],
   },
   registrar: {
-    icone: 'person_add',
+    icon: 'person_add',
     titulo: 'Entre para registrar',
     texto:
       'Cada registro fica ligado a uma conta — é isso que permite medir a confiança do que aparece no mapa. Sem conta, você continua vendo o mapa normalmente.',
-    itens: [
+    items: [
       ['add_location_alt', 'Registrar problemas e incidentes'],
       ['how_to_vote', 'Confirmar e avaliar ocorrências perto de você'],
       ['history', 'Acompanhar o andamento dos seus registros'],
@@ -41,7 +41,7 @@ const conteudos: Record<MotivoConta, Conteudo> = {
 }
 
 export function EntreParaContinuar() {
-  const motivo = useGuardaStore((s) => s.motivo)
+  const motivo = useGuardaStore((s) => s.reason)
   const expirou = useGuardaStore((s) => s.expirou)
   const fecharFolha = useGuardaStore((s) => s.fecharFolha)
   const descartar = useGuardaStore((s) => s.descartar)
@@ -58,18 +58,18 @@ export function EntreParaContinuar() {
       aberto={motivo !== null}
       aoMudarAberto={(aberto) => !aberto && descartar()}
       titulo={conteudo.titulo}
-      icone={
+      icon={
         <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-primario-suave text-primario">
-          <Icone nome={conteudo.icone} className="text-[28px]" />
+          <Icone name={conteudo.icon} className="text-[28px]" />
         </span>
       }
     >
       {expirou && <AvisoExpirou />}
       <p className="mb-4 text-sm text-muted-foreground">{conteudo.texto}</p>
       <ul className="mb-6 space-y-3">
-        {conteudo.itens.map(([icone, texto]) => (
+        {conteudo.items.map(([icone, texto]) => (
           <li key={texto} className="flex items-center gap-3 text-sm">
-            <Icone nome={icone} className="text-[22px] text-primario" />
+            <Icone name={icone} className="text-[22px] text-primario" />
             {texto}
           </li>
         ))}

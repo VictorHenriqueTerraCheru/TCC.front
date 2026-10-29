@@ -37,7 +37,7 @@ export function CadastroPage() {
   const [erroGeral, setErroGeral] = useState<string | null>(null)
   const { register, control, handleSubmit, setError, formState } = useForm<CadastrarForm>({
     resolver: zodResolver(cadastrarSchema),
-    defaultValues: { nome: '', email: '', senha: '', aceitouTermos: false },
+    defaultValues: { name: '', email: '', password: '', acceptedTerms: false },
   })
 
   const enviar = handleSubmit((form) => {
@@ -45,7 +45,9 @@ export function CadastroPage() {
     cadastrar.mutate(form, {
       onSuccess: aposEntrar,
       onError: (erro) =>
-        setErroGeral(aplicarErroAuth(erro, setError, ['nome', 'email', 'senha', 'aceitouTermos'])),
+        setErroGeral(
+          aplicarErroAuth(erro, setError, ['name', 'email', 'password', 'acceptedTerms']),
+        ),
     })
   })
 
@@ -54,7 +56,7 @@ export function CadastroPage() {
     navigate(-1)
   }
 
-  const erroTermos = formState.errors.aceitouTermos?.message
+  const erroTermos = formState.errors.acceptedTerms?.message
 
   return (
     <TelaComVoltar titulo="Criar conta" aoVoltar={voltar}>
@@ -66,13 +68,13 @@ export function CadastroPage() {
 
         <div className="space-y-6">
           <CampoTexto
-            rotulo="Nome"
+            label="Nome"
             autoComplete="name"
-            erro={formState.errors.nome?.message}
-            {...register('nome')}
+            erro={formState.errors.name?.message}
+            {...register('name')}
           />
           <CampoTexto
-            rotulo="E-mail"
+            label="E-mail"
             type="email"
             autoComplete="email"
             inputMode="email"
@@ -80,18 +82,18 @@ export function CadastroPage() {
             {...register('email')}
           />
           <CampoSenha
-            rotulo="Senha"
+            label="Senha"
             autoComplete="new-password"
             ajuda="Mínimo de 8 caracteres"
-            erro={formState.errors.senha?.message}
-            {...register('senha')}
+            erro={formState.errors.password?.message}
+            {...register('password')}
           />
         </div>
 
         <div className="mt-6 flex items-start gap-3 text-sm">
           <Controller
             control={control}
-            name="aceitouTermos"
+            name="acceptedTerms"
             render={({ field }) => (
               <Checkbox
                 id="aceitou-termos"

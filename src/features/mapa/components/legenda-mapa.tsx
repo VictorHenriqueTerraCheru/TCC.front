@@ -8,12 +8,12 @@ import { dimensoesMarcador, MarcadorProblema } from '@/features/problemas'
 import type { ModoMapa } from '../models/filtros'
 
 function Balao({
-  status = 'ativa',
-  faixa = 'alta',
+  status = 'active',
+  band: faixa = 'high',
   escala = 0.72,
 }: {
-  status?: 'ativa' | 'possivelmenteResolvida'
-  faixa?: 'alta' | 'baixa'
+  status?: 'active' | 'possiblyResolved'
+  band?: 'high' | 'low'
   escala?: number
 }) {
   const { largura, altura } = dimensoesMarcador(status, faixa)
@@ -27,10 +27,10 @@ function Balao({
         style={{ transform: `scale(${escala})` }}
       >
         <MarcadorProblema
-          cor={aparenciaDaCor.laranja.corForte}
-          icone="edit_road"
+          color={aparenciaDaCor.orange.corForte}
+          icon="edit_road"
           status={status}
-          faixa={faixa}
+          band={faixa}
         />
       </span>
     </span>
@@ -66,7 +66,7 @@ export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): vo
           aria-label="Fechar legenda"
           className="-m-2.5 flex size-11 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
-          <Icone nome="close" className="text-[18px]" />
+          <Icone name="close" className="text-[18px]" />
         </button>
       </header>
       {comCalor ? (
@@ -94,8 +94,8 @@ export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): vo
             <Item
               simbolo={
                 <span className="flex items-end gap-0.5">
-                  <Balao faixa="baixa" escala={0.5} />
-                  <Balao faixa="alta" escala={0.55} />
+                  <Balao band="low" escala={0.5} />
+                  <Balao band="high" escala={0.55} />
                 </span>
               }
               titulo="Maior e mais cheio = mais confiável"
@@ -105,12 +105,9 @@ export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): vo
       ) : (
         <ul className="space-y-3">
           <Item simbolo={<Balao />} titulo="Ativa" />
+          <Item simbolo={<Balao status="possiblyResolved" />} titulo="Possivelmente resolvida" />
           <Item
-            simbolo={<Balao status="possivelmenteResolvida" />}
-            titulo="Possivelmente resolvida"
-          />
-          <Item
-            simbolo={<Icone nome="history" className="text-[18px] text-muted-foreground" />}
+            simbolo={<Icone name="history" className="text-[18px] text-muted-foreground" />}
             titulo="Resolvidas saem do mapa e ficam só no histórico"
           />
           <Item

@@ -32,7 +32,7 @@ export function GuardaAdmin({ titulo, caminho, children }: GuardaAdminProps) {
               Tentar novamente
             </Button>
           </div>
-        ) : me.perfil !== 'administrador' ? (
+        ) : me.role !== 'administrator' ? (
           <div className="space-y-3 py-10 text-center">
             <p>Esta área é só para administradores.</p>
             <Button asChild variant="outline">

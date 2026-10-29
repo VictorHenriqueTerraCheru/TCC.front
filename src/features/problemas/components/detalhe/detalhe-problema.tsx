@@ -16,20 +16,20 @@ import { ResumoAlerta } from './resumo-alerta'
 import { RodapeLocalizacao } from './rodape-localizacao'
 
 const chipStatus: Record<
-  Exclude<StatusProblema, 'resolvida'>,
-  { rotulo: string; icone: MaterialSymbol; classe: string }
+  Exclude<StatusProblema, 'resolved'>,
+  { label: string; icon: MaterialSymbol; classe: string }
 > = {
-  ativa: { rotulo: 'Ativa', icone: 'radio_button_checked', classe: 'bg-muted text-foreground' },
-  nova: { rotulo: 'Em avaliação', icone: 'hourglass_top', classe: 'bg-nova/15 text-nova' },
-  possivelmenteResolvida: {
-    rotulo: 'Possivelmente resolvida',
-    icone: 'help',
+  active: { label: 'Ativa', icon: 'radio_button_checked', classe: 'bg-muted text-foreground' },
+  new: { label: 'Em avaliação', icon: 'hourglass_top', classe: 'bg-nova/15 text-nova' },
+  possiblyResolved: {
+    label: 'Possivelmente resolvida',
+    icon: 'help',
     classe: 'bg-primario-suave text-primario',
   },
 }
 
 function ChipStatus({ status }: { status: StatusProblema }) {
-  if (status === 'resolvida') {
+  if (status === 'resolved') {
     return (
       <span className="rounded-lg bg-primario-suave px-2 py-1 text-xs font-medium text-primario">
         Resolvida
@@ -44,38 +44,38 @@ function ChipStatus({ status }: { status: StatusProblema }) {
         chip.classe,
       )}
     >
-      <Icone nome={chip.icone} preenchido className="text-[16px]" />
-      {chip.rotulo}
+      <Icone name={chip.icon} preenchido className="text-[16px]" />
+      {chip.label}
     </span>
   )
 }
 
-function Informacoes({ problema }: { problema: Detalhe }) {
+function Informacoes({ issue: problema }: { issue: Detalhe }) {
   return (
     <div className="mb-4 space-y-3 text-sm">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <Icone nome="schedule" className="text-[20px] text-muted-foreground" />
+        <Icone name="schedule" className="text-[20px] text-muted-foreground" />
         <p className="flex-1">
-          Registrada {tempoRelativo(problema.criadoEm)} · {horaCurta(problema.criadoEm)}
+          Registrada {tempoRelativo(problema.createdAt)} · {horaCurta(problema.createdAt)}
         </p>
         <ChipStatus status={problema.status} />
       </div>
-      {problema.descricao && <p className="pl-8 text-muted-foreground">{problema.descricao}</p>}
+      {problema.description && <p className="pl-8 text-muted-foreground">{problema.description}</p>}
     </div>
   )
 }
 
-function legendaConfianca({ votos: { sim, nao } }: Detalhe) {
+function legendaConfianca({ votes: { yes: sim, no: nao } }: Detalhe) {
   const votos = sim + nao
   return `Calculada com ${votos} ${votos === 1 ? 'voto' : 'votos'}, ponderados por proximidade e histórico de quem votou.`
 }
 
-function Corpo({ problema }: { problema: Detalhe }) {
-  if (problema.status === 'resolvida') {
-    const { nao: resolvido } = problema.votos
+function Corpo({ issue: problema }: { issue: Detalhe }) {
+  if (problema.status === 'resolved') {
+    const { no: resolvido } = problema.votes
     return (
       <p className="flex items-start gap-3 rounded-2xl bg-primario-suave p-4 text-sm">
-        <Icone nome="check_circle" preenchido className="text-[20px] text-primario" />
+        <Icone name="check_circle" preenchido className="text-[20px] text-primario" />
         <span>
           A comunidade confirmou que este problema foi resolvido
           {resolvido > 0 && ` (${resolvido} ${resolvido === 1 ? 'voto' : 'votos'})`}. Ele não
@@ -85,24 +85,24 @@ function Corpo({ problema }: { problema: Detalhe }) {
     )
   }
 
-  if (problema.status === 'nova') {
+  if (problema.status === 'new') {
     return (
       <>
-        {problema.avaliacao && <BarraAvaliacao avaliacao={problema.avaliacao} />}
-        <CartaoVoto problema={problema} />
+        {problema.evaluation && <BarraAvaliacao evaluation={problema.evaluation} />}
+        <CartaoVoto issue={problema} />
         <RodapeLocalizacao ponto={problema} mostrarDistancia={false} />
       </>
     )
   }
 
-  if (problema.status === 'possivelmenteResolvida') {
+  if (problema.status === 'possiblyResolved') {
     return (
       <>
-        <CartaoVoto problema={problema} />
-        {problema.confianca !== null && problema.faixa && (
+        <CartaoVoto issue={problema} />
+        {problema.trustScore !== null && problema.band && (
           <BarraConfianca
-            confianca={problema.confianca}
-            faixa={problema.faixa}
+            trustScore={problema.trustScore}
+            band={problema.band}
             legenda={legendaConfianca(problema)}
           />
         )}
@@ -113,14 +113,14 @@ function Corpo({ problema }: { problema: Detalhe }) {
 
   return (
     <>
-      {problema.confianca !== null && problema.faixa && (
+      {problema.trustScore !== null && problema.band && (
         <BarraConfianca
-          confianca={problema.confianca}
-          faixa={problema.faixa}
+          trustScore={problema.trustScore}
+          band={problema.band}
           legenda={legendaConfianca(problema)}
         />
       )}
-      <CartaoVoto problema={problema} />
+      <CartaoVoto issue={problema} />
       <RodapeLocalizacao ponto={problema} />
     </>
   )
@@ -167,11 +167,11 @@ export function DetalheProblema({ id }: { id: string }) {
 
   return (
     <article className="space-y-4">
-      <ResumoAlerta problema={problema} />
+      <ResumoAlerta issue={problema} />
 
       <div className={cn('space-y-4 transition-opacity duration-300', recolhido && 'opacity-0')}>
-        <Informacoes problema={problema} />
-        <Corpo problema={problema} />
+        <Informacoes issue={problema} />
+        <Corpo issue={problema} />
       </div>
     </article>
   )

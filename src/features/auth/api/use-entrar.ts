@@ -16,7 +16,7 @@ export function useEntrar() {
 export function useCadastrar() {
   const entrar = useSessaoStore((s) => s.entrar)
   return useMutation({
-    mutationFn: (form: CadastrarForm) => api.POST('/auth/cadastro', { body: form }).then(dados),
+    mutationFn: (form: CadastrarForm) => api.POST('/auth/register', { body: form }).then(dados),
     onSuccess: entrar,
   })
 }

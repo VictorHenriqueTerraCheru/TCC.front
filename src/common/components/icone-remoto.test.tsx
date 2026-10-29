@@ -11,7 +11,7 @@ beforeEach(() => limparCacheDeIcones())
 
 describe('IconeDinamico', () => {
   it('ícone do pacote embutido usa a fonte, sem rede', () => {
-    const { container } = renderizar(<IconeDinamico nome="bolt" />)
+    const { container } = renderizar(<IconeDinamico name="bolt" />)
 
     expect(container.querySelector('.material-symbols-rounded')).toHaveTextContent('bolt')
     expect(container.querySelector('svg')).toBeNull()
@@ -26,7 +26,7 @@ describe('IconeDinamico', () => {
         }),
       ),
     )
-    const { container } = renderizar(<IconeDinamico nome="ico_a" alternativo="category" />)
+    const { container } = renderizar(<IconeDinamico name="ico_a" alternativo="category" />)
 
     expect(container.querySelector('.material-symbols-rounded')).toHaveTextContent('category')
     await waitFor(() =>
@@ -42,7 +42,7 @@ describe('IconeDinamico', () => {
         () => new HttpResponse(null, { status: 500 }),
       ),
     )
-    const { container } = renderizar(<IconeDinamico nome="ico_a" alternativo="category" />)
+    const { container } = renderizar(<IconeDinamico name="ico_a" alternativo="category" />)
 
     expect(await carregarIcone('ico_a')).toBeNull()
     expect(container.querySelector('.material-symbols-rounded')).toHaveTextContent('category')

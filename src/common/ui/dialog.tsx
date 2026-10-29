@@ -64,7 +64,7 @@ function DialogContent({
             data-slot="dialog-close"
             className="absolute top-4 right-4 flex size-9 pressionavel items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-superficie-2 hover:text-foreground focus-visible:outline-2 disabled:pointer-events-none"
           >
-            <Icone nome="close" className="text-[20px]" />
+            <Icone name="close" className="text-[20px]" />
             <span className="sr-only">Fechar</span>
           </DialogPrimitive.Close>
         )}

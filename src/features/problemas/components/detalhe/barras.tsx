@@ -8,31 +8,31 @@ import { cn } from '@/common/lib/utils'
 import type { DetalheProblema, FaixaConfianca } from '../../models/problema'
 
 const rotuloFaixa: Record<FaixaConfianca, string> = {
-  alta: 'Confiança alta',
-  media: 'Confiança média',
-  baixa: 'Confiança baixa',
+  high: 'Confiança alta',
+  medium: 'Confiança média',
+  low: 'Confiança baixa',
 }
 
 export function BarraConfianca({
-  confianca,
-  faixa,
+  trustScore: confianca,
+  band: faixa,
   legenda,
 }: {
-  confianca: number
-  faixa: FaixaConfianca
+  trustScore: number
+  band: FaixaConfianca
   legenda: string
 }) {
   const valor = Math.round(confianca)
   return (
     <section aria-label="Confiança">
       <div className="mb-2 flex items-center gap-2">
-        {faixa === 'alta' && (
-          <Icone nome="check_circle" preenchido className="text-[20px] text-primario" />
+        {faixa === 'high' && (
+          <Icone name="check_circle" preenchido className="text-[20px] text-primario" />
         )}
-        <span className={cn('font-medium', faixa === 'alta' && 'text-primario')}>
+        <span className={cn('font-medium', faixa === 'high' && 'text-primario')}>
           {rotuloFaixa[faixa]}
         </span>
-        <NumeroAnimado valor={valor} formatar={(n) => `${n} / 100`} className="ml-auto text-sm" />
+        <NumeroAnimado value={valor} formatar={(n) => `${n} / 100`} className="ml-auto text-sm" />
       </div>
       <div
         role="meter"
@@ -55,15 +55,15 @@ export function BarraConfianca({
 }
 
 export function BarraAvaliacao({
-  avaliacao,
+  evaluation: avaliacao,
 }: {
-  avaliacao: NonNullable<DetalheProblema['avaliacao']>
+  evaluation: NonNullable<DetalheProblema['evaluation']>
 }) {
-  const { votantes, necessarios } = avaliacao
+  const { voters: votantes, required: necessarios } = avaliacao
   return (
     <section aria-label="Em avaliação">
       <div className="mb-2 flex items-center gap-2 text-nova">
-        <Icone nome="hourglass_top" className="text-[20px]" />
+        <Icone name="hourglass_top" className="text-[20px]" />
         <span className="font-medium">Em avaliação</span>
         <span className="ml-auto text-sm text-foreground">
           {Math.min(votantes, necessarios)} de {necessarios} votos

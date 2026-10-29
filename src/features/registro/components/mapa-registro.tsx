@@ -17,12 +17,12 @@ import { useRascunhoStore, type Ponto } from '../stores/rascunho-store'
 const RAIO_AREA_INCIDENTE_M = 150
 
 type MapaRegistroProps =
-  | { modo: 'pino'; categoria: CategoriaResumo | null }
+  | { modo: 'pino'; category: CategoriaResumo | null }
   | { modo: 'area' }
   | {
       modo: 'conferencia'
       novo: Ponto
-      existente: Ponto & { categoria: CategoriaResumo; distanciaMetros: number }
+      existente: Ponto & { category: CategoriaResumo; distanceMeters: number }
     }
   | { modo: 'estatico' }
 
@@ -68,7 +68,7 @@ function BotaoGps() {
         aria-label="Usar minha localização"
         className="absolute right-3 bottom-10 z-[1000] flex size-11 pressionavel items-center justify-center rounded-xl bg-superficie-2 shadow-2 focus-visible:outline-2"
       >
-        <Icone nome="my_location" />
+        <Icone name="my_location" />
       </button>
       {dialogo}
     </>
@@ -78,7 +78,7 @@ function BotaoGps() {
 function DicaArrastar({ texto }: { texto: string }) {
   return (
     <p className="pointer-events-none absolute inset-x-0 top-3 z-[1000] mx-auto flex w-fit items-center gap-2 rounded-lg bg-background/95 px-3 py-1.5 text-sm shadow-2">
-      <Icone nome="pan_tool" className="text-[18px]" />
+      <Icone name="pan_tool" className="text-[18px]" />
       {texto}
     </p>
   )
@@ -108,13 +108,13 @@ function AreaNoCentro({ inicial }: { inicial: Ponto }) {
         />
       </Source>
       <Marker latitude={centro.lat} longitude={centro.lng} anchor="center">
-        <PontoCentral cor="var(--background)" tamanho={10} />
+        <PontoCentral color="var(--background)" pageSize={10} />
       </Marker>
     </>
   )
 }
 
-function PontoCentral({ cor, tamanho }: { cor: string; tamanho: number }) {
+function PontoCentral({ color: cor, pageSize: tamanho }: { color: string; pageSize: number }) {
   return (
     <span
       aria-hidden="true"
@@ -185,8 +185,8 @@ export function MapaRegistro(props: MapaRegistroProps) {
 
   if (props.modo === 'conferencia') {
     const { novo, existente } = props
-    const cor = aparenciaDe(existente.categoria).corForte
-    const icone = iconeDe(existente.categoria)
+    const cor = aparenciaDe(existente.category).corForte
+    const icone = iconeDe(existente.category)
     const meio = { lat: (novo.lat + existente.lat) / 2, lng: (novo.lng + existente.lng) / 2 }
     return (
       <MapaVetorial centro={[novo.lat, novo.lng]} zoom={17} interativo={false}>
@@ -199,14 +199,14 @@ export function MapaRegistro(props: MapaRegistroProps) {
           />
         </Source>
         <Marker latitude={existente.lat} longitude={existente.lng} anchor="bottom">
-          <MarcadorProblema cor={cor} icone={icone} status="ativa" faixa="alta" />
+          <MarcadorProblema color={cor} icon={icone} status="active" band="high" />
         </Marker>
         <Marker latitude={novo.lat} longitude={novo.lng} anchor="bottom">
-          <MarcadorProblema cor={cor} icone={icone} status="ativa" faixa="alta" selecionado />
+          <MarcadorProblema color={cor} icon={icone} status="active" band="high" selecionado />
         </Marker>
         <Marker latitude={meio.lat} longitude={meio.lng} anchor="center">
           <span className="rounded-md bg-foreground px-1.5 py-0.5 text-[11px] font-medium text-background">
-            {distanciaTexto(existente.distanciaMetros)}
+            {distanciaTexto(existente.distanceMeters)}
           </span>
         </Marker>
       </MapaVetorial>
@@ -219,7 +219,7 @@ export function MapaRegistro(props: MapaRegistroProps) {
       <MapaVetorial centro={[ponto.lat, ponto.lng]} interativo={false}>
         {local && (
           <Marker latitude={local.lat} longitude={local.lng} anchor="center">
-            <PontoCentral cor="var(--primario)" tamanho={14} />
+            <PontoCentral color="var(--primario)" pageSize={14} />
           </Marker>
         )}
       </MapaVetorial>
@@ -240,7 +240,7 @@ export function MapaRegistro(props: MapaRegistroProps) {
     )
   }
 
-  const categoria = props.categoria
+  const categoria = props.category
   return (
     <>
       <MapaVetorial centro={centro} zoom={16}>
@@ -254,10 +254,10 @@ export function MapaRegistro(props: MapaRegistroProps) {
       <div className="pointer-events-none absolute top-1/2 left-1/2 z-[1000] -translate-x-1/2 -translate-y-full">
         {categoria && (
           <MarcadorProblema
-            cor={aparenciaDe(categoria).corForte}
-            icone={iconeDe(categoria)}
-            status="ativa"
-            faixa="alta"
+            color={aparenciaDe(categoria).corForte}
+            icon={iconeDe(categoria)}
+            status="active"
+            band="high"
             selecionado
           />
         )}

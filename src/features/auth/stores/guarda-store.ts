@@ -6,8 +6,8 @@ import type { Schema } from '@/infrastructure/api'
 export type MotivoConta = 'votar' | 'registrar'
 
 export type AcaoPendente =
-  | { tipo: 'votar'; problemaId: string; valor: Schema<'ValorVotoContrato'> }
-  | { tipo: 'continuarRegistro'; passo: 'conferir' | 'enviar' }
+  | { type: 'votar'; problemaId: string; value: Schema<'VoteAnswer'> }
+  | { type: 'continuarRegistro'; passo: 'conferir' | 'enviar' }
 
 export interface Pendencia {
   retorno: string
@@ -15,7 +15,7 @@ export interface Pendencia {
 }
 
 interface GuardaState {
-  motivo: MotivoConta | null
+  reason: MotivoConta | null
   expirou: boolean
   pendencia: Pendencia | null
   pedirConta(motivo: MotivoConta, pendencia: Pendencia, expirou?: boolean): void
@@ -28,15 +28,16 @@ interface GuardaState {
 export const useGuardaStore = create<GuardaState>()(
   persist(
     (set, get) => ({
-      motivo: null,
+      reason: null,
       expirou: false,
       pendencia: null,
-      pedirConta: (motivo, pendencia, expirou = false) => set({ motivo, pendencia, expirou }),
-      fecharFolha: () => set({ motivo: null }),
-      descartar: () => set({ motivo: null, pendencia: null, expirou: false }),
+      pedirConta: (motivo, pendencia, expirou = false) =>
+        set({ reason: motivo, pendencia, expirou }),
+      fecharFolha: () => set({ reason: null }),
+      descartar: () => set({ reason: null, pendencia: null, expirou: false }),
       concluirLogin: () => {
         const { pendencia } = get()
-        set({ motivo: null, expirou: false, pendencia: pendencia?.acao ? pendencia : null })
+        set({ reason: null, expirou: false, pendencia: pendencia?.acao ? pendencia : null })
         return pendencia?.retorno ?? null
       },
       consumirAcao: (filtro) => {

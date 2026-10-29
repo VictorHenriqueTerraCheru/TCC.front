@@ -4,14 +4,14 @@ import { mensagemErroVerificacao } from './errors'
 
 describe('mensagemErroVerificacao', () => {
   it('mapeia os códigos da API', () => {
-    expect(mensagemErroVerificacao(new ApiError(409, { type: 'ja-verificado' }))).toBe(
+    expect(mensagemErroVerificacao(new ApiError(409, { type: 'already-verified' }))).toBe(
       'Seu perfil já é verificado.',
     )
     expect(
-      mensagemErroVerificacao(new ApiError(409, { type: 'verificacao-pendente-existente' })),
+      mensagemErroVerificacao(new ApiError(409, { type: 'verification-already-pending' })),
     ).toContain('em análise')
     expect(
-      mensagemErroVerificacao(new ApiError(409, { type: 'verificacao-ja-analisada' })),
+      mensagemErroVerificacao(new ApiError(409, { type: 'verification-already-reviewed' })),
     ).toContain('já foi analisado')
   })
 
@@ -20,7 +20,7 @@ describe('mensagemErroVerificacao', () => {
       'Sem conexão. Tente de novo.',
     )
     expect(
-      mensagemErroVerificacao(new ApiError(400, { errors: { justificativa: ['Curta demais.'] } })),
+      mensagemErroVerificacao(new ApiError(400, { errors: { justification: ['Curta demais.'] } })),
     ).toBe('Curta demais.')
     expect(mensagemErroVerificacao(new ApiError(500, { title: 'Falha' }))).toBe('Falha')
     expect(mensagemErroVerificacao(new ApiError(500))).toBe(

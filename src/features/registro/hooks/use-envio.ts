@@ -27,7 +27,7 @@ export function useEnvio<Variaveis, Resultado>(
         else if (isApiError(erro) && erro.status === 401)
           exigirConta('registrar', () => {}, {
             retorno: pathname,
-            pendente: { tipo: 'continuarRegistro', passo: 'enviar' },
+            pending: { type: 'continuarRegistro', passo: 'enviar' },
           })
         else setErroRegra(mensagemErroRegistro(erro))
       },

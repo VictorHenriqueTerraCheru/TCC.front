@@ -75,7 +75,7 @@ describe('carregarIcone', () => {
     await carregarIcone('ico_a')
 
     expect(pedidos).toEqual(['ico-a-rounded,ico-b-rounded'])
-    expect(flood).toEqual({ caminhos: ['M8.5 17.5q-1.4 0-1.9-.5L12 4z'], tamanho: 24 })
+    expect(flood).toEqual({ caminhos: ['M8.5 17.5q-1.4 0-1.9-.5L12 4z'], pageSize: 24 })
     expect(park).not.toBeNull()
   })
 
@@ -119,9 +119,9 @@ describe('carregarIcone', () => {
 
 describe('carregarIcone: entradas hostis', () => {
   it.each([
-    ['caminhos que não é lista', { caminhos: 'x', tamanho: 24 }],
-    ['d com caracteres fora do SVG', { caminhos: ['M1 1 <script>'], tamanho: 24 }],
-    ['tamanho absurdo', { caminhos: ['M1 1h4'], tamanho: 100000 }],
+    ['caminhos que não é lista', { caminhos: 'x', pageSize: 24 }],
+    ['d com caracteres fora do SVG', { caminhos: ['M1 1 <script>'], pageSize: 24 }],
+    ['tamanho absurdo', { caminhos: ['M1 1h4'], pageSize: 100000 }],
     ['sem tamanho', { caminhos: ['M1 1h4'] }],
     ['null', null],
   ])('cache do localStorage adulterado (%s) é ignorado e o ícone vem da rede', async (_, lixo) => {
@@ -130,7 +130,7 @@ describe('carregarIcone: entradas hostis', () => {
 
     expect(await carregarIcone('ico_a')).toEqual({
       caminhos: ['M8.5 17.5q-1.4 0-1.9-.5L12 4z'],
-      tamanho: 24,
+      pageSize: 24,
     })
   })
 

@@ -16,7 +16,8 @@ export const useSessaoStore = create<SessaoState>()(
   persist(
     (set) => ({
       sessao: null,
-      entrar: ({ token, expiraEm, usuario }) => set({ sessao: { token, expiraEm, usuario } }),
+      entrar: ({ token, expiresAt: expiraEm, user: usuario }) =>
+        set({ sessao: { token, expiresAt: expiraEm, user: usuario } }),
       sair: () => set({ sessao: null }),
     }),
     {
@@ -33,7 +34,7 @@ export const useSessaoStore = create<SessaoState>()(
 )
 
 function expirou(sessao: Sessao): boolean {
-  return Date.parse(sessao.expiraEm) <= Date.now()
+  return Date.parse(sessao.expiresAt) <= Date.now()
 }
 
 export function sessaoAtual(): Sessao | null {

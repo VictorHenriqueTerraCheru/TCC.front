@@ -8,14 +8,20 @@ const plural: Record<number, string> = { 7: 'Roubos', 8: 'Acidentes' }
 
 export function SucessoIncidentePage() {
   const { state } = useLocation()
-  const { area, categoriaId, rotuloArea, bairro, ponto } = (state ?? {}) as {
+  const {
+    area,
+    categoryId: categoriaId,
+    areaLabel: rotuloArea,
+    neighborhood: bairro,
+    ponto,
+  } = (state ?? {}) as {
     area?: AreaIncidentesDados
-    categoriaId?: number
-    rotuloArea?: string | null
-    bairro?: string | null
+    categoryId?: number
+    areaLabel?: string | null
+    neighborhood?: string | null
     ponto?: { lat: number; lng: number }
   }
-  const contagem = area?.contagens.find((c) => c.categoriaId === categoriaId)
+  const contagem = area?.counts.find((c) => c.categoryId === categoriaId)
   const verNoMapa = ponto
     ? `/mapa/area?modo=incidentes&lat=${ponto.lat.toFixed(5)}&lng=${ponto.lng.toFixed(5)}`
     : '/mapa?modo=incidentes'
@@ -39,8 +45,8 @@ export function SucessoIncidentePage() {
             <div className="min-w-0">
               <p className="font-medium">{rotuloArea ?? 'Área do relato'}</p>
               <p className="text-xs text-muted-foreground">
-                {plural[contagem.categoriaId] ?? contagem.nome} · {contagem.dias7}{' '}
-                {contagem.dias7 === 1 ? 'relato' : 'relatos'} nos últimos 7 dias
+                {plural[contagem.categoryId] ?? contagem.name} · {contagem.days7}{' '}
+                {contagem.days7 === 1 ? 'relato' : 'relatos'} nos últimos 7 dias
               </p>
             </div>
           </div>

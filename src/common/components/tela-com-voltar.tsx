@@ -20,7 +20,7 @@ export function TelaComVoltar({ titulo, aoVoltar, children }: TelaComVoltarProps
           aria-label="Voltar"
           className="flex size-12 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
-          <Icone nome="arrow_back" />
+          <Icone name="arrow_back" />
         </button>
         <h1 className="text-[20px] leading-7 font-semibold tracking-tight">{titulo}</h1>
       </header>

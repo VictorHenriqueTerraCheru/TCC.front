@@ -14,11 +14,11 @@ import { GuardaAdmin } from '../components/guarda-admin'
 
 type FiltroPerfil = Perfil | 'todos'
 
-const filtros: { valor: FiltroPerfil; rotulo: string }[] = [
-  { valor: 'todos', rotulo: 'Todos' },
-  { valor: 'cidadao', rotulo: 'Cidadão' },
-  { valor: 'cidadaoVerificado', rotulo: 'Verificado' },
-  { valor: 'administrador', rotulo: 'Admin' },
+const filtros: { value: FiltroPerfil; label: string }[] = [
+  { value: 'todos', label: 'Todos' },
+  { value: 'citizen', label: 'Cidadão' },
+  { value: 'verifiedCitizen', label: 'Verificado' },
+  { value: 'administrator', label: 'Admin' },
 ]
 
 function ListaUsuarios() {
@@ -27,26 +27,26 @@ function ListaUsuarios() {
   const buscaAtrasada = useDebouncedValue(busca.trim(), 300)
   const usuarios = useUsuariosAdmin({
     busca: buscaAtrasada,
-    perfil: perfil === 'todos' ? null : perfil,
+    role: perfil === 'todos' ? null : perfil,
   })
   const { data: me } = useMe()
 
   const total = usuarios.data?.pages[0]?.total
-  const itens = usuarios.data?.pages.flatMap((p) => p.itens) ?? []
+  const itens = usuarios.data?.pages.flatMap((p) => p.items) ?? []
 
   return (
     <>
       <div className="mb-4 space-y-3">
         <CampoBusca
-          valor={busca}
+          value={busca}
           aoMudar={setBusca}
-          rotulo="Buscar usuário"
+          label="Buscar usuário"
           placeholder="Buscar por nome ou e-mail"
         />
         <Segmentado<FiltroPerfil>
-          rotulo="Perfil"
+          label="Perfil"
           opcoes={filtros}
-          valor={perfil}
+          value={perfil}
           aoMudar={setPerfil}
         />
         {total !== undefined && (
@@ -73,7 +73,7 @@ function ListaUsuarios() {
         <ListaInfinita consulta={usuarios}>
           <div className="space-y-3">
             {itens.map((u) => (
-              <CartaoUsuario key={u.id} usuario={u} ehVoce={u.id === me?.id} />
+              <CartaoUsuario key={u.id} user={u} ehVoce={u.id === me?.id} />
             ))}
           </div>
         </ListaInfinita>

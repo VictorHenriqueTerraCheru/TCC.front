@@ -4,7 +4,7 @@ import { api, dados } from '@/infrastructure/api'
 
 export const categoriasQuery = queryOptions({
   queryKey: ['categorias'],
-  queryFn: ({ signal }) => api.GET('/categorias', { signal }).then(dados),
+  queryFn: ({ signal }) => api.GET('/categories', { signal }).then(dados),
   staleTime: 5 * 60_000,
 })
 

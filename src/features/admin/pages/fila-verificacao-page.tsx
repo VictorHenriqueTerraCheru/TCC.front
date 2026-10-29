@@ -9,10 +9,10 @@ import { useFila } from '../api/use-fila'
 import { CartaoSolicitacao } from '../components/cartao-solicitacao'
 import { GuardaAdmin } from '../components/guarda-admin'
 
-const abas: { status: StatusVerificacao; rotulo: string }[] = [
-  { status: 'pendente', rotulo: 'Pendentes' },
-  { status: 'aprovada', rotulo: 'Aprovadas' },
-  { status: 'recusada', rotulo: 'Recusadas' },
+const abas: { status: StatusVerificacao; label: string }[] = [
+  { status: 'pending', label: 'Pendentes' },
+  { status: 'approved', label: 'Aprovadas' },
+  { status: 'rejected', label: 'Recusadas' },
 ]
 
 function Fila({ status }: { status: StatusVerificacao }) {
@@ -28,7 +28,7 @@ function Fila({ status }: { status: StatusVerificacao }) {
       </div>
     )
   }
-  const itens = fila.data.pages.flatMap((p) => p.itens)
+  const itens = fila.data.pages.flatMap((p) => p.items)
   if (itens.length === 0) {
     return <p className="py-10 text-center text-sm text-muted-foreground">Nenhum pedido aqui.</p>
   }
@@ -44,13 +44,13 @@ function Fila({ status }: { status: StatusVerificacao }) {
 }
 
 function TotalPendentes() {
-  const { data } = useFila('pendente')
+  const { data } = useFila('pending')
   const total = data?.pages[0]?.total
   return total !== undefined ? <> · {total}</> : null
 }
 
 export function FilaVerificacaoPage() {
-  const [aba, setAba] = useState<StatusVerificacao>('pendente')
+  const [aba, setAba] = useState<StatusVerificacao>('pending')
 
   return (
     <GuardaAdmin titulo="Fila de verificação" caminho="/admin/verificacoes">
@@ -59,7 +59,7 @@ export function FilaVerificacaoPage() {
         aria-label="Situação dos pedidos"
         className="mb-4 flex border-b border-border"
       >
-        {abas.map(({ status, rotulo }) => (
+        {abas.map(({ status, label: rotulo }) => (
           <button
             key={status}
             type="button"
@@ -76,7 +76,7 @@ export function FilaVerificacaoPage() {
             )}
           >
             {rotulo}
-            {status === 'pendente' && <TotalPendentes />}
+            {status === 'pending' && <TotalPendentes />}
           </button>
         ))}
       </div>

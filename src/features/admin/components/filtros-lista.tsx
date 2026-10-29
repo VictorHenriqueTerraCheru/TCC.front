@@ -8,22 +8,20 @@ import { rotuloDoTipo } from '../models/tipo'
 
 export type FiltroTipo = 'todos' | TipoGrupo
 
-const opcoesTipo: { valor: FiltroTipo; rotulo: string }[] = [
-  { valor: 'todos', rotulo: 'Todos' },
-  { valor: 'problema', rotulo: rotuloDoTipo.problema },
-  { valor: 'incidente', rotulo: rotuloDoTipo.incidente },
+const opcoesTipo: { value: FiltroTipo; label: string }[] = [
+  { value: 'todos', label: 'Todos' },
+  { value: 'issue', label: rotuloDoTipo.issue },
+  { value: 'incident', label: rotuloDoTipo.incident },
 ]
 
 export function SegmentadoTipo({
-  valor,
+  value: valor,
   aoMudar,
 }: {
-  valor: FiltroTipo
+  value: FiltroTipo
   aoMudar(valor: FiltroTipo): void
 }) {
-  return (
-    <Segmentado<FiltroTipo> rotulo="Tipo" opcoes={opcoesTipo} valor={valor} aoMudar={aoMudar} />
-  )
+  return <Segmentado<FiltroTipo> label="Tipo" opcoes={opcoesTipo} value={valor} aoMudar={aoMudar} />
 }
 
 export function ResumoDosFiltros({

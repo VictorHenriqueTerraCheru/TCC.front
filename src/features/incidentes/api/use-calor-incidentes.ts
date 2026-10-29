@@ -16,9 +16,9 @@ export function calorIncidentesQuery({ grupos, dias, ...retangulo }: FiltroCalor
     queryKey: ['incidentes', 'calor', retangulo, { grupos, dias }],
     queryFn: ({ signal }) =>
       api
-        .GET('/incidentes/calor', {
+        .GET('/incidents/heatmap', {
           params: {
-            query: { ...retangulo, dias, grupos: grupos.length ? grupos.join(',') : undefined },
+            query: { ...retangulo, dias, groups: grupos.length ? grupos.join(',') : undefined },
           },
           signal,
         })

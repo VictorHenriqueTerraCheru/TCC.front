@@ -6,6 +6,15 @@ import ts from 'typescript'
 const sourceDirectory = path.resolve('src')
 const referencePath = path.resolve('docs/superpowers/plans/2026-10-29-ingles-front/ui-strings.txt')
 const shouldCheck = process.argv.includes('--check')
+const schemaMapPath = path.resolve(
+  'docs/superpowers/plans/2026-10-29-ingles-front/mapa-schemas.tsv',
+)
+const schemaMap = new Map(
+  (await readFile(schemaMapPath, 'utf8'))
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => line.split('\t')),
+)
 
 const files = await sourceFiles(sourceDirectory)
 const strings = new Set()
@@ -41,12 +50,17 @@ try {
   process.exit(1)
 }
 
-if (reference === output) {
+const normalizedReference =
+  lines(reference)
+    .filter((value) => !schemaMap.has(value) || strings.has(value))
+    .join('\n') + '\n'
+
+if (normalizedReference === output) {
   console.log('Textos da UI idênticos à referência.')
   process.exit(0)
 }
 
-const expected = new Set(lines(reference))
+const expected = new Set(lines(normalizedReference))
 const actual = new Set(lines(output))
 
 for (const value of [...actual]
@@ -104,7 +118,7 @@ function collectStrings(node, strings) {
     ts.isTemplateMiddle(node) ||
     ts.isTemplateTail(node)
   ) {
-    if (isHumanText(node.text)) strings.add(node.text)
+    if (isHumanText(node.text) && !isTypeLiteral(node)) strings.add(node.text)
   }
 
   if (
@@ -125,6 +139,10 @@ function isHumanText(value) {
 
 function isAccessibleAttribute(name) {
   return name === 'aria-label' || name === 'title' || name === 'placeholder' || name === 'alt'
+}
+
+function isTypeLiteral(node) {
+  return ts.isLiteralTypeNode(node.parent)
 }
 
 function lines(value) {

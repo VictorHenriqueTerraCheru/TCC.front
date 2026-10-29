@@ -5,8 +5,8 @@ import { useAparencia } from '../hooks/use-aparencia'
 import { iconeDe, type CategoriaResumo } from '../models/categoria'
 
 interface CategoriaIconeProps {
-  categoria: Pick<CategoriaResumo, 'icone' | 'grupo'>
-  tamanho?: 'sm' | 'md' | 'lg'
+  category: Pick<CategoriaResumo, 'icon' | 'group'>
+  pageSize?: 'sm' | 'md' | 'lg'
   className?: string
 }
 
@@ -16,7 +16,11 @@ const tamanhos = {
   lg: 'size-12 text-[26px]',
 }
 
-export function CategoriaIcone({ categoria, tamanho = 'md', className }: CategoriaIconeProps) {
+export function CategoriaIcone({
+  category: categoria,
+  pageSize: tamanho = 'md',
+  className,
+}: CategoriaIconeProps) {
   const { aparenciaDe } = useAparencia()
   const aparencia = aparenciaDe(categoria)
   return (
@@ -29,7 +33,7 @@ export function CategoriaIcone({ categoria, tamanho = 'md', className }: Categor
         className,
       )}
     >
-      <IconeDinamico nome={iconeDe(categoria)} className="text-[length:inherit]" />
+      <IconeDinamico name={iconeDe(categoria)} className="text-[length:inherit]" />
     </span>
   )
 }

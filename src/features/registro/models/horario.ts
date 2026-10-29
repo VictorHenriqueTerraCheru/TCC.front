@@ -1,7 +1,7 @@
 import { format, isToday, isYesterday } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
-export type ModoHorario = 'agora' | 'umaHora' | 'outro'
+export type ModoHorario = 'agora' | 'umaHora' | 'other'
 
 export interface Horario {
   modo: ModoHorario

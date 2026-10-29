@@ -1,18 +1,18 @@
 import type { DetalheProblema, ValorVoto } from './problema'
 
 export function aplicarVoto(d: DetalheProblema, valor: ValorVoto): DetalheProblema {
-  const anterior = d.meuVoto ?? null
+  const anterior = d.myVote ?? null
   if (anterior === valor) return d
-  const votos = { ...d.votos }
-  if (anterior === 'sim') votos.sim--
-  if (anterior === 'nao') {
-    votos.nao--
-    votos.naoUltimas24h = Math.max(0, votos.naoUltimas24h - 1)
+  const votos = { ...d.votes }
+  if (anterior === 'yes') votos.yes--
+  if (anterior === 'no') {
+    votos.no--
+    votos.noLast24h = Math.max(0, votos.noLast24h - 1)
   }
-  if (valor === 'sim') votos.sim++
+  if (valor === 'yes') votos.yes++
   else {
-    votos.nao++
-    votos.naoUltimas24h++
+    votos.no++
+    votos.noLast24h++
   }
-  return { ...d, votos, meuVoto: valor }
+  return { ...d, votes: votos, myVote: valor }
 }

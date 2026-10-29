@@ -1,12 +1,12 @@
 import { useSessaoStore } from '@/features/auth'
 
-type Perfil = 'cidadao' | 'cidadaoVerificado' | 'administrador'
+type Perfil = 'citizen' | 'verifiedCitizen' | 'administrator'
 
-export function entrarComo(id: string, nome: string, perfil: Perfil = 'cidadao') {
+export function entrarComo(id: string, nome: string, perfil: Perfil = 'citizen') {
   useSessaoStore.getState().entrar({
     token: `mock-jwt-${id}`,
-    expiraEm: new Date(Date.now() + 86_400_000).toISOString(),
-    usuario: { id, nome, email: `${id}@tcc.local`, perfil },
+    expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
+    user: { id, name: nome, email: `${id}@tcc.local`, role: perfil },
   })
 }
 
@@ -15,7 +15,7 @@ export function entrarComoCidadao() {
 }
 
 export function entrarComoAdmin() {
-  entrarComo('u-admin', 'Admin TCC', 'administrador')
+  entrarComo('u-admin', 'Admin TCC', 'administrator')
 }
 
 export function sair() {

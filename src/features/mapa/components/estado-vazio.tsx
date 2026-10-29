@@ -18,17 +18,17 @@ export function EstadoVazio({ aoVerAreaMaior, aoFechar }: EstadoVazioProps) {
         aria-label="Fechar aviso"
         className="absolute top-1.5 right-1.5 flex size-11 pressionavel items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-2"
       >
-        <Icone nome="close" className="text-[20px]" />
+        <Icone name="close" className="text-[20px]" />
       </button>
       <span className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-primario-suave text-primario">
-        <Icone nome="travel_explore" />
+        <Icone name="travel_explore" />
       </span>
       <h2 className="mb-1 font-medium">Nenhuma ocorrência nesta área</h2>
       <p className="mb-4 text-sm text-muted-foreground">
         Ninguém registrou problemas por aqui. Afaste o mapa para ver bairros vizinhos.
       </p>
       <Button variant="tonal" onClick={aoVerAreaMaior}>
-        <Icone nome="zoom_out_map" className="text-[18px]" />
+        <Icone name="zoom_out_map" className="text-[18px]" />
         Ver área maior
       </Button>
     </div>

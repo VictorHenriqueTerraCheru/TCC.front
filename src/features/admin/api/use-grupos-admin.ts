@@ -15,8 +15,8 @@ function useInvalidarGrupos() {
 export function useCriarGrupo() {
   const invalidar = useInvalidarGrupos()
   return useMutation({
-    mutationFn: (corpo: Schema<'CriarGrupoRequest'>) =>
-      api.POST('/admin/grupos', { body: corpo }).then(dados),
+    mutationFn: (corpo: Schema<'CreateGroupRequest'>) =>
+      api.POST('/admin/groups', { body: corpo }).then(dados),
     onSuccess: invalidar,
   })
 }
@@ -24,8 +24,8 @@ export function useCriarGrupo() {
 export function useEditarGrupo() {
   const invalidar = useInvalidarGrupos()
   return useMutation({
-    mutationFn: ({ chave, ...corpo }: Schema<'EditarGrupoRequest'> & { chave: string }) =>
-      api.PUT('/admin/grupos/{chave}', { params: { path: { chave } }, body: corpo }).then(dados),
+    mutationFn: ({ key: chave, ...corpo }: Schema<'EditGroupRequest'> & { key: string }) =>
+      api.PUT('/admin/groups/{key}', { params: { path: { key: chave } }, body: corpo }).then(dados),
     onSuccess: invalidar,
   })
 }
@@ -34,7 +34,7 @@ export function useApagarGrupo() {
   const invalidar = useInvalidarGrupos()
   return useMutation({
     mutationFn: (chave: string) =>
-      api.DELETE('/admin/grupos/{chave}', { params: { path: { chave } } }).then(semConteudo),
+      api.DELETE('/admin/groups/{key}', { params: { path: { key: chave } } }).then(semConteudo),
     onSuccess: invalidar,
   })
 }

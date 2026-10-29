@@ -103,7 +103,7 @@ describe('guarda "visitante vê, conta age"', () => {
   it('sessão vencida (expiraEm no passado) conta como visitante na guarda', async () => {
     entrarComoCidadao()
     const { sessao } = useSessaoStore.getState()
-    useSessaoStore.setState({ sessao: { ...sessao!, expiraEm: '2020-01-01T00:00:00Z' } })
+    useSessaoStore.setState({ sessao: { ...sessao!, expiresAt: '2020-01-01T00:00:00Z' } })
     const usuario = userEvent.setup()
     const { router } = abrir('/mapa')
 
@@ -131,12 +131,12 @@ describe('guarda "visitante vê, conta age"', () => {
 
     expect(await screen.findByRole('heading', { name: 'Nova ocorrência' })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/registrar')
-    expect(useSessaoStore.getState().sessao?.usuario.nome).toBe('Nova Pessoa')
+    expect(useSessaoStore.getState().sessao?.user.name).toBe('Nova Pessoa')
   })
 
   it('token expirado (401) limpa a sessão e reabre a guarda com o voto guardado (regra 13)', async () => {
     entrarComoCidadao()
-    server.use(http.put(rota('/problemas/:id/voto'), () => new HttpResponse(null, { status: 401 })))
+    server.use(http.put(rota('/issues/:id/vote'), () => new HttpResponse(null, { status: 401 })))
     const usuario = userEvent.setup()
     abrir(`/mapa/problema/${ATIVA}`)
 
@@ -150,9 +150,9 @@ describe('guarda "visitante vê, conta age"', () => {
     expect(
       JSON.parse(sessionStorage.getItem('ocorrencias.pendencia')!).state.pendencia.acao,
     ).toEqual({
-      tipo: 'votar',
+      type: 'votar',
       problemaId: ATIVA,
-      valor: 'sim',
+      value: 'yes',
     })
   })
 })

@@ -11,11 +11,11 @@ import { rotuloVinculo } from '../models/verificacao'
 const data = (iso: string) => format(new Date(iso), 'd MMM. yyyy', { locale: ptBR })
 
 export function CartaoVerificacao({ me }: { me: Me }) {
-  if (me.perfil === 'cidadaoVerificado') {
+  if (me.role === 'verifiedCitizen') {
     return (
       <section className="rounded-2xl bg-primario-suave p-4 text-primario">
         <h2 className="mb-1 flex items-center gap-2 font-medium">
-          <Icone nome="how_to_reg" className="text-[22px]" />
+          <Icone name="how_to_reg" className="text-[22px]" />
           Seu voto tem peso maior
         </h2>
         <p className="text-sm">
@@ -23,25 +23,25 @@ export function CartaoVerificacao({ me }: { me: Me }) {
           ocorrências — ainda mais perto de onde você mora.
         </p>
         <p className="mt-3 border-t border-primario/15 pt-3 text-xs">
-          {me.verificadoEm ? `Verificado em ${data(me.verificadoEm)}` : 'Perfil verificado'}
-          {me.verificacao && ` · ${rotuloVinculo[me.verificacao.tipoVinculo]}`}
+          {me.verifiedAt ? `Verificado em ${data(me.verifiedAt)}` : 'Perfil verificado'}
+          {me.verification && ` · ${rotuloVinculo[me.verification.affiliationType]}`}
         </p>
       </section>
     )
   }
 
-  if (me.perfil !== 'cidadao') return null
+  if (me.role !== 'citizen') return null
 
-  if (me.verificacao?.status === 'pendente') {
+  if (me.verification?.status === 'pending') {
     return (
       <section className="rounded-[20px] border border-border bg-card p-4 shadow-1">
         <h2 className="mb-1 flex items-center gap-2 font-medium">
-          <Icone nome="hourglass_top" className="text-[22px] text-nova" />
+          <Icone name="hourglass_top" className="text-[22px] text-nova" />
           Pedido em análise
         </h2>
         <p className="text-sm text-muted-foreground">
-          Enviado em {data(me.verificacao.criadaEm)}. A equipe de moderação vai analisar seu vínculo
-          com a região.
+          Enviado em {data(me.verification.createdAt)}. A equipe de moderação vai analisar seu
+          vínculo com a região.
         </p>
       </section>
     )
@@ -50,7 +50,7 @@ export function CartaoVerificacao({ me }: { me: Me }) {
   return (
     <section className="rounded-[20px] border border-border bg-card p-4 shadow-1">
       <h2 className="mb-1 flex items-center gap-2 font-medium">
-        <Icone nome="verified_user" className="text-[22px] text-primario" />
+        <Icone name="verified_user" className="text-[22px] text-primario" />
         Verifique seu perfil
       </h2>
       <p className="mb-3 text-sm text-muted-foreground">

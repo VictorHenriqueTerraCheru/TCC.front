@@ -49,7 +49,7 @@ function BarraInferior() {
                 className="relative flex"
               >
                 <Icone
-                  nome={item.icone}
+                  name={item.icon}
                   preenchido={isActive}
                   className={cn(
                     'text-[23px] transition-colors',
@@ -63,7 +63,7 @@ function BarraInferior() {
                   isActive ? 'text-primario' : 'text-muted-foreground',
                 )}
               >
-                {item.rotulo}
+                {item.label}
               </span>
             </>
           )}

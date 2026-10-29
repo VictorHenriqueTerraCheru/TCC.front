@@ -5,12 +5,12 @@ import { ApiError } from '@/infrastructure/api'
 import { aplicarErroAuth } from './errors'
 
 interface Form {
-  nome: string
+  name: string
   email: string
-  senha: string
+  password: string
 }
 
-const campos: (keyof Form)[] = ['nome', 'email', 'senha']
+const campos: (keyof Form)[] = ['name', 'email', 'password']
 
 function aplicar(erro: unknown) {
   const setError = vi.fn()
@@ -31,7 +31,7 @@ describe('aplicarErroAuth', () => {
   })
 
   it('e-mail em uso (409) vai para o campo e-mail', () => {
-    const { mensagem, setError } = aplicar(new ApiError(409, { type: 'email-ja-cadastrado' }))
+    const { mensagem, setError } = aplicar(new ApiError(409, { type: 'email-already-registered' }))
 
     expect(mensagem).toBeNull()
     expect(setError).toHaveBeenCalledWith('email', {
@@ -45,18 +45,18 @@ describe('aplicarErroAuth', () => {
 
   it('erros de validação (400) vão para os campos conhecidos', () => {
     const { mensagem, setError } = aplicar(
-      new ApiError(400, { errors: { email: ['E-mail inválido.'], senha: ['Mínimo de 8.'] } }),
+      new ApiError(400, { errors: { email: ['E-mail inválido.'], password: ['Mínimo de 8.'] } }),
     )
 
     expect(mensagem).toBeNull()
     expect(setError).toHaveBeenCalledWith('email', { message: 'E-mail inválido.' })
-    expect(setError).toHaveBeenCalledWith('senha', { message: 'Mínimo de 8.' })
+    expect(setError).toHaveBeenCalledWith('password', { message: 'Mínimo de 8.' })
     expect(setError).toHaveBeenCalledTimes(2)
   })
 
   it('validação de campo que o formulário não tem cai no título', () => {
     const { mensagem, setError } = aplicar(
-      new ApiError(400, { title: 'Dados inválidos', errors: { outro: ['x'] } }),
+      new ApiError(400, { title: 'Dados inválidos', errors: { other: ['x'] } }),
     )
 
     expect(mensagem).toBe('Dados inválidos')

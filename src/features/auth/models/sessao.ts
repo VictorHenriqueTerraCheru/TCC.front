@@ -1,9 +1,9 @@
 import type { Schema } from '@/infrastructure/api'
 
-export type RespostaAuth = Schema<'RespostaAuth'>
+export type RespostaAuth = Schema<'AuthResponse'>
 
 export interface Sessao {
   token: string
-  expiraEm: string
-  usuario: RespostaAuth['usuario']
+  expiresAt: string
+  user: RespostaAuth['user']
 }

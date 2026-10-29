@@ -5,5 +5,5 @@ export function caminhoDaCategoria(tipo: TipoGrupo) {
 }
 
 export function lerTipo(valor: string | null): TipoGrupo | null {
-  return valor === 'problema' || valor === 'incidente' ? valor : null
+  return valor === 'issue' || valor === 'incident' ? valor : null
 }

@@ -53,16 +53,16 @@ async function capturarTudo(dados, tema) {
   await capturar('05-registro-duplicata', '/registrar/conferencia', {
     usuario: 'cidadao1',
     rascunho: {
-      categoriaId: dados.alta.categoriaId,
+      categoryId: dados.alta.categoryId,
       local: { lat: dados.alta.lat + 0.0001, lng: dados.alta.lng + 0.0001 },
     },
   })
   await capturar('06-registro-incidente', '/registrar/incidente/revisao', {
     usuario: 'cidadao1',
     rascunho: {
-      categoriaId: dados.incidente.id,
+      categoryId: dados.incidente.id,
       local: { lat: dados.calor.lat, lng: dados.calor.lng },
-      descricao: 'Celular levado na saída do metrô, por volta das 19h.',
+      description: 'Celular levado na saída do metrô, por volta das 19h.',
     },
   })
   await capturar('07-recentes', '/recentes')
@@ -100,7 +100,7 @@ async function capturarTela(
           JSON.stringify({ state: { sessao }, version: 0 }),
         )
       if (rascunho) {
-        const estado = { descricao: '', horario: { modo: 'agora', outroEm: null }, ...rascunho }
+        const estado = { description: '', horario: { modo: 'agora', outroEm: null }, ...rascunho }
         sessionStorage.setItem(
           'ocorrencias.rascunhoRegistro',
           JSON.stringify({ state: estado, version: 0 }),
@@ -204,11 +204,11 @@ async function entrar(contexto, usuario) {
   const resposta = await chamarApi(pagina, '/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: `${usuario}@tcc.local`, senha: SENHA }),
+    body: JSON.stringify({ email: `${usuario}@tcc.local`, password: SENHA }),
   })
   await pagina.close()
-  const { token, expiraEm, usuario: dados } = resposta
-  return { token, expiraEm, usuario: dados }
+  const { token, expiresAt, user } = resposta
+  return { token, expiresAt, user }
 }
 
 async function descobrirDados() {
@@ -216,18 +216,18 @@ async function descobrirDados() {
   const pagina = await abrirApp(contexto)
   const area = `minLat=${CENTRO.lat - 0.02}&minLng=${CENTRO.lng - 0.02}&maxLat=${CENTRO.lat + 0.02}&maxLng=${CENTRO.lng + 0.02}`
   const [problemas, celulas, categorias] = await Promise.all([
-    chamarApi(pagina, `/problemas?${area}`),
-    chamarApi(pagina, `/incidentes/calor?${area}&dias=7`),
-    chamarApi(pagina, '/categorias'),
+    chamarApi(pagina, `/issues?${area}`),
+    chamarApi(pagina, `/incidents/heatmap?${area}&days=7`),
+    chamarApi(pagina, '/categories'),
   ])
   await contexto.close()
 
   const alta = problemas
-    .filter((p) => p.faixa === 'alta')
-    .sort((a, b) => b.confianca - a.confianca)[0]
-  const nova = problemas.find((p) => p.status === 'nova')
-  const calor = [...celulas].sort((a, b) => b.quantidade - a.quantidade)[0]
-  const incidente = categorias.find((c) => c.tipo === 'incidente')
+    .filter((p) => p.band === 'high')
+    .sort((a, b) => b.trustScore - a.trustScore)[0]
+  const nova = problemas.find((p) => p.status === 'new')
+  const calor = [...celulas].sort((a, b) => b.count - a.count)[0]
+  const incidente = categorias.find((c) => c.type === 'incident')
   const faltando = Object.entries({ alta, nova, calor, incidente }).filter(([, valor]) => !valor)
   if (faltando.length) {
     throw new Error(

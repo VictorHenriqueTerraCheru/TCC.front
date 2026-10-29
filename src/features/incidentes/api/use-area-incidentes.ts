@@ -9,7 +9,7 @@ export function areaIncidentesQuery(lat: number, lng: number) {
   return queryOptions({
     queryKey: ['incidentes', 'area', ponto],
     queryFn: ({ signal }) =>
-      api.GET('/incidentes/area', { params: { query: ponto }, signal }).then(dados),
+      api.GET('/incidents/area', { params: { query: ponto }, signal }).then(dados),
   })
 }
 

@@ -8,21 +8,24 @@ import { CategoriaIcone, useAparencia } from '@/features/categorias'
 import { tituloItem, type ItemHistorico } from '../models/historico'
 
 const chips: Partial<
-  Record<NonNullable<ItemHistorico['statusProblema']>, { rotulo: string; classe: string }>
+  Record<NonNullable<ItemHistorico['issueStatus']>, { label: string; classe: string }>
 > = {
-  nova: { rotulo: 'Nova', classe: 'bg-primario-suave text-primario' },
-  ativa: { rotulo: 'Ativa', classe: 'bg-muted text-foreground' },
-  possivelmenteResolvida: {
-    rotulo: 'Possivelmente resolvida',
+  new: { label: 'Nova', classe: 'bg-primario-suave text-primario' },
+  active: { label: 'Ativa', classe: 'bg-muted text-foreground' },
+  possiblyResolved: {
+    label: 'Possivelmente resolvida',
     classe: 'bg-primario-suave text-primario',
   },
-  resolvida: { rotulo: 'Resolvida', classe: 'bg-primario-suave text-primario' },
+  resolved: { label: 'Resolvida', classe: 'bg-primario-suave text-primario' },
 }
+
+const isReport = (type: ItemHistorico['type']) =>
+  type === 'issueReport' || type === 'incidentReport'
 
 function IconeItem({ item }: { item: ItemHistorico }) {
   const { aparenciaDe } = useAparencia()
-  if (item.tipo.startsWith('registro')) return <CategoriaIcone categoria={item.categoria} />
-  const aparencia = aparenciaDe(item.categoria)
+  if (isReport(item.type)) return <CategoriaIcone category={item.category} />
+  const aparencia = aparenciaDe(item.category)
   const icone: MaterialSymbol = 'how_to_vote'
   return (
     <span
@@ -32,34 +35,33 @@ function IconeItem({ item }: { item: ItemHistorico }) {
         aparencia.forte,
       )}
     >
-      <Icone nome={icone} className="text-[22px]" />
+      <Icone name={icone} className="text-[22px]" />
     </span>
   )
 }
 
 export function ItemHistoricoLinha({ item, quando }: { item: ItemHistorico; quando: string }) {
-  const chip =
-    item.tipo === 'registroProblema' && item.statusProblema ? chips[item.statusProblema] : undefined
+  const chip = item.type === 'issueReport' && item.issueStatus ? chips[item.issueStatus] : undefined
   const conteudo = (
     <>
       <IconeItem item={item} />
       <div className="min-w-0 flex-1">
         <p className="leading-5">{tituloItem(item)}</p>
         <p className="text-sm text-muted-foreground">
-          {[item.endereco, quando].filter(Boolean).join(' · ')}
+          {[item.address, quando].filter(Boolean).join(' · ')}
         </p>
       </div>
       {chip && (
         <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-xs font-medium', chip.classe)}>
-          {chip.rotulo}
+          {chip.label}
         </span>
       )}
     </>
   )
   const classe = 'flex items-center gap-3 py-2.5'
-  return item.ocorrenciaId ? (
+  return item.reportId ? (
     <Link
-      to={`/mapa/problema/${item.ocorrenciaId}`}
+      to={`/mapa/problema/${item.reportId}`}
       className={cn(classe, '-mx-2 rounded-xl px-2 hover:bg-card focus-visible:outline-2')}
     >
       {conteudo}

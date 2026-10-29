@@ -18,8 +18,8 @@ export function useAparencia() {
     () => ({
       grupos,
       carregado: data !== undefined,
-      grupoDe: (categoria: Pick<CategoriaResumo, 'grupo'>) => grupoDe(grupos, categoria),
-      aparenciaDe: (categoria: Pick<CategoriaResumo, 'grupo'>): AparenciaCategoria =>
+      grupoDe: (categoria: Pick<CategoriaResumo, 'group'>) => grupoDe(grupos, categoria),
+      aparenciaDe: (categoria: Pick<CategoriaResumo, 'group'>): AparenciaCategoria =>
         aparenciaDe(grupos, categoria),
     }),
     [grupos, data],

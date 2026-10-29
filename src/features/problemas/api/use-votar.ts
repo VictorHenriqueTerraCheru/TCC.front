@@ -15,7 +15,7 @@ function useCoordenadasDoVoto() {
       : { lat: null, lng: null }
 }
 
-export const chaveVotos = (id: string) => ['votos', id] as const
+export const chaveVotos = (id: string) => ['votes', id] as const
 
 export function useVotar(id: string) {
   const queryClient = useQueryClient()
@@ -26,9 +26,9 @@ export function useVotar(id: string) {
     mutationKey: chaveVotos(id),
     mutationFn: (valor: ValorVoto) =>
       api
-        .PUT('/problemas/{id}/voto', {
+        .PUT('/issues/{id}/vote', {
           params: { path: { id } },
-          body: { valor, ...coordenadas() },
+          body: { value: valor, ...coordenadas() },
         })
         .then(dados),
     onMutate: async (valor) => {

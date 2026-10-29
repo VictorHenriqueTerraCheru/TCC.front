@@ -35,12 +35,12 @@ function renderizar(id: string) {
 function espiarVotos() {
   const votos: string[] = []
   server.events.on('request:start', ({ request }) => {
-    if (request.method !== 'PUT' || !new URL(request.url).pathname.endsWith('/voto')) return
+    if (request.method !== 'PUT' || !new URL(request.url).pathname.endsWith('/vote')) return
     const posicao = votos.push('?') - 1
     void request
       .clone()
       .json()
-      .then(({ valor }: { valor: string }) => (votos[posicao] = valor))
+      .then(({ value: valor }: { value: string }) => (votos[posicao] = valor))
   })
   return votos
 }
@@ -95,8 +95,8 @@ describe('DetalheProblema', () => {
   it('Resolvida (link salvo): só leitura, sem botões de voto', async () => {
     const detalhe = criarDetalhes().get(ATIVA)!
     server.use(
-      http.get(rota('/problemas/:id'), () =>
-        HttpResponse.json({ ...detalhe, status: 'resolvida', confianca: null, faixa: null }),
+      http.get(rota('/issues/:id'), () =>
+        HttpResponse.json({ ...detalhe, status: 'resolved', trustScore: null, band: null }),
       ),
     )
     renderizar(ATIVA)
@@ -109,7 +109,7 @@ describe('DetalheProblema', () => {
   it('enquanto um voto está em andamento, os outros botões ficam desabilitados', async () => {
     entrarComoCidadao()
     server.use(
-      http.put(rota('/problemas/:id/voto'), async () => {
+      http.put(rota('/issues/:id/vote'), async () => {
         await delay('infinite')
       }),
     )
@@ -149,7 +149,7 @@ describe('DetalheProblema', () => {
       'true',
     )
     expect(within(cartao()).getByText('16')).toBeInTheDocument()
-    await waitFor(() => expect(votos).toEqual(['sim']))
+    await waitFor(() => expect(votos).toEqual(['yes']))
     expect(screen.getByText(/Calculada com 17 votos/)).toBeInTheDocument()
   })
 
@@ -163,7 +163,7 @@ describe('DetalheProblema', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Não está lá' })).toBeEnabled())
     await usuario.click(screen.getByRole('button', { name: 'Não está lá' }))
 
-    await waitFor(() => expect(votos).toEqual(['sim', 'nao']))
+    await waitFor(() => expect(votos).toEqual(['yes', 'no']))
     expect(screen.getByRole('button', { name: 'Não está lá' })).toHaveAttribute(
       'aria-pressed',
       'true',
@@ -174,8 +174,8 @@ describe('DetalheProblema', () => {
   it('erro de regra desfaz o voto otimista e mostra a mensagem', async () => {
     entrarComoCidadao()
     server.use(
-      http.put(rota('/problemas/:id/voto'), () =>
-        erroDeRegra(422, 'problema-resolvido', 'Problema resolvido.'),
+      http.put(rota('/issues/:id/vote'), () =>
+        erroDeRegra(422, 'issue-resolved', 'Problema resolvido.'),
       ),
     )
     const usuario = userEvent.setup()

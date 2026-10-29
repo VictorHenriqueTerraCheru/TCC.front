@@ -21,20 +21,20 @@ import { caminhoDaCategoria } from '../models/rotas'
 
 export function RevisaoIncidentePage() {
   const navigate = useNavigate()
-  const { categoria, categoriaId, local, horario } = useRascunho()
+  const { category: categoria, categoryId: categoriaId, local, horario } = useRascunho()
   const { data: endereco } = useEnderecoDoRascunho()
   const registrar = useRegistrarIncidente()
-  useExigirCategoria('incidente')
+  useExigirCategoria('incident')
   useExigirPasso(local !== null, '/registrar/incidente/local')
 
-  const envio = useEnvio(registrar.mutateAsync, (area, { categoriaId: idCategoria, lat, lng }) => {
+  const envio = useEnvio(registrar.mutateAsync, (area, { categoryId: idCategoria, lat, lng }) => {
     navigate('/registrar/incidente/sucesso', {
       replace: true,
       state: {
         area,
-        categoriaId: idCategoria,
-        rotuloArea: endereco?.rotuloArea ?? null,
-        bairro: endereco?.bairro ?? null,
+        categoryId: idCategoria,
+        areaLabel: endereco?.areaLabel ?? null,
+        neighborhood: endereco?.neighborhood ?? null,
         ponto: { lat, lng },
       },
     })
@@ -42,26 +42,26 @@ export function RevisaoIncidentePage() {
 
   function enviar() {
     if (categoriaId === null || !local) return
-    envio.enviar({ categoriaId, ...local, ocorridoEm: ocorridoEm(horario) })
+    envio.enviar({ categoryId: categoriaId, ...local, occurredAt: ocorridoEm(horario) })
   }
   useRetomarRegistro('enviar', enviar)
 
   return (
     <PassoRegistro
       titulo="Revisão"
-      passo={{ atual: 3, total: 3, rotulo: 'Revisão' }}
+      passo={{ atual: 3, total: 3, label: 'Revisão' }}
       acaoTopo="voltar"
       aoTopo={() => navigate('/registrar/incidente/local')}
       rodape={
         <Button className="w-full" carregando={registrar.isPending} onClick={enviar}>
-          <Icone nome="send" className="text-[18px]" />
+          <Icone name="send" className="text-[18px]" />
           {registrar.isPending ? 'Enviando…' : 'Enviar registro'}
         </Button>
       }
     >
       <div className="space-y-6 pt-2">
         <section className="flex gap-3 rounded-2xl bg-primario-suave p-4 text-primario">
-          <Icone nome="visibility_off" className="text-[22px]" />
+          <Icone name="visibility_off" className="text-[22px]" />
           <div>
             <h2 className="font-medium">Registro anônimo e agregado</h2>
             <p className="text-sm">
@@ -73,28 +73,28 @@ export function RevisaoIncidentePage() {
 
         <Resumo>
           <LinhaResumo
-            icone={
+            icon={
               categoria ? (
-                <CategoriaIcone categoria={categoria} tamanho="sm" className="bg-transparent" />
+                <CategoriaIcone category={categoria} pageSize="sm" className="bg-transparent" />
               ) : (
                 'category'
               )
             }
-            rotulo="Categoria"
-            valor={categoria?.nome ?? '—'}
-            aoEditar={() => navigate(caminhoDaCategoria('incidente'))}
+            label="Categoria"
+            value={categoria?.name ?? '—'}
+            aoEditar={() => navigate(caminhoDaCategoria('incident'))}
           />
-          <LinhaResumo icone="blur_on" rotulo="Tipo" valor="Incidente — entra no mapa de calor" />
+          <LinhaResumo icon="blur_on" label="Tipo" value="Incidente — entra no mapa de calor" />
           <LinhaResumo
-            icone="location_on"
-            rotulo="Área aproximada"
-            valor={endereco ? (endereco.rotuloArea ?? endereco.endereco) : 'Buscando endereço…'}
+            icon="location_on"
+            label="Área aproximada"
+            value={endereco ? (endereco.areaLabel ?? endereco.address) : 'Buscando endereço…'}
             aoEditar={() => navigate('/registrar/incidente/local')}
           />
           <LinhaResumo
-            icone="schedule"
-            rotulo="Quando"
-            valor={descreverHorario(horario)}
+            icon="schedule"
+            label="Quando"
+            value={descreverHorario(horario)}
             aoEditar={() => navigate('/registrar/incidente/local')}
           />
         </Resumo>

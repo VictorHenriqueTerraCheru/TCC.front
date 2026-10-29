@@ -2,12 +2,12 @@ import type { MaterialSymbol } from 'material-symbols'
 
 export interface ItemNavegacao {
   rota: string
-  rotulo: string
-  icone: MaterialSymbol
+  label: string
+  icon: MaterialSymbol
 }
 
 export const itensNavegacao: ItemNavegacao[] = [
-  { rota: '/mapa', rotulo: 'Mapa', icone: 'map' },
-  { rota: '/recentes', rotulo: 'Recentes', icone: 'history' },
-  { rota: '/perfil', rotulo: 'Perfil', icone: 'person' },
+  { rota: '/mapa', label: 'Mapa', icon: 'map' },
+  { rota: '/recentes', label: 'Recentes', icon: 'history' },
+  { rota: '/perfil', label: 'Perfil', icon: 'person' },
 ]

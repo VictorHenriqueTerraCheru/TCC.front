@@ -28,12 +28,12 @@ export function expressaoGradienteCalor(): ExpressionSpecification {
 }
 
 export function pesosCalor(celulas: CelulaCalor[]): FeatureCollection<Point, { peso: number }> {
-  const maximo = Math.max(4, ...celulas.map((c) => c.quantidade))
+  const maximo = Math.max(4, ...celulas.map((c) => c.count))
   return {
     type: 'FeatureCollection',
     features: celulas.map((c) => ({
       type: 'Feature',
-      properties: { peso: c.quantidade / maximo },
+      properties: { peso: c.count / maximo },
       geometry: { type: 'Point', coordinates: [c.lng, c.lat] },
     })),
   }

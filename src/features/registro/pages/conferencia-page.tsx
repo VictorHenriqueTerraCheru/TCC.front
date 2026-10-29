@@ -17,9 +17,9 @@ import { MapaRegistro } from '../components/mapa-registro'
 import { PassoRegistro } from '../components/passo-registro'
 import { useExigirCategoria, useExigirPasso, useRascunho } from '../hooks/use-rascunho'
 
-type Duplicata = Schema<'BuscarDuplicatasResponse'>
+type Duplicata = Schema<'SearchDuplicatesResponse'>
 
-const rotuloFaixa = { alta: 'Confiança alta', media: 'Confiança média', baixa: 'Confiança baixa' }
+const rotuloFaixa = { high: 'Confiança alta', medium: 'Confiança média', low: 'Confiança baixa' }
 
 function CartaoDuplicata({
   duplicata,
@@ -41,20 +41,20 @@ function CartaoDuplicata({
         selecionada ? 'border-primario' : 'border-border/60',
       )}
     >
-      <CategoriaIcone categoria={duplicata.categoria} tamanho="sm" />
+      <CategoriaIcone category={duplicata.category} pageSize="sm" />
       <div className="min-w-0 text-sm">
-        <p className="font-medium">{duplicata.categoria.nome}</p>
+        <p className="font-medium">{duplicata.category.name}</p>
         <p className="text-xs text-muted-foreground">
-          {duplicata.endereco} · {tempoRelativo(duplicata.criadoEm)}
+          {duplicata.address} · {tempoRelativo(duplicata.createdAt)}
         </p>
         <p className="mt-1 flex items-center gap-1 text-xs font-medium text-primario">
           <Icone
-            nome={duplicata.faixa ? 'check_circle' : 'hourglass_top'}
+            name={duplicata.band ? 'check_circle' : 'hourglass_top'}
             preenchido
             className="text-[16px]"
           />
-          {duplicata.faixa ? rotuloFaixa[duplicata.faixa] : 'Em avaliação'} ·{' '}
-          {duplicata.confirmacoes} {duplicata.confirmacoes === 1 ? 'confirmação' : 'confirmações'}
+          {duplicata.band ? rotuloFaixa[duplicata.band] : 'Em avaliação'} ·{' '}
+          {duplicata.confirmations} {duplicata.confirmations === 1 ? 'confirmação' : 'confirmações'}
         </p>
       </div>
     </button>
@@ -63,8 +63,8 @@ function CartaoDuplicata({
 
 export function ConferenciaPage() {
   const navigate = useNavigate()
-  const { categoria, categoriaId, local } = useRascunho()
-  useExigirCategoria('problema')
+  const { category: categoria, categoryId: categoriaId, local } = useRascunho()
+  useExigirCategoria('issue')
   useExigirPasso(local !== null, '/registrar/local')
 
   const { data: duplicatas } = useQuery({
@@ -83,9 +83,12 @@ export function ConferenciaPage() {
 
   function confirmarExistente() {
     if (!escolhida) return
-    confirmar.mutate('sim', {
+    confirmar.mutate('yes', {
       onSuccess: (problema) => {
-        navigate('/registrar/sucesso', { replace: true, state: { problema, confirmacao: true } })
+        navigate('/registrar/sucesso', {
+          replace: true,
+          state: { issue: problema, confirmacao: true },
+        })
       },
     })
   }
@@ -94,7 +97,7 @@ export function ConferenciaPage() {
   return (
     <PassoRegistro
       titulo="Conferência"
-      passo={{ atual: 3, total: 4, rotulo: 'Registros próximos' }}
+      passo={{ atual: 3, total: 4, label: 'Registros próximos' }}
       acaoTopo="voltar"
       aoTopo={() => navigate('/registrar/local')}
       mapa={
@@ -124,11 +127,11 @@ export function ConferenciaPage() {
       ) : (
         <div className="space-y-3">
           <span className="flex size-10 items-center justify-center rounded-full bg-primario-suave text-primario">
-            <Icone nome="content_copy" className="text-[20px]" />
+            <Icone name="content_copy" className="text-[20px]" />
           </span>
           <h2 className="text-[22px] leading-7">
-            Já existe um registro de {categoria?.nome ?? primeira.categoria.nome} a{' '}
-            {distanciaTexto(primeira.distanciaMetros)}. É o mesmo?
+            Já existe um registro de {categoria?.name ?? primeira.category.name} a{' '}
+            {distanciaTexto(primeira.distanceMeters)}. É o mesmo?
           </h2>
           <p className="text-sm text-muted-foreground">
             Se for, sua confirmação reforça o registro existente em vez de criar uma duplicata.

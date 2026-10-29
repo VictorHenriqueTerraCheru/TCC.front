@@ -8,14 +8,14 @@ const HORA = 3_600_000
 function entrarExpirando(emMs: number) {
   useSessaoStore.getState().entrar({
     token: 'jwt-teste',
-    expiraEm: new Date(Date.now() + emMs).toISOString(),
-    usuario: { id: 'u-1', nome: 'Ana', email: 'ana@tcc.local', perfil: 'cidadao' },
+    expiresAt: new Date(Date.now() + emMs).toISOString(),
+    user: { id: 'u-1', name: 'Ana', email: 'ana@tcc.local', role: 'citizen' },
   })
 }
 
 beforeEach(() => {
   useSessaoStore.setState({ sessao: null })
-  useGuardaStore.setState({ motivo: null, expirou: false, pendencia: null })
+  useGuardaStore.setState({ reason: null, expirou: false, pendencia: null })
 })
 
 describe('sessão (regras 11 e 13)', () => {
@@ -45,8 +45,8 @@ describe('sessão (regras 11 e 13)', () => {
       vi.setSystemTime(new Date('2026-10-20T12:00:00Z'))
       useSessaoStore.getState().entrar({
         token: 'jwt-teste',
-        expiraEm: '2026-10-20T12:00:00Z',
-        usuario: { id: 'u-1', nome: 'Ana', email: 'ana@tcc.local', perfil: 'cidadao' },
+        expiresAt: '2026-10-20T12:00:00Z',
+        user: { id: 'u-1', name: 'Ana', email: 'ana@tcc.local', role: 'citizen' },
       })
 
       expect(sessaoAtual()).toBeNull()

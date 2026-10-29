@@ -26,42 +26,42 @@ import type { Schema } from '@/infrastructure/api'
 import { RAIO_RECENTES_KM, useRecentes } from '../api/use-recentes'
 import type { FaixaConfianca } from '../models/problema'
 
-type ItemRecente = Schema<'ListarProblemasRecentesItem'>
+type ItemRecente = Schema<'ListRecentIssuesItem'>
 
-const faixa: Record<FaixaConfianca, { rotulo: string; icone: MaterialSymbol }> = {
-  alta: { rotulo: 'Alta', icone: 'signal_cellular_alt' },
-  media: { rotulo: 'Média', icone: 'signal_cellular_alt_2_bar' },
-  baixa: { rotulo: 'Baixa', icone: 'signal_cellular_alt_1_bar' },
+const faixa: Record<FaixaConfianca, { label: string; icon: MaterialSymbol }> = {
+  high: { label: 'Alta', icon: 'signal_cellular_alt' },
+  medium: { label: 'Média', icon: 'signal_cellular_alt_2_bar' },
+  low: { label: 'Baixa', icon: 'signal_cellular_alt_1_bar' },
 }
 
 function Cartao({ item }: { item: ItemRecente }) {
-  const possivel = item.status === 'possivelmenteResolvida'
+  const possivel = item.status === 'possiblyResolved'
   return (
     <Link
       to={`/mapa/problema/${item.id}`}
       className="flex pressionavel gap-3 rounded-[20px] border border-border bg-card p-3 shadow-1 hover:bg-superficie-2 focus-visible:outline-2"
     >
-      <CategoriaIcone categoria={item.categoria} />
+      <CategoriaIcone category={item.category} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="font-medium">{item.categoria.nome}</p>
-          {item.status === 'nova' && (
+          <p className="font-medium">{item.category.name}</p>
+          {item.status === 'new' && (
             <span className="rounded bg-nova px-1.5 text-[11px] leading-4 text-nova-foreground">
               Nova
             </span>
           )}
-          {item.faixa && (
+          {item.band && (
             <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-              <Icone nome={faixa[item.faixa].icone} className="text-[16px] text-primario" />
-              {faixa[item.faixa].rotulo}
+              <Icone name={faixa[item.band].icon} className="text-[16px] text-primario" />
+              {faixa[item.band].label}
             </span>
           )}
         </div>
-        <p className="truncate text-xs text-muted-foreground">{item.endereco}</p>
+        <p className="truncate text-xs text-muted-foreground">{item.address}</p>
         <p className="mt-1 flex flex-wrap items-center gap-2 text-xs">
           <span className="flex items-center gap-1 text-muted-foreground">
-            <Icone nome="schedule" className="text-[16px]" />
-            {tempoRelativo(item.criadoEm)}
+            <Icone name="schedule" className="text-[16px]" />
+            {tempoRelativo(item.createdAt)}
           </span>
           <span
             className={cn(
@@ -70,19 +70,15 @@ function Cartao({ item }: { item: ItemRecente }) {
             )}
           >
             <Icone
-              nome={
-                possivel
-                  ? 'help'
-                  : item.status === 'nova'
-                    ? 'hourglass_top'
-                    : 'radio_button_checked'
+              name={
+                possivel ? 'help' : item.status === 'new' ? 'hourglass_top' : 'radio_button_checked'
               }
               preenchido
               className="text-[14px]"
             />
             {possivel
               ? 'Possivelmente resolvida'
-              : item.status === 'nova'
+              : item.status === 'new'
                 ? 'Em avaliação'
                 : 'Ativa'}
           </span>
@@ -97,11 +93,11 @@ export function RecentesPage() {
   const { grupos: todos, carregado } = useAparencia()
   const gruposQuery = useGrupos()
   const [escolhidos, setGrupos] = useState<string[]>([])
-  const grupos = carregado ? escolhidos.filter((g) => todos.some((t) => t.chave === g)) : escolhidos
+  const grupos = carregado ? escolhidos.filter((g) => todos.some((t) => t.key === g)) : escolhidos
   const centro =
     estado === 'granted' && posicao ? posicao : { lat: CENTRO_PADRAO[0], lng: CENTRO_PADRAO[1] }
   const recentes = useRecentes(centro, grupos)
-  const itens = recentes.data?.pages.flatMap((p) => p.itens) ?? []
+  const itens = recentes.data?.pages.flatMap((p) => p.items) ?? []
 
   const alternar = (grupo: string) =>
     setGrupos(() =>
@@ -132,20 +128,20 @@ export function RecentesPage() {
         aria-label="Filtros"
         className="-mx-4 mb-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1"
       >
-        {gruposDoTipo(todos, 'problema').map((grupo) => {
-          const selecionado = grupos.includes(grupo.chave)
+        {gruposDoTipo(todos, 'issue').map((grupo) => {
+          const selecionado = grupos.includes(grupo.key)
           return (
             <ChipFiltro
-              key={grupo.chave}
+              key={grupo.key}
               selecionado={selecionado}
-              aoClicar={() => alternar(grupo.chave)}
+              aoClicar={() => alternar(grupo.key)}
             >
               {selecionado ? (
-                <Icone nome="check" preenchido className="text-[18px]" />
+                <Icone name="check" preenchido className="text-[18px]" />
               ) : (
-                <PontoGrupo cor={aparenciaDaCor[grupo.cor]} />
+                <PontoGrupo color={aparenciaDaCor[grupo.color]} />
               )}
-              {grupo.rotulo}
+              {grupo.label}
             </ChipFiltro>
           )
         })}

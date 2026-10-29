@@ -13,12 +13,12 @@ const MINIMO_LETRAS = 2
 const MAXIMO_RESULTADOS = 48
 
 interface SeletorIconeProps {
-  valor: string
+  value: string
   aoMudar(nome: string): void
   erro?: string
 }
 
-export function SeletorIcone({ valor, aoMudar, erro }: SeletorIconeProps) {
+export function SeletorIcone({ value: valor, aoMudar, erro }: SeletorIconeProps) {
   const [busca, setBusca] = useState('')
   const termo = useDebouncedValue(busca.trim().toLowerCase(), 350)
   const resultado = useQuery({
@@ -34,7 +34,7 @@ export function SeletorIcone({ valor, aoMudar, erro }: SeletorIconeProps) {
     <div className="space-y-3">
       <div className="flex items-center gap-3 text-sm">
         <span className="flex size-12 items-center justify-center rounded-full bg-muted text-[26px]">
-          {valor ? <IconeDinamico nome={iconeDe({ icone: valor })} /> : <Icone nome="category" />}
+          {valor ? <IconeDinamico name={iconeDe({ icon: valor })} /> : <Icone name="category" />}
         </span>
         <span className={cn(!valor && 'text-muted-foreground')}>
           {valor ? (
@@ -48,9 +48,9 @@ export function SeletorIcone({ valor, aoMudar, erro }: SeletorIconeProps) {
       </div>
 
       <CampoBusca
-        valor={busca}
+        value={busca}
         aoMudar={setBusca}
-        rotulo="Buscar ícone"
+        label="Buscar ícone"
         placeholder="Buscar ícone (em inglês: flood, tree, fire…)"
       />
 
@@ -84,7 +84,7 @@ export function SeletorIcone({ valor, aoMudar, erro }: SeletorIconeProps) {
                   : 'border-border bg-card hover:bg-superficie-2',
               )}
             >
-              <IconeDinamico nome={nome} />
+              <IconeDinamico name={nome} />
             </button>
           ))}
         </div>

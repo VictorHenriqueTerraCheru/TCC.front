@@ -4,13 +4,13 @@ import type { CSSProperties } from 'react'
 import { cn } from '@/common/lib/utils'
 
 interface IconeProps {
-  nome: MaterialSymbol
+  name: MaterialSymbol
   preenchido?: boolean
   className?: string
   style?: CSSProperties
 }
 
-export function Icone({ nome, preenchido = false, className, style }: IconeProps) {
+export function Icone({ name: nome, preenchido = false, className, style }: IconeProps) {
   return (
     <span
       aria-hidden="true"

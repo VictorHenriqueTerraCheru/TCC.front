@@ -24,21 +24,21 @@ export function SolicitarVerificacaoPage() {
   const solicitar = useSolicitarVerificacao()
   const { register, handleSubmit, control, formState } = useForm<SolicitarForm>({
     resolver: zodResolver(solicitarSchema),
-    defaultValues: { tipoVinculo: 'moradorRegiao', justificativa: '' },
+    defaultValues: { affiliationType: 'livesInArea', justification: '' },
   })
-  const justificativa = useWatch({ control, name: 'justificativa' })
+  const justificativa = useWatch({ control, name: 'justification' })
 
   if (!autenticado) return <Navigate to="/login" replace state={{ de: '/perfil/verificacao' }} />
-  if (me && me.perfil !== 'cidadao') return <Navigate to="/perfil" replace />
+  if (me && me.role !== 'citizen') return <Navigate to="/perfil" replace />
 
   const enviar = handleSubmit((form) =>
     solicitar.mutate(
-      { tipoVinculo: form.tipoVinculo, justificativa: form.justificativa },
+      { affiliationType: form.affiliationType, justification: form.justification },
       { onSuccess: () => navigate('/perfil', { replace: true }) },
     ),
   )
-  const recusa = me?.verificacao?.status === 'recusada' ? me.verificacao : null
-  const pendente = me?.verificacao?.status === 'pendente'
+  const recusa = me?.verification?.status === 'rejected' ? me.verification : null
+  const pendente = me?.verification?.status === 'pending'
 
   return (
     <div className="mx-auto h-full w-full lg:max-w-3xl">
@@ -52,11 +52,11 @@ export function SolicitarVerificacaoPage() {
                 role="status"
                 className="mb-4 flex gap-3 rounded-2xl bg-destructive/15 p-4 text-destructive"
               >
-                <Icone nome="cancel" preenchido className="text-[22px] text-destructive" />
+                <Icone name="cancel" preenchido className="text-[22px] text-destructive" />
                 <div className="text-sm">
                   <p className="text-xs">Último pedido</p>
                   <p className="text-base font-medium">Recusada</p>
-                  {recusa.motivoRecusa && <p>Motivo: {recusa.motivoRecusa}</p>}
+                  {recusa.rejectionReason && <p>Motivo: {recusa.rejectionReason}</p>}
                   <p>Você pode enviar um novo pedido.</p>
                 </div>
               </div>
@@ -74,7 +74,7 @@ export function SolicitarVerificacaoPage() {
             ) : (
               <>
                 <div className="space-y-6">
-                  <CampoSelecao rotulo="Tipo de vínculo" {...register('tipoVinculo')}>
+                  <CampoSelecao label="Tipo de vínculo" {...register('affiliationType')}>
                     {tiposVinculo.map((tipo) => (
                       <option key={tipo} value={tipo}>
                         {rotuloVinculo[tipo]}
@@ -82,13 +82,13 @@ export function SolicitarVerificacaoPage() {
                     ))}
                   </CampoSelecao>
                   <CampoAreaTexto
-                    rotulo="Justificativa *"
+                    label="Justificativa *"
                     placeholder="Ex.: moro na Rua São Clemente há 8 anos e passo pelo trecho todos os dias."
                     maximo={LIMITE}
                     valorAtual={justificativa}
-                    erro={formState.errors.justificativa?.message}
+                    erro={formState.errors.justification?.message}
                     ajuda="Conte seu vínculo com a região (mínimo de 30 caracteres)."
-                    {...register('justificativa')}
+                    {...register('justification')}
                   />
                 </div>
                 {solicitar.error && (

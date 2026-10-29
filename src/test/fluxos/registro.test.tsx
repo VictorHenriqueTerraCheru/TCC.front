@@ -18,14 +18,10 @@ function abrir(caminho = '/registrar') {
 
 type Usuario = ReturnType<typeof userEvent.setup>
 
-async function escolher(
-  usuario: Usuario,
-  categoria: string,
-  tipo: 'problema' | 'incidente' = 'problema',
-) {
+async function escolher(usuario: Usuario, categoria: string, tipo: 'issue' | 'incident' = 'issue') {
   await usuario.click(
     await screen.findByRole('link', {
-      name: tipo === 'problema' ? /^Estado/ : /^Evento/,
+      name: tipo === 'issue' ? /^Estado/ : /^Evento/,
     }),
   )
   await usuario.click(await screen.findByRole('button', { name: categoria }))
@@ -51,12 +47,12 @@ describe('fluxo de registro', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
   })
 
-  it('visitante em /registrar/categoria?tipo=incidente volta para a mesma URL depois do login', async () => {
+  it('visitante em /registrar/categoria?tipo=incident volta para a mesma URL depois do login', async () => {
     sair()
-    const { router } = abrir('/registrar/categoria?tipo=incidente')
+    const { router } = abrir('/registrar/categoria?tipo=incident')
     await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
 
-    expect(router.state.location.state).toEqual({ de: '/registrar/categoria?tipo=incidente' })
+    expect(router.state.location.state).toEqual({ de: '/registrar/categoria?tipo=incident' })
   })
 
   it('aceite: registrar onde já há um buraco a menos de 50 m abre a conferência; "Não, é outro" segue e envia', async () => {
@@ -82,14 +78,14 @@ describe('fluxo de registro', () => {
     expect(router.state.location.pathname).toBe('/registrar/sucesso')
     await waitFor(() =>
       expect(
-        JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro')!).state.categoriaId,
+        JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro')!).state.categoryId,
       ).toBeNull(),
     )
   })
 
   it('sessão expirada no envio (401): login e o registro é enviado ao voltar', async () => {
     server.use(
-      http.post(rota('/problemas'), () => new HttpResponse(null, { status: 401 }), {
+      http.post(rota('/issues'), () => new HttpResponse(null, { status: 401 }), {
         once: true,
       }),
     )
@@ -129,9 +125,9 @@ describe('fluxo de registro', () => {
       'ocorrencias.rascunhoRegistro',
       JSON.stringify({
         state: {
-          categoriaId: 3,
+          categoryId: 3,
           local: { lat: -22.9535, lng: -43.1827 },
-          descricao: '',
+          description: '',
           horario: { modo: 'agora', outroEm: null },
         },
         version: 0,
@@ -149,9 +145,9 @@ describe('fluxo de registro', () => {
       'ocorrencias.rascunhoRegistro',
       JSON.stringify({
         state: {
-          categoriaId: 3,
+          categoryId: 3,
           local: { lat: -22.9535, lng: -43.1827 },
-          descricao: 'Poste piscando a noite toda',
+          description: 'Poste piscando a noite toda',
           horario: { modo: 'agora', outroEm: null },
         },
         version: 0,
@@ -165,7 +161,7 @@ describe('fluxo de registro', () => {
   })
 
   it('falha de rede mostra "Não foi possível enviar"; "Tentar novamente" envia com os mesmos dados', async () => {
-    server.use(http.post(rota('/problemas'), () => HttpResponse.error()))
+    server.use(http.post(rota('/issues'), () => HttpResponse.error()))
     const usuario = userEvent.setup()
     abrir()
 
@@ -177,7 +173,7 @@ describe('fluxo de registro', () => {
       await screen.findByRole('dialog', { name: 'Não foi possível enviar' }),
     ).toBeInTheDocument()
     expect(
-      JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro')!).state.categoriaId,
+      JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro')!).state.categoryId,
     ).toBe(4)
 
     server.resetHandlers()
@@ -189,7 +185,7 @@ describe('fluxo de registro', () => {
     const usuario = userEvent.setup()
     abrir()
 
-    await escolher(usuario, 'Roubo', 'incidente')
+    await escolher(usuario, 'Roubo', 'incident')
     expect(await screen.findByRole('heading', { name: 'Onde aconteceu?' })).toBeInTheDocument()
     await usuario.click(screen.getByRole('radio', { name: 'Outro horário' }))
     await usuario.click(screen.getByRole('button', { name: '15 minutos antes' }))
@@ -206,14 +202,14 @@ describe('fluxo de registro', () => {
 
   it('incidente recusado por horário mostra a mensagem do type', async () => {
     server.use(
-      http.post(rota('/incidentes'), () =>
-        erroDeRegra(422, 'horario-fora-da-janela', 'Horário fora da janela.'),
+      http.post(rota('/incidents'), () =>
+        erroDeRegra(422, 'time-outside-window', 'Horário fora da janela.'),
       ),
     )
     const usuario = userEvent.setup()
     abrir()
 
-    await escolher(usuario, 'Acidente de trânsito', 'incidente')
+    await escolher(usuario, 'Acidente de trânsito', 'incident')
     await usuario.click(await screen.findByRole('button', { name: 'Continuar' }))
     await usuario.click(await screen.findByRole('button', { name: /Enviar registro/ }))
 

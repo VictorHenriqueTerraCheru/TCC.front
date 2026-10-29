@@ -18,7 +18,7 @@ describe('mutations de categoria', () => {
     )
     const { result } = renderHook(() => useAlterarAtivaCategoria(), { wrapper })
 
-    result.current.mutate({ id: 1, ativa: false })
+    result.current.mutate({ id: 1, active: false })
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
     const raizes = invalidar.mock.calls.map(([filtro]) => filtro?.queryKey)

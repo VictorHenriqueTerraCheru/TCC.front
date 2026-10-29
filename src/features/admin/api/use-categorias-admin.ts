@@ -2,11 +2,11 @@ import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/r
 
 import { api, dados, semConteudo, type Schema } from '@/infrastructure/api'
 
-export type CategoriaAdmin = Schema<'CategoriaAdminResponse'>
+export type CategoriaAdmin = Schema<'CategoryAdminResponse'>
 
 export const categoriasAdminQuery = queryOptions({
   queryKey: ['admin', 'categorias'],
-  queryFn: ({ signal }) => api.GET('/admin/categorias', { signal }).then(dados),
+  queryFn: ({ signal }) => api.GET('/admin/categories', { signal }).then(dados),
 })
 
 export function useCategoriasAdmin() {
@@ -27,8 +27,8 @@ function useInvalidarCategorias() {
 export function useCriarCategoria() {
   const invalidar = useInvalidarCategorias()
   return useMutation({
-    mutationFn: (corpo: Schema<'CriarCategoriaRequest'>) =>
-      api.POST('/admin/categorias', { body: corpo }).then(dados),
+    mutationFn: (corpo: Schema<'CreateCategoryRequest'>) =>
+      api.POST('/admin/categories', { body: corpo }).then(dados),
     onSuccess: invalidar,
   })
 }
@@ -36,8 +36,8 @@ export function useCriarCategoria() {
 export function useEditarCategoria() {
   const invalidar = useInvalidarCategorias()
   return useMutation({
-    mutationFn: ({ id, ...corpo }: Schema<'EditarCategoriaRequest'> & { id: number }) =>
-      api.PUT('/admin/categorias/{id}', { params: { path: { id } }, body: corpo }).then(dados),
+    mutationFn: ({ id, ...corpo }: Schema<'EditCategoryRequest'> & { id: number }) =>
+      api.PUT('/admin/categories/{id}', { params: { path: { id } }, body: corpo }).then(dados),
     onSuccess: invalidar,
   })
 }
@@ -45,9 +45,12 @@ export function useEditarCategoria() {
 export function useAlterarAtivaCategoria() {
   const invalidar = useInvalidarCategorias()
   return useMutation({
-    mutationFn: ({ id, ativa }: { id: number; ativa: boolean }) =>
+    mutationFn: ({ id, active: ativa }: { id: number; active: boolean }) =>
       api
-        .PATCH('/admin/categorias/{id}/ativa', { params: { path: { id } }, body: { ativa } })
+        .PATCH('/admin/categories/{id}/active', {
+          params: { path: { id } },
+          body: { active: ativa },
+        })
         .then(semConteudo),
     onSuccess: invalidar,
   })

@@ -24,7 +24,7 @@ export function FalhaEnvioDialog({
     <Dialog open={aberto} onOpenChange={aoMudarAberto}>
       <DialogContent showCloseButton={false} className="max-w-sm">
         <DialogHeader className="items-center text-center sm:text-center">
-          <Icone nome="cloud_off" className="text-[28px] text-destructive" />
+          <Icone name="cloud_off" className="text-[28px] text-destructive" />
           <DialogTitle>Não foi possível enviar</DialogTitle>
           <DialogDescription className="text-left">
             Parece que você está sem conexão. Os dados continuam preenchidos — é só tentar de novo

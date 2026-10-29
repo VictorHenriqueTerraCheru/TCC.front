@@ -10,9 +10,9 @@ interface SeletorModoProps {
 export function SeletorModo({ modo, aoMudar }: SeletorModoProps) {
   return (
     <Segmentado
-      rotulo="O que mostrar no mapa"
+      label="O que mostrar no mapa"
       opcoes={modosMapa}
-      valor={modo}
+      value={modo}
       aoMudar={aoMudar}
       className="pointer-events-auto shadow-1 lg:max-w-[440px]"
     />

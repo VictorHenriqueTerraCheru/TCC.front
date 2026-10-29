@@ -8,9 +8,9 @@ beforeEach(() => {
 describe('rascunho do registro (regra 5)', () => {
   it('começa vazio, com horário "agora"', () => {
     expect(useRascunhoStore.getState()).toMatchObject({
-      categoriaId: null,
+      categoryId: null,
       local: null,
-      descricao: '',
+      description: '',
       horario: { modo: 'agora', outroEm: null },
     })
   })
@@ -21,13 +21,13 @@ describe('rascunho do registro (regra 5)', () => {
     escolherCategoria(3)
     definirLocal({ lat: -22.95, lng: -43.18 })
     definirDescricao('Buraco fundo na calçada')
-    definirHorario({ modo: 'outro', outroEm: '2026-10-20T10:00:00.000Z' })
+    definirHorario({ modo: 'other', outroEm: '2026-10-20T10:00:00.000Z' })
 
     expect(useRascunhoStore.getState()).toMatchObject({
-      categoriaId: 3,
+      categoryId: 3,
       local: { lat: -22.95, lng: -43.18 },
-      descricao: 'Buraco fundo na calçada',
-      horario: { modo: 'outro', outroEm: '2026-10-20T10:00:00.000Z' },
+      description: 'Buraco fundo na calçada',
+      horario: { modo: 'other', outroEm: '2026-10-20T10:00:00.000Z' },
     })
   })
 
@@ -60,9 +60,9 @@ describe('rascunho do registro (regra 5)', () => {
     limpar()
 
     expect(useRascunhoStore.getState()).toMatchObject({
-      categoriaId: null,
+      categoryId: null,
       local: null,
-      descricao: '',
+      description: '',
       horario: { modo: 'agora', outroEm: null },
     })
   })
@@ -71,6 +71,6 @@ describe('rascunho do registro (regra 5)', () => {
     useRascunhoStore.getState().definirDescricao('Poste apagado')
 
     const guardado = JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro') ?? '{}')
-    expect(guardado.state.descricao).toBe('Poste apagado')
+    expect(guardado.state.description).toBe('Poste apagado')
   })
 })

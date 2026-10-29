@@ -2,13 +2,13 @@ import type { MaterialSymbol } from 'material-symbols'
 
 import type { Schema } from '@/infrastructure/api'
 
-export type Me = Schema<'ObterMeResponse'>
-export type Perfil = Schema<'Perfil'>
+export type Me = Schema<'GetMeResponse'>
+export type Perfil = Schema<'Role'>
 
-export const aparenciaPerfil: Record<Perfil, { rotulo: string; icone: MaterialSymbol }> = {
-  cidadao: { rotulo: 'Cidadão', icone: 'person' },
-  cidadaoVerificado: { rotulo: 'Perfil verificado', icone: 'verified' },
-  administrador: { rotulo: 'Administrador', icone: 'admin_panel_settings' },
+export const aparenciaPerfil: Record<Perfil, { label: string; icon: MaterialSymbol }> = {
+  citizen: { label: 'Cidadão', icon: 'person' },
+  verifiedCitizen: { label: 'Perfil verificado', icon: 'verified' },
+  administrator: { label: 'Administrador', icon: 'admin_panel_settings' },
 }
 
 export function iniciais(nome: string): string {

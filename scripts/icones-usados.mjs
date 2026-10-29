@@ -1,6 +1,8 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
+const VALORES_DE_CONTRATO = new Set(['filter', 'groups', 'label', 'pending'])
+
 export async function iconesUsados(raiz = 'src') {
   const tipos = await readFile('node_modules/material-symbols/index.d.ts', 'utf8')
   const validos = new Set([...tipos.matchAll(/^\s*"([a-z0-9_]+)",?$/gm)].map((m) => m[1]))
@@ -9,9 +11,9 @@ export async function iconesUsados(raiz = 'src') {
   for (const arquivo of await arquivosFonte(raiz)) {
     const codigo = await readFile(arquivo, 'utf8')
     for (const [, nome] of codigo.matchAll(/['"`]([a-z0-9_]+)['"`]/g)) {
-      if (validos.has(nome)) usados.add(nome)
+      if (validos.has(nome) && !VALORES_DE_CONTRATO.has(nome)) usados.add(nome)
     }
-    for (const [, nome] of codigo.matchAll(/nome="([a-z0-9_]+)"/g)) {
+    for (const [, nome] of codigo.matchAll(/name="([a-z0-9_]+)"/g)) {
       if (validos.has(nome)) usados.add(nome)
     }
   }

@@ -1,6 +1,6 @@
 import { circuloGeoJson, distanciaMetros, linhaGeoJson } from './geo'
 
-describe('distanciaMetros', () => {
+describe('distanceMeters', () => {
   it('é zero no mesmo ponto', () => {
     expect(distanciaMetros({ lat: -22.95, lng: -43.18 }, { lat: -22.95, lng: -43.18 })).toBe(0)
   })

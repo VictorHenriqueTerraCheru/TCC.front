@@ -1,8 +1,8 @@
 import { isApiError, isErroDeRede } from '@/infrastructure/api'
 
 const mensagens: Record<string, string> = {
-  'autor-nao-vota': 'Você registrou este problema; quem registra não vota nele.',
-  'problema-resolvido': 'Este problema já foi resolvido.',
+  'author-cannot-vote': 'Você registrou este problema; quem registra não vota nele.',
+  'issue-resolved': 'Este problema já foi resolvido.',
 }
 
 export function mensagemErroVoto(erro: unknown): string {

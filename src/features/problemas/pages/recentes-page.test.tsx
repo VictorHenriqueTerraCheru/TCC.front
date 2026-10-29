@@ -32,7 +32,7 @@ describe('RecentesPage', () => {
 
   it('falha em GET /grupos mostra erro com "Tentar novamente" em vez de lista sem filtros', async () => {
     definirLargura(390)
-    server.use(http.get(rota('/grupos'), () => new HttpResponse(null, { status: 500 })))
+    server.use(http.get(rota('/groups'), () => new HttpResponse(null, { status: 500 })))
     renderizarRotas([{ path: '/recentes', element: <RecentesPage /> }], '/recentes')
 
     expect(await screen.findByText('Não foi possível carregar os filtros.')).toBeInTheDocument()

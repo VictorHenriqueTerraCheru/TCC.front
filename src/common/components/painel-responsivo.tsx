@@ -111,7 +111,7 @@ function BotaoFechar({ aoFechar, className }: { aoFechar(): void; className: str
       aria-label="Fechar"
       className={`flex size-9 pressionavel items-center justify-center rounded-full bg-foreground/6 text-muted-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:outline-2 ${className}`}
     >
-      <Icone nome="close" className="text-[20px]" />
+      <Icone name="close" className="text-[20px]" />
     </button>
   )
 }

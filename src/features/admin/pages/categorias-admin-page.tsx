@@ -8,9 +8,9 @@ import { ListaGrupos } from '../components/lista-grupos'
 
 type Secao = 'categorias' | 'grupos'
 
-const secoes: { valor: Secao; rotulo: string }[] = [
-  { valor: 'categorias', rotulo: 'Categorias' },
-  { valor: 'grupos', rotulo: 'Grupos' },
+const secoes: { value: Secao; label: string }[] = [
+  { value: 'categorias', label: 'Categorias' },
+  { value: 'grupos', label: 'Grupos' },
 ]
 
 export function CategoriasAdminPage() {
@@ -19,9 +19,9 @@ export function CategoriasAdminPage() {
   return (
     <GuardaAdmin titulo="Categorias" caminho="/admin/categorias">
       <Segmentado<Secao>
-        rotulo="Seção"
+        label="Seção"
         opcoes={secoes}
-        valor={secao}
+        value={secao}
         aoMudar={setSecao}
         className="mb-4"
       />

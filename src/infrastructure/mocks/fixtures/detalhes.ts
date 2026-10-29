@@ -2,7 +2,7 @@ import type { Schema } from '../../api'
 import { categorias } from './categorias'
 import { problemasNaArea } from './problemas'
 
-type Detalhe = Schema<'ObterDetalheProblemaResponse'>
+type Detalhe = Schema<'GetIssueDetailResponse'>
 
 const enderecos = [
   'Rua Voluntários da Pátria, 190 — Botafogo',
@@ -26,35 +26,35 @@ export const ID_DO_AUTOR = problemasNaArea[8]!.id
 export function criarDetalhes(): Map<string, Detalhe> {
   return new Map(
     problemasNaArea.map((p, i) => {
-      const { tipo, ...categoria } = categorias.find((c) => c.id === p.categoriaId)!
+      const { type: _tipo, ...categoria } = categorias.find((c) => c.id === p.categoryId)!
       const base = {
         id: p.id,
-        categoria,
-        descricao: null,
+        category: categoria,
+        description: null,
         lat: p.lat,
         lng: p.lng,
-        endereco: enderecos[i] ?? 'Rua Voluntários da Pátria, 170 — Botafogo',
+        address: enderecos[i] ?? 'Rua Voluntários da Pátria, 170 — Botafogo',
         status: p.status,
-        confianca: p.confianca,
-        faixa: p.faixa,
-        meuVoto: null,
-        souAutor: false,
+        trustScore: p.trustScore,
+        band: p.band,
+        myVote: null,
+        isAuthor: false,
       }
       const porStatus: Record<string, Partial<Detalhe>> = {
-        nova: {
-          criadoEm: horasAtras(0.7),
-          avaliacao: { votantes: 2, necessarios: 5, encerraEm: horasAtras(-70) },
-          votos: { sim: 2, nao: 0, naoUltimas24h: 0 },
+        new: {
+          createdAt: horasAtras(0.7),
+          evaluation: { voters: 2, required: 5, closesAt: horasAtras(-70) },
+          votes: { yes: 2, no: 0, noLast24h: 0 },
         },
-        possivelmenteResolvida: {
-          criadoEm: horasAtras(5 * 24 + 3),
-          avaliacao: null,
-          votos: { sim: 12, nao: 7, naoUltimas24h: 7 },
+        possiblyResolved: {
+          createdAt: horasAtras(5 * 24 + 3),
+          evaluation: null,
+          votes: { yes: 12, no: 7, noLast24h: 7 },
         },
-        ativa: {
-          criadoEm: horasAtras(2 * 24 + 4),
-          avaliacao: null,
-          votos: { sim: 15, nao: 1, naoUltimas24h: 1 },
+        active: {
+          createdAt: horasAtras(2 * 24 + 4),
+          evaluation: null,
+          votes: { yes: 15, no: 1, noLast24h: 1 },
         },
       }
       return [p.id, { ...base, ...porStatus[p.status] } as Detalhe]

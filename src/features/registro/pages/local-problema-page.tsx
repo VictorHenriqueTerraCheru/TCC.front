@@ -18,9 +18,9 @@ export function LocalProblemaPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const exigirConta = useExigirConta()
-  const { categoria, categoriaId, local } = useRascunho()
+  const { category: categoria, categoryId: categoriaId, local } = useRascunho()
   const [conferindo, setConferindo] = useState(false)
-  useExigirCategoria('problema')
+  useExigirCategoria('issue')
 
   async function confirmar() {
     if (categoriaId === null || !local) return
@@ -32,7 +32,7 @@ export function LocalProblemaPage() {
       if (isApiError(erro) && erro.status === 401) {
         exigirConta('registrar', () => {}, {
           retorno: '/registrar/local',
-          pendente: { tipo: 'continuarRegistro', passo: 'conferir' },
+          pending: { type: 'continuarRegistro', passo: 'conferir' },
         })
         return
       }
@@ -46,10 +46,10 @@ export function LocalProblemaPage() {
   return (
     <PassoRegistro
       titulo="Onde fica?"
-      passo={{ atual: 2, total: 4, rotulo: 'Local' }}
+      passo={{ atual: 2, total: 4, label: 'Local' }}
       acaoTopo="voltar"
-      aoTopo={() => navigate(caminhoDaCategoria('problema'))}
-      mapa={<MapaRegistro modo="pino" categoria={categoria} />}
+      aoTopo={() => navigate(caminhoDaCategoria('issue'))}
+      mapa={<MapaRegistro modo="pino" category={categoria} />}
       rodape={
         <Button className="w-full" disabled={!local || conferindo} onClick={() => void confirmar()}>
           {conferindo ? 'Conferindo…' : 'Confirmar local'}

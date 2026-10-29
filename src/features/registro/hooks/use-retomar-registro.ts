@@ -14,7 +14,7 @@ export function useRetomarRegistro(passo: Passo, acao: () => void) {
 
   useEffect(() => {
     if (!autenticado) return
-    const pendente = consumirAcao((a) => a.tipo === 'continuarRegistro' && a.passo === passo)
+    const pendente = consumirAcao((a) => a.type === 'continuarRegistro' && a.passo === passo)
     if (pendente) acaoRef.current()
   }, [autenticado, consumirAcao, passo])
 }

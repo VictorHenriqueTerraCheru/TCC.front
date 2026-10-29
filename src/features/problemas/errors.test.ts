@@ -4,10 +4,10 @@ import { mensagemErroVoto } from './errors'
 
 describe('mensagemErroVoto', () => {
   it('mapeia os códigos da API', () => {
-    expect(mensagemErroVoto(new ApiError(403, { type: 'autor-nao-vota' }))).toBe(
+    expect(mensagemErroVoto(new ApiError(403, { type: 'author-cannot-vote' }))).toBe(
       'Você registrou este problema; quem registra não vota nele.',
     )
-    expect(mensagemErroVoto(new ApiError(409, { type: 'problema-resolvido' }))).toBe(
+    expect(mensagemErroVoto(new ApiError(409, { type: 'issue-resolved' }))).toBe(
       'Este problema já foi resolvido.',
     )
   })
@@ -27,7 +27,7 @@ describe('mensagemErroVoto', () => {
   })
 
   it('o código vence o status; título e padrão ficam como último recurso', () => {
-    expect(mensagemErroVoto(new ApiError(404, { type: 'problema-resolvido' }))).toBe(
+    expect(mensagemErroVoto(new ApiError(404, { type: 'issue-resolved' }))).toBe(
       'Este problema já foi resolvido.',
     )
     expect(mensagemErroVoto(new ApiError(500, { title: 'Falha interna' }))).toBe('Falha interna')

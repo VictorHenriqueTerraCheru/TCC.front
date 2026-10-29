@@ -10,23 +10,30 @@ import type { Schema } from '@/infrastructure/api'
 
 import { useAnalisarVerificacao } from '../api/use-fila'
 
-type Solicitacao = Schema<'ListarVerificacoesItem'>
+type Solicitacao = Schema<'ListVerificationsItem'>
 
 export function CartaoSolicitacao({ solicitacao }: { solicitacao: Solicitacao }) {
   const analisar = useAnalisarVerificacao()
   const [recusando, setRecusando] = useState(false)
   const [motivo, setMotivo] = useState('')
-  const { usuario, tipoVinculo, justificativa, status, criadaEm, motivoRecusa } = solicitacao
+  const {
+    user: usuario,
+    affiliationType: tipoVinculo,
+    justification: justificativa,
+    status,
+    createdAt: criadaEm,
+    rejectionReason: motivoRecusa,
+  } = solicitacao
 
   return (
     <article
-      aria-label={`Pedido de ${usuario.nome}`}
+      aria-label={`Pedido de ${usuario.name}`}
       className="rounded-2xl border border-border/60 bg-card p-4 shadow-1"
     >
       <header className="mb-3 flex items-center gap-3">
-        <Avatar nome={usuario.nome} />
+        <Avatar name={usuario.name} />
         <div className="min-w-0">
-          <h2 className="font-medium">{usuario.nome}</h2>
+          <h2 className="font-medium">{usuario.name}</h2>
           <p className="text-xs text-muted-foreground">
             {format(new Date(criadaEm), 'd MMM., HH:mm', { locale: ptBR })} ·{' '}
             {rotuloVinculo[tipoVinculo]}
@@ -34,7 +41,7 @@ export function CartaoSolicitacao({ solicitacao }: { solicitacao: Solicitacao })
         </div>
       </header>
       <p className="text-sm">{justificativa}</p>
-      {status === 'recusada' && motivoRecusa && (
+      {status === 'rejected' && motivoRecusa && (
         <p className="mt-2 text-sm text-destructive">Motivo da recusa: {motivoRecusa}</p>
       )}
 
@@ -44,7 +51,7 @@ export function CartaoSolicitacao({ solicitacao }: { solicitacao: Solicitacao })
         </p>
       )}
 
-      {status === 'pendente' && !recusando && (
+      {status === 'pending' && !recusando && (
         <div className="mt-4 flex justify-end gap-2">
           <Button
             variant="outline"
@@ -62,10 +69,10 @@ export function CartaoSolicitacao({ solicitacao }: { solicitacao: Solicitacao })
         </div>
       )}
 
-      {status === 'pendente' && recusando && (
+      {status === 'pending' && recusando && (
         <div className="mt-4">
           <CampoAreaTexto
-            rotulo="Motivo da recusa *"
+            label="Motivo da recusa *"
             placeholder="Explique por que o pedido foi recusado"
             ajuda="Obrigatório. A pessoa verá este motivo."
             rows={3}
@@ -89,7 +96,7 @@ export function CartaoSolicitacao({ solicitacao }: { solicitacao: Solicitacao })
               variant="tonal"
               disabled={!motivo.trim() || analisar.isPending}
               onClick={() =>
-                analisar.mutate({ id: solicitacao.id, decisao: 'recusar', motivo: motivo.trim() })
+                analisar.mutate({ id: solicitacao.id, decisao: 'recusar', reason: motivo.trim() })
               }
             >
               Confirmar recusa

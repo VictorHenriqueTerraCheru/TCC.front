@@ -14,61 +14,61 @@ import { EtiquetaTipo } from './etiqueta-tipo'
 import { grupoSchema, type GrupoForm } from '../validators/grupo'
 
 interface FormularioGrupoProps {
-  grupo?: Grupo
+  group?: Grupo
   aoConcluir(): void
 }
 
-export function FormularioGrupo({ grupo, aoConcluir }: FormularioGrupoProps) {
+export function FormularioGrupo({ group: grupo, aoConcluir }: FormularioGrupoProps) {
   const criar = useCriarGrupo()
   const editar = useEditarGrupo()
   const mutacao = grupo ? editar : criar
   const { register, handleSubmit, control, setValue, formState } = useForm<GrupoForm>({
     resolver: zodResolver(grupoSchema),
     defaultValues: {
-      rotulo: grupo?.rotulo ?? '',
-      tipo: grupo?.tipo ?? 'problema',
-      cor: grupo?.cor ?? 'azul',
-      ordem: grupo?.ordem ?? 1,
+      label: grupo?.label ?? '',
+      type: grupo?.type ?? 'issue',
+      color: grupo?.color ?? 'blue',
+      sortOrder: grupo?.sortOrder ?? 1,
     },
   })
-  const [tipo, cor] = useWatch({ control, name: ['tipo', 'cor'] })
+  const [tipo, cor] = useWatch({ control, name: ['type', 'color'] })
 
   const enviar = handleSubmit((form) => {
     const opcoes = { onSuccess: aoConcluir }
     if (grupo) {
       editar.mutate(
-        { chave: grupo.chave, rotulo: form.rotulo, cor: form.cor, ordem: form.ordem },
+        { key: grupo.key, label: form.label, color: form.color, sortOrder: form.sortOrder },
         opcoes,
       )
     } else {
-      criar.mutate({ rotulo: form.rotulo, tipo: form.tipo, cor: form.cor }, opcoes)
+      criar.mutate({ label: form.label, type: form.type, color: form.color }, opcoes)
     }
   })
 
   return (
     <form onSubmit={enviar} noValidate className="mt-2 space-y-5">
       <CampoTexto
-        rotulo="Nome do grupo"
+        label="Nome do grupo"
         maxLength={40}
-        erro={formState.errors.rotulo?.message}
-        {...register('rotulo')}
+        erro={formState.errors.label?.message}
+        {...register('label')}
       />
 
       <div className="space-y-2">
         <p className="text-sm font-medium">Tipo</p>
         {grupo ? (
           <p className="text-sm text-muted-foreground">
-            <EtiquetaTipo tipo={grupo.tipo} className="mr-2" />O tipo não muda depois de criado.
+            <EtiquetaTipo type={grupo.type} className="mr-2" />O tipo não muda depois de criado.
           </p>
         ) : (
           <Segmentado
-            rotulo="Tipo"
+            label="Tipo"
             opcoes={opcoesDeTipo}
-            valor={tipo}
-            aoMudar={(valor) => setValue('tipo', valor)}
+            value={tipo}
+            aoMudar={(valor) => setValue('type', valor)}
           />
         )}
-        <p className="text-xs text-muted-foreground">{ajudaDoTipo[grupo?.tipo ?? tipo]}</p>
+        <p className="text-xs text-muted-foreground">{ajudaDoTipo[grupo?.type ?? tipo]}</p>
       </div>
 
       <div className="space-y-2">
@@ -82,7 +82,7 @@ export function FormularioGrupo({ grupo, aoConcluir }: FormularioGrupoProps) {
               aria-checked={c === cor}
               aria-label={nomeDaCor[c]}
               title={nomeDaCor[c]}
-              onClick={() => setValue('cor', c, { shouldValidate: true })}
+              onClick={() => setValue('color', c, { shouldValidate: true })}
               className={cn(
                 'size-10 rounded-full border-[3px] border-card ring-1 ring-border focus-visible:outline-2',
                 c === cor && 'ring-2 ring-foreground',
@@ -95,14 +95,14 @@ export function FormularioGrupo({ grupo, aoConcluir }: FormularioGrupoProps) {
 
       {grupo && (
         <CampoTexto
-          rotulo="Ordem de exibição"
+          label="Ordem de exibição"
           type="number"
           inputMode="numeric"
           min={1}
           max={100000}
-          erro={formState.errors.ordem?.message}
+          erro={formState.errors.sortOrder?.message}
           ajuda="Menor aparece primeiro nos filtros e na escolha de categoria."
-          {...register('ordem', { valueAsNumber: true })}
+          {...register('sortOrder', { valueAsNumber: true })}
         />
       )}
 

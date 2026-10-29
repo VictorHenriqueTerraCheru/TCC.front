@@ -8,7 +8,7 @@ interface FolhaResponsivaProps {
   aberto: boolean
   aoMudarAberto(aberto: boolean): void
   titulo: string
-  icone?: ReactNode
+  icon?: ReactNode
   children: ReactNode
 }
 
@@ -16,7 +16,7 @@ export function FolhaResponsiva({
   aberto,
   aoMudarAberto,
   titulo,
-  icone,
+  icon: icone,
   children,
 }: FolhaResponsivaProps) {
   const desktop = useDesktop()

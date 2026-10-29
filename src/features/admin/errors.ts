@@ -1,11 +1,11 @@
 import { isApiError, isErroDeRede } from '@/infrastructure/api'
 
 const mensagens: Record<string, string> = {
-  'nome-duplicado': 'Já existe uma categoria com este nome.',
-  'grupo-tipo-incompativel': 'O grupo escolhido é de outro tipo (Estado ou Evento).',
-  'grupo-rotulo-duplicado': 'Já existe um grupo com este nome.',
-  'proprio-perfil': 'Você não pode alterar o seu próprio perfil.',
-  'grupo-em-uso':
+  'duplicate-name': 'Já existe uma categoria com este nome.',
+  'group-type-mismatch': 'O grupo escolhido é de outro tipo (Estado ou Evento).',
+  'duplicate-group-label': 'Já existe um grupo com este nome.',
+  'own-role': 'Você não pode alterar o seu próprio perfil.',
+  'group-in-use':
     'Este grupo ainda tem categorias (inclusive desativadas). Mova todas para outro grupo antes de apagar.',
 }
 

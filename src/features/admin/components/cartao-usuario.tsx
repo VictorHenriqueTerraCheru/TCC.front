@@ -11,33 +11,33 @@ import { aparenciaPerfil, Avatar, type Perfil } from '@/features/usuarios'
 import { useAlterarPerfilUsuario, type UsuarioAdmin } from '../api/use-usuarios-admin'
 import { mensagemErroUsuarios } from '../errors'
 
-const ordemPerfis: Perfil[] = ['cidadao', 'cidadaoVerificado', 'administrador']
+const ordemPerfis: Perfil[] = ['citizen', 'verifiedCitizen', 'administrator']
 
 const descricaoPerfil: Record<Perfil, string> = {
-  cidadao: 'Registra e vota com o peso padrão.',
-  cidadaoVerificado: 'O voto passa a valer mais no cálculo de confiança.',
-  administrador: 'Acesso total ao painel: fila, categorias e usuários.',
+  citizen: 'Registra e vota com o peso padrão.',
+  verifiedCitizen: 'O voto passa a valer mais no cálculo de confiança.',
+  administrator: 'Acesso total ao painel: fila, categorias e usuários.',
 }
 
 interface CartaoUsuarioProps {
-  usuario: UsuarioAdmin
+  user: UsuarioAdmin
   ehVoce: boolean
 }
 
-export function CartaoUsuario({ usuario, ehVoce }: CartaoUsuarioProps) {
+export function CartaoUsuario({ user: usuario, ehVoce }: CartaoUsuarioProps) {
   const [aberta, setAberta] = useState(false)
-  const { rotulo, icone } = aparenciaPerfil[usuario.perfil]
+  const { label: rotulo, icon: icone } = aparenciaPerfil[usuario.role]
 
   return (
     <article
-      aria-label={`Usuário ${usuario.nome}`}
+      aria-label={`Usuário ${usuario.name}`}
       className="rounded-2xl border border-border/60 bg-card p-4 shadow-1"
     >
       <header className="flex items-center gap-3">
-        <Avatar nome={usuario.nome} verificado={usuario.perfil !== 'cidadao'} />
+        <Avatar name={usuario.name} verificado={usuario.role !== 'citizen'} />
         <div className="min-w-0 flex-1">
           <h2 className="truncate font-medium">
-            {usuario.nome}
+            {usuario.name}
             {ehVoce && (
               <span className="ml-2 rounded-full bg-primario-suave px-2 py-0.5 text-xs font-semibold text-primario">
                 Você
@@ -49,10 +49,10 @@ export function CartaoUsuario({ usuario, ehVoce }: CartaoUsuarioProps) {
       </header>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <p className="flex items-center gap-1.5 text-sm">
-          <Icone nome={icone} className="text-[18px] text-primario" />
+          <Icone name={icone} className="text-[18px] text-primario" />
           <span>{rotulo}</span>
           <span className="text-xs text-muted-foreground">
-            · desde {format(new Date(usuario.criadoEm), 'd MMM yyyy', { locale: ptBR })}
+            · desde {format(new Date(usuario.createdAt), 'd MMM yyyy', { locale: ptBR })}
           </span>
         </p>
         {!ehVoce && (
@@ -61,19 +61,19 @@ export function CartaoUsuario({ usuario, ehVoce }: CartaoUsuarioProps) {
           </Button>
         )}
       </div>
-      {aberta && <FolhaPerfil usuario={usuario} aoFechar={() => setAberta(false)} />}
+      {aberta && <FolhaPerfil user={usuario} aoFechar={() => setAberta(false)} />}
     </article>
   )
 }
 
-function FolhaPerfil({ usuario, aoFechar }: { usuario: UsuarioAdmin; aoFechar(): void }) {
+function FolhaPerfil({ user: usuario, aoFechar }: { user: UsuarioAdmin; aoFechar(): void }) {
   const alterar = useAlterarPerfilUsuario()
-  const [escolhido, setEscolhido] = useState<Perfil>(usuario.perfil)
-  const rebaixandoAdmin = usuario.perfil === 'administrador' && escolhido !== 'administrador'
+  const [escolhido, setEscolhido] = useState<Perfil>(usuario.role)
+  const rebaixandoAdmin = usuario.role === 'administrator' && escolhido !== 'administrator'
 
   function salvar() {
-    if (escolhido === usuario.perfil) return aoFechar()
-    alterar.mutate({ id: usuario.id, perfil: escolhido }, { onSuccess: aoFechar })
+    if (escolhido === usuario.role) return aoFechar()
+    alterar.mutate({ id: usuario.id, role: escolhido }, { onSuccess: aoFechar })
   }
 
   return (
@@ -82,7 +82,7 @@ function FolhaPerfil({ usuario, aoFechar }: { usuario: UsuarioAdmin; aoFechar():
       aoMudarAberto={(aberto) => !aberto && aoFechar()}
       titulo="Alterar perfil"
     >
-      <p className="mb-4 text-sm text-muted-foreground">{usuario.nome}</p>
+      <p className="mb-4 text-sm text-muted-foreground">{usuario.name}</p>
       <div role="radiogroup" aria-label="Perfil" className="space-y-2">
         {ordemPerfis.map((perfil) => {
           const selecionado = perfil === escolhido
@@ -98,9 +98,9 @@ function FolhaPerfil({ usuario, aoFechar }: { usuario: UsuarioAdmin; aoFechar():
                 selecionado ? 'border-primario bg-primario-suave' : 'border-border',
               )}
             >
-              <Icone nome={aparenciaPerfil[perfil].icone} className="text-primario" />
+              <Icone name={aparenciaPerfil[perfil].icon} className="text-primario" />
               <span className="flex-1">
-                <span className="block font-medium">{aparenciaPerfil[perfil].rotulo}</span>
+                <span className="block font-medium">{aparenciaPerfil[perfil].label}</span>
                 <span className="text-xs text-muted-foreground">{descricaoPerfil[perfil]}</span>
               </span>
             </button>

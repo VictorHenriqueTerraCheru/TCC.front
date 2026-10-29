@@ -17,9 +17,9 @@ import type { DetalheProblema } from '../../models/problema'
 export const ALTURA_RESUMO = 236
 
 interface Polegar {
-  rotulo: string
-  icone: MaterialSymbol
-  cor: string
+  label: string
+  icon: MaterialSymbol
+  color: string
   marcado: boolean
   votar(): void
 }
@@ -28,7 +28,7 @@ function BotaoPolegar({ polegar, desabilitado }: { polegar: Polegar; desabilitad
   return (
     <button
       type="button"
-      aria-label={`Voto rápido: ${polegar.rotulo}`}
+      aria-label={`Voto rápido: ${polegar.label}`}
       aria-pressed={polegar.marcado}
       disabled={desabilitado}
       onClick={polegar.votar}
@@ -36,7 +36,7 @@ function BotaoPolegar({ polegar, desabilitado }: { polegar: Polegar; desabilitad
         'flex size-11 pressionavel items-center justify-center rounded-full bg-foreground/8 hover:bg-foreground/12 focus-visible:outline-2 disabled:opacity-40',
         polegar.marcado && 'ring-2 ring-current',
       )}
-      style={{ color: polegar.cor }}
+      style={{ color: polegar.color }}
     >
       <m.span
         initial={false}
@@ -44,33 +44,33 @@ function BotaoPolegar({ polegar, desabilitado }: { polegar: Polegar; desabilitad
         transition={polegar.marcado ? { duration: 0.4, ease: 'easeOut' } : MOLA_RAPIDA}
         className="flex"
       >
-        <Icone nome={polegar.icone} preenchido={polegar.marcado} className="text-[21px]" />
+        <Icone name={polegar.icon} preenchido={polegar.marcado} className="text-[21px]" />
       </m.span>
     </button>
   )
 }
 
-export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
+export function ResumoAlerta({ issue: problema }: { issue: DetalheProblema }) {
   const { aparenciaDe } = useAparencia()
-  const aparencia = aparenciaDe(problema.categoria)
+  const aparencia = aparenciaDe(problema.category)
   const { recolhido, expandir, medirResumo } = usePainelResponsivo()
   const distancia = useDistanciaAte(problema)
-  const { erro, votar, meuVoto, votando, podeVotar } = useVotos(problema)
+  const { erro, votar, myVote: meuVoto, votando, podeVotar } = useVotos(problema)
 
   const polegares: [Polegar, Polegar] = [
     {
-      rotulo: 'Sim, está lá',
-      icone: 'thumb_up',
-      cor: 'var(--voto-sim)',
-      marcado: meuVoto === 'sim',
-      votar: () => votar('sim'),
+      label: 'Sim, está lá',
+      icon: 'thumb_up',
+      color: 'var(--voto-sim)',
+      marcado: meuVoto === 'yes',
+      votar: () => votar('yes'),
     },
     {
-      rotulo: 'Não está lá',
-      icone: 'thumb_down',
-      cor: 'var(--voto-nao)',
-      marcado: meuVoto === 'nao',
-      votar: () => votar('nao'),
+      label: 'Não está lá',
+      icon: 'thumb_down',
+      color: 'var(--voto-nao)',
+      marcado: meuVoto === 'no',
+      votar: () => votar('no'),
     },
   ]
 
@@ -89,23 +89,21 @@ export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
           className="flex size-12 shrink-0 items-center justify-center rounded-full text-white"
           style={{ background: aparencia.corForte }}
         >
-          <IconeDinamico nome={iconeDe(problema.categoria)} preenchido className="text-[26px]" />
+          <IconeDinamico name={iconeDe(problema.category)} preenchido className="text-[26px]" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className={cn('text-xs font-semibold', aparencia.forte)}>{aparencia.rotulo}</p>
-          <h2 className="truncate text-[20px] leading-7 font-semibold">
-            {problema.categoria.nome}
-          </h2>
+          <p className={cn('text-xs font-semibold', aparencia.forte)}>{aparencia.label}</p>
+          <h2 className="truncate text-[20px] leading-7 font-semibold">{problema.category.name}</h2>
         </div>
       </div>
       <div className="mt-3 space-y-1 text-[13px] text-muted-foreground">
         <p className="flex items-start gap-1.5">
-          <Icone nome="location_on" className="mt-px text-[16px]" />
-          <span className="line-clamp-2">{problema.endereco}</span>
+          <Icone name="location_on" className="mt-px text-[16px]" />
+          <span className="line-clamp-2">{problema.address}</span>
         </p>
         <p className="flex items-center gap-1.5">
-          <Icone nome="group" className="text-[16px]" />
-          {problema.votos.sim} confirmaram
+          <Icone name="group" className="text-[16px]" />
+          {problema.votes.yes} confirmaram
           {distancia !== null && ` · ${distanciaTexto(distancia)} de você`}
         </p>
       </div>
@@ -114,7 +112,7 @@ export function ResumoAlerta({ problema }: { problema: DetalheProblema }) {
         <div className="mt-3 flex items-center gap-3 rounded-2xl bg-foreground/5 py-2 pr-2 pl-4">
           <p className="min-w-0 flex-1 text-[15px] font-semibold">Ainda está lá?</p>
           {polegares.map((polegar) => (
-            <BotaoPolegar key={polegar.rotulo} polegar={polegar} desabilitado={votando} />
+            <BotaoPolegar key={polegar.label} polegar={polegar} desabilitado={votando} />
           ))}
         </div>
       )}

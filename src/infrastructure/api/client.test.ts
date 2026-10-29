@@ -41,7 +41,7 @@ describe('cliente da API', () => {
       }),
     )
 
-    await api.POST('/auth/login', { body: { email: 'a@b.c', senha: '12345678' } })
+    await api.POST('/auth/login', { body: { email: 'a@b.c', password: '12345678' } })
 
     expect(recebido).toBeNull()
     expect(aoExpirarSessao).not.toHaveBeenCalled()
@@ -73,10 +73,10 @@ describe('cliente da API', () => {
 
   it('converte ProblemDetails em ApiError com type e errors', async () => {
     server.use(
-      http.post(rota('/auth/cadastro'), () =>
+      http.post(rota('/auth/register'), () =>
         HttpResponse.json(
           {
-            type: 'email-ja-cadastrado',
+            type: 'email-already-registered',
             title: 'Já existe uma conta com este e-mail.',
             status: 409,
             errors: { email: ['E-mail em uso.'] },
@@ -87,8 +87,8 @@ describe('cliente da API', () => {
     )
 
     const erro = await api
-      .POST('/auth/cadastro', {
-        body: { nome: 'Ana', email: 'ana@x.com', senha: '12345678', aceitouTermos: true },
+      .POST('/auth/register', {
+        body: { name: 'Ana', email: 'ana@x.com', password: '12345678', acceptedTerms: true },
       })
       .then(dados)
       .catch((e: unknown) => e)
@@ -96,7 +96,7 @@ describe('cliente da API', () => {
     expect(erro).toBeInstanceOf(ApiError)
     expect(erro).toMatchObject({
       status: 409,
-      type: 'email-ja-cadastrado',
+      type: 'email-already-registered',
       title: 'Já existe uma conta com este e-mail.',
     })
     expect((erro as ApiError).erroDoCampo('email')).toBe('E-mail em uso.')

@@ -10,7 +10,7 @@ import { Icone } from './icone'
 const NO_PACOTE = new Set<string>(iconesDoPacote)
 
 interface IconeDinamicoProps {
-  nome: string
+  name: string
   alternativo?: MaterialSymbol
   preenchido?: boolean
   className?: string
@@ -18,7 +18,7 @@ interface IconeDinamicoProps {
 }
 
 export function IconeDinamico({
-  nome,
+  name: nome,
   alternativo = 'category',
   preenchido,
   className,
@@ -27,7 +27,7 @@ export function IconeDinamico({
   if (NO_PACOTE.has(nome)) {
     return (
       <Icone
-        nome={nome as MaterialSymbol}
+        name={nome as MaterialSymbol}
         preenchido={preenchido}
         className={className}
         style={style}
@@ -37,7 +37,7 @@ export function IconeDinamico({
   return (
     <IconeRemoto
       key={nome}
-      nome={nome}
+      name={nome}
       alternativo={alternativo}
       preenchido={preenchido}
       className={className}
@@ -47,13 +47,13 @@ export function IconeDinamico({
 }
 
 function IconeRemoto({
-  nome,
+  name: nome,
   alternativo,
   preenchido,
   className,
   style,
 }: {
-  nome: string
+  name: string
   alternativo: MaterialSymbol
   preenchido?: boolean
   className?: string
@@ -72,12 +72,12 @@ function IconeRemoto({
   }, [nome])
 
   if (!dados) {
-    return <Icone nome={alternativo} preenchido={preenchido} className={className} style={style} />
+    return <Icone name={alternativo} preenchido={preenchido} className={className} style={style} />
   }
   return (
     <svg
       aria-hidden="true"
-      viewBox={`0 0 ${dados.tamanho} ${dados.tamanho}`}
+      viewBox={`0 0 ${dados.pageSize} ${dados.pageSize}`}
       fill="currentColor"
       width="1em"
       height="1em"

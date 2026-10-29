@@ -56,7 +56,7 @@ describe('MapaPage', () => {
       liberar = resolver
     })
     server.use(
-      http.get(rota('/grupos'), async () => {
+      http.get(rota('/groups'), async () => {
         await espera
         return HttpResponse.json(banco.grupos())
       }),
@@ -74,7 +74,7 @@ describe('MapaPage', () => {
   })
 
   it('falha em GET /grupos mostra o erro do mapa em vez de sumir com as camadas', async () => {
-    server.use(http.get(rota('/grupos'), () => new HttpResponse(null, { status: 500 })))
+    server.use(http.get(rota('/groups'), () => new HttpResponse(null, { status: 500 })))
     renderizarMapa()
 
     expect(await screen.findByText('Não foi possível carregar o mapa.')).toBeInTheDocument()
@@ -82,7 +82,7 @@ describe('MapaPage', () => {
   })
 
   it('falha em GET /categorias mostra o erro do mapa com "Tentar novamente"', async () => {
-    server.use(http.get(rota('/categorias'), () => new HttpResponse(null, { status: 500 })))
+    server.use(http.get(rota('/categories'), () => new HttpResponse(null, { status: 500 })))
     renderizarMapa()
 
     expect(await screen.findByText('Não foi possível carregar o mapa.')).toBeInTheDocument()
@@ -90,7 +90,7 @@ describe('MapaPage', () => {
   })
 
   it('aviso de área vazia some ao mexer no mapa e não volta a cada área vazia', async () => {
-    server.use(http.get(rota('/problemas'), () => HttpResponse.json([])))
+    server.use(http.get(rota('/issues'), () => HttpResponse.json([])))
     renderizarMapa()
 
     expect(await screen.findByText('Nenhuma ocorrência nesta área')).toBeInTheDocument()
@@ -104,7 +104,7 @@ describe('MapaPage', () => {
     const usuario = userEvent.setup()
     let consultas = 0
     server.use(
-      http.get(rota('/problemas'), () => {
+      http.get(rota('/issues'), () => {
         consultas++
         return HttpResponse.json([])
       }),
@@ -125,7 +125,7 @@ describe('MapaPage', () => {
   })
 
   it('toque no mapa no modo Ambos sem incidentes mostra o aviso e não abre a área', async () => {
-    server.use(http.get(rota('/incidentes/area'), () => HttpResponse.json({ contagens: [] })))
+    server.use(http.get(rota('/incidents/area'), () => HttpResponse.json({ counts: [] })))
     const { router } = renderizarMapa('/mapa?modo=ambos')
     await screen.findByTestId('mapa')
 
@@ -140,7 +140,7 @@ describe('MapaPage', () => {
   it('retângulo enviado à API fica dentro de ±180 mesmo com o mapa afastado (regra 15)', async () => {
     const pedidos: URL[] = []
     server.use(
-      http.get(rota('/problemas'), ({ request }) => {
+      http.get(rota('/issues'), ({ request }) => {
         pedidos.push(new URL(request.url))
         return HttpResponse.json([])
       }),

@@ -3,11 +3,11 @@ import { z } from 'zod'
 import { tiposVinculo, type TipoVinculo } from '../models/verificacao'
 
 export const solicitarSchema = z.object({
-  tipoVinculo: z.enum(
+  affiliationType: z.enum(
     tiposVinculo as [TipoVinculo, ...TipoVinculo[]],
     'Escolha o tipo de vínculo.',
   ),
-  justificativa: z
+  justification: z
     .string()
     .trim()
     .min(30, 'Campo obrigatório — escreva pelo menos 30 caracteres.')

@@ -11,13 +11,13 @@ export function historicoQuery(filtro: FiltroHistorico) {
     queryKey: ['me', 'historico', filtro],
     queryFn: ({ pageParam, signal }) =>
       api
-        .GET('/me/historico', {
-          params: { query: { filtro, pagina: pageParam, tamanho: TAMANHO_PAGINA } },
+        .GET('/me/history', {
+          params: { query: { filter: filtro, page: pageParam, pageSize: TAMANHO_PAGINA } },
           signal,
         })
         .then(dados),
     initialPageParam: 1,
-    getNextPageParam: ({ pagina, tamanho, total }) =>
+    getNextPageParam: ({ page: pagina, pageSize: tamanho, total }) =>
       pagina * tamanho < total ? pagina + 1 : undefined,
   })
 }
@@ -31,8 +31,8 @@ export function useHistoricoResumo() {
     queryKey: ['me', 'historico', 'resumo'],
     queryFn: ({ signal }) =>
       api
-        .GET('/me/historico', { params: { query: { tamanho: 3 } }, signal })
+        .GET('/me/history', { params: { query: { pageSize: 3 } }, signal })
         .then(dados)
-        .then(({ itens }) => itens),
+        .then(({ items: itens }) => itens),
   })
 }

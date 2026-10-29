@@ -29,10 +29,10 @@ describe('horário do incidente (regra 16)', () => {
   it('no envio, um horário que saiu da janela volta para dentro dela', () => {
     const escolhidoHaMuito = new Date(agora.getTime() - minutos(24 * 60)).toISOString()
     const futuro = new Date(agora.getTime() + minutos(5)).toISOString()
-    expect(ocorridoEm({ modo: 'outro', outroEm: escolhidoHaMuito }, agora).getTime()).toBe(
+    expect(ocorridoEm({ modo: 'other', outroEm: escolhidoHaMuito }, agora).getTime()).toBe(
       agora.getTime() - JANELA_MAXIMA,
     )
-    expect(ocorridoEm({ modo: 'outro', outroEm: futuro }, agora).getTime()).toBe(
+    expect(ocorridoEm({ modo: 'other', outroEm: futuro }, agora).getTime()).toBe(
       agora.getTime() - minutos(1),
     )
   })

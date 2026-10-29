@@ -3,7 +3,7 @@ import type { TipoGrupo } from '@/features/categorias'
 
 import { classeDoTipo, rotuloDoTipo } from '../models/tipo'
 
-export function EtiquetaTipo({ tipo, className }: { tipo: TipoGrupo; className?: string }) {
+export function EtiquetaTipo({ type: tipo, className }: { type: TipoGrupo; className?: string }) {
   return (
     <span
       className={cn(

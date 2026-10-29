@@ -28,10 +28,10 @@ import { ResumoDosFiltros, SegmentadoTipo, type FiltroTipo } from './filtros-lis
 
 type Situacao = 'todas' | 'ativas' | 'inativas'
 
-const situacoes: { valor: Situacao; rotulo: string }[] = [
-  { valor: 'todas', rotulo: 'Todas' },
-  { valor: 'ativas', rotulo: 'Ativas' },
-  { valor: 'inativas', rotulo: 'Inativas' },
+const situacoes: { value: Situacao; label: string }[] = [
+  { value: 'todas', label: 'Todas' },
+  { value: 'ativas', label: 'Ativas' },
+  { value: 'inativas', label: 'Inativas' },
 ]
 
 export function ListaCategorias() {
@@ -39,7 +39,7 @@ export function ListaCategorias() {
   const gruposQuery = useGrupos()
   const { grupos, grupoDe } = useAparencia()
   const alterarAtiva = useAlterarAtivaCategoria()
-  const [formulario, setFormulario] = useState<'nova' | CategoriaAdmin | null>(null)
+  const [formulario, setFormulario] = useState<'new' | CategoriaAdmin | null>(null)
   const [busca, setBusca] = useState('')
   const [tipo, setTipo] = useState<FiltroTipo>('todos')
   const [situacao, setSituacao] = useState<Situacao>('todas')
@@ -70,26 +70,26 @@ export function ListaCategorias() {
     )
   }
 
-  const ordemDoGrupo = (chave: string) => grupos.find((g) => g.chave === chave)?.ordem ?? 0
+  const ordemDoGrupo = (chave: string) => grupos.find((g) => g.key === chave)?.sortOrder ?? 0
   const ordenadas = [...categorias.data].sort(
     (a, b) =>
-      (a.tipo === b.tipo ? 0 : a.tipo === 'problema' ? -1 : 1) ||
-      ordemDoGrupo(a.grupo) - ordemDoGrupo(b.grupo) ||
-      a.nome.localeCompare(b.nome),
+      (a.type === b.type ? 0 : a.type === 'issue' ? -1 : 1) ||
+      ordemDoGrupo(a.group) - ordemDoGrupo(b.group) ||
+      a.name.localeCompare(b.name),
   )
 
   const termo = semAcento(busca.trim())
   const visiveis = ordenadas.filter(
     (c) =>
-      (tipo === 'todos' || c.tipo === tipo) &&
-      (situacao === 'todas' || c.ativa === (situacao === 'ativas')) &&
-      (grupo === null || c.grupo === grupo) &&
+      (tipo === 'todos' || c.type === tipo) &&
+      (situacao === 'todas' || c.active === (situacao === 'ativas')) &&
+      (grupo === null || c.group === grupo) &&
       (termo === '' ||
-        semAcento(c.nome).includes(termo) ||
-        semAcento(grupoDe(c)?.rotulo ?? c.grupo).includes(termo)),
+        semAcento(c.name).includes(termo) ||
+        semAcento(grupoDe(c)?.label ?? c.group).includes(termo)),
   )
   const filtrando = termo !== '' || tipo !== 'todos' || situacao !== 'todas' || grupo !== null
-  const gruposDoFiltro = grupos.filter((g) => tipo === 'todos' || g.tipo === tipo)
+  const gruposDoFiltro = grupos.filter((g) => tipo === 'todos' || g.type === tipo)
 
   function limpar() {
     setBusca('')
@@ -100,11 +100,7 @@ export function ListaCategorias() {
 
   function mudarTipo(novo: FiltroTipo) {
     setTipo(novo)
-    if (
-      grupo !== null &&
-      novo !== 'todos' &&
-      grupos.find((g) => g.chave === grupo)?.tipo !== novo
-    ) {
+    if (grupo !== null && novo !== 'todos' && grupos.find((g) => g.key === grupo)?.type !== novo) {
       setGrupo(null)
     }
   }
@@ -115,24 +111,24 @@ export function ListaCategorias() {
         <p className="text-sm text-muted-foreground">
           Desativar esconde a categoria sem apagar o histórico.
         </p>
-        <Button size="sm" onClick={() => setFormulario('nova')}>
+        <Button size="sm" onClick={() => setFormulario('new')}>
           Nova categoria
         </Button>
       </div>
 
       <div className="mb-3 space-y-3">
         <CampoBusca
-          valor={busca}
+          value={busca}
           aoMudar={setBusca}
-          rotulo="Buscar categoria"
+          label="Buscar categoria"
           placeholder="Buscar por nome ou grupo"
         />
         <div className="grid gap-3 sm:grid-cols-2">
-          <SegmentadoTipo valor={tipo} aoMudar={mudarTipo} />
+          <SegmentadoTipo value={tipo} aoMudar={mudarTipo} />
           <Segmentado<Situacao>
-            rotulo="Situação"
+            label="Situação"
             opcoes={situacoes}
-            valor={situacao}
+            value={situacao}
             aoMudar={setSituacao}
           />
         </div>
@@ -146,12 +142,12 @@ export function ListaCategorias() {
           </ChipFiltro>
           {gruposDoFiltro.map((g) => (
             <ChipFiltro
-              key={g.chave}
-              selecionado={grupo === g.chave}
-              aoClicar={() => setGrupo(grupo === g.chave ? null : g.chave)}
+              key={g.key}
+              selecionado={grupo === g.key}
+              aoClicar={() => setGrupo(grupo === g.key ? null : g.key)}
             >
-              <PontoGrupo cor={aparenciaDaCor[g.cor]} />
-              {g.rotulo}
+              <PontoGrupo color={aparenciaDaCor[g.color]} />
+              {g.label}
             </ChipFiltro>
           ))}
         </div>
@@ -179,21 +175,21 @@ export function ListaCategorias() {
           {visiveis.map((categoria) => (
             <li
               key={categoria.id}
-              className={cn('flex items-center gap-3 p-3', !categoria.ativa && 'opacity-60')}
+              className={cn('flex items-center gap-3 p-3', !categoria.active && 'opacity-60')}
             >
-              <CategoriaIcone categoria={categoria} />
+              <CategoriaIcone category={categoria} />
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{categoria.nome}</p>
+                <p className="truncate font-medium">{categoria.name}</p>
                 <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-                  <EtiquetaTipo tipo={categoria.tipo} />
-                  <span className="truncate">{grupoDe(categoria)?.rotulo ?? categoria.grupo}</span>
-                  {!categoria.ativa && <span className="font-medium">Inativa</span>}
+                  <EtiquetaTipo type={categoria.type} />
+                  <span className="truncate">{grupoDe(categoria)?.label ?? categoria.group}</span>
+                  {!categoria.active && <span className="font-medium">Inativa</span>}
                 </p>
               </div>
               <Button
                 variant="outline"
                 size="sm"
-                aria-label={`Editar ${categoria.nome}`}
+                aria-label={`Editar ${categoria.name}`}
                 onClick={() => setFormulario(categoria)}
               >
                 Editar
@@ -201,11 +197,11 @@ export function ListaCategorias() {
               <Button
                 variant="outline"
                 size="sm"
-                aria-label={`${categoria.ativa ? 'Desativar' : 'Ativar'} ${categoria.nome}`}
+                aria-label={`${categoria.active ? 'Desativar' : 'Ativar'} ${categoria.name}`}
                 disabled={alterarAtiva.isPending}
-                onClick={() => alterarAtiva.mutate({ id: categoria.id, ativa: !categoria.ativa })}
+                onClick={() => alterarAtiva.mutate({ id: categoria.id, active: !categoria.active })}
               >
-                {categoria.ativa ? 'Desativar' : 'Ativar'}
+                {categoria.active ? 'Desativar' : 'Ativar'}
               </Button>
             </li>
           ))}
@@ -215,12 +211,12 @@ export function ListaCategorias() {
       <FolhaResponsiva
         aberto={formulario !== null}
         aoMudarAberto={(aberto) => !aberto && setFormulario(null)}
-        titulo={formulario === 'nova' ? 'Nova categoria' : 'Editar categoria'}
+        titulo={formulario === 'new' ? 'Nova categoria' : 'Editar categoria'}
       >
         {formulario !== null && (
           <FormularioCategoria
-            key={formulario === 'nova' ? 'nova' : formulario.id}
-            categoria={formulario === 'nova' ? undefined : formulario}
+            key={formulario === 'new' ? 'new' : formulario.id}
+            category={formulario === 'new' ? undefined : formulario}
             grupos={grupos}
             aoConcluir={() => setFormulario(null)}
           />

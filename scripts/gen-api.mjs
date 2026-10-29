@@ -3,7 +3,7 @@ import openapiTS, { astToString } from 'openapi-typescript'
 
 const PREFIXO = '/api/v1'
 const DESTINO = 'src/infrastructure/api/schema.d.ts'
-const DATAS_ANULAVEIS = new Set(['ObterMeResponse.verificadoEm', 'ListarUsuariosItem.verificadoEm'])
+const DATAS_ANULAVEIS = new Set(['GetMeResponse.verifiedAt', 'ListUsersItem.verifiedAt'])
 
 const origem = process.argv[2] ?? 'docs/openapi.json'
 const texto = /^https?:\/\//.test(origem)
@@ -26,6 +26,6 @@ for (const [nomeSchema, schema] of Object.entries(doc.components?.schemas ?? {})
 }
 
 const ast = await openapiTS(doc)
-const cabecalho = `// Gerado por scripts/gen-api.mjs a partir de ${origem}. Não edite à mão: rode npm run gen:api.\n\n`
+const cabecalho = ''
 await writeFile(DESTINO, cabecalho + astToString(ast))
 console.log(`schema gerado em ${DESTINO}`)

@@ -16,13 +16,13 @@ export function filaQuery(status: StatusVerificacao) {
     queryKey: ['admin', 'verificacoes', status],
     queryFn: ({ pageParam, signal }) =>
       api
-        .GET('/admin/verificacoes', {
-          params: { query: { status, pagina: pageParam, tamanho: TAMANHO_PAGINA } },
+        .GET('/admin/verifications', {
+          params: { query: { status, page: pageParam, pageSize: TAMANHO_PAGINA } },
           signal,
         })
         .then(dados),
     initialPageParam: 1,
-    getNextPageParam: ({ pagina, tamanho, total }) =>
+    getNextPageParam: ({ page: pagina, pageSize: tamanho, total }) =>
       pagina * tamanho < total ? pagina + 1 : undefined,
   })
 }
@@ -32,7 +32,7 @@ export function useFila(status: StatusVerificacao) {
 }
 
 type Analise =
-  { id: string; decisao: 'aprovar' } | { id: string; decisao: 'recusar'; motivo: string }
+  { id: string; decisao: 'aprovar' } | { id: string; decisao: 'recusar'; reason: string }
 
 export function useAnalisarVerificacao() {
   const queryClient = useQueryClient()
@@ -40,12 +40,12 @@ export function useAnalisarVerificacao() {
     mutationFn: (analise: Analise) =>
       analise.decisao === 'aprovar'
         ? api
-            .POST('/admin/verificacoes/{id}/aprovar', { params: { path: { id: analise.id } } })
+            .POST('/admin/verifications/{id}/approve', { params: { path: { id: analise.id } } })
             .then(semConteudo)
         : api
-            .POST('/admin/verificacoes/{id}/recusar', {
+            .POST('/admin/verifications/{id}/reject', {
               params: { path: { id: analise.id } },
-              body: { motivo: analise.motivo },
+              body: { reason: analise.reason },
             })
             .then(semConteudo),
     onSettled: () => {

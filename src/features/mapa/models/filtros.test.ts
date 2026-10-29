@@ -3,7 +3,7 @@ import { grupos } from '@/infrastructure/mocks/fixtures/grupos'
 import { filtrosDasCamadas, gruposDoModo } from './filtros'
 
 const chaves = (modo: Parameters<typeof gruposDoModo>[1]) =>
-  gruposDoModo(grupos, modo).map((g) => g.chave)
+  gruposDoModo(grupos, modo).map((g) => g.key)
 
 describe('filtros do mapa', () => {
   it('cada modo oferece os chips do seu tipo', () => {
@@ -16,14 +16,14 @@ describe('filtros do mapa', () => {
     const comNovo = [
       ...grupos,
       {
-        chave: 'clima',
-        rotulo: 'Clima',
-        tipo: 'incidente' as const,
-        cor: 'azul' as const,
-        ordem: 6,
+        key: 'clima',
+        label: 'Clima',
+        type: 'incident' as const,
+        color: 'blue' as const,
+        sortOrder: 6,
       },
     ]
-    expect(gruposDoModo(comNovo, 'incidentes').map((g) => g.chave)).toEqual([
+    expect(gruposDoModo(comNovo, 'incidentes').map((g) => g.key)).toEqual([
       'seguranca',
       'transito',
       'clima',
@@ -33,7 +33,7 @@ describe('filtros do mapa', () => {
   it('Ambos respeita a ordem configurada, misturando os tipos', () => {
     const naOrdem = [grupos[3]!, grupos[0]!, grupos[4]!, grupos[1]!, grupos[2]!]
 
-    expect(gruposDoModo(naOrdem, 'ambos').map((g) => g.chave)).toEqual(naOrdem.map((g) => g.chave))
+    expect(gruposDoModo(naOrdem, 'ambos').map((g) => g.key)).toEqual(naOrdem.map((g) => g.key))
   })
 
   it('Problemas liga só os marcadores; Incidentes só o calor', () => {
@@ -49,7 +49,7 @@ describe('filtros do mapa', () => {
     expect(
       filtrosDasCamadas({ modo: 'problemas', grupos: ['eletrica'], somenteNovas: true }, grupos)
         .problemas,
-    ).toEqual({ grupos: ['eletrica'], status: ['nova'] })
+    ).toEqual({ grupos: ['eletrica'], status: ['new'] })
   })
 
   it('em Ambos, marcar só um grupo de incidente desliga os marcadores', () => {

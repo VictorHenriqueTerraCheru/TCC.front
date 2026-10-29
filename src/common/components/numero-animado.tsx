@@ -4,12 +4,12 @@ import { useEffect } from 'react'
 import { MOLA_RAPIDA } from '@/common/lib/movimento'
 
 interface NumeroAnimadoProps {
-  valor: number
+  value: number
   formatar?(n: number): string
   className?: string
 }
 
-export function NumeroAnimado({ valor, formatar = String, className }: NumeroAnimadoProps) {
+export function NumeroAnimado({ value: valor, formatar = String, className }: NumeroAnimadoProps) {
   const atual = useMotionValue(valor)
   const texto = useTransform(atual, (n) => formatar(Math.round(n)))
   const reduzir = useReducedMotion()
@@ -28,7 +28,7 @@ export function NumeroAnimado({ valor, formatar = String, className }: NumeroAni
   )
 }
 
-export function NumeroComPulso({ valor, className }: { valor: number; className?: string }) {
+export function NumeroComPulso({ value: valor, className }: { value: number; className?: string }) {
   return (
     <m.span
       key={valor}

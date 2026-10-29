@@ -9,7 +9,7 @@ const NOME_VALIDO = /^[a-z0-9_-]+$/
 
 export interface IconeRemotoDados {
   caminhos: string[]
-  tamanho: number
+  pageSize: number
 }
 
 export function nomeNoIconify(nome: string) {
@@ -36,7 +36,7 @@ export function caminhosDoCorpo(corpo: string): string[] | null {
 
 function dadosValidos(valor: unknown): valor is IconeRemotoDados {
   if (typeof valor !== 'object' || valor === null) return false
-  const { caminhos, tamanho } = valor as Partial<IconeRemotoDados>
+  const { caminhos, pageSize: tamanho } = valor as Partial<IconeRemotoDados>
   return (
     Array.isArray(caminhos) &&
     caminhos.length > 0 &&
@@ -88,7 +88,7 @@ async function buscarJson(url: string, sinal?: AbortSignal): Promise<unknown> {
 }
 
 const emMemoria = new Map<string, Promise<IconeRemotoDados | null>>()
-let fila: { nome: string; resolver(dados: IconeRemotoDados | null): void }[] = []
+let fila: { name: string; resolver(dados: IconeRemotoDados | null): void }[] = []
 
 async function buscarLote(nomes: string[]): Promise<Map<string, IconeRemotoDados>> {
   const consulta = nomes.map(nomeNoIconify).join(',')
@@ -103,7 +103,7 @@ async function buscarLote(nomes: string[]): Promise<Map<string, IconeRemotoDados
     const chave = nomeNoIconify(nome)
     const icone = json.icons && Object.hasOwn(json.icons, chave) ? json.icons[chave] : undefined
     const caminhos = icone?.body ? caminhosDoCorpo(icone.body) : null
-    const dados = { caminhos: caminhos ?? [], tamanho: icone?.width ?? json.width ?? 24 }
+    const dados = { caminhos: caminhos ?? [], pageSize: icone?.width ?? json.width ?? 24 }
     if (dadosValidos(dados)) resultado.set(nome, dados)
   }
   return resultado
@@ -113,11 +113,11 @@ function descarregarFila() {
   const lote = fila
   fila = []
   if (lote.length === 0) return
-  const nomes = lote.map((item) => item.nome)
+  const nomes = lote.map((item) => item.name)
   buscarLote(nomes)
     .then((resultado) => {
       gravarCache(Object.fromEntries(resultado))
-      for (const { nome, resolver } of lote) resolver(resultado.get(nome) ?? null)
+      for (const { name: nome, resolver } of lote) resolver(resultado.get(nome) ?? null)
     })
     .catch(() => {
       for (const { resolver } of lote) resolver(null)
@@ -134,7 +134,7 @@ export function carregarIcone(nome: string): Promise<IconeRemotoDados | null> {
   const promessa = salvo
     ? Promise.resolve(salvo)
     : new Promise<IconeRemotoDados | null>((resolver) => {
-        fila.push({ nome, resolver })
+        fila.push({ name: nome, resolver })
         if (fila.length === 1) queueMicrotask(descarregarFila)
       })
   emMemoria.set(nome, promessa)

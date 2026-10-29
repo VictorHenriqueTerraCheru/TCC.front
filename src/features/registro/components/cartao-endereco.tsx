@@ -16,14 +16,14 @@ function usePrecisao(): number | null {
 export function CartaoEndereco() {
   const { data, atualizando } = useEnderecoDoRascunho()
   const precisao = usePrecisao()
-  const detalhes = [data?.cidade, precisao !== null && `precisão de ±${Math.round(precisao)} m`]
+  const detalhes = [data?.city, precisao !== null && `precisão de ±${Math.round(precisao)} m`]
     .filter(Boolean)
     .join(' · ')
 
   return (
     <div className="flex gap-3" aria-live="polite">
       <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-        <Icone nome="location_on" preenchido className="text-[22px]" />
+        <Icone name="location_on" preenchido className="text-[22px]" />
       </span>
 
       <div className="min-h-[84px] min-w-0 flex-1">
@@ -35,8 +35,8 @@ export function CartaoEndereco() {
           </div>
         ) : (
           <>
-            <p className="text-lg leading-6 font-medium">{data.endereco}</p>
-            {!data.disponivel && (
+            <p className="text-lg leading-6 font-medium">{data.address}</p>
+            {!data.available && (
               <p className="text-xs text-muted-foreground">
                 Endereço indisponível agora; o registro segue com o ponto do mapa.
               </p>

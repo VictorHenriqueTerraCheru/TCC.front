@@ -67,8 +67,8 @@ export function TelaSucesso({ titulo, texto, cartao, verNoMapa }: TelaSucessoPro
 export function SucessoProblemaPage() {
   const { state } = useLocation()
   const { aparenciaDe } = useAparencia()
-  const { problema, confirmacao } = (state ?? {}) as {
-    problema?: DetalheProblemaDados
+  const { issue: problema, confirmacao } = (state ?? {}) as {
+    issue?: DetalheProblemaDados
     confirmacao?: boolean
   }
 
@@ -76,15 +76,15 @@ export function SucessoProblemaPage() {
     <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-1">
       <span className="shrink-0 pr-6">
         <MarcadorProblema
-          cor={aparenciaDe(problema.categoria).corForte}
-          icone={iconeDe(problema.categoria)}
+          color={aparenciaDe(problema.category).corForte}
+          icon={iconeDe(problema.category)}
           status={problema.status}
-          faixa={problema.faixa}
+          band={problema.band}
         />
       </span>
       <div className="min-w-0">
-        <p className="font-medium">{problema.categoria.nome}</p>
-        <p className="text-xs text-muted-foreground">{problema.endereco}</p>
+        <p className="font-medium">{problema.category.name}</p>
+        <p className="text-xs text-muted-foreground">{problema.address}</p>
       </div>
     </div>
   )

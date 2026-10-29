@@ -8,8 +8,8 @@ import type { TipoVinculo } from '../models/verificacao'
 export function useSolicitarVerificacao() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (corpo: { tipoVinculo: TipoVinculo; justificativa: string }) =>
-      api.POST('/verificacoes', { body: corpo }).then(dados),
+    mutationFn: (corpo: { affiliationType: TipoVinculo; justification: string }) =>
+      api.POST('/verifications', { body: corpo }).then(dados),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: meQuery.queryKey }),
   })
 }

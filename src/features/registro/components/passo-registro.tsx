@@ -7,7 +7,7 @@ import { MapaRegistro } from './mapa-registro'
 
 interface PassoRegistroProps {
   titulo: string
-  passo: { atual: number; total: number; rotulo: string }
+  passo: { atual: number; total: number; label: string }
   acaoTopo: 'fechar' | 'voltar'
   aoTopo(): void
   mapa?: ReactNode
@@ -30,7 +30,7 @@ function Cabecalho({
           aria-label={acaoTopo === 'fechar' ? 'Fechar registro' : 'Voltar'}
           className="flex size-12 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
-          <Icone nome={acaoTopo === 'fechar' ? 'close' : 'arrow_back'} />
+          <Icone name={acaoTopo === 'fechar' ? 'close' : 'arrow_back'} />
         </button>
         <h1 className="text-[22px] leading-7">{titulo}</h1>
       </header>
@@ -49,7 +49,7 @@ function Cabecalho({
           />
         </div>
         <p className="mt-2 text-xs font-medium text-muted-foreground">
-          Passo {passo.atual} de {passo.total} · {passo.rotulo}
+          Passo {passo.atual} de {passo.total} · {passo.label}
         </p>
       </div>
     </div>

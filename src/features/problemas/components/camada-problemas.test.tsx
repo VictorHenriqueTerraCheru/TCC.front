@@ -38,8 +38,8 @@ describe('CamadaProblemas', () => {
   })
 
   it('marcador selecionado fica por cima; alta acima de baixa', () => {
-    const alta = problemasNaArea.find((p) => p.faixa === 'alta' && p.status !== 'nova')!
-    const baixa = problemasNaArea.find((p) => p.faixa === 'baixa' && p.status !== 'nova')!
+    const alta = problemasNaArea.find((p) => p.band === 'high' && p.status !== 'new')!
+    const baixa = problemasNaArea.find((p) => p.band === 'low' && p.status !== 'new')!
     montar(baixa.id)
 
     const zDe = (id: string) =>

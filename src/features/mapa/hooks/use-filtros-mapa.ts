@@ -13,7 +13,7 @@ export function useFiltrosMapa() {
   const { grupos: todos, carregado } = useAparencia()
 
   const modo = lerModo(params.get('modo'))
-  const disponiveis = gruposDoModo(todos, modo).map((g) => g.chave)
+  const disponiveis = gruposDoModo(todos, modo).map((g) => g.key)
   const filtros: FiltrosMapa = {
     modo,
     grupos: (params.get('grupos') ?? '')
@@ -41,7 +41,7 @@ export function useFiltrosMapa() {
   return {
     ...filtros,
     alterarModo(modo: ModoMapa) {
-      const disponiveis = gruposDoModo(todos, modo).map((g) => g.chave)
+      const disponiveis = gruposDoModo(todos, modo).map((g) => g.key)
       gravar({
         modo,
         grupos: carregado ? filtros.grupos.filter((g) => disponiveis.includes(g)) : filtros.grupos,

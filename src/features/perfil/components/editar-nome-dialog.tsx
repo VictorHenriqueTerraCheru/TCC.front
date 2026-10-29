@@ -26,7 +26,7 @@ function FormularioNome({ nomeAtual, aoFechar }: { nomeAtual: string; aoFechar()
   const [nome, setNome] = useState(nomeAtual)
   const atualizar = useAtualizarNome()
   const invalido = nome.trim().length === 0 || nome.trim().length > 120
-  const erroApi = isApiError(atualizar.error) ? atualizar.error.erroDoCampo('nome') : undefined
+  const erroApi = isApiError(atualizar.error) ? atualizar.error.erroDoCampo('name') : undefined
 
   return (
     <form
@@ -40,7 +40,7 @@ function FormularioNome({ nomeAtual, aoFechar }: { nomeAtual: string; aoFechar()
         <DialogTitle>Editar nome</DialogTitle>
       </DialogHeader>
       <CampoTexto
-        rotulo="Nome"
+        label="Nome"
         value={nome}
         maxLength={120}
         autoComplete="name"

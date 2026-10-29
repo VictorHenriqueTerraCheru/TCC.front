@@ -53,7 +53,7 @@ describe('administração de categorias e grupos', () => {
   })
 
   it('falha em GET /grupos mostra erro com "Tentar novamente" em vez de chaves cruas', async () => {
-    server.use(http.get(rota('/grupos'), () => new HttpResponse(null, { status: 500 })))
+    server.use(http.get(rota('/groups'), () => new HttpResponse(null, { status: 500 })))
     abrir()
 
     expect(await screen.findByText('Não foi possível carregar os grupos.')).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('administração de categorias e grupos', () => {
   })
 
   it('na aba Grupos, falha em GET /admin/categorias mostra erro em vez de travar o apagar', async () => {
-    server.use(http.get(rota('/admin/categorias'), () => new HttpResponse(null, { status: 500 })))
+    server.use(http.get(rota('/admin/categories'), () => new HttpResponse(null, { status: 500 })))
     const usuario = userEvent.setup()
     abrir()
 
@@ -194,9 +194,9 @@ describe('administração de categorias e grupos', () => {
 
   it('grupo em uso (outra pessoa criou categoria) mostra o motivo ao apagar', async () => {
     server.use(
-      http.delete(rota('/admin/grupos/:chave'), () =>
+      http.delete(rota('/admin/groups/:key'), () =>
         HttpResponse.json(
-          { type: 'grupo-em-uso', title: 'x', status: 409 },
+          { type: 'group-in-use', title: 'x', status: 409 },
           { status: 409, headers: { 'Content-Type': 'application/problem+json' } },
         ),
       ),
@@ -215,7 +215,7 @@ describe('administração de categorias e grupos', () => {
   })
 
   it('falha ao carregar mostra tentar de novo', async () => {
-    server.use(http.get(rota('/admin/categorias'), () => new HttpResponse(null, { status: 500 })))
+    server.use(http.get(rota('/admin/categories'), () => new HttpResponse(null, { status: 500 })))
     abrir()
 
     expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()

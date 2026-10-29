@@ -11,8 +11,8 @@ import { useRascunhoStore } from '../stores/rascunho-store'
 export function useRascunho() {
   const rascunho = useRascunhoStore()
   const { data: categorias } = useCategorias()
-  const categoria = categorias?.find((c) => c.id === rascunho.categoriaId) ?? null
-  return { ...rascunho, categoria }
+  const categoria = categorias?.find((c) => c.id === rascunho.categoryId) ?? null
+  return { ...rascunho, category: categoria }
 }
 
 export function useEnderecoDoRascunho() {
@@ -24,10 +24,10 @@ export function useEnderecoDoRascunho() {
 }
 
 export function useExigirCategoria(tipo: TipoGrupo) {
-  const { categoria, categoriaId } = useRascunho()
+  const { category: categoria, categoryId: categoriaId } = useRascunho()
   const { isSuccess } = useCategorias()
   useExigirPasso(
-    categoriaId !== null && (!isSuccess || categoria?.tipo === tipo),
+    categoriaId !== null && (!isSuccess || categoria?.type === tipo),
     caminhoDaCategoria(tipo),
   )
 }

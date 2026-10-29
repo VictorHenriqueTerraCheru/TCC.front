@@ -11,28 +11,39 @@ import {
 
 describe('modelo de categoria', () => {
   it('cor e rótulo vêm do grupo cadastrado', () => {
-    expect(aparenciaDe(grupos, { grupo: 'eletrica' })).toEqual({
-      rotulo: 'Elétrica',
-      ...aparenciaDaCor.ocre,
+    expect(aparenciaDe(grupos, { group: 'eletrica' })).toEqual({
+      label: 'Elétrica',
+      ...aparenciaDaCor.ochre,
     })
   })
 
   it('grupo ainda não carregado ou removido: cinza neutro, com a chave no rótulo', () => {
-    expect(aparenciaDe([], { grupo: 'clima' })).toEqual({
-      rotulo: 'clima',
-      ...aparenciaDaCor.cinza,
+    expect(aparenciaDe([], { group: 'clima' })).toEqual({
+      label: 'clima',
+      ...aparenciaDaCor.gray,
     })
-    expect(grupoDe(grupos, { grupo: 'clima' })).toBeUndefined()
+    expect(grupoDe(grupos, { group: 'clima' })).toBeUndefined()
   })
 
   it('filtra grupos por tipo', () => {
-    expect(gruposDoTipo(grupos, 'incidente').map((g) => g.chave)).toEqual(['seguranca', 'transito'])
+    expect(gruposDoTipo(grupos, 'incident').map((g) => g.key)).toEqual(['seguranca', 'transito'])
   })
 
   it('todo slot da API tem classes Tailwind literais e o token CSS do mesmo nome', () => {
     for (const cor of coresGrupo) {
       const { forte, claro, corForte } = aparenciaDaCor[cor]
-      const token = cor.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)
+      const token = {
+        orange: 'laranja',
+        ochre: 'ocre',
+        brown: 'marrom',
+        red: 'vermelho',
+        terracotta: 'terracota',
+        blue: 'azul',
+        teal: 'verde-agua',
+        purple: 'roxo',
+        pink: 'rosa',
+        gray: 'cinza',
+      }[cor]
       expect([forte, claro, corForte]).toEqual([
         `text-cat-${token}`,
         `bg-cat-${token}-claro`,
@@ -42,7 +53,7 @@ describe('modelo de categoria', () => {
   })
 
   it('ícone: chaves do seed antigo viram Material Symbols; o resto já é o nome', () => {
-    expect(iconeDe({ icone: 'buraco' })).toBe('edit_road')
-    expect(iconeDe({ icone: 'flood' })).toBe('flood')
+    expect(iconeDe({ icon: 'buraco' })).toBe('edit_road')
+    expect(iconeDe({ icon: 'flood' })).toBe('flood')
   })
 })

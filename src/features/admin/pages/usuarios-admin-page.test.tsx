@@ -91,9 +91,9 @@ describe('administração de usuários', () => {
 
   it('mostra o erro da API ao salvar e mantém a folha aberta', async () => {
     server.use(
-      http.patch(rota('/admin/usuarios/:id/perfil'), () =>
+      http.patch(rota('/admin/users/:id/role'), () =>
         HttpResponse.json(
-          { type: 'proprio-perfil', title: 'x', status: 422 },
+          { type: 'own-role', title: 'x', status: 422 },
           { status: 422, headers: { 'Content-Type': 'application/problem+json' } },
         ),
       ),
@@ -113,7 +113,7 @@ describe('administração de usuários', () => {
   })
 
   it('falha ao carregar mostra "Tentar novamente"', async () => {
-    server.use(http.get(rota('/admin/usuarios'), () => new HttpResponse(null, { status: 500 })))
+    server.use(http.get(rota('/admin/users'), () => new HttpResponse(null, { status: 500 })))
     abrir()
 
     expect(await screen.findByText('Não foi possível carregar os usuários.')).toBeInTheDocument()

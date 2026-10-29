@@ -8,7 +8,7 @@ test('a legenda do calor vai do roxo (menos) ao amarelo (mais)', () => {
 })
 
 test('pesosCalor normaliza pela maior célula com piso 4', () => {
-  const celula = (quantidade: number) => ({ lat: 0, lng: 0, quantidade }) as CelulaCalor
+  const celula = (quantidade: number) => ({ lat: 0, lng: 0, count: quantidade }) as CelulaCalor
   expect(
     pesosCalor([celula(2), celula(8)]).features.map(
       (f: { properties: { peso: number } }) => f.properties.peso,
@@ -16,7 +16,7 @@ test('pesosCalor normaliza pela maior célula com piso 4', () => {
   ).toEqual([0.25, 1])
   expect(pesosCalor([celula(1)]).features[0]!.properties.peso).toBe(0.25)
   expect(
-    pesosCalor([{ lat: -22.9, lng: -43.1, quantidade: 4 } as CelulaCalor]).features[0]!.geometry
+    pesosCalor([{ lat: -22.9, lng: -43.1, count: 4 } as CelulaCalor]).features[0]!.geometry
       .coordinates,
   ).toEqual([-43.1, -22.9])
 })

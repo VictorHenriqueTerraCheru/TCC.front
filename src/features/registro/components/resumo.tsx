@@ -4,18 +4,23 @@ import type { ReactNode } from 'react'
 import { Icone } from '@/common/components/icone'
 
 interface LinhaResumoProps {
-  icone: ReactNode | MaterialSymbol
-  rotulo: string
-  valor: ReactNode
+  icon: ReactNode | MaterialSymbol
+  label: string
+  value: ReactNode
   aoEditar?(): void
 }
 
-export function LinhaResumo({ icone, rotulo, valor, aoEditar }: LinhaResumoProps) {
+export function LinhaResumo({
+  icon: icone,
+  label: rotulo,
+  value: valor,
+  aoEditar,
+}: LinhaResumoProps) {
   return (
     <li className="flex items-center gap-3 border-t border-border/60 px-4 py-3 first:border-t-0">
       <span className="flex w-6 justify-center text-muted-foreground">
         {typeof icone === 'string' ? (
-          <Icone nome={icone as MaterialSymbol} className="text-[22px]" />
+          <Icone name={icone as MaterialSymbol} className="text-[22px]" />
         ) : (
           icone
         )}
@@ -31,7 +36,7 @@ export function LinhaResumo({ icone, rotulo, valor, aoEditar }: LinhaResumoProps
           aria-label={`Editar ${rotulo.toLowerCase()}`}
           className="flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
-          <Icone nome="edit" className="text-[20px]" />
+          <Icone name="edit" className="text-[20px]" />
         </button>
       )}
     </li>

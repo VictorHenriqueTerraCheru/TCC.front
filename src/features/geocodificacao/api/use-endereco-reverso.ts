@@ -9,12 +9,10 @@ const arredondar = (valor: number) => Math.round(valor * 10_000) / 10_000
 export function enderecoReversoQuery(lat: number, lng: number) {
   const ponto = { lat: arredondar(lat), lng: arredondar(lng) }
   return queryOptions({
-    queryKey: ['geocodificacao', 'reversa', ponto],
+    queryKey: ['geocoding', 'reversa', ponto],
     queryFn: async ({ signal }) => {
       try {
-        return await api
-          .GET('/geocodificacao/reversa', { params: { query: ponto }, signal })
-          .then(dados)
+        return await api.GET('/geocoding/reverse', { params: { query: ponto }, signal }).then(dados)
       } catch (erro) {
         if (isApiError(erro) && erro.status === 429)
           return enderecoIndisponivel(ponto.lat, ponto.lng)

@@ -9,40 +9,40 @@ import { caminhoDaCategoria } from '../models/rotas'
 import { useRascunhoStore } from '../stores/rascunho-store'
 
 interface Opcao {
-  tipo: TipoGrupo
+  type: TipoGrupo
   titulo: string
   significado: string
   exemplos: string
   consequencia: string
   iconeConsequencia: MaterialSymbol
-  icones: { nome: MaterialSymbol; fundo: string; cor: string }[]
+  icones: { name: MaterialSymbol; fundo: string; color: string }[]
 }
 
 const opcoes: Opcao[] = [
   {
-    tipo: 'problema',
+    type: 'issue',
     titulo: 'Estado',
     significado: 'Continua lá até ser resolvido',
     exemplos: 'Buraco, poste apagado, lixo acumulado…',
     consequencia: 'Vira um ponto no mapa até alguém confirmar que foi resolvido.',
     iconeConsequencia: 'location_on',
     icones: [
-      { nome: 'edit_road', fundo: 'bg-cat-laranja-claro', cor: 'text-cat-laranja' },
-      { nome: 'light_off', fundo: 'bg-cat-ocre-claro', cor: 'text-cat-ocre' },
-      { nome: 'delete_sweep', fundo: 'bg-cat-marrom-claro', cor: 'text-cat-marrom' },
+      { name: 'edit_road', fundo: 'bg-cat-laranja-claro', color: 'text-cat-laranja' },
+      { name: 'light_off', fundo: 'bg-cat-ocre-claro', color: 'text-cat-ocre' },
+      { name: 'delete_sweep', fundo: 'bg-cat-marrom-claro', color: 'text-cat-marrom' },
     ],
   },
   {
-    tipo: 'incidente',
+    type: 'incident',
     titulo: 'Evento',
     significado: 'Aconteceu e passou',
     exemplos: 'Roubo, acidente, rua inundada…',
     consequencia: 'Anônimo. Entra no mapa de calor da região, sem ponto exato.',
     iconeConsequencia: 'visibility_off',
     icones: [
-      { nome: 'error', fundo: 'bg-cat-vermelho-claro', cor: 'text-cat-vermelho' },
-      { nome: 'car_crash', fundo: 'bg-cat-terracota-claro', cor: 'text-cat-terracota' },
-      { nome: 'flood', fundo: 'bg-cat-azul-claro', cor: 'text-cat-azul' },
+      { name: 'error', fundo: 'bg-cat-vermelho-claro', color: 'text-cat-vermelho' },
+      { name: 'car_crash', fundo: 'bg-cat-terracota-claro', color: 'text-cat-terracota' },
+      { name: 'flood', fundo: 'bg-cat-azul-claro', color: 'text-cat-azul' },
     ],
   },
 ]
@@ -59,7 +59,7 @@ export function TipoPage() {
   return (
     <PassoRegistro
       titulo="Nova ocorrência"
-      passo={{ atual: 1, total: 4, rotulo: 'Tipo' }}
+      passo={{ atual: 1, total: 4, label: 'Tipo' }}
       acaoTopo="fechar"
       aoTopo={fechar}
       rodape={
@@ -76,22 +76,22 @@ export function TipoPage() {
       <div className="space-y-3">
         {opcoes.map((opcao) => (
           <Link
-            key={opcao.tipo}
-            to={caminhoDaCategoria(opcao.tipo)}
+            key={opcao.type}
+            to={caminhoDaCategoria(opcao.type)}
             className="block pressionavel space-y-3.5 rounded-[20px] border border-border bg-card p-5 shadow-1 hover:border-primario focus-visible:outline-2"
           >
             <div className="flex items-center">
               <div className="flex">
                 {opcao.icones.map((icone, i) => (
                   <span
-                    key={icone.nome}
-                    className={`flex size-11 items-center justify-center rounded-full border-2 border-card ${icone.fundo} ${icone.cor} ${i > 0 ? '-ml-2.5' : ''}`}
+                    key={icone.name}
+                    className={`flex size-11 items-center justify-center rounded-full border-2 border-card ${icone.fundo} ${icone.color} ${i > 0 ? '-ml-2.5' : ''}`}
                   >
-                    <Icone nome={icone.nome} className="text-[24px]" />
+                    <Icone name={icone.name} className="text-[24px]" />
                   </span>
                 ))}
               </div>
-              <Icone nome="chevron_right" className="ml-auto text-[24px] text-muted-foreground" />
+              <Icone name="chevron_right" className="ml-auto text-[24px] text-muted-foreground" />
             </div>
             <div>
               <p className="text-xl font-bold tracking-tight">{opcao.titulo}</p>
@@ -101,7 +101,7 @@ export function TipoPage() {
               </p>
             </div>
             <p className="flex items-center gap-2 border-t border-border pt-3 text-[13px] text-muted-foreground">
-              <Icone nome={opcao.iconeConsequencia} className="text-[18px] text-primario" />
+              <Icone name={opcao.iconeConsequencia} className="text-[18px] text-primario" />
               {opcao.consequencia}
             </p>
           </Link>

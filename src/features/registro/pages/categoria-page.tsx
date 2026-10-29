@@ -13,36 +13,36 @@ import { useRecentesStore } from '../stores/recentes-store'
 export function CategoriaPage() {
   const tipo = lerTipo(useSearchParams()[0].get('tipo'))
   if (!tipo) return <Navigate to="/registrar" replace />
-  return <CategoriaDoTipo tipo={tipo} />
+  return <CategoriaDoTipo type={tipo} />
 }
 
-function CategoriaDoTipo({ tipo }: { tipo: NonNullable<ReturnType<typeof lerTipo>> }) {
+function CategoriaDoTipo({ type: tipo }: { type: NonNullable<ReturnType<typeof lerTipo>> }) {
   const navigate = useNavigate()
   const categorias = useCategorias()
   const grupos = useGrupos()
-  const { categoria, escolherCategoria } = useRascunho()
+  const { category: categoria, escolherCategoria } = useRascunho()
   const recentesIds = useRecentesStore((s) => s.ids)
   const registrarRecente = useRecentesStore((s) => s.registrar)
 
-  const doTipo = categorias.data?.filter((c) => c.tipo === tipo) ?? []
-  const escolhida = categoria?.tipo === tipo ? categoria : null
+  const doTipo = categorias.data?.filter((c) => c.type === tipo) ?? []
+  const escolhida = categoria?.type === tipo ? categoria : null
 
   function continuar() {
     if (!escolhida) return
     registrarRecente(escolhida.id)
-    navigate(tipo === 'incidente' ? '/registrar/incidente/local' : '/registrar/local')
+    navigate(tipo === 'incident' ? '/registrar/incidente/local' : '/registrar/local')
   }
 
   return (
     <PassoRegistro
       titulo="Nova ocorrência"
-      passo={{ atual: 1, total: 4, rotulo: 'Categoria' }}
+      passo={{ atual: 1, total: 4, label: 'Categoria' }}
       acaoTopo="voltar"
       aoTopo={() => navigate('/registrar')}
       rodape={
         <div className="space-y-2">
           <p className="min-h-5 text-center text-[13px] text-muted-foreground" aria-live="polite">
-            {escolhida ? `Selecionada: ${escolhida.nome}` : 'Escolha uma categoria para continuar'}
+            {escolhida ? `Selecionada: ${escolhida.name}` : 'Escolha uma categoria para continuar'}
           </p>
           <Button className="w-full" disabled={!escolhida} onClick={continuar}>
             Continuar
@@ -51,7 +51,7 @@ function CategoriaDoTipo({ tipo }: { tipo: NonNullable<ReturnType<typeof lerTipo
       }
     >
       <h2 className="mb-4 text-2xl">
-        {tipo === 'problema' ? 'Qual é o estado?' : 'Qual foi o evento?'}
+        {tipo === 'issue' ? 'Qual é o estado?' : 'Qual foi o evento?'}
       </h2>
       {categorias.isPending || grupos.isPending ? (
         <Skeleton className="h-60 rounded-2xl bg-muted" />

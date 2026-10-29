@@ -1,9 +1,9 @@
 import type { Schema } from '../../api'
 
-export const grupos: Schema<'GrupoResponse'>[] = [
-  { chave: 'viaPublica', rotulo: 'Via pública', tipo: 'problema', cor: 'laranja', ordem: 1 },
-  { chave: 'eletrica', rotulo: 'Elétrica', tipo: 'problema', cor: 'ocre', ordem: 2 },
-  { chave: 'limpeza', rotulo: 'Limpeza', tipo: 'problema', cor: 'marrom', ordem: 3 },
-  { chave: 'seguranca', rotulo: 'Segurança', tipo: 'incidente', cor: 'vermelho', ordem: 4 },
-  { chave: 'transito', rotulo: 'Trânsito', tipo: 'incidente', cor: 'terracota', ordem: 5 },
+export const grupos: Schema<'GroupResponse'>[] = [
+  { key: 'viaPublica', label: 'Via pública', type: 'issue', color: 'orange', sortOrder: 1 },
+  { key: 'eletrica', label: 'Elétrica', type: 'issue', color: 'ochre', sortOrder: 2 },
+  { key: 'limpeza', label: 'Limpeza', type: 'issue', color: 'brown', sortOrder: 3 },
+  { key: 'seguranca', label: 'Segurança', type: 'incident', color: 'red', sortOrder: 4 },
+  { key: 'transito', label: 'Trânsito', type: 'incident', color: 'terracotta', sortOrder: 5 },
 ]

@@ -27,20 +27,20 @@ function Descricao({ id, erro, children }: { id: string; erro?: string; children
         erro ? 'text-destructive' : 'text-muted-foreground',
       )}
     >
-      {erro && <Icone nome="error" preenchido className="mt-px text-[14px]" />}
+      {erro && <Icone name="error" preenchido className="mt-px text-[14px]" />}
       {children}
     </p>
   )
 }
 
 interface CampoTextoProps extends ComponentProps<'input'> {
-  rotulo: string
+  label: string
   erro?: string
   ajuda?: string
 }
 
 export function CampoTexto({
-  rotulo,
+  label: rotulo,
   erro,
   ajuda,
   className,
@@ -111,7 +111,7 @@ export function CampoSenha(props: Omit<CampoTextoProps, 'type'>) {
             className="flex"
           >
             <Icone
-              nome={visivel ? 'visibility' : 'visibility_off'}
+              name={visivel ? 'visibility' : 'visibility_off'}
               className="text-muted-foreground"
             />
           </m.span>
@@ -122,7 +122,7 @@ export function CampoSenha(props: Omit<CampoTextoProps, 'type'>) {
 }
 
 interface CampoAreaTextoProps extends ComponentProps<'textarea'> {
-  rotulo: string
+  label: string
   erro?: string
   ajuda?: string
   maximo?: number
@@ -130,7 +130,7 @@ interface CampoAreaTextoProps extends ComponentProps<'textarea'> {
 }
 
 export function CampoAreaTexto({
-  rotulo,
+  label: rotulo,
   erro,
   ajuda,
   maximo,
@@ -187,12 +187,12 @@ export function CampoAreaTexto({
 }
 
 interface CampoSelecaoProps extends ComponentProps<'select'> {
-  rotulo: string
+  label: string
   erro?: string
 }
 
 export function CampoSelecao({
-  rotulo,
+  label: rotulo,
   erro,
   className,
   id,
@@ -218,7 +218,7 @@ export function CampoSelecao({
           {rotulo}
         </label>
         <Icone
-          nome="keyboard_arrow_down"
+          name="keyboard_arrow_down"
           className="pointer-events-none absolute top-4 right-4 text-muted-foreground transition-transform peer-focus:rotate-180"
         />
       </div>

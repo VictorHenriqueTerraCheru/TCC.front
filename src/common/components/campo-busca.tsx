@@ -5,20 +5,20 @@ import { Icone } from '@/common/components/icone'
 import { SURGIR } from '@/common/lib/movimento'
 
 interface CampoBuscaProps {
-  valor: string
+  value: string
   aoMudar(valor: string): void
-  rotulo: string
+  label: string
   placeholder?: string
 }
 
-export function CampoBusca({ valor, aoMudar, rotulo, placeholder }: CampoBuscaProps) {
+export function CampoBusca({ value: valor, aoMudar, label: rotulo, placeholder }: CampoBuscaProps) {
   const campo = useRef<HTMLInputElement>(null)
   return (
     <div
       onClick={() => campo.current?.focus()}
       className="flex h-11 items-center gap-2 rounded-xl border border-transparent bg-muted px-3 text-muted-foreground transition-[border-color,box-shadow,background-color] duration-200 focus-within:border-ring focus-within:bg-card focus-within:shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_18%,transparent)]"
     >
-      <Icone nome="search" className="text-[20px]" />
+      <Icone name="search" className="text-[20px]" />
       <input
         ref={campo}
         type="search"
@@ -43,7 +43,7 @@ export function CampoBusca({ valor, aoMudar, rotulo, placeholder }: CampoBuscaPr
             transition={SURGIR}
             className="-mr-1 flex size-7 items-center justify-center rounded-full hover:bg-foreground/10 focus-visible:outline-2"
           >
-            <Icone nome="cancel" preenchido className="text-[18px]" />
+            <Icone name="cancel" preenchido className="text-[18px]" />
           </m.button>
         )}
       </AnimatePresence>

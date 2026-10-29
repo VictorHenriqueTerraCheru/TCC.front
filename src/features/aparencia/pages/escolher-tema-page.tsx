@@ -20,7 +20,7 @@ export function EscolherTemaPage() {
   return (
     <div className="flex min-h-full flex-col px-6 pt-20 pb-6 lg:pt-12">
       <span className="mb-8 flex size-[72px] items-center justify-center rounded-full bg-primario-suave text-primario">
-        <Icone nome="palette" className="text-[36px]" />
+        <Icone name="palette" className="text-[36px]" />
       </span>
       <h1 className="mb-3 text-[28px] leading-9">Escolha a aparência</h1>
       <p className="mb-8 text-muted-foreground">
