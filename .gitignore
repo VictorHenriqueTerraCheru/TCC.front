@@ -16,6 +16,8 @@ test-results
 
 # npm run prints
 prints
+prints-baseline
+prints-diff
 
 # Mockups do brainstorming (visual companion)
 .superpowers/

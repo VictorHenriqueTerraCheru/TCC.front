@@ -21,18 +21,22 @@ const SAIDA = 'prints'
 const API = process.env.PRINTS_API ?? '/api/v1'
 const SENHA = process.env.PRINTS_SENHA ?? 'tcc12345'
 const NAVEGADOR = process.env.PRINTS_NAVEGADOR ?? 'chrome'
-// Botafogo (CENTRO_PADRAO do app); o usuário fica ~130 m ao sul para aparecer "você está a X m".
-const CENTRO = { lat: -22.9519, lng: -43.1866 }
-const POSICAO = { latitude: -22.9531, longitude: -43.1862, accuracy: 15 }
+// Icaraí (CENTRO_PADRAO do app); o usuário fica ~130 m ao sul para aparecer "você está a X m".
+const CENTRO = { lat: -22.905, lng: -43.109 }
+const POSICAO = { latitude: -22.9062, longitude: -43.1086, accuracy: 15 }
 const CELULAR = { width: 390, height: 844 }
 const DESKTOP = { width: 1440, height: 900 }
+const AGORA_FIXO = new Date('2026-10-29T15:00:00-03:00').valueOf()
 
 const servidor = process.env.PRINTS_URL ? null : await subirViteComMocks()
 const BASE = process.env.PRINTS_URL ?? servidor.url
 
 await mkdir(`${SAIDA}/claro`, { recursive: true })
 await mkdir(`${SAIDA}/escuro`, { recursive: true })
-const navegador = await chromium.launch(NAVEGADOR === 'chromium' ? {} : { channel: NAVEGADOR })
+const navegador = await chromium.launch({
+  ...(NAVEGADOR === 'chromium' ? {} : { channel: NAVEGADOR }),
+  args: ['--disable-gpu', '--force-color-profile=srgb'],
+})
 const erros = []
 
 try {
@@ -128,28 +132,90 @@ async function capturarTela(
   pagina.on('pageerror', (erro) => erros.push(`${nome}: ${erro.message}`))
   await pagina.goto(BASE + rota)
   await pagina.waitForLoadState('networkidle')
-  // Folhas (vaul) animam e os tiles do mapa terminam de pintar depois do networkidle.
-  await esperar(1200)
+  await esperar(2500)
+  await esperarAnimacoes(pagina)
+  await esperarPaginaEstavel(pagina)
   if (new URL(pagina.url()).pathname !== new URL(BASE + rota).pathname) {
     console.warn(`${nome}: a rota ${rota} redirecionou para ${pagina.url()}`)
   }
-  await pagina.screenshot({ path: `${SAIDA}/${nome}.png` })
+  await pagina.screenshot({
+    path: `${SAIDA}/${nome}.png`,
+    animations: 'disabled',
+    caret: 'hide',
+  })
   console.log(`✓ ${nome}`)
   await contexto.close()
 }
 
-function novoContexto(tela) {
+async function esperarAnimacoes(pagina) {
+  await pagina.evaluate(async () => {
+    for (let tentativa = 0; tentativa < 5; tentativa++) {
+      const animacoes = document
+        .getAnimations({ subtree: true })
+        .filter(
+          (animacao) =>
+            animacao.playState !== 'finished' &&
+            animacao.effect?.getTiming().iterations !== Infinity,
+        )
+      if (!animacoes.length) return
+      await Promise.all(animacoes.map((animacao) => animacao.finished.catch(() => undefined)))
+    }
+  })
+}
+
+async function esperarPaginaEstavel(pagina) {
+  const estabilizou = await pagina.evaluate(async () => {
+    await document.fonts.ready
+    const proximoFrame = () => new Promise(requestAnimationFrame)
+    const folha = document.querySelector('[data-slot="drawer-content"]')
+    if (!folha) {
+      await proximoFrame()
+      return true
+    }
+
+    let quadroAnterior = ''
+    let quadrosEstaveis = 0
+    for (let tentativa = 0; tentativa < 120; tentativa++) {
+      await proximoFrame()
+      const retangulo = folha.getBoundingClientRect()
+      const quadro = `${getComputedStyle(folha).transform}:${retangulo.top}:${retangulo.height}`
+      quadrosEstaveis = quadro === quadroAnterior ? quadrosEstaveis + 1 : 0
+      if (quadrosEstaveis === 4) return true
+      quadroAnterior = quadro
+    }
+    return false
+  })
+
+  if (!estabilizou) throw new Error('A folha não estabilizou antes da captura.')
+}
+
+async function novoContexto(tela) {
   const celular = tela.width < 1024
-  return navegador.newContext({
+  const contexto = await navegador.newContext({
     viewport: tela,
     deviceScaleFactor: 2,
     isMobile: celular,
     hasTouch: celular,
     locale: 'pt-BR',
     timezoneId: 'America/Sao_Paulo',
+    reducedMotion: 'reduce',
     permissions: ['geolocation'],
     geolocation: POSICAO,
   })
+  await contexto.addInitScript((agora) => {
+    const DateReal = Date
+    class DateFixa extends DateReal {
+      constructor(...argumentos) {
+        super(...(argumentos.length ? argumentos : [agora]))
+      }
+
+      static now() {
+        return agora
+      }
+    }
+    globalThis.Date = DateFixa
+  }, AGORA_FIXO)
+  return contexto
 }
 
 /** Login pela página (a API falsa só existe dentro do navegador, no service worker do MSW). */
