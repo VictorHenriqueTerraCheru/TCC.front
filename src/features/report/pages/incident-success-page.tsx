@@ -4,8 +4,6 @@ import type { IncidentAreaData } from '@/features/incidents'
 
 import { SuccessScreen } from './issue-success-page'
 
-const plural: Record<number, string> = { 7: 'Roubos', 8: 'Acidentes' }
-
 export function IncidentSuccessPage() {
   const { state } = useLocation()
   const { area, categoryId, areaLabel, neighborhood, point } = (state ?? {}) as {
@@ -39,8 +37,8 @@ export function IncidentSuccessPage() {
             <div className="min-w-0">
               <p className="font-medium">{areaLabel ?? 'Área do relato'}</p>
               <p className="text-xs text-muted-foreground">
-                {plural[count.categoryId] ?? count.name} · {count.days7}{' '}
-                {count.days7 === 1 ? 'relato' : 'relatos'} nos últimos 7 dias
+                {count.name} · {count.days7} {count.days7 === 1 ? 'relato' : 'relatos'} nos últimos
+                7 dias
               </p>
             </div>
           </div>

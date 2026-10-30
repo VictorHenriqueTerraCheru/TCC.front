@@ -1,9 +1,9 @@
-import type { MaterialSymbol } from 'material-symbols'
-
 import { Icon } from '@/common/components/icon'
+import { DynamicIcon } from '@/common/components/remote-icon'
 import { shortTime } from '@/common/lib/formatting'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { iconOf, useCategories } from '@/features/categories'
 import { useReverseGeocode } from '@/features/geocoding'
 
 import { useIncidentArea } from '../api/use-incident-area'
@@ -16,14 +16,14 @@ const level: Record<ConcentrationLevel, { label: string; color: string }> = {
   high: { label: 'Concentração alta', color: heatmapGradient[1]! },
 }
 
-const lines: Record<number, { label: string; icon: MaterialSymbol }> = {
-  7: { label: 'Roubos', icon: 'error' },
-  8: { label: 'Acidentes', icon: 'car_crash' },
-}
-
 export function IncidentArea({ lat, lng }: { lat: number; lng: number }) {
   const area = useIncidentArea(lat, lng)
   const address = useReverseGeocode({ lat, lng })
+  const categories = useCategories()
+  const iconFor = (id: number) => {
+    const category = categories.data?.find((c) => c.id === id)
+    return category ? iconOf(category) : 'error'
+  }
 
   const title = address.data?.areaLabel ?? (address.data ? 'Área selecionada' : null)
 
@@ -89,11 +89,11 @@ export function IncidentArea({ lat, lng }: { lat: number; lng: number }) {
                 <tr key={c.categoryId} className="border-t border-border/60">
                   <td className="px-4 py-3">
                     <span className="flex items-center gap-3">
-                      <Icon
-                        name={lines[c.categoryId]?.icon ?? 'error'}
+                      <DynamicIcon
+                        name={iconFor(c.categoryId)}
                         className="text-[20px] text-muted-foreground"
                       />
-                      {lines[c.categoryId]?.label ?? c.name}
+                      {c.name}
                     </span>
                   </td>
                   <td className="px-2 py-3 text-right text-2xl">{c.days7}</td>

@@ -198,7 +198,7 @@ describe('report flow', () => {
     await user.click(screen.getByRole('button', { name: /Enviar registro/ }))
 
     expect(await screen.findByRole('heading', { name: 'Relato enviado' })).toBeInTheDocument()
-    expect(screen.getByText(/Roubos · \d+ relatos nos últimos 7 dias/)).toBeInTheDocument()
+    expect(screen.getByText(/Roubo · \d+ relatos nos últimos 7 dias/)).toBeInTheDocument()
   })
 
   it('incident rejected because of the time shows the type message', async () => {
