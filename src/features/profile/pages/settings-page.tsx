@@ -153,7 +153,7 @@ export function SettingsPage() {
           <Row
             icon="info"
             title="Sobre o app"
-            subtitle={`Versão ${__VERSAO_APP__} · termos e privacidade`}
+            subtitle={`Versão ${__APP_VERSION__} · termos e privacidade`}
             onClick={() => setAboutOpen(true)}
           />
           <Row icon="logout" title="Sair da conta" onClick={signOut} arrow={false} />

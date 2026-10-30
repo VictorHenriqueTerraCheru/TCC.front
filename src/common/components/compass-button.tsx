@@ -14,11 +14,11 @@ function cardinalPoint(rotation: number) {
 
 export function CompassButton({ className }: { className?: string }) {
   const { current: map } = useMap()
-  const [vista, setVista] = useState({ rotation: 0, pitch: 0 })
+  const [view, setView] = useState({ rotation: 0, pitch: 0 })
 
   useEffect(() => {
     if (!map) return
-    const update = () => setVista({ rotation: map.getBearing(), pitch: map.getPitch() })
+    const update = () => setView({ rotation: map.getBearing(), pitch: map.getPitch() })
     update()
     map.on('rotate', update)
     map.on('pitch', update)
@@ -28,7 +28,7 @@ export function CompassButton({ className }: { className?: string }) {
     }
   }, [map])
 
-  if (Math.abs(vista.rotation) < DEGREE_TOLERANCE && vista.pitch < DEGREE_TOLERANCE) return null
+  if (Math.abs(view.rotation) < DEGREE_TOLERANCE && view.pitch < DEGREE_TOLERANCE) return null
 
   return (
     <button
@@ -45,7 +45,7 @@ export function CompassButton({ className }: { className?: string }) {
         aria-hidden="true"
         viewBox="0 0 44 44"
         className="absolute inset-0 size-full"
-        style={{ transform: `rotate(${-vista.rotation}deg)` }}
+        style={{ transform: `rotate(${-view.rotation}deg)` }}
       >
         {DASHES.map((angle) => (
           <line
@@ -63,7 +63,7 @@ export function CompassButton({ className }: { className?: string }) {
         <path d="M22 2.5 25 8H19Z" fill="#ff3b30" />
       </svg>
       <span aria-hidden="true" className="relative text-[17px] leading-none font-bold">
-        {cardinalPoint(vista.rotation)}
+        {cardinalPoint(view.rotation)}
       </span>
     </button>
   )

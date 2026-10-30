@@ -6,7 +6,7 @@ import { iconOf, type CategorySummary } from '../models/category'
 
 interface CategoryIconProps {
   category: Pick<CategorySummary, 'icon' | 'group'>
-  pageSize?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg'
   className?: string
 }
 
@@ -16,7 +16,7 @@ const sizes = {
   lg: 'size-12 text-[26px]',
 }
 
-export function CategoryIcon({ category, pageSize: size = 'md', className }: CategoryIconProps) {
+export function CategoryIcon({ category, size = 'md', className }: CategoryIconProps) {
   const { appearanceOf } = useAppearance()
   const appearance = appearanceOf(category)
   return (

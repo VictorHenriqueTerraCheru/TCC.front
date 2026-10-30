@@ -93,3 +93,10 @@ A partir daqui a execução passou do Codex para o Claude. O inventário do Code
 - Busca da Task 5 (`rg ... src scripts`) vazia.
 - Efeito para quem já usa o app: entrar de novo, escolher o tema de novo, ver a pré-permissão de novo; links antigos (`/mapa/problema/{id}`) caem na página não encontrada.
 - Gate: typecheck ok; lint ok; format ok; `Tests 366 passed` (340 + 26 novos); textos idênticos; prints idênticos.
+
+### Correções depois da Task 5 (varredura com o dicionário português)
+
+- O detector de sobras usava o dicionário inglês do macOS, que aceita algumas palavras portuguesas (`aviso`, `vista`). Uma segunda varredura, com as palavras do `dicionario-palavras.txt` e do mapa, achou: `aviso/setAviso`, `vista/setVista`, `ultimas/setUltimas`, `AreaIncidentesDados`, `__VERSAO_APP__` (define do Vite), `pacote` (`vite.config.ts`), `importarFeaturePorDentro/importarCamadaDeCima` (`eslint.config.js`) e ids de camada do MapLibre (`calor`, `area-incidentes`).
+- Três locais chamados `dados` tinham virado `unwrapData` (o nome do helper do cliente): agora `iconData` e `geoJson`.
+- Achado do Task 3 (Codex): o mapa de campos trocou `tamanho → pageSize` também em props de componente (`Avatar`, `CategoryIcon`, `CenterPoint`) e em `RemoteIconData`. `pageSize` é só do contrato de paginação; essas props viraram `size`.
+- Gate: typecheck ok; lint ok; format ok; `Tests 366 passed`; textos idênticos; prints idênticos.

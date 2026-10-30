@@ -41,7 +41,7 @@ function DuplicateCard({
         selected ? 'border-brand' : 'border-border/60',
       )}
     >
-      <CategoryIcon category={duplicate.category} pageSize="sm" />
+      <CategoryIcon category={duplicate.category} size="sm" />
       <div className="min-w-0 text-sm">
         <p className="font-medium">{duplicate.category.name}</p>
         <p className="text-xs text-muted-foreground">

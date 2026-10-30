@@ -6,11 +6,11 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
-const importarFeaturePorDentro = {
+const featureInternalsImport = {
   group: ['@/features/*/*'],
   message: 'Importe outra feature só pelo index.ts dela (@/features/<area>).',
 }
-const importarCamadaDeCima = {
+const upperLayerImport = {
   group: ['@/features', '@/features/*', '@/app', '@/app/*'],
   message: 'common/ e infrastructure/ não dependem de features/ nem de app/.',
 }
@@ -41,13 +41,13 @@ export default defineConfig([
   {
     files: ['src/features/**/*.{ts,tsx}', 'src/app/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [importarFeaturePorDentro] }],
+      'no-restricted-imports': ['error', { patterns: [featureInternalsImport] }],
     },
   },
   {
     files: ['src/common/**/*.{ts,tsx}', 'src/infrastructure/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: [importarCamadaDeCima] }],
+      'no-restricted-imports': ['error', { patterns: [upperLayerImport] }],
     },
   },
   {

@@ -115,7 +115,7 @@ export function CategoryPicker({
                     : 'border-border bg-card hover:bg-surface-2',
                 )}
               >
-                <CategoryIcon category={category} pageSize="sm" />
+                <CategoryIcon category={category} size="sm" />
                 {category.name}
               </button>
             ))}

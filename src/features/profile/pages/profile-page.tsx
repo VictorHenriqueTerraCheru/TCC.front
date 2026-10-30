@@ -27,7 +27,7 @@ function Header({ me }: { me: Me }) {
   const verified = me.role === 'verifiedCitizen'
   return (
     <div className="mb-4 flex items-center gap-4">
-      <Avatar name={me.name} pageSize="lg" verified={verified} />
+      <Avatar name={me.name} size="lg" verified={verified} />
       <div className="min-w-0">
         <h2 className="text-[22px] leading-7">{me.name}</h2>
         <p className="mb-1.5 text-xs text-muted-foreground">

@@ -78,7 +78,7 @@ export function MapPage() {
   const [map, setMap] = useState<MapRef | null>(null)
   const [bounds, setBounds] = useState<Bounds | null>(null)
   const [legendOpen, setLegendOpen] = useState(() => !checked(LEGEND_SEEN_KEY))
-  const [aviso, setAviso] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
   const [emptyDismissed, setEmptyDismissed] = useState(false)
   const [emptyClosed, setEmptyClosed] = useState(() => checked(EMPTY_NOTICE_DISMISSED_KEY))
 
@@ -118,10 +118,10 @@ export function MapPage() {
   }, [map])
 
   useEffect(() => {
-    if (!aviso) return
-    const timer = setTimeout(() => setAviso(null), 3500)
+    if (!notice) return
+    const timer = setTimeout(() => setNotice(null), 3500)
     return () => clearTimeout(timer)
-  }, [aviso])
+  }, [notice])
 
   const focus = useCallback<MapContext['focus']>(
     ({ lat, lng }) => {
@@ -140,9 +140,9 @@ export function MapPage() {
     try {
       const area = await queryClient.fetchQuery(incidentAreaQuery(lat, lng))
       if (sevenDayTotal(area) > 0) navigation.openArea(lat, lng)
-      else setAviso('Sem incidentes por aqui nos últimos 7 dias')
+      else setNotice('Sem incidentes por aqui nos últimos 7 dias')
     } catch {
-      setAviso('Não foi possível consultar os incidentes desta área')
+      setNotice('Não foi possível consultar os incidentes desta área')
     }
   }
 
@@ -201,9 +201,9 @@ export function MapPage() {
           />
         )}
         {areaCircle && (
-          <Source id="area-incidentes" type="geojson" data={areaCircle}>
+          <Source id="incident-area" type="geojson" data={areaCircle}>
             <Layer
-              id="area-incidentes"
+              id="incident-area"
               type="line"
               paint={{
                 'line-color': DASH_COLOR[theme],
@@ -275,12 +275,12 @@ export function MapPage() {
         </div>
       )}
 
-      {aviso && (
+      {notice && (
         <div
           role="status"
           className="pointer-events-none absolute inset-x-0 bottom-[168px] z-[1000] mx-auto w-fit max-w-[90%] rounded-2xl px-4 py-2.5 text-sm shadow-3 glass lg:bottom-8"
         >
-          {aviso}
+          {notice}
         </div>
       )}
 

@@ -84,7 +84,7 @@ export function IssueReviewPage() {
           <SummaryRow
             icon={
               category ? (
-                <CategoryIcon category={category} pageSize="sm" className="bg-transparent" />
+                <CategoryIcon category={category} size="sm" className="bg-transparent" />
               ) : (
                 'category'
               )

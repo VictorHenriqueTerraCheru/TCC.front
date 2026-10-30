@@ -5,11 +5,11 @@ import react from '@vitejs/plugin-react'
 import { msw } from 'msw/vite'
 import { defineConfig } from 'vite'
 
-import pacote from './package.json' with { type: 'json' }
+import packageJson from './package.json' with { type: 'json' }
 
 export default defineConfig(({ command }) => ({
   plugins: [react(), tailwindcss(), command === 'serve' && msw({ mode: 'worker-only' })],
-  define: { __VERSAO_APP__: JSON.stringify(pacote.version) },
+  define: { __APP_VERSION__: JSON.stringify(packageJson.version) },
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },

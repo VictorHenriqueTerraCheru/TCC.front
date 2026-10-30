@@ -1,7 +1,7 @@
 import { useGuardStore, type PendingActionKind } from './guard-store'
 
 const vote: PendingActionKind = { type: 'vote', issueId: 'p-1', value: 'yes' }
-const pendingAction = { returnTo: '/problemas/p-1?tab=1', action: vote }
+const pendingAction = { returnTo: '/map/issue/p-1?tab=1', action: vote }
 
 beforeEach(() => {
   useGuardStore.setState({ reason: null, expired: false, pendingAction: null })
@@ -47,7 +47,7 @@ describe('guard-store (rules 1 and 13)', () => {
   it('completeLogin returns the return route and keeps the action for the destination screen', () => {
     useGuardStore.getState().askForAccount('vote', pendingAction, true)
 
-    expect(useGuardStore.getState().completeLogin()).toBe('/problemas/p-1?tab=1')
+    expect(useGuardStore.getState().completeLogin()).toBe('/map/issue/p-1?tab=1')
     expect(useGuardStore.getState()).toMatchObject({ reason: null, expired: false, pendingAction })
   })
 

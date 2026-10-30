@@ -108,13 +108,13 @@ function AreaAtCenter({ initial }: { initial: Point }) {
         />
       </Source>
       <Marker latitude={center.lat} longitude={center.lng} anchor="center">
-        <CenterPoint color="var(--background)" pageSize={10} />
+        <CenterPoint color="var(--background)" size={10} />
       </Marker>
     </>
   )
 }
 
-function CenterPoint({ color, pageSize: size }: { color: string; pageSize: number }) {
+function CenterPoint({ color, size }: { color: string; size: number }) {
   return (
     <span
       aria-hidden="true"
@@ -222,7 +222,7 @@ export function ReportMap(props: ReportMapProps) {
       <VectorMap center={[point.lat, point.lng]} interactive={false}>
         {location && (
           <Marker latitude={location.lat} longitude={location.lng} anchor="center">
-            <CenterPoint color="var(--brand)" pageSize={14} />
+            <CenterPoint color="var(--brand)" size={14} />
           </Marker>
         )}
       </VectorMap>

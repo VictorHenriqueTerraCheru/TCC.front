@@ -9,7 +9,7 @@ const VALID_NAME = /^[a-z0-9_-]+$/
 
 export interface RemoteIconData {
   paths: string[]
-  pageSize: number
+  size: number
 }
 
 export function iconifyName(name: string) {
@@ -36,7 +36,7 @@ export function bodyPaths(body: string): string[] | null {
 
 function validData(value: unknown): value is RemoteIconData {
   if (typeof value !== 'object' || value === null) return false
-  const { paths, pageSize: size } = value as Partial<RemoteIconData>
+  const { paths, size } = value as Partial<RemoteIconData>
   return (
     Array.isArray(paths) &&
     paths.length > 0 &&
@@ -86,7 +86,7 @@ async function fetchJson(url: string, signal?: AbortSignal): Promise<unknown> {
 }
 
 const inMemory = new Map<string, Promise<RemoteIconData | null>>()
-let queue: { name: string; resolve(unwrapData: RemoteIconData | null): void }[] = []
+let queue: { name: string; resolve(iconData: RemoteIconData | null): void }[] = []
 
 async function fetchBatch(names: string[]): Promise<Map<string, RemoteIconData>> {
   const query = names.map(iconifyName).join(',')
@@ -99,8 +99,8 @@ async function fetchBatch(names: string[]): Promise<Map<string, RemoteIconData>>
     const key = iconifyName(name)
     const icon = json.icons && Object.hasOwn(json.icons, key) ? json.icons[key] : undefined
     const paths = icon?.body ? bodyPaths(icon.body) : null
-    const unwrapData = { paths: paths ?? [], pageSize: icon?.width ?? json.width ?? 24 }
-    if (validData(unwrapData)) result.set(name, unwrapData)
+    const iconData = { paths: paths ?? [], size: icon?.width ?? json.width ?? 24 }
+    if (validData(iconData)) result.set(name, iconData)
   }
   return result
 }

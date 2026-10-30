@@ -6,6 +6,6 @@ export { HeatmapLayer } from './components/heatmap-layer'
 export { heatmapGradientCss } from './models/heatmap'
 export {
   sevenDayTotal,
-  type IncidentArea as AreaIncidentesDados,
+  type IncidentArea as IncidentAreaData,
   type HeatmapCell,
 } from './models/incident'

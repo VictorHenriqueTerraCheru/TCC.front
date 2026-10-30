@@ -7,11 +7,11 @@ import type { HeatmapCell } from '../models/incident'
 const GRADIENT = heatmapGradientExpression()
 
 export function HeatmapLayer({ cells }: { cells: HeatmapCell[] }) {
-  const unwrapData = useMemo(() => heatmapWeights(cells), [cells])
+  const geoJson = useMemo(() => heatmapWeights(cells), [cells])
   return (
-    <Source id="calor" type="geojson" data={unwrapData}>
+    <Source id="heatmap" type="geojson" data={geoJson}>
       <Layer
-        id="calor"
+        id="heatmap"
         type="heatmap"
         paint={{
           'heatmap-weight': ['get', 'weight'],

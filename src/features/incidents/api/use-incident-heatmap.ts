@@ -13,7 +13,7 @@ export interface IncidentHeatmapFilter {
 
 export function incidentHeatmapQuery({ groups, days, ...bounds }: IncidentHeatmapFilter) {
   return queryOptions({
-    queryKey: ['incidents', 'calor', bounds, { groups, days }],
+    queryKey: ['incidents', 'heatmap', bounds, { groups, days }],
     queryFn: ({ signal }) =>
       api
         .GET('/incidents/heatmap', {

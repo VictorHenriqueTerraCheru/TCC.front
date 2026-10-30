@@ -54,32 +54,32 @@ function RemoteIcon({
   className?: string
   style?: CSSProperties
 }) {
-  const [unwrapData, setDados] = useState<RemoteIconData | null>(null)
+  const [iconData, setIconData] = useState<RemoteIconData | null>(null)
 
   useEffect(() => {
     let active = true
     void loadIcon(name).then((result) => {
-      if (active) setDados(result)
+      if (active) setIconData(result)
     })
     return () => {
       active = false
     }
   }, [name])
 
-  if (!unwrapData) {
+  if (!iconData) {
     return <Icon name={alternative} filled={filled} className={className} style={style} />
   }
   return (
     <svg
       aria-hidden="true"
-      viewBox={`0 0 ${unwrapData.pageSize} ${unwrapData.pageSize}`}
+      viewBox={`0 0 ${iconData.size} ${iconData.size}`}
       fill="currentColor"
       width="1em"
       height="1em"
       className={cn('shrink-0 select-none', className)}
       style={{ fontSize: undefined, ...style }}
     >
-      {unwrapData.paths.map((d, i) => (
+      {iconData.paths.map((d, i) => (
         <path key={i} d={d} />
       ))}
     </svg>

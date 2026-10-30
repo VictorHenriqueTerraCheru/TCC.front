@@ -6,11 +6,11 @@ import { initials } from '../models/user'
 export function Avatar({
   name,
   verified = false,
-  pageSize: size,
+  size,
 }: {
   name: string
   verified?: boolean
-  pageSize?: 'md' | 'lg'
+  size?: 'md' | 'lg'
 }) {
   return (
     <span

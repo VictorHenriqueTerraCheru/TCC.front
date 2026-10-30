@@ -14,12 +14,12 @@ export function useSubmission<Variables, Result>(
   const { pathname } = useLocation()
   const [failureOpen, setFailureOpen] = useState(false)
   const [ruleError, setRuleError] = useState<string | null>(null)
-  const [ultimas, setUltimas] = useState<Variables | null>(null)
+  const [lastVariables, setLastVariables] = useState<Variables | null>(null)
 
   function send(variables: Variables) {
     setRuleError(null)
     setFailureOpen(false)
-    setUltimas(variables)
+    setLastVariables(variables)
     run(variables).then(
       (result) => onSuccess(result, variables),
       (error: unknown) => {
@@ -40,7 +40,7 @@ export function useSubmission<Variables, Result>(
     failure: {
       open: failureOpen,
       onOpenChange: setFailureOpen,
-      onRetry: () => ultimas !== null && send(ultimas),
+      onRetry: () => lastVariables !== null && send(lastVariables),
     },
   }
 }

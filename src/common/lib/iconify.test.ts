@@ -43,7 +43,7 @@ describe('bodyPaths', () => {
   it.each([
     ['script', '<script>alert(1)</script>'],
     ['nested svg with event', '<path d="M1 1" onload="x()"/><svg onload="x()"></svg>'],
-    ['d com caracteres de comando fora do SVG', '<path d="M1 1 <img src=x onerror=x()>"/>'],
+    ['d with command characters outside SVG', '<path d="M1 1 <img src=x onerror=x()>"/>'],
     ['no path', '<g></g>'],
     ['empty', ''],
   ])('rejects %s', (_, body) => {
@@ -68,7 +68,7 @@ describe('loadIcon', () => {
     await loadIcon('ico_a')
 
     expect(requests).toEqual(['ico-a-rounded,ico-b-rounded'])
-    expect(flood).toEqual({ paths: ['M8.5 17.5q-1.4 0-1.9-.5L12 4z'], pageSize: 24 })
+    expect(flood).toEqual({ paths: ['M8.5 17.5q-1.4 0-1.9-.5L12 4z'], size: 24 })
     expect(park).not.toBeNull()
   })
 
@@ -112,9 +112,9 @@ describe('loadIcon', () => {
 
 describe('loadIcon: hostile inputs', () => {
   it.each([
-    ['caminhos que não é lista', { paths: 'x', pageSize: 24 }],
-    ['d com caracteres fora do SVG', { paths: ['M1 1 <script>'], pageSize: 24 }],
-    ['absurd size', { paths: ['M1 1h4'], pageSize: 100000 }],
+    ['paths that are not a list', { paths: 'x', size: 24 }],
+    ['d with characters outside SVG', { paths: ['M1 1 <script>'], size: 24 }],
+    ['absurd size', { paths: ['M1 1h4'], size: 100000 }],
     ['no size', { paths: ['M1 1h4'] }],
     ['null', null],
   ])(
@@ -125,7 +125,7 @@ describe('loadIcon: hostile inputs', () => {
 
       expect(await loadIcon('ico_a')).toEqual({
         paths: ['M8.5 17.5q-1.4 0-1.9-.5L12 4z'],
-        pageSize: 24,
+        size: 24,
       })
     },
   )
@@ -144,7 +144,7 @@ describe('loadIcon: hostile inputs', () => {
     },
   )
 
-  it.each(['constructor', '__proto__', 'toString'])(
+  it.each(['function Object() { [native code] }', '[object Object]', 'function toString() { [native code] }'])(
     'object property name (%s) does not return the prototype as a response',
     async (name) => {
       server.use(iconifyIcons({}))

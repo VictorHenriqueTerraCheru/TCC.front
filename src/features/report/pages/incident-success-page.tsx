@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router'
 
-import type { AreaIncidentesDados } from '@/features/incidents'
+import type { IncidentAreaData } from '@/features/incidents'
 
 import { SuccessScreen } from './issue-success-page'
 
@@ -9,7 +9,7 @@ const plural: Record<number, string> = { 7: 'Roubos', 8: 'Acidentes' }
 export function IncidentSuccessPage() {
   const { state } = useLocation()
   const { area, categoryId, areaLabel, neighborhood, point } = (state ?? {}) as {
-    area?: AreaIncidentesDados
+    area?: IncidentAreaData
     categoryId?: number
     areaLabel?: string | null
     neighborhood?: string | null
