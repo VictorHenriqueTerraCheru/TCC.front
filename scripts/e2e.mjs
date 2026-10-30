@@ -1,59 +1,56 @@
 import { execFileSync } from 'node:child_process'
 import { mkdir } from 'node:fs/promises'
-import { setTimeout as esperar } from 'node:timers/promises'
+import { setTimeout as delay } from 'node:timers/promises'
 
 import { chromium } from 'playwright'
 
 const BASE = process.env.E2E_URL ?? 'http://localhost:5173'
 const DB = process.env.E2E_DB ?? 'tccback-db-1'
-const SENHA = process.env.E2E_SENHA ?? 'tcc12345'
-const NAVEGADOR = process.env.E2E_NAVEGADOR ?? 'chrome'
-const VISIVEL = process.env.E2E_VISIVEL === '1'
-const SAIDA = 'prints/e2e'
-const CELULAR = { width: 390, height: 844 }
+const PASSWORD = process.env.E2E_PASSWORD ?? 'tcc12345'
+const BROWSER = process.env.E2E_BROWSER ?? 'chrome'
+const VISIBLE = process.env.E2E_HEADED === '1'
+const OUTPUT = 'prints/e2e'
+const MOBILE = { width: 390, height: 844 }
 const DESKTOP = { width: 1440, height: 900 }
 
-const sorteio = () => (Math.random() - 0.5) * 0.006
-const POSICAO = { latitude: -22.9519 + sorteio(), longitude: -43.1866 + sorteio(), accuracy: 10 }
-const EXECUCAO = new Date().toISOString().replace(/\D/g, '').slice(0, 14)
-const NOVO = {
-  nome: `Teste E2E ${EXECUCAO}`,
-  email: `e2e-${EXECUCAO}@tcc.local`,
-  senha: 'senha-e2e-123',
+const jitter = () => (Math.random() - 0.5) * 0.006
+const POSITION = { latitude: -22.9519 + jitter(), longitude: -43.1866 + jitter(), accuracy: 10 }
+const RUN_ID = new Date().toISOString().replace(/\D/g, '').slice(0, 14)
+const NEW = {
+  name: `Teste E2E ${RUN_ID}`,
+  email: `e2e-${RUN_ID}@tcc.local`,
+  password: 'senha-e2e-123',
 }
-const DESCRICAO = `Buraco aberto perto do meio-fio (e2e ${EXECUCAO}).`
+const DESCRIPTION = `Buraco aberto perto do meio-fio (e2e ${RUN_ID}).`
 
-const resultados = []
-const problemasRede = []
-const errosConsole = []
-const estado = {}
+const results = []
+const fetchedIssues = []
+const consoleErrors = []
+const state = {}
 
-await mkdir(SAIDA, { recursive: true })
-await conferirAmbiente()
-const navegador = await chromium.launch({
-  ...(NAVEGADOR === 'chromium' ? {} : { channel: NAVEGADOR }),
-  headless: !VISIVEL,
-  slowMo: VISIVEL ? 250 : 0,
+await mkdir(OUTPUT, { recursive: true })
+await checkEnvironment()
+const browser = await chromium.launch({
+  ...(BROWSER === 'chromium' ? {} : { channel: BROWSER }),
+  headless: !VISIBLE,
+  slowMo: VISIBLE ? 250 : 0,
 })
 
 try {
-  const visitante = await novaPagina('visitante', CELULAR, { primeiraVez: true })
-  const p = visitante.pagina
+  const guest = await newPage('visitante', MOBILE, { firstTime: true })
+  const p = guest.page
 
-  await passo(
+  await step(
     'Visitante abre o app, escolhe o tema escuro e passa pela pré-permissão',
     p,
     async () => {
       await p.goto(BASE + '/map')
       await p.getByRole('heading', { name: 'Escolha a aparência' }).waitFor()
-      const automatico = p.getByRole('radio', { name: /Automático/ })
-      confere(
-        (await automatico.getAttribute('aria-checked')) === 'true',
-        'Automático não veio marcado',
-      )
+      const system = p.getByRole('radio', { name: /Automático/ })
+      assert((await system.getAttribute('aria-checked')) === 'true', 'Automático não veio marcado')
       await p.getByRole('radio', { name: /Escuro/ }).click()
-      const tema = await p.evaluate(() => document.documentElement.dataset.theme)
-      confere(tema === 'escuro', `o tema não mudou na hora (data-theme=${tema})`)
+      const theme = await p.evaluate(() => document.documentElement.dataset.theme)
+      assert(theme === 'escuro', `o tema não mudou na hora (data-theme=${theme})`)
       await p.getByRole('button', { name: 'Continuar' }).click()
       await p.waitForURL(/location-permission|map/)
       if (p.url().includes('permissao')) {
@@ -63,26 +60,26 @@ try {
     },
   )
 
-  await passo('Mapa carrega os marcadores da API (GET /problemas)', p, async () => {
-    const resposta = await p.waitForResponse((r) => /\/api\/v1\/problemas\?/.test(r.url()))
-    confere(resposta.status() === 200, `GET /problemas respondeu ${resposta.status()}`)
-    const corpo = await resposta.json()
+  await step('Mapa carrega os marcadores da API (GET /problemas)', p, async () => {
+    const response = await p.waitForResponse((r) => /\/api\/v1\/problemas\?/.test(r.url()))
+    assert(response.status() === 200, `GET /problemas respondeu ${response.status()}`)
+    const body = await response.json()
     await p.locator('[data-issue]').first().waitFor()
-    const marcadores = await p.locator('[data-issue]').count()
-    confere(marcadores > 0, 'nenhum marcador na tela')
-    return `${corpo.length} da API, ${marcadores} na tela`
+    const markers = await p.locator('[data-issue]').count()
+    assert(markers > 0, 'nenhum marcador na tela')
+    return `${body.length} da API, ${markers} na tela`
   })
 
-  await passo('Visitante toca num alerta e vê o card rápido com dados da API', p, async () => {
+  await step('Visitante toca num alerta e vê o card rápido com dados da API', p, async () => {
     await p.locator('[data-issue]').first().click({ force: true })
     await p.waitForURL(/\/map\/issue\//)
-    estado.problemaSeed = p.url().split('/map/issue/')[1].split('?')[0]
+    state.seedIssue = p.url().split('/map/issue/')[1].split('?')[0]
     const card = p.getByRole('region', { name: 'Resumo do alerta' })
     await card.waitFor()
-    return `problema ${estado.problemaSeed.slice(0, 8)} · ${await card.locator('h2').innerText()}`
+    return `problema ${state.seedIssue.slice(0, 8)} · ${await card.locator('h2').innerText()}`
   })
 
-  await passo('Voto como visitante abre a folha "Entre para votar"', p, async () => {
+  await step('Voto como visitante abre a folha "Entre para votar"', p, async () => {
     await p
       .getByRole('button', { name: /^Voto rápido/ })
       .first()
@@ -90,35 +87,35 @@ try {
     await p.getByRole('button', { name: 'Criar conta' }).waitFor()
   })
 
-  await passo(
+  await step(
     'Cadastro pela folha cria a conta e volta ao alerta com o voto retomado',
     p,
     async () => {
       await p.getByRole('button', { name: 'Criar conta' }).click()
       await p.waitForURL(/\/register/)
-      await p.getByLabel('Nome').fill(NOVO.nome)
-      await p.getByLabel('E-mail').fill(NOVO.email)
-      await p.getByLabel('Senha', { exact: true }).fill(NOVO.senha)
+      await p.getByLabel('Nome').fill(NEW.name)
+      await p.getByLabel('E-mail').fill(NEW.email)
+      await p.getByLabel('Senha', { exact: true }).fill(NEW.password)
       await p.locator('#aceitou-termos').check()
-      const votou = p.waitForResponse(
+      const voted = p.waitForResponse(
         (r) => /\/voto$/.test(r.url()) && r.request().method() === 'PUT',
       )
       await p.getByRole('button', { name: /criar conta/i }).click()
-      await p.waitForURL(new RegExp(`/map/issue/${estado.problemaSeed}`))
-      const resposta = await votou
-      confere(resposta.ok(), `voto retomado respondeu ${resposta.status()}`)
-      estado.usuarioId = sql(`select id from usuarios where email = '${NOVO.email}'`)
-      confere(estado.usuarioId, 'usuário novo não está no banco')
+      await p.waitForURL(new RegExp(`/map/issue/${state.seedIssue}`))
+      const response = await voted
+      assert(response.ok(), `voto retomado respondeu ${response.status()}`)
+      state.userId = sql(`select id from usuarios where email = '${NEW.email}'`)
+      assert(state.userId, 'usuário novo não está no banco')
       await p.getByRole('button', { name: /^Voto rápido/, pressed: true }).waitFor()
-      const votos = sql(
-        `select count(*) from votos where usuario_id = '${estado.usuarioId}' and problema_id = '${estado.problemaSeed}'`,
+      const votes = sql(
+        `select count(*) from votos where usuario_id = '${state.userId}' and problema_id = '${state.seedIssue}'`,
       )
-      confere(votos === '1', `esperava 1 voto no banco, há ${votos}`)
-      return `usuário ${estado.usuarioId.slice(0, 8)} no banco, voto gravado e marcado na tela`
+      assert(votes === '1', `esperava 1 voto no banco, há ${votes}`)
+      return `usuário ${state.userId.slice(0, 8)} no banco, voto gravado e marcado na tela`
     },
   )
 
-  await passo('Registrar problema: categoria → local (endereço da API) → revisão', p, async () => {
+  await step('Registrar problema: categoria → local (endereço da API) → revisão', p, async () => {
     await p.goto(BASE + '/map')
     await p.getByRole('link', { name: 'Registrar' }).click()
     await p.waitForURL(/\/report$/)
@@ -127,54 +124,54 @@ try {
     await p.getByRole('button', { name: /Buraco na via/ }).click()
     await p.getByRole('button', { name: 'Continuar' }).click()
     await p.waitForURL(/\/report\/location/)
-    const confirmar = p.getByRole('button', { name: 'Confirmar local' })
-    await confirmar.waitFor()
-    await esperarHabilitado(confirmar)
-    await confirmar.click()
+    const confirm = p.getByRole('button', { name: 'Confirmar local' })
+    await confirm.waitFor()
+    await waitUntilEnabled(confirm)
+    await confirm.click()
     await p.waitForURL(/\/report\/(review|duplicate-check)/)
     if (p.url().includes('conferencia')) {
       await p.getByRole('button', { name: 'Não, é outro' }).click()
       await p.waitForURL(/\/report\/review/)
     }
-    await p.locator('textarea').fill(DESCRICAO)
+    await p.locator('textarea').fill(DESCRIPTION)
     await p.getByText('Buscando endereço…').waitFor({ state: 'detached', timeout: 20_000 })
   })
 
-  await passo('Sem internet o envio falha sem perder o rascunho (tela 26)', p, async () => {
-    await visitante.contexto.setOffline(true)
+  await step('Sem internet o envio falha sem perder o rascunho (tela 26)', p, async () => {
+    await guest.context.setOffline(true)
     await p.getByRole('button', { name: 'Enviar registro' }).click()
     await p.getByText('Não foi possível enviar').waitFor({ timeout: 25_000 })
-    await visitante.contexto.setOffline(false)
+    await guest.context.setOffline(false)
   })
 
-  await passo('"Tentar novamente" envia e o problema chega ao banco', p, async () => {
-    const criou = p.waitForResponse(
+  await step('"Tentar novamente" envia e o problema chega ao banco', p, async () => {
+    const didCreate = p.waitForResponse(
       (r) => /\/api\/v1\/problemas$/.test(r.url()) && r.request().method() === 'POST',
     )
     await p.getByRole('button', { name: 'Tentar novamente' }).click()
-    const resposta = await criou
-    confere(resposta.status() === 201, `POST /problemas respondeu ${resposta.status()}`)
-    estado.problemaNovo = (await resposta.json()).id
+    const response = await didCreate
+    assert(response.status() === 201, `POST /problemas respondeu ${response.status()}`)
+    state.newIssue = (await response.json()).id
     await p.getByRole('heading', { name: 'Registro enviado' }).waitFor()
-    const linha = sql(
-      `select descricao, autor_id, endereco_aproximado, round(st_distance(localizacao, st_makepoint(${POSICAO.longitude}, ${POSICAO.latitude})::geography)) from problemas where id = '${estado.problemaNovo}'`,
+    const line = sql(
+      `select descricao, autor_id, endereco_aproximado, round(st_distance(localizacao, st_makepoint(${POSITION.longitude}, ${POSITION.latitude})::geography)) from problemas where id = '${state.newIssue}'`,
     ).split('|')
-    confere(linha[0] === DESCRICAO, 'descrição diferente no banco')
-    confere(linha[1] === estado.usuarioId, 'autor diferente no banco')
-    confere(Number(linha[3]) < 60, `ponto a ${linha[3]} m da posição do GPS`)
-    estado.endereco = linha[2]
-    return `"${linha[2]}", a ${linha[3]} m do GPS`
+    assert(line[0] === DESCRIPTION, 'descrição diferente no banco')
+    assert(line[1] === state.userId, 'autor diferente no banco')
+    assert(Number(line[3]) < 60, `ponto a ${line[3]} m da posição do GPS`)
+    state.address = line[2]
+    return `"${line[2]}", a ${line[3]} m do GPS`
   })
 
-  await passo('"Ver no mapa" abre o alerta novo com o selo de autor', p, async () => {
+  await step('"Ver no mapa" abre o alerta novo com o selo de autor', p, async () => {
     await p.getByRole('button', { name: 'Ver no mapa' }).click()
-    await p.waitForURL(new RegExp(`/map/issue/${estado.problemaNovo}`))
+    await p.waitForURL(new RegExp(`/map/issue/${state.newIssue}`))
     const card = p.getByRole('region', { name: 'Resumo do alerta' })
     await card.getByText('Buraco na via').waitFor()
-    confere((await card.getByRole('button').count()) === 0, 'autor viu polegares no próprio alerta')
+    assert((await card.getByRole('button').count()) === 0, 'autor viu polegares no próprio alerta')
   })
 
-  await passo('Registrar incidente (anônimo) e conferir a área no banco', p, async () => {
+  await step('Registrar incidente (anônimo) e conferir a área no banco', p, async () => {
     await p.goto(BASE + '/report')
     await p.getByRole('link', { name: /^Evento/ }).click()
     await p.waitForURL(/\/report\/category\?type=incident/)
@@ -183,70 +180,70 @@ try {
     await p.waitForURL(/\/report\/incident\/location/)
     await p.getByRole('button', { name: /continuar|confirmar/i }).click()
     await p.waitForURL(/\/report\/incident\/review/)
-    const criou = p.waitForResponse(
+    const didCreate = p.waitForResponse(
       (r) => /\/api\/v1\/incidentes$/.test(r.url()) && r.request().method() === 'POST',
     )
     await p.getByRole('button', { name: /enviar/i }).click()
-    const resposta = await criou
-    confere(resposta.status() === 201, `POST /incidentes respondeu ${resposta.status()}`)
+    const response = await didCreate
+    assert(response.status() === 201, `POST /incidentes respondeu ${response.status()}`)
     await p.getByRole('heading', { name: 'Relato enviado' }).waitFor()
-    const linha = sql(
-      `select raio_metros, rotulo_area from incidentes where autor_id = '${estado.usuarioId}' order by registrado_em desc limit 1`,
+    const line = sql(
+      `select raio_metros, rotulo_area from incidentes where autor_id = '${state.userId}' order by registrado_em desc limit 1`,
     ).split('|')
-    confere(linha[0], 'incidente não está no banco')
-    return `raio ${linha[0]} m · ${linha[1] || 'sem rótulo'}`
+    assert(line[0], 'incidente não está no banco')
+    return `raio ${line[0]} m · ${line[1] || 'sem rótulo'}`
   })
 
-  await passo(
+  await step(
     'Modo Incidentes: tocar no mapa abre a área com o relato (GET /incidentes/area)',
     p,
     async () => {
       await p.goto(BASE + '/map?mode=incidents')
-      const mapa = p.locator('canvas.maplibregl-canvas')
-      await mapa.waitFor()
+      const map = p.locator('canvas.maplibregl-canvas')
+      await map.waitFor()
       await p.waitForLoadState('networkidle')
       const area = p.waitForResponse((r) => /\/incidentes\/area/.test(r.url()))
-      const caixa = await mapa.boundingBox()
-      await p.mouse.click(caixa.x + caixa.width / 2, caixa.y + caixa.height / 2)
-      const resposta = await area
-      confere(resposta.status() === 200, `GET /incidentes/area respondeu ${resposta.status()}`)
-      const corpo = await resposta.json()
+      const box = await map.boundingBox()
+      await p.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
+      const response = await area
+      assert(response.status() === 200, `GET /incidentes/area respondeu ${response.status()}`)
+      const body = await response.json()
       await p.waitForURL(/\/map\/area/)
       await p.getByRole('heading', { name: 'Área de incidentes' }).waitFor()
-      const roubos = corpo.contagens.find((c) => c.nome === 'Roubo')
-      confere(roubos?.dias7 >= 1, 'o roubo registrado não entrou na contagem da área')
-      return `nível ${corpo.nivel} · ${roubos.dias7} roubo(s) em 7 dias no raio de ${corpo.raioMetros} m`
+      const robberies = body.counts.find((c) => c.name === 'Roubo')
+      assert(robberies?.sevenDays >= 1, 'o roubo registrado não entrou na contagem da área')
+      return `nível ${body.level} · ${robberies.sevenDays} roubo(s) em 7 dias no raio de ${body.radiusMeters} m`
     },
   )
 
-  await passo('Perfil mostra os totais e o histórico vindos de GET /me', p, async () => {
+  await step('Perfil mostra os totais e o histórico vindos de GET /me', p, async () => {
     await p.goto(BASE + '/profile')
-    await p.getByText(NOVO.nome).first().waitFor()
+    await p.getByText(NEW.name).first().waitFor()
     await p.getByText('Buraco na via').first().waitFor()
     await p.getByText('Roubo').first().waitFor()
     const total = sql(
-      `select (select count(*) from problemas where autor_id = '${estado.usuarioId}') + (select count(*) from incidentes where autor_id = '${estado.usuarioId}')`,
+      `select (select count(*) from problemas where autor_id = '${state.userId}') + (select count(*) from incidentes where autor_id = '${state.userId}')`,
     )
-    confere(total === '2', `esperava 2 registros no banco, há ${total}`)
+    assert(total === '2', `esperava 2 registros no banco, há ${total}`)
   })
 
-  await passo('Configurações → editar nome grava no banco (PATCH /me)', p, async () => {
+  await step('Configurações → editar nome grava no banco (PATCH /me)', p, async () => {
     await p.goto(BASE + '/profile/settings')
     await p.getByRole('button', { name: /^Nome/ }).click()
-    const campo = p.getByRole('dialog').getByRole('textbox')
-    estado.nomeNovo = `${NOVO.nome} (editado)`
-    await campo.fill(estado.nomeNovo)
+    const field = p.getByRole('dialog').getByRole('textbox')
+    state.newName = `${NEW.name} (editado)`
+    await field.fill(state.newName)
     await p
       .getByRole('dialog')
       .getByRole('button', { name: /salvar/i })
       .click()
     await p.getByRole('dialog').waitFor({ state: 'detached' })
-    await p.getByText(estado.nomeNovo).waitFor()
-    const nome = sql(`select nome from usuarios where id = '${estado.usuarioId}'`)
-    confere(nome === estado.nomeNovo, `nome no banco: ${nome}`)
+    await p.getByText(state.newName).waitFor()
+    const name = sql(`select nome from usuarios where id = '${state.userId}'`)
+    assert(name === state.newName, `nome no banco: ${name}`)
   })
 
-  await passo('Pedido de verificação fica pendente no banco', p, async () => {
+  await step('Pedido de verificação fica pendente no banco', p, async () => {
     await p.goto(BASE + '/profile')
     await p.getByRole('link', { name: 'Solicitar verificação' }).click()
     await p.waitForURL(/\/profile\/verification/)
@@ -258,102 +255,102 @@ try {
     await p.waitForURL(/\/profile$/)
     await p.getByText('Pedido em análise').waitFor()
     const status = sql(
-      `select status from solicitacoes_verificacao where usuario_id = '${estado.usuarioId}'`,
+      `select status from solicitacoes_verificacao where usuario_id = '${state.userId}'`,
     )
-    confere(status !== '', 'pedido não está no banco')
+    assert(status !== '', 'pedido não está no banco')
   })
 
-  const vizinho = await novaPagina('cidadao2')
-  await passo(
+  const neighbor = await newPage('cidadao2')
+  await step(
     'Outro cidadão entra pelo login e confirma o problema novo',
-    vizinho.pagina,
+    neighbor.page,
     async () => {
-      const q = vizinho.pagina
-      await entrarPelaTela(q, 'cidadao2@tcc.local')
-      await q.goto(BASE + `/map/issue/${estado.problemaNovo}`)
+      const q = neighbor.page
+      await loginThroughScreen(q, 'cidadao2@tcc.local')
+      await q.goto(BASE + `/map/issue/${state.newIssue}`)
       const card = q.getByRole('region', { name: 'Resumo do alerta' })
       await card.waitFor()
-      const antes = await card.innerText()
-      const votou = q.waitForResponse((r) => /\/voto$/.test(r.url()))
+      const before = await card.innerText()
+      const voted = q.waitForResponse((r) => /\/voto$/.test(r.url()))
       await q.getByRole('button', { name: 'Voto rápido: Sim, está lá' }).click()
-      const resposta = await votou
-      confere(resposta.ok(), `voto respondeu ${resposta.status()}`)
+      const response = await voted
+      assert(response.ok(), `voto respondeu ${response.status()}`)
       await q.getByRole('button', { name: 'Voto rápido: Sim, está lá', pressed: true }).waitFor()
       await card.getByText('1 confirmaram').waitFor()
-      const votos = sql(
-        `select count(*) from votos where problema_id = '${estado.problemaNovo}' and usuario_id <> '${estado.usuarioId}'`,
+      const votes = sql(
+        `select count(*) from votos where problema_id = '${state.newIssue}' and usuario_id <> '${state.userId}'`,
       )
-      confere(votos === '1', `esperava 1 voto no banco, há ${votos}`)
-      return `antes: "${antes.split('\n').find((l) => l.includes('confirmaram'))}" → 1 confirmaram`
+      assert(votes === '1', `esperava 1 voto no banco, há ${votes}`)
+      return `antes: "${before.split('\n').find((l) => l.includes('confirmaram'))}" → 1 confirmaram`
     },
   )
 
-  await passo(
+  await step(
     'Recentes lista o problema novo (GET /problemas/recentes)',
-    vizinho.pagina,
+    neighbor.page,
     async () => {
-      const q = vizinho.pagina
+      const q = neighbor.page
       await q.goto(BASE + '/recent')
-      const url = `${BASE}/api/v1/problemas/recentes?lat=${POSICAO.latitude}&lng=${POSICAO.longitude}&raioKm=10&tamanho=100`
-      const corpo = await (await fetch(url)).json()
-      confere(
-        corpo.itens.some((i) => i.id === estado.problemaNovo),
+      const url = `${BASE}/api/v1/problemas/recentes?lat=${POSITION.latitude}&lng=${POSITION.longitude}&raioKm=10&tamanho=100`
+      const body = await (await fetch(url)).json()
+      assert(
+        body.items.some((i) => i.id === state.newIssue),
         'problema novo fora da resposta de recentes',
       )
-      await q.getByText(estado.endereco).first().waitFor()
+      await q.getByText(state.address).first().waitFor()
     },
   )
-  await vizinho.contexto.close()
+  await neighbor.context.close()
 
-  const admin = await novaPagina('admin')
-  await passo('Admin aprova o pedido na fila de verificação', admin.pagina, async () => {
-    const q = admin.pagina
-    await entrarPelaTela(q, 'admin@tcc.local')
+  const admin = await newPage('admin')
+  await step('Admin aprova o pedido na fila de verificação', admin.page, async () => {
+    const q = admin.page
+    await loginThroughScreen(q, 'admin@tcc.local')
     await q.goto(BASE + '/admin/verifications')
-    const cartao = q.getByRole('article', { name: `Pedido de ${estado.nomeNovo}` })
-    await cartao.waitFor()
-    await cartao.getByRole('button', { name: /aprovar/i }).click()
-    await cartao.waitFor({ state: 'detached' })
-    const linha = sql(
-      `select s.status, u.perfil, u.verificado_em is not null from solicitacoes_verificacao s join usuarios u on u.id = s.usuario_id where s.usuario_id = '${estado.usuarioId}'`,
+    const card = q.getByRole('article', { name: `Pedido de ${state.newName}` })
+    await card.waitFor()
+    await card.getByRole('button', { name: /aprovar/i }).click()
+    await card.waitFor({ state: 'detached' })
+    const line = sql(
+      `select s.status, u.perfil, u.verificado_em is not null from solicitacoes_verificacao s join usuarios u on u.id = s.usuario_id where s.usuario_id = '${state.userId}'`,
     )
-    return `banco: status/perfil/verificado = ${linha}`
+    return `banco: status/perfil/verificado = ${line}`
   })
-  await admin.contexto.close()
+  await admin.context.close()
 
-  await passo('Usuário vê "Perfil verificado" sem sair da conta (GET /me)', p, async () => {
+  await step('Usuário vê "Perfil verificado" sem sair da conta (GET /me)', p, async () => {
     await p.goto(BASE + '/profile')
     await p.getByText(/^Verificado em/).waitFor()
     await p.getByText('Seu voto tem peso maior').waitFor()
   })
 
-  await passo('Bússola: girar o mapa mostra a direção e o toque volta ao norte', p, async () => {
+  await step('Bússola: girar o mapa mostra a direção e o toque volta ao norte', p, async () => {
     await p.goto(BASE + '/map')
-    const mapa = p.locator('canvas.maplibregl-canvas')
-    await mapa.waitFor()
-    await mapa.focus()
+    const map = p.locator('canvas.maplibregl-canvas')
+    await map.waitFor()
+    await map.focus()
     for (let i = 0; i < 6; i++) {
       await p.keyboard.press('Shift+ArrowRight')
-      await esperar(250)
+      await delay(250)
     }
-    const bussola = p.getByRole('button', { name: 'Apontar para o norte' })
-    await bussola.waitFor()
-    await esperar(800)
-    const letra = await bussola.innerText()
-    confere(letra !== 'N', `a letra continuou N com o mapa girado`)
-    await bussola.click()
-    await bussola.waitFor({ state: 'detached' })
-    return `letra ${letra} com o mapa girado`
+    const compass = p.getByRole('button', { name: 'Apontar para o norte' })
+    await compass.waitFor()
+    await delay(800)
+    const letter = await compass.innerText()
+    assert(letter !== 'N', `a letra continuou N com o mapa girado`)
+    await compass.click()
+    await compass.waitFor({ state: 'detached' })
+    return `letra ${letter} com o mapa girado`
   })
 
-  await passo('Token inválido: o voto pede login de novo (regra 13)', p, async () => {
+  await step('Token inválido: o voto pede login de novo (regra 13)', p, async () => {
     await p.evaluate(() => {
-      const chave = 'urbanReports.session'
-      const salvo = JSON.parse(localStorage.getItem(chave))
-      salvo.state.sessao.token = 'token-invalido'
-      localStorage.setItem(chave, JSON.stringify(salvo))
+      const key = 'urbanReports.session'
+      const saved = JSON.parse(localStorage.getItem(key))
+      saved.state.session.token = 'token-invalido'
+      localStorage.setItem(key, JSON.stringify(saved))
     })
-    await p.goto(BASE + `/map/issue/${estado.problemaSeed}`)
+    await p.goto(BASE + `/map/issue/${state.seedIssue}`)
     await p.getByRole('region', { name: 'Resumo do alerta' }).waitFor()
     await p
       .getByRole('button', { name: /^Voto rápido/ })
@@ -363,147 +360,151 @@ try {
     await p.getByRole('button', { name: 'Agora não' }).click()
   })
 
-  await passo('Sair da conta volta ao modo visitante', p, async () => {
-    await entrarPelaTela(p, NOVO.email, NOVO.senha)
+  await step('Sair da conta volta ao modo visitante', p, async () => {
+    await loginThroughScreen(p, NEW.email, NEW.password)
     await p.goto(BASE + '/profile/settings')
     await p.getByRole('button', { name: 'Sair da conta' }).click()
     await p.waitForURL(/\/map/)
-    const sessao = await p.evaluate(() => localStorage.getItem('urbanReports.session'))
-    confere(!sessao || !JSON.parse(sessao).state.sessao, 'sessão continua no navegador')
+    const session = await p.evaluate(() => localStorage.getItem('urbanReports.session'))
+    assert(!session || !JSON.parse(session).state.session, 'sessão continua no navegador')
   })
-  await visitante.contexto.close()
+  await guest.context.close()
 
-  const mesa = await novaPagina('desktop', DESKTOP)
-  await passo('Desktop: alerta abre no painel lateral ao lado do mapa', mesa.pagina, async () => {
-    const q = mesa.pagina
-    await q.goto(BASE + `/map/issue/${estado.problemaNovo}`)
-    if (q.url().includes('permissao')) await q.getByRole('button', { name: 'Continuar' }).click()
-    await q.getByRole('region', { name: 'Resumo do alerta' }).getByText('Buraco na via').waitFor()
-    await q.locator(`[data-issue="${estado.problemaNovo}"]`).waitFor()
-    await q.waitForLoadState('networkidle')
-    await q.screenshot({ path: `${SAIDA}/desktop-painel.png` })
-  })
-  await mesa.contexto.close()
+  const desktopPage = await newPage('desktop', DESKTOP)
+  await step(
+    'Desktop: alerta abre no painel lateral ao lado do mapa',
+    desktopPage.page,
+    async () => {
+      const q = desktopPage.page
+      await q.goto(BASE + `/map/issue/${state.newIssue}`)
+      if (q.url().includes('permissao')) await q.getByRole('button', { name: 'Continuar' }).click()
+      await q.getByRole('region', { name: 'Resumo do alerta' }).getByText('Buraco na via').waitFor()
+      await q.locator(`[data-issue="${state.newIssue}"]`).waitFor()
+      await q.waitForLoadState('networkidle')
+      await q.screenshot({ path: `${OUTPUT}/desktop-painel.png` })
+    },
+  )
+  await desktopPage.context.close()
 } catch {
 } finally {
-  await navegador.close()
-  relatorio()
+  await browser.close()
+  report()
 }
 
-async function passo(nome, pagina, acao) {
-  const inicio = Date.now()
+async function step(name, page, action) {
+  const start = Date.now()
   try {
-    const detalhe = await acao()
-    resultados.push({ ok: true, nome, detalhe, ms: Date.now() - inicio })
-    console.log(`✓ ${nome}${detalhe ? ` — ${detalhe}` : ''}`)
-  } catch (erro) {
-    const arquivo = `${SAIDA}/falha-${resultados.length + 1}.png`
-    await pagina.screenshot({ path: arquivo }).catch(() => {})
-    resultados.push({
+    const detail = await action()
+    results.push({ ok: true, name, detail, ms: Date.now() - start })
+    console.log(`✓ ${name}${detail ? ` — ${detail}` : ''}`)
+  } catch (error) {
+    const file = `${OUTPUT}/falha-${results.length + 1}.png`
+    await page.screenshot({ path: file }).catch(() => {})
+    results.push({
       ok: false,
-      nome,
-      detalhe: erro.message.split('\n')[0],
-      ms: Date.now() - inicio,
+      name,
+      detail: error.message.split('\n')[0],
+      ms: Date.now() - start,
     })
     console.log(
-      `✗ ${nome}\n  ${erro.message.split('\n').slice(0, 3).join('\n  ')}\n  print: ${arquivo}`,
+      `✗ ${name}\n  ${error.message.split('\n').slice(0, 3).join('\n  ')}\n  print: ${file}`,
     )
-    throw erro
+    throw error
   }
 }
 
-function confere(condicao, mensagem) {
-  if (!condicao) throw new Error(mensagem)
+function assert(condition, message) {
+  if (!condition) throw new Error(message)
 }
 
-async function esperarHabilitado(botao, limite = 20_000) {
-  const fim = Date.now() + limite
-  while (await botao.isDisabled()) {
-    if (Date.now() > fim) throw new Error('botão continuou desabilitado')
-    await esperar(200)
+async function waitUntilEnabled(button, limit = 20_000) {
+  const end = Date.now() + limit
+  while (await button.isDisabled()) {
+    if (Date.now() > end) throw new Error('botão continuou desabilitado')
+    await delay(200)
   }
 }
 
-async function novaPagina(nome, tela = CELULAR, { primeiraVez = false } = {}) {
-  const celular = tela.width < 1024
-  const contexto = await navegador.newContext({
-    viewport: tela,
-    isMobile: celular,
-    hasTouch: celular,
+async function newPage(name, device = MOBILE, { firstTime = false } = {}) {
+  const mobile = device.width < 1024
+  const context = await browser.newContext({
+    viewport: device,
+    isMobile: mobile,
+    hasTouch: mobile,
     locale: 'pt-BR',
     timezoneId: 'America/Sao_Paulo',
     permissions: ['geolocation'],
-    geolocation: POSICAO,
+    geolocation: POSITION,
   })
-  await contexto.addInitScript(() => localStorage.setItem('urbanReports.legendSeen', '1'))
-  if (!primeiraVez) {
-    await contexto.addInitScript(() =>
+  await context.addInitScript(() => localStorage.setItem('urbanReports.legendSeen', '1'))
+  if (!firstTime) {
+    await context.addInitScript(() =>
       localStorage.setItem(
         'urbanReports.theme',
-        JSON.stringify({ state: { preferencia: 'claro', escolhido: true }, version: 0 }),
+        JSON.stringify({ state: { preference: 'claro', chosen: true }, version: 0 }),
       ),
     )
   }
-  const pagina = await contexto.newPage()
-  pagina.on('console', (m) => {
-    if (m.type() === 'error') errosConsole.push(`[${nome}] ${m.text().slice(0, 200)}`)
+  const page = await context.newPage()
+  page.on('console', (m) => {
+    if (m.type() === 'error') consoleErrors.push(`[${name}] ${m.text().slice(0, 200)}`)
   })
-  pagina.on('pageerror', (e) => errosConsole.push(`[${nome}] ${e.message.slice(0, 200)}`))
-  pagina.on('response', (r) => {
+  page.on('pageerror', (e) => consoleErrors.push(`[${name}] ${e.message.slice(0, 200)}`))
+  page.on('response', (r) => {
     const url = new URL(r.url())
     if (url.pathname.startsWith('/api/') && r.status() >= 400) {
-      problemasRede.push(`[${nome}] ${r.request().method()} ${url.pathname} → ${r.status()}`)
+      fetchedIssues.push(`[${name}] ${r.request().method()} ${url.pathname} → ${r.status()}`)
     }
   })
-  return { contexto, pagina }
+  return { context, page }
 }
 
-async function entrarPelaTela(pagina, email, senha = SENHA) {
-  await pagina.goto(BASE + '/login')
-  if (pagina.url().includes('permissao')) {
-    await pagina.getByRole('button', { name: 'Continuar' }).click()
-    await pagina.goto(BASE + '/login')
+async function loginThroughScreen(page, email, password = PASSWORD) {
+  await page.goto(BASE + '/login')
+  if (page.url().includes('permissao')) {
+    await page.getByRole('button', { name: 'Continuar' }).click()
+    await page.goto(BASE + '/login')
   }
-  await pagina.getByLabel('E-mail').fill(email)
-  await pagina.getByLabel('Senha', { exact: true }).fill(senha)
-  const entrou = pagina.waitForResponse((r) => /\/auth\/login/.test(r.url()))
-  await pagina.getByRole('button', { name: 'Entrar' }).click()
-  const resposta = await entrou
-  confere(resposta.ok(), `login de ${email} respondeu ${resposta.status()}`)
-  await pagina.waitForURL((url) => !url.pathname.startsWith('/login'))
+  await page.getByLabel('E-mail').fill(email)
+  await page.getByLabel('Senha', { exact: true }).fill(password)
+  const loggedIn = page.waitForResponse((r) => /\/auth\/login/.test(r.url()))
+  await page.getByRole('button', { name: 'Entrar' }).click()
+  const response = await loggedIn
+  assert(response.ok(), `login de ${email} respondeu ${response.status()}`)
+  await page.waitForURL((url) => !url.pathname.startsWith('/login'))
 }
 
-function sql(consulta) {
+function sql(query) {
   return execFileSync(
     'docker',
-    ['exec', DB, 'psql', '-U', 'ocorrencias', '-d', 'ocorrencias', '-tAc', consulta],
+    ['exec', DB, 'psql', '-U', 'ocorrencias', '-d', 'ocorrencias', '-tAc', query],
     { encoding: 'utf8' },
   ).trim()
 }
 
-async function conferirAmbiente() {
-  const checar = async (url, rotulo) => {
+async function checkEnvironment() {
+  const check = async (url, label) => {
     try {
       const r = await fetch(url)
       if (!r.ok) throw new Error(`${r.status}`)
-    } catch (erro) {
-      console.error(`${rotulo} fora do ar (${url}): ${erro.message}`)
+    } catch (error) {
+      console.error(`${label} fora do ar (${url}): ${error.message}`)
       process.exit(1)
     }
   }
-  await checar(BASE, 'Front')
-  await checar(BASE + '/api/v1/saude/banco', 'API/banco')
+  await check(BASE, 'Front')
+  await check(BASE + '/api/v1/saude/banco', 'API/banco')
   sql('select 1')
 }
 
-function relatorio() {
-  const ok = resultados.filter((r) => r.ok).length
-  console.log(`\n${ok}/${resultados.length} passos ok · conta ${NOVO.email}`)
-  const inesperados = problemasRede.filter((l) => !l.endsWith('→ 401'))
-  if (inesperados.length) console.log('\nRespostas de erro da API:\n  ' + inesperados.join('\n  '))
-  const console_ = errosConsole.filter(
+function report() {
+  const ok = results.filter((r) => r.ok).length
+  console.log(`\n${ok}/${results.length} passos ok · conta ${NEW.email}`)
+  const unexpected = fetchedIssues.filter((l) => !l.endsWith('→ 401'))
+  if (unexpected.length) console.log('\nRespostas de erro da API:\n  ' + unexpected.join('\n  '))
+  const console_ = consoleErrors.filter(
     (l) => !l.includes('ERR_INTERNET_DISCONNECTED') && !l.includes('status of 401'),
   )
   if (console_.length) console.log('\nErros no console:\n  ' + console_.join('\n  '))
-  if (ok !== resultados.length) process.exitCode = 1
+  if (ok !== results.length) process.exitCode = 1
 }

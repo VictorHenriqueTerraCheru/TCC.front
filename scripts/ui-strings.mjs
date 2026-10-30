@@ -36,9 +36,7 @@ const output =
 
 if (!shouldCheck) {
   await writeFile(referencePath, output)
-  console.log(
-    `Referência de textos da UI gravada em ${path.relative(process.cwd(), referencePath)}.`,
-  )
+  console.log(`UI strings reference saved to ${path.relative(process.cwd(), referencePath)}.`)
   process.exit(0)
 }
 
@@ -46,7 +44,7 @@ let reference
 try {
   reference = await readFile(referencePath, 'utf8')
 } catch {
-  console.error(`Referência ausente: ${path.relative(process.cwd(), referencePath)}`)
+  console.error(`Missing reference: ${path.relative(process.cwd(), referencePath)}`)
   process.exit(1)
 }
 
@@ -56,7 +54,7 @@ const normalizedReference =
     .join('\n') + '\n'
 
 if (normalizedReference === output) {
-  console.log('Textos da UI idênticos à referência.')
+  console.log('UI strings identical to the reference.')
   process.exit(0)
 }
 

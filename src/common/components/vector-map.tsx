@@ -8,8 +8,8 @@ import {
 } from '@vis.gl/react-maplibre'
 import type { ReactNode, Ref } from 'react'
 
-import lightStyle from '@/assets/mapa/estilo-claro.json'
-import darkStyle from '@/assets/mapa/estilo-escuro.json'
+import lightStyle from '@/assets/map/light-style.json'
+import darkStyle from '@/assets/map/dark-style.json'
 import { useTheme, type Theme } from '@/common/hooks/use-theme'
 import { DEFAULT_ZOOM } from '@/common/lib/map'
 

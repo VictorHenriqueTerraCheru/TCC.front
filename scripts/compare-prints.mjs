@@ -15,16 +15,14 @@ runPrints()
 if (shouldCreateBaseline) {
   await rm(baselineDirectory, { recursive: true, force: true })
   await cp(printsDirectory, baselineDirectory, { recursive: true })
-  console.log(`Baseline de prints gravada em ${path.relative(process.cwd(), baselineDirectory)}.`)
+  console.log(`Prints baseline saved to ${path.relative(process.cwd(), baselineDirectory)}.`)
   process.exit(0)
 }
 
 try {
   await stat(baselineDirectory)
 } catch {
-  console.error(
-    'Baseline de prints ausente. Execute node scripts/compare-prints.mjs --baseline primeiro.',
-  )
+  console.error('Prints baseline missing. Run node scripts/compare-prints.mjs --baseline first.')
   process.exit(1)
 }
 
@@ -39,7 +37,7 @@ for (const relativePath of files) {
   const currentPath = path.join(printsDirectory, relativePath)
 
   if (!baselineFiles.includes(relativePath) || !currentFiles.includes(relativePath)) {
-    differences.push(`${relativePath} (arquivo ausente)`)
+    differences.push(`${relativePath} (missing file)`)
     continue
   }
 
@@ -47,7 +45,7 @@ for (const relativePath of files) {
   const current = PNG.sync.read(await readFile(currentPath))
 
   if (baseline.width !== current.width || baseline.height !== current.height) {
-    differences.push(`${relativePath} (dimensões diferentes)`)
+    differences.push(`${relativePath} (different dimensions)`)
     continue
   }
 
@@ -65,17 +63,17 @@ for (const relativePath of files) {
     const diffPath = path.join(diffDirectory, relativePath)
     await mkdir(path.dirname(diffPath), { recursive: true })
     await writeFile(diffPath, PNG.sync.write(diff))
-    differences.push(`${relativePath} (${differentPixels} pixels diferentes)`)
+    differences.push(`${relativePath} (${differentPixels} different pixels)`)
   }
 }
 
 if (differences.length) {
-  console.error('Prints diferentes:')
+  console.error('Different prints:')
   for (const difference of differences) console.error(`- ${difference}`)
   process.exit(1)
 }
 
-console.log('Prints idênticos à baseline.')
+console.log('Prints identical to the baseline.')
 
 function runPrints() {
   execFileSync('npm', ['run', 'prints'], { stdio: 'inherit' })

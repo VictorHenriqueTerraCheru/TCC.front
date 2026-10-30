@@ -20,10 +20,10 @@ describe('VectorMap', () => {
   it('uses the current theme style and switches along with it', () => {
     useThemeStore.setState({ preference: 'light' })
     render(<VectorMap center={[0, 0]} />)
-    expect(screen.getByTestId('map')).toHaveAttribute('data-style', 'ocorrencias-claro')
+    expect(screen.getByTestId('map')).toHaveAttribute('data-style', 'urban-reports-light')
 
     act(() => useThemeStore.getState().setPreference('dark'))
-    expect(screen.getByTestId('map')).toHaveAttribute('data-style', 'ocorrencias-escuro')
+    expect(screen.getByTestId('map')).toHaveAttribute('data-style', 'urban-reports-dark')
   })
 
   it('notifies when it stops moving', () => {

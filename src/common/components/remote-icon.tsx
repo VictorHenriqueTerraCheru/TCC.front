@@ -3,7 +3,7 @@ import { useEffect, useState, type CSSProperties } from 'react'
 
 import { cn } from '@/common/lib/utils'
 import { loadIcon, type RemoteIconData } from '@/common/lib/iconify'
-import bundledIcons from '@/assets/material-symbols/icones.json'
+import bundledIcons from '@/assets/material-symbols/icons.json'
 
 import { Icon } from './icon'
 
