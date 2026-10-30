@@ -21,7 +21,7 @@ interface OptionItem {
 const options: OptionItem[] = [
   {
     type: 'issue',
-    title: 'Estado',
+    title: 'Problema',
     meaning: 'Continua lá até ser resolvido',
     examples: 'Buraco, poste apagado, lixo acumulado…',
     consequence: 'Vira um ponto no mapa até alguém confirmar que foi resolvido.',
@@ -34,7 +34,7 @@ const options: OptionItem[] = [
   },
   {
     type: 'incident',
-    title: 'Evento',
+    title: 'Incidente',
     meaning: 'Aconteceu e passou',
     examples: 'Roubo, acidente, rua inundada…',
     consequence: 'Anônimo. Entra no mapa de calor da região, sem ponto exato.',
@@ -69,11 +69,11 @@ export function TypePage() {
       footer={
         <p className="text-center text-[13px] leading-snug text-muted-foreground">
           Em dúvida? Se daqui a uma semana ainda der pra ver no local, é{' '}
-          <strong className="font-semibold text-foreground">estado</strong>.
+          <strong className="font-semibold text-foreground">problema</strong>.
         </p>
       }
     >
-      <h2 className="text-[28px] leading-tight font-bold tracking-tight">Estado ou evento?</h2>
+      <h2 className="text-[28px] leading-tight font-bold tracking-tight">Problema ou incidente?</h2>
       <p className="mt-2 mb-5 text-[15px] text-muted-foreground">
         Escolha como registrar o que você viu.
       </p>

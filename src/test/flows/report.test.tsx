@@ -21,7 +21,7 @@ type User = ReturnType<typeof userEvent.setup>
 async function choose(user: User, category: string, type: 'issue' | 'incident' = 'issue') {
   await user.click(
     await screen.findByRole('link', {
-      name: type === 'issue' ? /^Estado/ : /^Evento/,
+      name: type === 'issue' ? /^Problema/ : /^Incidente/,
     }),
   )
   await user.click(await screen.findByRole('button', { name: category }))

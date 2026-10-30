@@ -51,7 +51,7 @@ function TypeCategory({ type }: { type: NonNullable<ReturnType<typeof readType>>
       }
     >
       <h2 className="mb-4 text-2xl">
-        {type === 'issue' ? 'Qual é o estado?' : 'Qual foi o evento?'}
+        {type === 'issue' ? 'Qual é o problema?' : 'Qual foi o incidente?'}
       </h2>
       {categories.isPending || groups.isPending ? (
         <Skeleton className="h-60 rounded-2xl bg-muted" />

@@ -122,7 +122,7 @@ try {
       await p.goto(BASE + '/map')
       await p.getByRole('link', { name: 'Registrar' }).click()
       await p.waitForURL(/\/report$/)
-      await p.getByRole('link', { name: /^Estado/ }).click()
+      await p.getByRole('link', { name: /^Problema/ }).click()
       await p.waitForURL(/\/report\/category\?type=issue/)
       await p.getByRole('button', { name: /Buraco na via/ }).click()
       await p.getByRole('button', { name: 'Continuar' }).click()
@@ -184,7 +184,7 @@ try {
 
   await step('Report an incident (anonymous) and check the area in the database', p, async () => {
     await p.goto(BASE + '/report')
-    await p.getByRole('link', { name: /^Evento/ }).click()
+    await p.getByRole('link', { name: /^Incidente/ }).click()
     await p.waitForURL(/\/report\/category\?type=incident/)
     await p.getByRole('button', { name: /Roubo/ }).click()
     await p.getByRole('button', { name: 'Continuar' }).click()
