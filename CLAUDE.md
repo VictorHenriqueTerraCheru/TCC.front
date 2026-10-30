@@ -71,7 +71,7 @@ Componentes de layout compartilhados (`common/components/`): `VectorMap` (MapLib
 
 ### Guarda (regras 1 e 13)
 
-`requireAccount(reason, action, returnTo?)` executa `action` se há sessão; senão guarda `returnTo` (padrão: a rota atual) e abre a folha. Login/cadastro chamam `completeLogin()` e navegam para `returnTo`; a pessoa toca de novo na ação (nada é repetido sozinho). "Agora não" e "← Voltar" no login descartam o `returnTo`. Num `401`, o middleware limpa a sessão e marca `expired`; o `onError` do `useMutation` (não o do `mutate`, que se perde se o card desmontar) passa de novo pela guarda. Ao entrar/sair, `useSyncCacheWithSession` invalida o cache do TanStack Query (`myVote`, `isAuthor`, `/me`).
+`requireAccount(reason, action, returnTo?)` executa `action` se há sessão; senão guarda `returnTo` (padrão: a rota atual) e abre a folha. A folha leva `returnTo` para o login/cadastro no estado da navegação (`state.de`), e eles navegam para lá ao entrar; a pessoa toca de novo na ação (nada é repetido sozinho). "Agora não" descarta o `returnTo`; sair do login de qualquer jeito também, porque ele só existe no estado daquela navegação. Num `401`, o middleware limpa a sessão e marca `expired`; o `onError` do `useMutation` (não o do `mutate`, que se perde se o card desmontar) passa de novo pela guarda. Ao entrar/sair, `useSyncCacheWithSession` invalida o cache do TanStack Query (`myVote`, `isAuthor`, `/me`).
 
 Layouts de rota: `RootLayout` (monitor de localização, redirecionamento da pré-permissão, sincronização do cache, folha da guarda) → `AppLayout` (com navegação) ou `FullScreenLayout` (login, cadastro, pré-permissão; cartão centralizado no desktop).
 

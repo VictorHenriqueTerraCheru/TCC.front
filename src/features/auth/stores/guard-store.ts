@@ -9,19 +9,13 @@ interface GuardState {
   askForAccount(reason: AccountReason, returnTo: string): void
   closeSheet(): void
   discard(): void
-  completeLogin(): string | null
 }
 
-export const useGuardStore = create<GuardState>()((set, get) => ({
+export const useGuardStore = create<GuardState>()((set) => ({
   reason: null,
   returnTo: null,
   expired: false,
   askForAccount: (reason, returnTo) => set({ reason, returnTo }),
-  closeSheet: () => set({ reason: null }),
+  closeSheet: () => set({ reason: null, returnTo: null }),
   discard: () => set({ reason: null, returnTo: null, expired: false }),
-  completeLogin: () => {
-    const { returnTo } = get()
-    set({ reason: null, returnTo: null, expired: false })
-    return returnTo
-  },
 }))

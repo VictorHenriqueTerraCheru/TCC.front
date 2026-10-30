@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, type ReactNode } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 
 import { PasswordField, TextField } from '@/common/components/text-field'
 import { ScreenWithBack } from '@/common/components/screen-with-back'
@@ -32,6 +32,7 @@ function DocumentLink({ title, children }: { title: string; children: ReactNode 
 
 export function RegisterPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const afterLogin = useAfterLogin()
   const registration = useRegister()
   const [generalError, setGeneralError] = useState<string | null>(null)
@@ -146,6 +147,7 @@ export function RegisterPage() {
             Já tem conta?
             <Link
               to="/login"
+              state={location.state}
               replace
               className="inline-flex min-h-11 items-center font-medium text-brand hover:underline"
             >

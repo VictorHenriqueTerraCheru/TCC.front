@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { delay, http, HttpResponse } from 'msw'
 
@@ -51,6 +51,31 @@ describe('guard "guests see, accounts act"', () => {
     expect(router.state.location.search).toBe('?mode=both')
     expect(votes).toEqual([])
     server.events.removeAllListeners()
+  })
+
+  it('leaving the login with the browser back forgets where the sheet would return', async () => {
+    const user = userEvent.setup()
+    const { router } = openAt(`/map/issue/${ACTIVE}`)
+
+    await user.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
+    await user.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
+    await router.navigate(-1)
+    await router.navigate('/login', { state: { de: '/profile' } })
+    await loginAs(user, 'cidadao1@tcc.local')
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/profile'))
+  })
+
+  it('from the sheet, "Criar conta" → "Entrar" still returns to the alert', async () => {
+    const user = userEvent.setup()
+    const { router } = openAt(`/map/issue/${ACTIVE}`)
+
+    await user.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
+    await user.click(await screen.findByRole('button', { name: 'Criar conta' }))
+    await user.click(await screen.findByRole('link', { name: 'Entrar' }))
+    await loginAs(user, 'cidadao1@tcc.local')
+
+    await waitFor(() => expect(router.state.location.pathname).toBe(`/map/issue/${ACTIVE}`))
   })
 
   it('expired session (expiresAt in the past) counts as guest in the guard', async () => {
