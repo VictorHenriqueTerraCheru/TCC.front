@@ -1,7 +1,5 @@
-// Gerado por scripts/gen-api.mjs a partir de docs/openapi.json. Não edite à mão: rode npm run gen:api.
-
 export interface paths {
-    "/admin/categorias": {
+    "/admin/categories": {
         parameters: {
             query?: never;
             header?: never;
@@ -17,13 +15,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["CategoriaAdminResponse"][];
+                        "application/json": components["schemas"]["CategoryAdminResponse"][];
                     };
                 };
             };
@@ -38,20 +35,18 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["CriarCategoriaRequest"];
+                    "application/json": components["schemas"]["CreateCategoryRequest"];
                 };
             };
             responses: {
-                /** @description Created */
                 201: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["CategoriaAdminResponse"];
+                        "application/json": components["schemas"]["CategoryAdminResponse"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -68,7 +63,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/categorias/{id}": {
+    "/admin/categories/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -87,20 +82,18 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["EditarCategoriaRequest"];
+                    "application/json": components["schemas"]["EditCategoryRequest"];
                 };
             };
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["CategoriaAdminResponse"];
+                        "application/json": components["schemas"]["CategoryAdminResponse"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -109,7 +102,6 @@ export interface paths {
                         "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
-                /** @description Not Found */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -125,7 +117,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/categorias/{id}/ativa": {
+    "/admin/categories/{id}/active": {
         parameters: {
             query?: never;
             header?: never;
@@ -149,18 +141,16 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["AlterarAtivaCategoriaRequest"];
+                    "application/json": components["schemas"]["SetCategoryActiveRequest"];
                 };
             };
             responses: {
-                /** @description No Content */
                 204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
                 };
-                /** @description Not Found */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -171,7 +161,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/admin/grupos": {
+    "/admin/groups": {
         parameters: {
             query?: never;
             header?: never;
@@ -189,20 +179,18 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["CriarGrupoRequest"];
+                    "application/json": components["schemas"]["CreateGroupRequest"];
                 };
             };
             responses: {
-                /** @description Created */
                 201: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["GrupoResponse"];
+                        "application/json": components["schemas"]["GroupResponse"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -219,7 +207,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/grupos/{chave}": {
+    "/admin/groups/{key}": {
         parameters: {
             query?: never;
             header?: never;
@@ -232,26 +220,24 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    chave: string;
+                    key: string;
                 };
                 cookie?: never;
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["EditarGrupoRequest"];
+                    "application/json": components["schemas"]["EditGroupRequest"];
                 };
             };
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["GrupoResponse"];
+                        "application/json": components["schemas"]["GroupResponse"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -260,7 +246,6 @@ export interface paths {
                         "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
-                /** @description Not Found */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -275,20 +260,18 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    chave: string;
+                    key: string;
                 };
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description No Content */
                 204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
                 };
-                /** @description Not Found */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -302,7 +285,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/usuarios": {
+    "/admin/users": {
         parameters: {
             query?: never;
             header?: never;
@@ -312,10 +295,10 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    busca?: string;
-                    perfil?: string;
-                    pagina?: number;
-                    tamanho?: number;
+                    search?: string;
+                    role?: string;
+                    page?: number;
+                    pageSize?: number;
                 };
                 header?: never;
                 path?: never;
@@ -323,16 +306,14 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["PaginadoListarUsuariosItem"];
+                        "application/json": components["schemas"]["PagedListUsersItem"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -351,7 +332,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/usuarios/{id}/perfil": {
+    "/admin/users/{id}/role": {
         parameters: {
             query?: never;
             header?: never;
@@ -375,18 +356,16 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["AlterarPerfilRequest"];
+                    "application/json": components["schemas"]["ChangeRoleRequest"];
                 };
             };
             responses: {
-                /** @description No Content */
                 204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -395,7 +374,6 @@ export interface paths {
                         "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
-                /** @description Not Found */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -406,7 +384,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/admin/verificacoes": {
+    "/admin/verifications": {
         parameters: {
             query?: never;
             header?: never;
@@ -417,8 +395,8 @@ export interface paths {
             parameters: {
                 query?: {
                     status?: string;
-                    pagina?: number;
-                    tamanho?: number;
+                    page?: number;
+                    pageSize?: number;
                 };
                 header?: never;
                 path?: never;
@@ -426,16 +404,14 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["PaginadoListarVerificacoesItem"];
+                        "application/json": components["schemas"]["PagedListVerificationsItem"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -454,7 +430,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/verificacoes/{id}/aprovar": {
+    "/admin/verifications/{id}/approve": {
         parameters: {
             query?: never;
             header?: never;
@@ -474,14 +450,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description No Content */
                 204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
                 };
-                /** @description Not Found */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -496,7 +470,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/verificacoes/{id}/recusar": {
+    "/admin/verifications/{id}/reject": {
         parameters: {
             query?: never;
             header?: never;
@@ -516,18 +490,16 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["RecusarVerificacaoRequest"];
+                    "application/json": components["schemas"]["RejectVerificationRequest"];
                 };
             };
             responses: {
-                /** @description No Content */
                 204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -536,60 +508,11 @@ export interface paths {
                         "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
-                /** @description Not Found */
                 404: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/auth/cadastro": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CadastrarRequest"];
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["RespostaAuth"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
                 };
             };
         };
@@ -617,20 +540,18 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["EntrarRequest"];
+                    "application/json": components["schemas"]["LoginRequest"];
                 };
             };
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["RespostaAuth"];
+                        "application/json": components["schemas"]["AuthResponse"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -647,7 +568,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/categorias": {
+    "/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RegisterRequest"];
+                };
+            };
+            responses: {
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AuthResponse"];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/categories": {
         parameters: {
             query?: never;
             header?: never;
@@ -663,13 +630,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ListarCategoriasResponse"][];
+                        "application/json": components["schemas"]["ListCategoriesResponse"][];
                     };
                 };
             };
@@ -682,7 +648,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/geocodificacao/reversa": {
+    "/geocoding/reverse": {
         parameters: {
             query?: never;
             header?: never;
@@ -701,16 +667,14 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ReversaResponse"];
+                        "application/json": components["schemas"]["ReverseResponse"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -719,7 +683,6 @@ export interface paths {
                         "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                     };
                 };
-                /** @description Too Many Requests */
                 429: {
                     headers: {
                         [name: string]: unknown;
@@ -738,7 +701,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/grupos": {
+    "/groups": {
         parameters: {
             query?: never;
             header?: never;
@@ -754,13 +717,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["GrupoResponse"][];
+                        "application/json": components["schemas"]["GroupResponse"][];
                     };
                 };
             };
@@ -773,7 +735,83 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/incidentes": {
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["HealthStatusResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health/database": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["HealthStatusResponse"];
+                    };
+                };
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/incidents": {
         parameters: {
             query?: never;
             header?: never;
@@ -791,20 +829,18 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["RegistrarIncidenteRequest"];
+                    "application/json": components["schemas"]["CreateIncidentRequest"];
                 };
             };
             responses: {
-                /** @description Created */
                 201: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ObterAreaIncidentesResponse"];
+                        "application/json": components["schemas"]["GetIncidentAreaResponse"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -821,7 +857,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/incidentes/area": {
+    "/incidents/area": {
         parameters: {
             query?: never;
             header?: never;
@@ -840,16 +876,14 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ObterAreaIncidentesResponse"];
+                        "application/json": components["schemas"]["GetIncidentAreaResponse"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -868,7 +902,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/incidentes/calor": {
+    "/incidents/heatmap": {
         parameters: {
             query?: never;
             header?: never;
@@ -882,8 +916,8 @@ export interface paths {
                     minLng: number;
                     maxLat: number;
                     maxLng: number;
-                    dias?: number;
-                    grupos?: string;
+                    days?: number;
+                    groups?: string;
                 };
                 header?: never;
                 path?: never;
@@ -891,16 +925,14 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ObterCalorIncidentesResponse"][];
+                        "application/json": components["schemas"]["GetIncidentHeatmapResponse"][];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -912,6 +944,276 @@ export interface paths {
             };
         };
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    minLat: number;
+                    minLng: number;
+                    maxLat: number;
+                    maxLng: number;
+                    groups?: string;
+                    status?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ListIssuesInAreaResponse"][];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateIssueRequest"];
+                };
+            };
+            responses: {
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GetIssueDetailResponse"];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/duplicates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    categoryId: number;
+                    lat: number;
+                    lng: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SearchDuplicatesResponse"][];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/recent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query: {
+                    lat: number;
+                    lng: number;
+                    radiusKm?: number;
+                    groups?: string;
+                    page?: number;
+                    pageSize?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PagedListRecentIssuesItem"];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GetIssueDetailResponse"];
+                    };
+                };
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issues/{id}/vote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["VoteRequest"];
+                };
+            };
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GetIssueDetailResponse"];
+                    };
+                };
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                    };
+                };
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;
@@ -935,13 +1237,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ObterMeResponse"];
+                        "application/json": components["schemas"]["GetMeResponse"];
                     };
                 };
             };
@@ -960,20 +1261,18 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["AtualizarMeRequest"];
+                    "application/json": components["schemas"]["UpdateMeRequest"];
                 };
             };
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["ObterMeResponse"];
+                        "application/json": components["schemas"]["GetMeResponse"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -986,7 +1285,7 @@ export interface paths {
         };
         trace?: never;
     };
-    "/me/historico": {
+    "/me/history": {
         parameters: {
             query?: never;
             header?: never;
@@ -996,9 +1295,9 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    filtro?: string;
-                    pagina?: number;
-                    tamanho?: number;
+                    filter?: string;
+                    page?: number;
+                    pageSize?: number;
                 };
                 header?: never;
                 path?: never;
@@ -1006,16 +1305,14 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["PaginadoObterHistoricoItem"];
+                        "application/json": components["schemas"]["PagedGetHistoryItem"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -1034,369 +1331,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/problemas": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query: {
-                    minLat: number;
-                    minLng: number;
-                    maxLat: number;
-                    maxLng: number;
-                    grupos?: string;
-                    status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ListarProblemasNaAreaResponse"][];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["RegistrarProblemaRequest"];
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ObterDetalheProblemaResponse"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/problemas/duplicatas": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query: {
-                    categoriaId: number;
-                    lat: number;
-                    lng: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["BuscarDuplicatasResponse"][];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/problemas/recentes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query: {
-                    lat: number;
-                    lng: number;
-                    raioKm?: number;
-                    grupos?: string;
-                    pagina?: number;
-                    tamanho?: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["PaginadoListarProblemasRecentesItem"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/problemas/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ObterDetalheProblemaResponse"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/problemas/{id}/voto": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["VotarRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ObterDetalheProblemaResponse"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/saude": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["StatusSaudeResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/saude/banco": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["StatusSaudeResponse"];
-                    };
-                };
-                /** @description Service Unavailable */
-                503: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/problem+json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/verificacoes": {
+    "/verifications": {
         parameters: {
             query?: never;
             header?: never;
@@ -1414,20 +1349,18 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SolicitarVerificacaoRequest"];
+                    "application/json": components["schemas"]["RequestVerificationRequest"];
                 };
             };
             responses: {
-                /** @description Created */
                 201: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SolicitarVerificacaoResponse"];
+                        "application/json": components["schemas"]["RequestVerificationResponse"];
                     };
                 };
-                /** @description Bad Request */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -1448,87 +1381,150 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        AlterarAtivaCategoriaRequest: {
-            ativa: boolean;
+        AffiliationType: "livesInArea" | "worksInArea" | "publicServant" | "other";
+        AuthResponse: {
+            expiresAt: string;
+            token: string;
+            user: components["schemas"]["AuthResponseUserSummary"];
         };
-        AlterarPerfilRequest: {
-            perfil: components["schemas"]["Perfil"];
-        };
-        AtualizarMeRequest: {
-            nome: string;
-        };
-        BuscarDuplicatasResponse: {
-            categoria: components["schemas"]["CategoriaResumo"];
-            /** Format: int32 */
-            confirmacoes: number;
-            /** Format: date-time */
-            criadoEm: string;
-            /** Format: int32 */
-            distanciaMetros: number;
-            endereco: string;
-            faixa: null | components["schemas"]["FaixaConfianca"];
-            /** Format: uuid */
+        AuthResponseUserSummary: {
+            email: string;
             id: string;
+            name: string;
+            role: components["schemas"]["Role"];
         };
-        CadastrarRequest: {
-            aceitouTermos: boolean;
-            email: string;
-            nome: string;
-            senha: string;
-        };
-        CategoriaAdminResponse: {
-            ativa: boolean;
-            grupo: string;
-            icone: string;
-            /** Format: int16 */
+        CategoryAdminResponse: {
+            active: boolean;
+            group: string;
+            icon: string;
             id: number;
-            nome: string;
-            tipo: components["schemas"]["TipoOcorrencia"];
+            name: string;
+            type: components["schemas"]["ReportType"];
         };
-        CategoriaResumo: {
-            grupo: string;
-            icone: string;
-            /** Format: int16 */
+        CategorySummary: {
+            group: string;
+            icon: string;
             id: number;
-            nome: string;
+            name: string;
         };
-        /** @enum {unknown} */
-        CorGrupo: "laranja" | "ocre" | "marrom" | "vermelho" | "terracota" | "azul" | "verdeAgua" | "roxo" | "rosa" | "cinza";
-        CriarCategoriaRequest: {
-            grupo: string;
-            icone: string;
-            nome: string;
-            tipo: components["schemas"]["TipoOcorrencia"];
+        ChangeRoleRequest: {
+            role: components["schemas"]["Role"];
         };
-        CriarGrupoRequest: {
-            cor: components["schemas"]["CorGrupo"];
-            rotulo: string;
-            tipo: components["schemas"]["TipoOcorrencia"];
+        ConcentrationLevel: "low" | "medium" | "high";
+        CreateCategoryRequest: {
+            group: string;
+            icon: string;
+            name: string;
+            type: components["schemas"]["ReportType"];
         };
-        EditarCategoriaRequest: {
-            grupo: string;
-            icone: string;
-            nome: string;
+        CreateGroupRequest: {
+            color: components["schemas"]["GroupColor"];
+            label: string;
+            type: components["schemas"]["ReportType"];
         };
-        EditarGrupoRequest: {
-            cor: components["schemas"]["CorGrupo"];
-            /** Format: int32 */
-            ordem: number;
-            rotulo: string;
+        CreateIncidentRequest: {
+            categoryId: number;
+            lat: number;
+            lng: number;
+            occurredAt: string;
         };
-        EntrarRequest: {
+        CreateIssueRequest: {
+            categoryId: number;
+            description: null | string;
+            lat: number;
+            lng: number;
+        };
+        EditCategoryRequest: {
+            group: string;
+            icon: string;
+            name: string;
+        };
+        EditGroupRequest: {
+            color: components["schemas"]["GroupColor"];
+            label: string;
+            sortOrder: number;
+        };
+        GetHistoryItem: {
+            address: null | string;
+            category: components["schemas"]["CategorySummary"];
+            date: string;
+            issueStatus: null | components["schemas"]["IssueStatus"];
+            reportId: null | string;
+            type: components["schemas"]["GetHistoryItemType"];
+            value: null | components["schemas"]["GetHistoryItemValue"];
+        };
+        GetHistoryItemType: "issueReport" | "incidentReport" | "vote";
+        GetHistoryItemValue: "yes" | "no";
+        GetIncidentAreaCount: {
+            categoryId: number;
+            days30: number;
+            days7: number;
+            name: string;
+        };
+        GetIncidentAreaResponse: {
+            counts: components["schemas"]["GetIncidentAreaCount"][];
+            level: components["schemas"]["ConcentrationLevel"];
+            radiusMeters: number;
+            updatedAt: string;
+        };
+        GetIncidentHeatmapResponse: {
+            count: number;
+            lat: number;
+            lng: number;
+        };
+        GetIssueDetailEvaluation: {
+            closesAt: string;
+            required: number;
+            voters: number;
+        };
+        GetIssueDetailResponse: {
+            address: string;
+            band: null | components["schemas"]["TrustBand"];
+            category: components["schemas"]["CategorySummary"];
+            createdAt: string;
+            description: null | string;
+            evaluation: null | components["schemas"]["GetIssueDetailEvaluation"];
+            id: string;
+            isAuthor: boolean;
+            lat: number;
+            lng: number;
+            myVote: null | components["schemas"]["VoteAnswer"];
+            status: components["schemas"]["IssueStatus"];
+            trustScore: null | number;
+            votes: components["schemas"]["GetIssueDetailVotes"];
+        };
+        GetIssueDetailVotes: {
+            no: number;
+            noLast24h: number;
+            yes: number;
+        };
+        GetMeResponse: {
+            createdAt: string;
             email: string;
-            senha: string;
+            id: string;
+            name: string;
+            role: components["schemas"]["Role"];
+            totalReports: number;
+            totalVotes: number;
+            verification: null | components["schemas"]["GetMeVerificationSummary"];
+            verifiedAt: string | null;
         };
-        /** @enum {unknown} */
-        FaixaConfianca: "baixa" | "media" | "alta";
-        GrupoResponse: {
-            chave: string;
-            cor: components["schemas"]["CorGrupo"];
-            /** Format: int32 */
-            ordem: number;
-            rotulo: string;
-            tipo: components["schemas"]["TipoOcorrencia"];
+        GetMeVerificationSummary: {
+            affiliationType: components["schemas"]["AffiliationType"];
+            createdAt: string;
+            rejectionReason: null | string;
+            status: components["schemas"]["VerificationStatus"];
+        };
+        GroupColor: "orange" | "ochre" | "brown" | "red" | "terracotta" | "blue" | "teal" | "purple" | "pink" | "gray";
+        GroupResponse: {
+            color: components["schemas"]["GroupColor"];
+            key: string;
+            label: string;
+            sortOrder: number;
+            type: components["schemas"]["ReportType"];
+        };
+        HealthStatusResponse: {
+            status: string;
         };
         HttpValidationProblemDetails: {
             detail?: null | string;
@@ -1536,296 +1532,146 @@ export interface components {
                 [key: string]: string[];
             };
             instance?: null | string;
-            /** Format: int32 */
             status?: null | number;
             title?: null | string;
             type?: null | string;
         };
-        ListarCategoriasResponse: {
-            grupo: string;
-            icone: string;
-            /** Format: int16 */
+        IssueStatus: "new" | "active" | "possiblyResolved" | "resolved";
+        ListCategoriesResponse: {
+            group: string;
+            icon: string;
             id: number;
-            nome: string;
-            tipo: components["schemas"]["TipoOcorrencia"];
+            name: string;
+            type: components["schemas"]["ReportType"];
         };
-        ListarProblemasNaAreaResponse: {
-            /** Format: int16 */
-            categoriaId: number;
-            /** Format: double */
-            confianca: null | number;
-            faixa: null | components["schemas"]["FaixaConfianca"];
-            /** Format: uuid */
+        ListIssuesInAreaResponse: {
+            band: null | components["schemas"]["TrustBand"];
+            categoryId: number;
             id: string;
-            /** Format: double */
             lat: number;
-            /** Format: double */
             lng: number;
-            status: components["schemas"]["StatusProblema"];
+            status: components["schemas"]["IssueStatus"];
+            trustScore: null | number;
         };
-        ListarProblemasRecentesItem: {
-            categoria: components["schemas"]["CategoriaResumo"];
-            /** Format: date-time */
-            criadoEm: string;
-            endereco: string;
-            faixa: null | components["schemas"]["FaixaConfianca"];
-            /** Format: uuid */
+        ListRecentIssuesItem: {
+            address: string;
+            band: null | components["schemas"]["TrustBand"];
+            category: components["schemas"]["CategorySummary"];
+            createdAt: string;
             id: string;
-            status: components["schemas"]["StatusProblema"];
+            status: components["schemas"]["IssueStatus"];
         };
-        ListarUsuariosItem: {
-            /** Format: date-time */
-            criadoEm: string;
+        ListUsersItem: {
+            createdAt: string;
             email: string;
-            /** Format: uuid */
             id: string;
-            nome: string;
-            perfil: components["schemas"]["Perfil"];
-            /** Format: date-time */
-            verificadoEm: string | null;
+            name: string;
+            role: components["schemas"]["Role"];
+            verifiedAt: string | null;
         };
-        ListarVerificacoesItem: {
-            /** Format: date-time */
-            criadaEm: string;
-            /** Format: uuid */
+        ListVerificationsItem: {
+            affiliationType: components["schemas"]["AffiliationType"];
+            createdAt: string;
             id: string;
-            justificativa: string;
-            motivoRecusa: null | string;
-            status: components["schemas"]["StatusVerificacao"];
-            tipoVinculo: components["schemas"]["TipoVinculo"];
-            usuario: components["schemas"]["ListarVerificacoesUsuarioResumo"];
+            justification: string;
+            rejectionReason: null | string;
+            status: components["schemas"]["VerificationStatus"];
+            user: components["schemas"]["ListVerificationsUserSummary"];
         };
-        ListarVerificacoesUsuarioResumo: {
-            /** Format: uuid */
+        ListVerificationsUserSummary: {
             id: string;
-            iniciais: string;
-            nome: string;
+            initials: string;
+            name: string;
         };
-        /** @enum {unknown} */
-        NivelConcentracao: "baixa" | "media" | "alta";
-        ObterAreaIncidentesContagem: {
-            /** Format: int16 */
-            categoriaId: number;
-            /** Format: int32 */
-            dias30: number;
-            /** Format: int32 */
-            dias7: number;
-            nome: string;
-        };
-        ObterAreaIncidentesResponse: {
-            /** Format: date-time */
-            atualizadoEm: string;
-            contagens: components["schemas"]["ObterAreaIncidentesContagem"][];
-            nivel: components["schemas"]["NivelConcentracao"];
-            /** Format: int32 */
-            raioMetros: number;
-        };
-        ObterCalorIncidentesResponse: {
-            /** Format: double */
-            lat: number;
-            /** Format: double */
-            lng: number;
-            /** Format: int32 */
-            quantidade: number;
-        };
-        ObterDetalheProblemaAvaliacao: {
-            /** Format: date-time */
-            encerraEm: string;
-            /** Format: int32 */
-            necessarios: number;
-            /** Format: int32 */
-            votantes: number;
-        };
-        ObterDetalheProblemaResponse: {
-            avaliacao: null | components["schemas"]["ObterDetalheProblemaAvaliacao"];
-            categoria: components["schemas"]["CategoriaResumo"];
-            /** Format: double */
-            confianca: null | number;
-            /** Format: date-time */
-            criadoEm: string;
-            descricao: null | string;
-            endereco: string;
-            faixa: null | components["schemas"]["FaixaConfianca"];
-            /** Format: uuid */
-            id: string;
-            /** Format: double */
-            lat: number;
-            /** Format: double */
-            lng: number;
-            meuVoto: null | components["schemas"]["ValorVotoContrato"];
-            souAutor: boolean;
-            status: components["schemas"]["StatusProblema"];
-            votos: components["schemas"]["ObterDetalheProblemaVotos"];
-        };
-        ObterDetalheProblemaVotos: {
-            /** Format: int32 */
-            nao: number;
-            /** Format: int32 */
-            naoUltimas24h: number;
-            /** Format: int32 */
-            sim: number;
-        };
-        ObterHistoricoItem: {
-            categoria: components["schemas"]["CategoriaResumo"];
-            /** Format: date-time */
-            data: string;
-            endereco: null | string;
-            /** Format: uuid */
-            ocorrenciaId: null | string;
-            statusProblema: null | components["schemas"]["StatusProblema"];
-            tipo: components["schemas"]["ObterHistoricoTipoItem"];
-            valor: null | components["schemas"]["ObterHistoricoValorItem"];
-        };
-        /** @enum {unknown} */
-        ObterHistoricoTipoItem: "registroProblema" | "registroIncidente" | "voto";
-        /** @enum {unknown} */
-        ObterHistoricoValorItem: "sim" | "nao";
-        ObterMeResponse: {
-            /** Format: date-time */
-            criadoEm: string;
+        LoginRequest: {
             email: string;
-            /** Format: uuid */
-            id: string;
-            nome: string;
-            perfil: components["schemas"]["Perfil"];
-            /** Format: int32 */
-            totalRegistros: number;
-            /** Format: int32 */
-            totalVotos: number;
-            verificacao: null | components["schemas"]["ObterMeVerificacaoResumo"];
-            /** Format: date-time */
-            verificadoEm: string | null;
+            password: string;
         };
-        ObterMeVerificacaoResumo: {
-            /** Format: date-time */
-            criadaEm: string;
-            motivoRecusa: null | string;
-            status: components["schemas"]["StatusVerificacao"];
-            tipoVinculo: components["schemas"]["TipoVinculo"];
-        };
-        PaginadoListarProblemasRecentesItem: {
-            itens: components["schemas"]["ListarProblemasRecentesItem"][];
-            /** Format: int32 */
-            pagina: number;
-            /** Format: int32 */
-            tamanho: number;
-            /** Format: int32 */
+        PagedGetHistoryItem: {
+            items: components["schemas"]["GetHistoryItem"][];
+            page: number;
+            pageSize: number;
             total: number;
         };
-        PaginadoListarUsuariosItem: {
-            itens: components["schemas"]["ListarUsuariosItem"][];
-            /** Format: int32 */
-            pagina: number;
-            /** Format: int32 */
-            tamanho: number;
-            /** Format: int32 */
+        PagedListRecentIssuesItem: {
+            items: components["schemas"]["ListRecentIssuesItem"][];
+            page: number;
+            pageSize: number;
             total: number;
         };
-        PaginadoListarVerificacoesItem: {
-            itens: components["schemas"]["ListarVerificacoesItem"][];
-            /** Format: int32 */
-            pagina: number;
-            /** Format: int32 */
-            tamanho: number;
-            /** Format: int32 */
+        PagedListUsersItem: {
+            items: components["schemas"]["ListUsersItem"][];
+            page: number;
+            pageSize: number;
             total: number;
         };
-        PaginadoObterHistoricoItem: {
-            itens: components["schemas"]["ObterHistoricoItem"][];
-            /** Format: int32 */
-            pagina: number;
-            /** Format: int32 */
-            tamanho: number;
-            /** Format: int32 */
+        PagedListVerificationsItem: {
+            items: components["schemas"]["ListVerificationsItem"][];
+            page: number;
+            pageSize: number;
             total: number;
         };
-        /** @enum {unknown} */
-        Perfil: "cidadao" | "cidadaoVerificado" | "administrador";
         ProblemDetails: {
             detail?: null | string;
             instance?: null | string;
-            /** Format: int32 */
             status?: null | number;
             title?: null | string;
             type?: null | string;
         };
-        RecusarVerificacaoRequest: {
-            motivo: string;
-        };
-        RegistrarIncidenteRequest: {
-            /** Format: int16 */
-            categoriaId: number;
-            /** Format: double */
-            lat: number;
-            /** Format: double */
-            lng: number;
-            /** Format: date-time */
-            ocorridoEm: string;
-        };
-        RegistrarProblemaRequest: {
-            /** Format: int16 */
-            categoriaId: number;
-            descricao: null | string;
-            /** Format: double */
-            lat: number;
-            /** Format: double */
-            lng: number;
-        };
-        RespostaAuth: {
-            /** Format: date-time */
-            expiraEm: string;
-            token: string;
-            usuario: components["schemas"]["RespostaAuthUsuarioResumo"];
-        };
-        RespostaAuthUsuarioResumo: {
+        RegisterRequest: {
+            acceptedTerms: boolean;
             email: string;
-            /** Format: uuid */
+            name: string;
+            password: string;
+        };
+        RejectVerificationRequest: {
+            reason: string;
+        };
+        ReportType: "issue" | "incident";
+        RequestVerificationRequest: {
+            affiliationType: components["schemas"]["AffiliationType"];
+            justification: string;
+        };
+        RequestVerificationResponse: {
+            affiliationType: components["schemas"]["AffiliationType"];
+            createdAt: string;
             id: string;
-            nome: string;
-            perfil: components["schemas"]["Perfil"];
+            justification: string;
+            status: components["schemas"]["VerificationStatus"];
         };
-        ReversaResponse: {
-            bairro: null | string;
-            cidade: null | string;
-            disponivel: boolean;
-            endereco: string;
-            logradouro: null | string;
-            numero: null | string;
-            rotuloArea: null | string;
-            uf: null | string;
+        ReverseResponse: {
+            address: string;
+            areaLabel: null | string;
+            available: boolean;
+            city: null | string;
+            neighborhood: null | string;
+            number: null | string;
+            state: null | string;
+            street: null | string;
         };
-        SolicitarVerificacaoRequest: {
-            justificativa: string;
-            tipoVinculo: components["schemas"]["TipoVinculo"];
-        };
-        SolicitarVerificacaoResponse: {
-            /** Format: date-time */
-            criadaEm: string;
-            /** Format: uuid */
+        Role: "citizen" | "verifiedCitizen" | "administrator";
+        SearchDuplicatesResponse: {
+            address: string;
+            band: null | components["schemas"]["TrustBand"];
+            category: components["schemas"]["CategorySummary"];
+            confirmations: number;
+            createdAt: string;
+            distanceMeters: number;
             id: string;
-            justificativa: string;
-            status: components["schemas"]["StatusVerificacao"];
-            tipoVinculo: components["schemas"]["TipoVinculo"];
         };
-        /** @enum {unknown} */
-        StatusProblema: "nova" | "ativa" | "possivelmenteResolvida" | "resolvida";
-        StatusSaudeResponse: {
-            status: string;
+        SetCategoryActiveRequest: {
+            active: boolean;
         };
-        /** @enum {unknown} */
-        StatusVerificacao: "pendente" | "aprovada" | "recusada";
-        /** @enum {unknown} */
-        TipoOcorrencia: "problema" | "incidente";
-        /** @enum {unknown} */
-        TipoVinculo: "moradorRegiao" | "trabalhaRegiao" | "servidorPublico" | "outro";
-        /** @enum {unknown} */
-        ValorVotoContrato: "sim" | "nao";
-        VotarRequest: {
-            /** Format: double */
+        TrustBand: "low" | "medium" | "high";
+        UpdateMeRequest: {
+            name: string;
+        };
+        VerificationStatus: "pending" | "approved" | "rejected";
+        VoteAnswer: "yes" | "no";
+        VoteRequest: {
             lat: null | number;
-            /** Format: double */
             lng: null | number;
-            valor: components["schemas"]["ValorVotoContrato"];
+            value: components["schemas"]["VoteAnswer"];
         };
     };
     responses: never;

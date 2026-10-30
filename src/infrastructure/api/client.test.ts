@@ -1,82 +1,82 @@
 import { http, HttpResponse } from 'msw'
 
 import { server } from '../mocks/server'
-import { rota } from '../mocks/rota'
+import { route } from '../mocks/route'
 import { ApiError } from './api-error'
-import { registrarAutenticacao } from './autenticacao'
-import { api, dados } from './client'
+import { registerAuthProvider } from './authentication'
+import { api, unwrapData } from './client'
 
-describe('cliente da API', () => {
-  const aoExpirarSessao = vi.fn()
+describe('API client', () => {
+  const onSessionExpired = vi.fn()
   let token: string | null = null
 
   beforeEach(() => {
     token = null
-    aoExpirarSessao.mockReset()
-    registrarAutenticacao({ obterToken: () => token, aoExpirarSessao })
+    onSessionExpired.mockReset()
+    registerAuthProvider({ getToken: () => token, onSessionExpired })
   })
 
-  it('envia o JWT no Authorization quando há sessão', async () => {
-    token = 'jwt-de-teste'
-    let recebido: string | null = null
+  it('sends the JWT in Authorization when there is a session', async () => {
+    token = 'test-jwt'
+    let received: string | null = null
     server.use(
-      http.get(rota('/me'), ({ request }) => {
-        recebido = request.headers.get('Authorization')
+      http.get(route('/me'), ({ request }) => {
+        received = request.headers.get('Authorization')
         return HttpResponse.json({})
       }),
     )
 
     await api.GET('/me')
 
-    expect(recebido).toBe('Bearer jwt-de-teste')
+    expect(received).toBe('Bearer test-jwt')
   })
 
-  it('não envia o JWT para /auth/*', async () => {
-    token = 'jwt-antigo'
-    let recebido: string | null = 'nao-chamado'
+  it('does not send the JWT to /auth/*', async () => {
+    token = 'jwt-old'
+    let received: string | null = 'not-called'
     server.use(
-      http.post(rota('/auth/login'), ({ request }) => {
-        recebido = request.headers.get('Authorization')
+      http.post(route('/auth/login'), ({ request }) => {
+        received = request.headers.get('Authorization')
         return HttpResponse.json({}, { status: 401 })
       }),
     )
 
-    await api.POST('/auth/login', { body: { email: 'a@b.c', senha: '12345678' } })
+    await api.POST('/auth/login', { body: { email: 'a@b.c', password: '12345678' } })
 
-    expect(recebido).toBeNull()
-    expect(aoExpirarSessao).not.toHaveBeenCalled()
+    expect(received).toBeNull()
+    expect(onSessionExpired).not.toHaveBeenCalled()
   })
 
-  it('401 numa chamada autenticada expira a sessão (regra 13)', async () => {
-    token = 'jwt-expirado'
-    server.use(http.get(rota('/me'), () => new HttpResponse(null, { status: 401 })))
+  it('401 on an authenticated call expires the session (rule 13)', async () => {
+    token = 'jwt-expired'
+    server.use(http.get(route('/me'), () => new HttpResponse(null, { status: 401 })))
 
-    await expect(api.GET('/me').then(dados)).rejects.toMatchObject({ status: 401 })
-    expect(aoExpirarSessao).toHaveBeenCalledOnce()
+    await expect(api.GET('/me').then(unwrapData)).rejects.toMatchObject({ status: 401 })
+    expect(onSessionExpired).toHaveBeenCalledOnce()
   })
 
-  it('401 de uma chamada feita com o token antigo não expira a sessão nova', async () => {
+  it('401 from a call made with the old token does not expire the new session', async () => {
     token = 'jwt-a'
     server.use(
-      http.get(rota('/me'), async () => {
+      http.get(route('/me'), async () => {
         await new Promise((r) => setTimeout(r, 20))
         return new HttpResponse(null, { status: 401 })
       }),
     )
 
-    const pendente = api.GET('/me')
-    token = 'jwt-b' // saiu e entrou com outra conta enquanto a resposta não voltava
-    await pendente
+    const pending = api.GET('/me')
+    token = 'jwt-b'
+    await pending
 
-    expect(aoExpirarSessao).not.toHaveBeenCalled()
+    expect(onSessionExpired).not.toHaveBeenCalled()
   })
 
-  it('converte ProblemDetails em ApiError com type e errors', async () => {
+  it('converts ProblemDetails into ApiError with type and errors', async () => {
     server.use(
-      http.post(rota('/auth/cadastro'), () =>
+      http.post(route('/auth/register'), () =>
         HttpResponse.json(
           {
-            type: 'email-ja-cadastrado',
+            type: 'email-already-registered',
             title: 'Já existe uma conta com este e-mail.',
             status: 409,
             errors: { email: ['E-mail em uso.'] },
@@ -86,19 +86,19 @@ describe('cliente da API', () => {
       ),
     )
 
-    const erro = await api
-      .POST('/auth/cadastro', {
-        body: { nome: 'Ana', email: 'ana@x.com', senha: '12345678', aceitouTermos: true },
+    const error = await api
+      .POST('/auth/register', {
+        body: { name: 'Ana', email: 'ana@x.com', password: '12345678', acceptedTerms: true },
       })
-      .then(dados)
+      .then(unwrapData)
       .catch((e: unknown) => e)
 
-    expect(erro).toBeInstanceOf(ApiError)
-    expect(erro).toMatchObject({
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error).toMatchObject({
       status: 409,
-      type: 'email-ja-cadastrado',
+      type: 'email-already-registered',
       title: 'Já existe uma conta com este e-mail.',
     })
-    expect((erro as ApiError).erroDoCampo('email')).toBe('E-mail em uso.')
+    expect((error as ApiError).fieldError('email')).toBe('E-mail em uso.')
   })
 })

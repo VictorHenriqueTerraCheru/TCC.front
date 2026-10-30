@@ -2,41 +2,35 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { MotionGlobalConfig } from 'motion/react'
 
-import { useTemaStore } from '@/common/hooks/use-tema'
-import { provedorAutenticacao } from '@/features/auth'
-import { registrarAutenticacao } from '@/infrastructure/api'
-import { banco } from '@/infrastructure/mocks/banco'
+import { useThemeStore } from '@/common/hooks/use-theme'
+import { authProvider } from '@/features/auth'
+import { registerAuthProvider } from '@/infrastructure/api'
+import { database } from '@/infrastructure/mocks/database'
 import { server } from '@/infrastructure/mocks/server'
 
-// jsdom não tem WebGL: o mapa vira um falso que imita a API usada pelo app.
-vi.mock('@vis.gl/react-maplibre', () => import('./maplibre-falso'))
+vi.mock('@vis.gl/react-maplibre', () => import('./fake-maplibre'))
 
-// Sem animações: o AnimatePresence só tiraria os elementos do DOM depois da saída animada.
 MotionGlobalConfig.skipAnimations = true
 
-// Mesma composição do main.tsx.
-registrarAutenticacao(provedorAutenticacao)
+registerAuthProvider(authProvider)
 
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }))
-// A escolha do tema da primeira abertura tem teste próprio (fluxos/aparencia.test.tsx); nos
-// outros, o tema já foi escolhido.
-beforeEach(() => useTemaStore.setState({ preferencia: 'automatico', escolhido: true }))
+beforeEach(() => useThemeStore.setState({ preference: 'system', chosen: true }))
 afterEach(() => {
   cleanup()
   server.resetHandlers()
-  banco.reiniciar()
+  database.reset()
   localStorage.clear()
 })
 afterAll(() => server.close())
 
-// jsdom não tem matchMedia. Os testes escolhem a largura com definirLargura() (src/test/render.tsx).
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: (consulta: string) => {
-    const minimo = /min-width:\s*(\d+)px/.exec(consulta)?.[1]
+  value: (query: string) => {
+    const minimum = /min-width:\s*(\d+)px/.exec(query)?.[1]
     return {
-      matches: minimo !== undefined && window.innerWidth >= Number(minimo),
-      media: consulta,
+      matches: minimum !== undefined && window.innerWidth >= Number(minimum),
+      medium: query,
       onchange: null,
       addEventListener: () => {},
       removeEventListener: () => {},
@@ -47,12 +41,10 @@ Object.defineProperty(window, 'matchMedia', {
   },
 })
 
-// vaul (Drawer) usa pointer capture, que o jsdom não implementa.
 Element.prototype.setPointerCapture ??= () => {}
 Element.prototype.releasePointerCapture ??= () => {}
 Element.prototype.hasPointerCapture ??= () => false
 
-// O Checkbox do Radix mede o input escondido com ResizeObserver, que o jsdom não tem.
 globalThis.ResizeObserver ??= class {
   observe() {}
   unobserve() {}

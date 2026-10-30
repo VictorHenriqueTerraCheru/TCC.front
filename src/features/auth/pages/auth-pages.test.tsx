@@ -1,69 +1,69 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { definirLargura, renderizarRotas } from '@/test/render'
+import { setWidth, renderRoutes } from '@/test/render'
 
-import { rotas } from '@/app/router'
+import { routes } from '@/app/router'
 
-function abrir(caminho: string) {
-  definirLargura(390)
-  return renderizarRotas(rotas, caminho)
+function openAt(path: string) {
+  setWidth(390)
+  return renderRoutes(routes, path)
 }
 
-describe('login e cadastro', () => {
-  it('login valida os campos antes de enviar', async () => {
-    const usuario = userEvent.setup()
-    abrir('/login')
+describe('login and sign up', () => {
+  it('login validates the fields before submitting', async () => {
+    const user = userEvent.setup()
+    openAt('/login')
 
-    await usuario.click(await screen.findByRole('button', { name: 'Entrar' }))
+    await user.click(await screen.findByRole('button', { name: 'Entrar' }))
 
     expect(await screen.findByText('Informe seu e-mail.')).toBeInTheDocument()
     expect(screen.getByText('Informe sua senha.')).toBeInTheDocument()
     expect(screen.getByLabelText('E-mail')).toHaveAttribute('aria-invalid', 'true')
   })
 
-  it('senha errada mostra "E-mail ou senha inválidos."', async () => {
-    const usuario = userEvent.setup()
-    abrir('/login')
+  it('wrong password shows "E-mail ou senha inválidos."', async () => {
+    const user = userEvent.setup()
+    openAt('/login')
 
-    await usuario.type(await screen.findByLabelText('E-mail'), 'cidadao1@tcc.local')
-    await usuario.type(screen.getByLabelText('Senha'), 'errada123')
-    await usuario.click(screen.getByRole('button', { name: 'Entrar' }))
+    await user.type(await screen.findByLabelText('E-mail'), 'cidadao1@tcc.local')
+    await user.type(screen.getByLabelText('Senha'), 'wrong123')
+    await user.click(screen.getByRole('button', { name: 'Entrar' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('E-mail ou senha inválidos.')
   })
 
-  it('o olho mostra e esconde a senha', async () => {
-    const usuario = userEvent.setup()
-    abrir('/login')
+  it('the eye shows and hides the password', async () => {
+    const user = userEvent.setup()
+    openAt('/login')
 
-    const senha = await screen.findByLabelText('Senha')
-    expect(senha).toHaveAttribute('type', 'password')
-    await usuario.click(screen.getByRole('button', { name: 'Mostrar senha' }))
-    expect(senha).toHaveAttribute('type', 'text')
+    const password = await screen.findByLabelText('Senha')
+    expect(password).toHaveAttribute('type', 'password')
+    await user.click(screen.getByRole('button', { name: 'Mostrar senha' }))
+    expect(password).toHaveAttribute('type', 'text')
   })
 
-  it('cadastro com e-mail existente marca o campo (409 email-ja-cadastrado)', async () => {
-    const usuario = userEvent.setup()
-    abrir('/cadastro')
+  it('sign up with an existing e-mail marks the field (409 email-already-registered)', async () => {
+    const user = userEvent.setup()
+    openAt('/register')
 
-    await usuario.type(await screen.findByLabelText('Nome'), 'Ana')
-    await usuario.type(screen.getByLabelText('E-mail'), 'cidadao1@tcc.local')
-    await usuario.type(screen.getByLabelText('Senha'), '12345678')
-    await usuario.click(screen.getByRole('checkbox'))
-    await usuario.click(screen.getByRole('button', { name: 'Criar conta' }))
+    await user.type(await screen.findByLabelText('Nome'), 'Ana')
+    await user.type(screen.getByLabelText('E-mail'), 'cidadao1@tcc.local')
+    await user.type(screen.getByLabelText('Senha'), '12345678')
+    await user.click(screen.getByRole('checkbox'))
+    await user.click(screen.getByRole('button', { name: 'Criar conta' }))
 
     expect(await screen.findByText('Já existe uma conta com este e-mail.')).toBeInTheDocument()
   })
 
-  it('cadastro exige aceitar os termos', async () => {
-    const usuario = userEvent.setup()
-    abrir('/cadastro')
+  it('sign up requires accepting the terms', async () => {
+    const user = userEvent.setup()
+    openAt('/register')
 
-    await usuario.type(await screen.findByLabelText('Nome'), 'Ana')
-    await usuario.type(screen.getByLabelText('E-mail'), 'nova@x.com')
-    await usuario.type(screen.getByLabelText('Senha'), '12345678')
-    await usuario.click(screen.getByRole('button', { name: 'Criar conta' }))
+    await user.type(await screen.findByLabelText('Nome'), 'Ana')
+    await user.type(screen.getByLabelText('E-mail'), 'nova@x.com')
+    await user.type(screen.getByLabelText('Senha'), '12345678')
+    await user.click(screen.getByRole('button', { name: 'Criar conta' }))
 
     expect(await screen.findByText('Aceite os termos para criar a conta.')).toBeInTheDocument()
   })

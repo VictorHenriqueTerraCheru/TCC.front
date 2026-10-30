@@ -2,39 +2,34 @@ import type { components } from './schema'
 
 type ProblemDetails = components['schemas']['HttpValidationProblemDetails']
 
-/**
- * Erro HTTP da API, montado a partir do ProblemDetails (RFC 9457).
- * `type` é o código estável de docs/API.md (ex.: 'email-ja-cadastrado'); 400/401/403/404 podem vir sem ele.
- * Falha de rede não vira ApiError: o fetch lança TypeError (tela 26 trata à parte).
- */
 export class ApiError extends Error {
   readonly status: number
   readonly type: string | null
   readonly title: string | null
   readonly errors: Record<string, string[]>
 
-  constructor(status: number, problema?: ProblemDetails | null) {
-    super(problema?.title ?? `Erro HTTP ${status}`)
+  constructor(status: number, issue?: ProblemDetails | null) {
+    super(issue?.title ?? `Erro HTTP ${status}`)
     this.name = 'ApiError'
     this.status = status
-    this.type = problema?.type ?? null
-    this.title = problema?.title ?? null
-    this.errors = problema?.errors ?? {}
+    this.type = issue?.type ?? null
+    this.title = issue?.title ?? null
+    this.errors = issue?.errors ?? {}
   }
 
-  /** Primeira mensagem de validação do campo (camelCase, como a API devolve). */
-  erroDoCampo(campo: string): string | undefined {
-    return this.errors[campo]?.[0]
+  fieldError(field: string): string | undefined {
+    return this.errors[field]?.[0]
   }
 }
 
-export function isApiError(erro: unknown): erro is ApiError {
-  return erro instanceof ApiError
+export function isApiError(error: unknown): error is ApiError {
+  return error instanceof ApiError
 }
 
-export function isErroDeRede(erro: unknown): boolean {
+export function isNetworkError(error: unknown): boolean {
   return (
-    erro instanceof TypeError ||
-    (erro instanceof DOMException && (erro.name === 'AbortError' || erro.name === 'TimeoutError'))
+    error instanceof TypeError ||
+    (error instanceof DOMException &&
+      (error.name === 'AbortError' || error.name === 'TimeoutError'))
   )
 }

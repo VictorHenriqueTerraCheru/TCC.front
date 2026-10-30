@@ -1,25 +1,25 @@
 import { screen, within } from '@testing-library/react'
 
-import { definirLargura, renderizarRotas } from '@/test/render'
+import { setWidth, renderRoutes } from '@/test/render'
 
-import { rotas } from '../router'
+import { routes } from '../router'
 
 describe('AppLayout', () => {
-  it('no celular mostra a barra inferior e o FAB Registrar no mapa', async () => {
-    definirLargura(390)
-    renderizarRotas(rotas, '/')
+  it('on mobile shows the bottom bar and the Registrar FAB on the map', async () => {
+    setWidth(390)
+    renderRoutes(routes, '/')
 
     const nav = await screen.findByRole('navigation', { name: 'Navegação principal' })
-    for (const rotulo of ['Mapa', 'Recentes', 'Perfil']) {
-      expect(within(nav).getByRole('link', { name: new RegExp(rotulo) })).toBeInTheDocument()
+    for (const label of ['Mapa', 'Recentes', 'Perfil']) {
+      expect(within(nav).getByRole('link', { name: new RegExp(label) })).toBeInTheDocument()
     }
     expect(within(nav).getByRole('link', { name: /Mapa/ })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByRole('link', { name: /Registrar/ })).toHaveAttribute('href', '/registrar')
+    expect(screen.getByRole('link', { name: /Registrar/ })).toHaveAttribute('href', '/report')
   })
 
-  it('no desktop mostra o trilho com o botão Registrar em destaque', async () => {
-    definirLargura(1440)
-    renderizarRotas(rotas, '/recentes')
+  it('on desktop shows the rail with the Registrar button highlighted', async () => {
+    setWidth(1440)
+    renderRoutes(routes, '/recent')
 
     const nav = await screen.findByRole('navigation', { name: 'Navegação principal' })
     expect(within(nav).getByRole('link', { name: 'Registrar ocorrência' })).toBeInTheDocument()

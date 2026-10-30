@@ -4,36 +4,36 @@ import type { ReactElement } from 'react'
 import { createMemoryRouter, type RouteObject } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 
-import { ProvedorMovimento } from '@/common/components/provedor-movimento'
-import { criarQueryClient } from '@/infrastructure/query/query-client'
+import { MotionProvider } from '@/common/components/motion-provider'
+import { createQueryClient } from '@/infrastructure/query/query-client'
 
-export function definirLargura(largura: number) {
-  Object.defineProperty(window, 'innerWidth', { configurable: true, value: largura })
+export function setWidth(width: number) {
+  Object.defineProperty(window, 'innerWidth', { configurable: true, value: width })
 }
 
-function queryClientDeTeste() {
-  const client = criarQueryClient()
+function testQueryClient() {
+  const client = createQueryClient()
   client.setDefaultOptions({ queries: { retry: false, staleTime: Infinity } })
   return client
 }
 
-export function renderizar(ui: ReactElement) {
+export function renderWithProviders(ui: ReactElement) {
   return render(
-    <QueryClientProvider client={queryClientDeTeste()}>
-      <ProvedorMovimento>{ui}</ProvedorMovimento>
+    <QueryClientProvider client={testQueryClient()}>
+      <MotionProvider>{ui}</MotionProvider>
     </QueryClientProvider>,
   )
 }
 
-export function renderizarRotas(rotas: RouteObject[], caminho = '/') {
-  const router = createMemoryRouter(rotas, { initialEntries: [caminho] })
+export function renderRoutes(routes: RouteObject[], path = '/') {
+  const router = createMemoryRouter(routes, { initialEntries: [path] })
   return {
     router,
     ...render(
-      <QueryClientProvider client={queryClientDeTeste()}>
-        <ProvedorMovimento>
+      <QueryClientProvider client={testQueryClient()}>
+        <MotionProvider>
           <RouterProvider router={router} />
-        </ProvedorMovimento>
+        </MotionProvider>
       </QueryClientProvider>,
     ),
   }

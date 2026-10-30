@@ -1,35 +1,35 @@
-import { cadastrarSchema, entrarSchema } from './auth'
+import { registerSchema, loginSchema } from './auth'
 
-describe('validadores de auth', () => {
-  it('login exige e-mail válido e senha', () => {
-    const r = entrarSchema.safeParse({ email: 'nao-e-email', senha: '' })
+describe('auth validators', () => {
+  it('login requires a valid e-mail and password', () => {
+    const r = loginSchema.safeParse({ email: 'not-an-email', password: '' })
     expect(r.success).toBe(false)
     expect(r.error?.flatten().fieldErrors).toEqual({
       email: ['Informe um e-mail válido.'],
-      senha: ['Informe sua senha.'],
+      password: ['Informe sua senha.'],
     })
   })
 
-  it('cadastro exige senha ≥ 8 e termos aceitos', () => {
-    const r = cadastrarSchema.safeParse({
-      nome: ' Ana ',
+  it('sign up requires password ≥ 8 and accepted terms', () => {
+    const r = registerSchema.safeParse({
+      name: ' Ana ',
       email: 'ana@x.com',
-      senha: '1234567',
-      aceitouTermos: false,
+      password: '1234567',
+      acceptedTerms: false,
     })
     expect(r.error?.flatten().fieldErrors).toEqual({
-      senha: ['Mínimo de 8 caracteres'],
-      aceitouTermos: ['Aceite os termos para criar a conta.'],
+      password: ['Mínimo de 8 caracteres'],
+      acceptedTerms: ['Aceite os termos para criar a conta.'],
     })
   })
 
-  it('cadastro válido remove espaços do nome', () => {
-    const r = cadastrarSchema.parse({
-      nome: '  Mariana Souza ',
+  it('valid sign up trims the name', () => {
+    const r = registerSchema.parse({
+      name: '  Mariana Souza ',
       email: 'mariana@email.com',
-      senha: '12345678',
-      aceitouTermos: true,
+      password: '12345678',
+      acceptedTerms: true,
     })
-    expect(r.nome).toBe('Mariana Souza')
+    expect(r.name).toBe('Mariana Souza')
   })
 })

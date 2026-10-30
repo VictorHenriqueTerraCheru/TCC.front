@@ -2,68 +2,68 @@ import type { UseFormSetError } from 'react-hook-form'
 
 import { ApiError } from '@/infrastructure/api'
 
-import { aplicarErroAuth } from './errors'
+import { applyAuthError } from './errors'
 
 interface Form {
-  nome: string
+  name: string
   email: string
-  senha: string
+  password: string
 }
 
-const campos: (keyof Form)[] = ['nome', 'email', 'senha']
+const fields: (keyof Form)[] = ['name', 'email', 'password']
 
-function aplicar(erro: unknown) {
+function apply(error: unknown) {
   const setError = vi.fn()
-  const mensagem = aplicarErroAuth(erro, setError as unknown as UseFormSetError<Form>, campos)
-  return { mensagem, setError }
+  const message = applyAuthError(error, setError as unknown as UseFormSetError<Form>, fields)
+  return { message, setError }
 }
 
-describe('aplicarErroAuth', () => {
-  it('falha de rede vira mensagem geral, sem tocar nos campos', () => {
-    const { mensagem, setError } = aplicar(new TypeError('Failed to fetch'))
+describe('applyAuthError', () => {
+  it('network failure becomes a general message, without touching the fields', () => {
+    const { message, setError } = apply(new TypeError('Failed to fetch'))
 
-    expect(mensagem).toBe('Sem conexão. Tente de novo.')
+    expect(message).toBe('Sem conexão. Tente de novo.')
     expect(setError).not.toHaveBeenCalled()
   })
 
-  it('erro que não é da API vira mensagem genérica', () => {
-    expect(aplicar(new Error('boom')).mensagem).toBe('Algo deu errado. Tente de novo.')
+  it('error that is not from the API becomes a generic message', () => {
+    expect(apply(new Error('boom')).message).toBe('Algo deu errado. Tente de novo.')
   })
 
-  it('e-mail em uso (409) vai para o campo e-mail', () => {
-    const { mensagem, setError } = aplicar(new ApiError(409, { type: 'email-ja-cadastrado' }))
+  it('e-mail in use (409) goes to the e-mail field', () => {
+    const { message, setError } = apply(new ApiError(409, { type: 'email-already-registered' }))
 
-    expect(mensagem).toBeNull()
+    expect(message).toBeNull()
     expect(setError).toHaveBeenCalledWith('email', {
       message: 'Já existe uma conta com este e-mail.',
     })
   })
 
-  it('401 no login vira "E-mail ou senha inválidos."', () => {
-    expect(aplicar(new ApiError(401)).mensagem).toBe('E-mail ou senha inválidos.')
+  it('401 on login becomes "E-mail ou senha inválidos."', () => {
+    expect(apply(new ApiError(401)).message).toBe('E-mail ou senha inválidos.')
   })
 
-  it('erros de validação (400) vão para os campos conhecidos', () => {
-    const { mensagem, setError } = aplicar(
-      new ApiError(400, { errors: { email: ['E-mail inválido.'], senha: ['Mínimo de 8.'] } }),
+  it('validation errors (400) go to the known fields', () => {
+    const { message, setError } = apply(
+      new ApiError(400, { errors: { email: ['E-mail inválido.'], password: ['Mínimo de 8.'] } }),
     )
 
-    expect(mensagem).toBeNull()
+    expect(message).toBeNull()
     expect(setError).toHaveBeenCalledWith('email', { message: 'E-mail inválido.' })
-    expect(setError).toHaveBeenCalledWith('senha', { message: 'Mínimo de 8.' })
+    expect(setError).toHaveBeenCalledWith('password', { message: 'Mínimo de 8.' })
     expect(setError).toHaveBeenCalledTimes(2)
   })
 
-  it('validação de campo que o formulário não tem cai no título', () => {
-    const { mensagem, setError } = aplicar(
-      new ApiError(400, { title: 'Dados inválidos', errors: { outro: ['x'] } }),
+  it('validation of a field the form does not have falls back to the title', () => {
+    const { message, setError } = apply(
+      new ApiError(400, { title: 'Dados inválidos', errors: { other: ['x'] } }),
     )
 
-    expect(mensagem).toBe('Dados inválidos')
+    expect(message).toBe('Dados inválidos')
     expect(setError).not.toHaveBeenCalled()
   })
 
-  it('sem campo nem título, usa a mensagem padrão', () => {
-    expect(aplicar(new ApiError(500)).mensagem).toBe('Não foi possível continuar.')
+  it('without field or title, uses the default message', () => {
+    expect(apply(new ApiError(500)).message).toBe('Não foi possível continuar.')
   })
 })

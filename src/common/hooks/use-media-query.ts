@@ -1,18 +1,17 @@
 import { useSyncExternalStore } from 'react'
 
-export function useMediaQuery(consulta: string): boolean {
+export function useMediaQuery(query: string): boolean {
   return useSyncExternalStore(
-    (avisar) => {
-      const media = window.matchMedia(consulta)
-      media.addEventListener('change', avisar)
-      return () => media.removeEventListener('change', avisar)
+    (notify) => {
+      const medium = window.matchMedia(query)
+      medium.addEventListener('change', notify)
+      return () => medium.removeEventListener('change', notify)
     },
-    () => window.matchMedia(consulta).matches,
+    () => window.matchMedia(query).matches,
     () => false,
   )
 }
 
-/** Breakpoint único do layout (regra 8 do CLAUDE.md): lg, ≥ 1024 px. */
 export function useDesktop(): boolean {
   return useMediaQuery('(min-width: 1024px)')
 }

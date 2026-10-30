@@ -1,9 +1,8 @@
-export { api, dados, semConteudo } from './client'
-export { ApiError, isApiError, isErroDeRede } from './api-error'
-export { registrarAutenticacao, type ProvedorAutenticacao } from './autenticacao'
+export { api, unwrapData, unwrapEmpty } from './client'
+export { ApiError, isApiError, isNetworkError } from './api-error'
+export { registerAuthProvider, type AuthProvider } from './authentication'
 export type { components, paths } from './schema'
 
 import type { components } from './schema'
 
-/** Atalho para os schemas gerados: `Schema<'ObterDetalheProblemaResponse'>`. */
 export type Schema<Nome extends keyof components['schemas']> = components['schemas'][Nome]

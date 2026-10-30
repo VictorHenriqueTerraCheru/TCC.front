@@ -1,50 +1,45 @@
 import { m } from 'motion/react'
 import { NavLink, Outlet, useLocation } from 'react-router'
 
-import { Icone } from '@/common/components/icone'
-import { MOLA_SUAVE } from '@/common/lib/movimento'
+import { Icon } from '@/common/components/icon'
+import { SOFT_SPRING } from '@/common/lib/motion'
 import { cn } from '@/common/lib/utils'
 
-import { itensNavegacao } from './navegacao'
+import { navigationItems } from './navigation'
 
-/** < 1024 px: conteúdo + barra de abas flutuante de vidro (Mapa / Recentes / Perfil). */
 export function MobileLayout() {
-  // Registro e subpáginas com "←" (verificação, histórico, configurações, fila do admin) ocupam a
-  // tela inteira, como nos prints 5–8, 11, 13, 28 e 29.
   const { pathname } = useLocation()
-  const telaCheia = /^\/(registrar|admin)(\/|$)|^\/perfil\/.+/.test(pathname)
-  const noMapa = pathname.startsWith('/mapa')
+  const fullScreen = /^\/(report|admin)(\/|$)|^\/profile\/.+/.test(pathname)
+  const onMap = pathname.startsWith('/map')
   return (
-    <div data-layout-celular className="relative h-dvh">
-      {/* O mapa passa por baixo da barra; nas outras páginas o conteúdo termina acima dela. */}
-      <main className={cn('relative h-full overflow-y-auto', !telaCheia && !noMapa && 'pb-24')}>
+    <div data-layout-mobile className="relative h-dvh">
+      <main className={cn('relative h-full overflow-y-auto', !fullScreen && !onMap && 'pb-24')}>
         <Outlet />
       </main>
-      {!telaCheia && <BarraInferior />}
+      {!fullScreen && <BottomBar />}
     </div>
   )
 }
 
-function BarraInferior() {
+function BottomBar() {
   return (
     <nav
       aria-label="Navegação principal"
-      className="absolute inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex h-[58px] items-stretch gap-1 rounded-[22px] p-1 shadow-2 vidro"
+      className="absolute inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex h-[58px] items-stretch gap-1 rounded-[22px] p-1 shadow-2 glass"
     >
-      {itensNavegacao.map((item) => (
+      {navigationItems.map((item) => (
         <NavLink
-          key={item.rota}
-          to={item.rota}
-          className="relative flex flex-1 pressionavel flex-col items-center justify-center gap-0.5 rounded-[18px] text-[10px] font-semibold focus-visible:outline-2"
+          key={item.route}
+          to={item.route}
+          className="relative flex flex-1 pressable flex-col items-center justify-center gap-0.5 rounded-[18px] text-[10px] font-semibold focus-visible:outline-2"
         >
           {({ isActive }) => (
             <>
-              {/* A pílula da aba ativa desliza até a aba tocada. */}
               {isActive && (
                 <m.span
-                  layoutId="aba-ativa-celular"
-                  transition={MOLA_SUAVE}
-                  className="absolute inset-0 rounded-[18px] bg-primario-suave"
+                  layoutId="active-tab-mobile"
+                  transition={SOFT_SPRING}
+                  className="absolute inset-0 rounded-[18px] bg-brand-soft"
                 />
               )}
               <m.span
@@ -53,22 +48,22 @@ function BarraInferior() {
                 transition={{ duration: 0.35, ease: 'easeOut' }}
                 className="relative flex"
               >
-                <Icone
-                  nome={item.icone}
-                  preenchido={isActive}
+                <Icon
+                  name={item.icon}
+                  filled={isActive}
                   className={cn(
                     'text-[23px] transition-colors',
-                    isActive ? 'text-primario' : 'text-muted-foreground',
+                    isActive ? 'text-brand' : 'text-muted-foreground',
                   )}
                 />
               </m.span>
               <span
                 className={cn(
                   'relative transition-colors',
-                  isActive ? 'text-primario' : 'text-muted-foreground',
+                  isActive ? 'text-brand' : 'text-muted-foreground',
                 )}
               >
-                {item.rotulo}
+                {item.label}
               </span>
             </>
           )}

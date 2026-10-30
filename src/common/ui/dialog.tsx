@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 
-import { Icone } from '@/common/components/icone'
+import { Icon } from '@/common/components/icon'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 
@@ -51,7 +51,6 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          // Entrada com curva de mola (cresce de 96 % e sobe 8 px); a saída é mais curta.
           'fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-[28px] border border-border bg-card p-6 shadow-3 outline-none',
           'data-[state=open]:animate-in data-[state=open]:duration-300 data-[state=open]:ease-[cubic-bezier(0.2,0.9,0.25,1.1)] data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-2 data-[state=open]:zoom-in-96',
           'data-[state=closed]:animate-out data-[state=closed]:duration-150 data-[state=closed]:ease-in data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-96 sm:max-w-lg',
@@ -63,9 +62,9 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="absolute top-4 right-4 flex size-9 pressionavel items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-superficie-2 hover:text-foreground focus-visible:outline-2 disabled:pointer-events-none"
+            className="absolute top-4 right-4 flex size-9 pressable items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 disabled:pointer-events-none"
           >
-            <Icone nome="close" className="text-[20px]" />
+            <Icon name="close" className="text-[20px]" />
             <span className="sr-only">Fechar</span>
           </DialogPrimitive.Close>
         )}

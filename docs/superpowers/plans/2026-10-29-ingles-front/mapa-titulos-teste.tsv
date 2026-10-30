@@ -1,0 +1,308 @@
+AppLayout	AppLayout
+no celular mostra a barra inferior e o FAB Registrar no mapa	on mobile shows the bottom bar and the Registrar FAB on the map
+no desktop mostra o trilho com o botão Registrar em destaque	on desktop shows the rail with the Registrar button highlighted
+BotaoBussola	CompassButton
+fica escondida com o mapa apontando para o norte	stays hidden while the map points north
+aparece ao girar e o mostrador acompanha o giro	appears when rotated and the dial follows the rotation
+with the top of the screen at %s° shows the letter %s	with the top of the screen at %s° shows the letter %s
+aparece com o mapa inclinado mesmo sem giro	appears when the map is tilted even without rotation
+ao tocar, endireita para o norte e some	on tap, turns back north and disappears
+IconeDinamico	DynamicIcon
+ícone do pacote embutido usa a fonte, sem rede	bundled icon uses the font, without network
+ícone fora do pacote mostra o alternativo e troca pelo SVG quando chega	icon outside the bundle shows the fallback and swaps to the SVG when it arrives
+se o Iconify falhar, o alternativo fica	if Iconify fails, the fallback stays
+MapaVetorial	VectorMap
+nasce no centro [lat, lng] e devolve o toque como { lat, lng }	starts at center [lat, lng] and reports taps as { lat, lng }
+usa o estilo do tema atual e troca junto com ele	uses the current theme style and switches along with it
+avisa ao parar de mover	notifies when it stops moving
+tema	theme
+na primeira vez é automático e ainda não foi escolhido	on first run it is system and not chosen yet
+preferência %s com o sistema escuro=%s → %s	preference %s with dark system=%s → %s
+aplica o tema no <html> e na cor da barra do navegador, e acompanha a troca	applies the theme to <html> and to the browser bar color, and follows changes
+guarda a escolha no localStorage (lida pelo script do index.html antes da pintura)	stores the choice in localStorage (read by the index.html script before paint)
+formatacao	formatting
+tempoRelativo(%s) = %s	relativeTime(%s) = %s
+distanciaTexto(%d) = %s	distanceText(%d) = %s
+distanceMeters	distanceMeters
+é zero no mesmo ponto	is zero at the same point
+≈ 111 m por milésimo de grau de latitude	≈ 111 m per thousandth of a degree of latitude
+GeoJSON	GeoJSON
+circuloGeoJson fecha o anel e tem o raio pedido	circleGeoJson closes the ring and has the requested radius
+linhaGeoJson usa [lng, lat]	lineGeoJson uses [lng, lat]
+nomes	names
+Material Symbols (snake_case) ↔ Iconify (kebab + -rounded)	Material Symbols (snake_case) ↔ Iconify (kebab + -rounded)
+só o estilo Rounded sólido serve; outline, sharp e outro conjunto saem	only the solid Rounded style works; outline, sharp and other sets are dropped
+caminhosDoCorpo	bodyPaths
+aceita só <path d>	accepts only <path d>
+rejects %s	rejects %s
+carregarIcone	loadIcon
+pedidos do mesmo instante viajam em uma requisição, e o segundo uso vem do cache	requests from the same instant travel in one request, and the second use comes from cache
+aceita hífen no nome, como o contrato de categorias	accepts a hyphen in the name, like the categories contract
+guarda no localStorage: outra sessão não pede de novo	stores in localStorage: another session does not ask again
+ícone com corpo suspeito ou que o Iconify não conhece vira null	icon with a suspicious body or unknown to Iconify becomes null
+falha de rede vira null e não é repetida na sessão	network failure becomes null and is not retried in the session
+carregarIcone: entradas hostis	loadIcon: hostile inputs
+cache do localStorage adulterado (%s) é ignorado e o ícone vem da rede	tampered localStorage cache (%s) is ignored and the icon comes from the network
+cache que não é objeto não quebra	cache that is not an object does not break
+nome "%s" nem chega à rede	name "%s" never reaches the network
+nome de propriedade de objeto (%s) não vira o protótipo como resposta	object property name (%s) does not return the prototype as a response
+largura absurda vinda da rede descarta o ícone	absurd width from the network discards the icon
+buscarIcones	fetchIcons
+devolve os nomes Rounded sólidos, sem repetir	returns the solid Rounded names, without repeats
+semAcento	withoutAccents
+tira acento e põe em minúsculas	removes accents and lowercases
+aplicarErroAuth	applyAuthError
+falha de rede vira mensagem geral, sem tocar nos campos	network failure becomes a general message, without touching the fields
+erro que não é da API vira mensagem genérica	error that is not from the API becomes a generic message
+e-mail em uso (409) vai para o campo e-mail	e-mail in use (409) goes to the e-mail field
+401 no login vira "E-mail ou senha inválidos."	401 on login becomes "E-mail ou senha inválidos."
+erros de validação (400) vão para os campos conhecidos	validation errors (400) go to the known fields
+validação de campo que o formulário não tem cai no título	validation of a field the form does not have falls back to the title
+sem campo nem título, usa a mensagem padrão	without field or title, uses the default message
+mensagemErroVoto	voteErrorMessage
+mapeia os códigos da API	maps the API codes
+401 e 404 sem código têm mensagem própria	401 and 404 without code have their own message
+rede e timeout viram "Sem conexão"	network and timeout become "Sem conexão"
+o código vence o status; título e padrão ficam como último recurso	the code beats the status; title and default are the last resort
+mensagemErroRegistro	reportErrorMessage
+mapeia os códigos de regra	maps the rule codes
+sem código conhecido, usa a primeira mensagem de validação, depois o título	without a known code, uses the first validation message, then the title
+erro de rede cai na mensagem padrão (a tela 26 trata à parte)	network error falls back to the default message (screen 26 handles it separately)
+mensagemErroVerificacao	verificationErrorMessage
+rede, validação, título e padrão	network, validation, title and default
+cliente da API	API client
+envia o JWT no Authorization quando há sessão	sends the JWT in Authorization when there is a session
+não envia o JWT para /auth/*	does not send the JWT to /auth/*
+401 numa chamada autenticada expira a sessão (regra 13)	401 on an authenticated call expires the session (rule 13)
+401 de uma chamada feita com o token antigo não expira a sessão nova	401 from a call made with the old token does not expire the new session
+converte ProblemDetails em ApiError com type e errors	converts ProblemDetails into ApiError with type and errors
+aparência (claro, escuro ou automático)	appearance (light, dark or system)
+na primeira abertura pede o tema, com Automático marcado, e volta para onde estava	on first open asks for the theme, with Automático checked, and returns to where it was
+depois de escolhido, não aparece de novo	once chosen, does not appear again
+vem antes da pré-permissão de localização	comes before the location pre-permission
+Configurações troca o tema na hora	Configurações switches the theme immediately
+guarda "visitante vê, conta age"	guard "guests see, accounts act"
+aceite da etapa 3: visitante vota → login → volta ao detalhe com o voto aplicado	acceptance of stage 3: guest votes → login → back to the detail with the vote applied
+card rápido: visitante toca no polegar → login → o voto é retomado (regra 1)	quick card: guest taps the thumb → login → the vote is resumed (rule 1)
+"Agora não" esquece o voto: um login depois não vota sozinho	"Agora não" forgets the vote: a later login does not vote by itself
+"voltar" do navegador no login também esquece o voto	browser "back" on login also forgets the vote
+sessão vencida (expiraEm no passado) conta como visitante na guarda	expired session (expiresAt in the past) counts as guest in the guard
+visitante em "Registrar" → cadastro → cai no fluxo de registro	guest on "Registrar" → sign up → lands in the report flow
+token expirado (401) limpa a sessão e reabre a guarda com o voto guardado (regra 13)	expired token (401) clears the session and reopens the guard with the stored vote (rule 13)
+perfil, verificação e fila do admin	profile, verification and admin queue
+aceite da etapa 5: cidadão solicita → admin aprova → perfil mostra "Perfil verificado"	acceptance of stage 5: citizen requests → admin approves → profile shows "Perfil verificado"
+recusa exige motivo e a pessoa vê o banner "Recusada" ao pedir de novo	rejection requires a reason and the person sees the "Recusada" banner when asking again
+justificativa curta mostra o erro do protótipo	short justification shows the prototype error
+cidadão não acessa a fila do admin	citizen cannot access the admin queue
+admin com /me fora do ar vê "Tentar novamente", não "só para administradores"	admin with /me down sees "Tentar novamente", not "só para administradores"
+"Cancelar" na edição do nome descarta o texto digitado	"Cancelar" while editing the name discards the typed text
+histórico agrupa por período e filtra por votos	history groups by period and filters by votes
+configurações: edita o nome e sai da conta	settings: edits the name and signs out
+visitante vê o convite para entrar no perfil	guest sees the invitation to log in on the profile
+recentes	recent
+lista os problemas perto de Icaraí e filtra por grupo	lists the issues near Icaraí and filters by group
+pré-permissão de localização (tela 17)	location pre-permission (screen 17)
+na primeira abertura em prompt, explica antes de pedir; "Agora não" volta ao mapa	on first open in prompt, explains before asking; "Agora não" goes back to the map
+depois de vista, não aparece de novo	once seen, does not appear again
+fluxo de registro	report flow
+visitante que abre /registrar vai para o login	guest who opens /report goes to login
+visitante em /registrar/categoria?type=incident volta para a mesma URL depois do login	guest on /report/category?type=incident returns to the same URL after login
+aceite: registrar onde já há um buraco a menos de 50 m abre a conferência; "Não, é outro" segue e envia	acceptance: reporting where there is already a pothole within 50 m opens the duplicate check; "Não, é outro" continues and submits
+sessão expirada no envio (401): login e o registro é enviado ao voltar	session expired on submit (401): login and the report is submitted on return
+"Sim, confirmar esse" vota no existente e mostra a confirmação	"Sim, confirmar esse" votes on the existing one and shows the confirmation
+revisão com categoria desativada volta para a escolha da categoria	review with a deactivated category goes back to choosing the category
+aceite: recarregar no meio do fluxo não perde o rascunho	acceptance: reloading in the middle of the flow does not lose the draft
+falha de rede mostra "Não foi possível enviar"; "Tentar novamente" envia com os mesmos dados	network failure shows "Não foi possível enviar"; "Tentar novamente" submits with the same data
+incidente: área, "Outro horário" com stepper, revisão anônima e resumo da área	incident: area, "Outro horário" with stepper, anonymous review and area summary
+incidente recusado por horário mostra a mensagem do type	incident rejected because of the time shows the type message
+mutations de categoria	category mutations
+recarregam tudo que traz a categoria embutida	reload everything that embeds the category
+administração de categorias e grupos	categories and groups administration
+cidadão comum não entra	regular citizen cannot enter
+falha em GET /groups mostra erro com "Tentar novamente" em vez de chaves cruas	failure on GET /groups shows an error with "Tentar novamente" instead of raw keys
+na aba Grupos, falha em GET /admin/categories mostra erro em vez de travar o apagar	on the Grupos tab, failure on GET /admin/categories shows an error instead of locking delete
+visitante vai para o login	guest goes to login
+lista as categorias com grupo e tipo	lists the categories with group and type
+cria um grupo e depois uma categoria nele, com ícone buscado no Iconify	creates a group and then a category in it, with an icon searched on Iconify
+formulário de categoria mostra os erros de preenchimento	category form shows the validation errors
+nome repetido mostra a mensagem da API	duplicate name shows the API message
+editar não deixa trocar o tipo e salva o novo nome	editing does not allow changing the type and saves the new name
+desativar marca como inativa e ativar volta	deactivating marks as inactive and activating restores it
+só apaga grupo vazio: com categorias o botão fica desabilitado	only deletes an empty group: with categories the button is disabled
+grupo em uso (outra pessoa criou categoria) mostra o motivo ao apagar	group in use (someone else created a category) shows the reason on delete
+falha ao carregar mostra tentar de novo	loading failure shows try again
+Estado e Evento têm etiquetas de cores diferentes	Estado and Evento have labels of different colors
+busca e filtros das categorias	category search and filters
+busca por nome ou por grupo, sem acento	searches by name or group, ignoring accents
+filtra por tipo e os chips de grupo seguem o tipo	filters by type and the group chips follow the type
+filtra por situação e Limpar filtros volta tudo	filters by status and Limpar filtros resets everything
+sem resultado avisa	no result shows a notice
+busca e filtros dos grupos	group search and filters
+busca por nome e filtra por tipo	searches by name and filters by type
+administração de usuários	user administration
+lista os usuários com e-mail e perfil	lists the users with e-mail and role
+busca por nome ou e-mail	searches by name or e-mail
+filtra por perfil	filters by role
+altera o perfil de um usuário e a lista reflete a mudança	changes a user's role and the list reflects the change
+não oferece trocar o próprio perfil	does not offer changing one's own role
+mostra o erro da API ao salvar e mantém a folha aberta	shows the API error on save and keeps the sheet open
+falha ao carregar mostra "Tentar novamente"	loading failure shows "Tentar novamente"
+na troca de conta, o detalhe em cache (meuVoto, souAutor) não é servido à conta nova	when switching accounts, the cached detail (myVote, isAuthor) is not served to the new account
+na troca de conta, /me e a fila do admin saem do cache; o resto só fica velho	when switching accounts, /me and the admin queue leave the cache; the rest only becomes stale
+login e cadastro	login and sign up
+login valida os campos antes de enviar	login validates the fields before submitting
+senha errada mostra "E-mail ou senha inválidos."	wrong password shows "E-mail ou senha inválidos."
+o olho mostra e esconde a senha	the eye shows and hides the password
+cadastro com e-mail existente marca o campo (409 email-ja-cadastrado)	sign up with an existing e-mail marks the field (409 email-already-registered)
+cadastro exige aceitar os termos	sign up requires accepting the terms
+guarda-store (regras 1 e 13)	guard-store (rules 1 and 13)
+pedirConta abre a folha e guarda a ação com a rota de retorno	askForAccount opens the sheet and stores the action with the return route
+pedirConta marca a expiração quando o token venceu	askForAccount marks the expiration when the token expired
+fecharFolha mantém a pendência (o visitante foi para login/cadastro)	closeSheet keeps the pending action (the guest went to login/sign up)
+descartar ("Agora não") esquece folha, ação e expiração	discard ("Agora não") forgets sheet, action and expiration
+concluirLogin devolve o retorno e mantém a ação para a tela de destino	completeLogin returns the return route and keeps the action for the destination screen
+concluirLogin sem ação pendente devolve o retorno mas não guarda nada	completeLogin without a pending action returns the return route but stores nothing
+concluirLogin sem pendência devolve null	completeLogin without pending returns null
+consumirAcao entrega a ação uma só vez	consumeAction delivers the action only once
+consumirAcao deixa a ação quando ela não é da tela que perguntou	consumeAction keeps the action when it does not belong to the asking screen
+só a pendência vai para o sessionStorage; a folha aberta não sobrevive ao recarregar	only the pending action goes to sessionStorage; the open sheet does not survive a reload
+sessão (regras 11 e 13)	session (rules 11 and 13)
+sessaoAtual devolve a sessão enquanto ela vale	currentSession returns the session while it is valid
+sessaoAtual sem sessão devolve null e não marca expiração	currentSession without session returns null and does not mark expiration
+sessaoAtual limpa a sessão vencida e marca a expiração para a guarda	currentSession clears the expired session and marks the expiration for the guard
+expiraEm exatamente agora já conta como vencida	expiresAt exactly now already counts as expired
+o provedor entrega o token da sessão válida e null para visitante ou sessão vencida	the provider hands the token of the valid session and null for a guest or expired session
+aoExpirarSessao (401) limpa a sessão e marca a expiração	onSessionExpired (401) clears the session and marks the expiration
+sair não marca expiração (só o vencimento marca)	logout does not mark expiration (only expiry does)
+a sessão é gravada no localStorage	the session is saved in localStorage
+validadores de auth	auth validators
+login exige e-mail válido e senha	login requires a valid e-mail and password
+cadastro exige senha ≥ 8 e termos aceitos	sign up requires password ≥ 8 and accepted terms
+cadastro válido remove espaços do nome	valid sign up trims the name
+modelo de categoria	category model
+cor e rótulo vêm do grupo cadastrado	color and label come from the registered group
+grupo ainda não carregado ou removido: cinza neutro, com a chave no rótulo	group not loaded yet or removed: neutral gray, with the key in the label
+filtra grupos por tipo	filters groups by type
+todo slot da API tem classes Tailwind literais e o token CSS do mesmo nome	every API slot has literal Tailwind classes and the CSS token of the same name
+ícone: chaves do seed antigo viram Material Symbols; o resto já é o nome	icon: old seed keys become Material Symbols; the rest is already the name
+a legenda do calor vai do roxo (menos) ao amarelo (mais)	the heatmap legend goes from purple (less) to yellow (more)
+pesosCalor normaliza pela maior célula com piso 4	heatmapWeights normalizes by the largest cell with a floor of 4
+expressaoGradienteCalor começa transparente e segue as paradas em ordem	heatmapGradientExpression starts transparent and follows the stops in order
+localizacao-store	geolocation-store
+fica indisponível fora de contexto seguro	is unavailable outside a secure context
+com permissão já concedida, acompanha a posição sem pedir	with permission already granted, tracks the position without asking
+em prompt, não acompanha até o usuário pedir	in prompt, does not track until the user asks
+guarda que a permissão foi concedida	remembers that permission was granted
+em prompt, se já concedeu antes (iOS esquece), pede de novo sem esperar o Ativar	in prompt, if it was granted before (iOS forgets), asks again without waiting for Ativar
+app aberto: se o iOS volta a permissão para prompt, pede de novo em vez do banner	app open: if iOS moves the permission back to prompt, asks again instead of the banner
+se o pedido automático for negado, esquece a concessão e fica denied	if the automatic request is denied, forgets the grant and stays denied
+se o pedido automático falhar por outro motivo, volta a prompt	if the automatic request fails for another reason, goes back to prompt
+pedido negado vira denied e resolve null	denied request becomes denied and resolves null
+filtros do mapa	map filters
+cada modo oferece os chips do seu tipo	each mode offers the chips of its type
+um grupo criado pelo admin aparece no modo do seu tipo	a group created by the admin appears in the mode of its type
+Ambos respeita a ordem configurada, misturando os tipos	Ambos respects the configured order, mixing the types
+Problemas liga só os marcadores; Incidentes só o calor	Problemas turns on only the markers; Incidentes only the heatmap
+o chip de ampulheta pede status=nova	the hourglass chip asks for status=new
+em Ambos, marcar só um grupo de incidente desliga os marcadores	in Ambos, checking only an incident group turns the markers off
+lê lat e lng válidos	reads valid lat and lng
+link inválido (%s) vira null	invalid link (%s) becomes null
+retanguloDaApi	apiBounds
+arredonda para fora em 3 casas	rounds outward to 3 decimals
+limita longitude e latitude quando o zoom afasta além do mundo (regra 15)	clamps longitude and latitude when zooming out beyond the world (rule 15)
+devolve null quando não sobra retângulo válido	returns null when no valid bounds remain
+MapaPage	MapPage
+troca de modo e mostra os chips do modo escolhido	switches mode and shows the chips of the chosen mode
+link com chip de outro modo é ignorado (não apaga as camadas)	link with a chip from another mode is ignored (does not clear the layers)
+trocar de modo antes de os grupos chegarem não apaga os chips do link	switching mode before the groups arrive does not clear the link chips
+falha em GET /groups mostra o erro do mapa em vez de sumir com as camadas	failure on GET /groups shows the map error instead of hiding the layers
+falha em GET /categories mostra o erro do mapa com "Tentar novamente"	failure on GET /categories shows the map error with "Tentar novamente"
+aviso de área vazia some ao mexer no mapa e não volta a cada área vazia	empty area notice disappears when moving the map and does not come back on every empty area
+X do aviso de área vazia fecha de vez	the empty area notice X closes it for good
+toque no mapa no modo Ambos sem incidentes mostra o aviso e não abre a área	tapping the map in Ambos mode without incidents shows the notice and does not open the area
+retângulo enviado à API fica dentro de ±180 mesmo com o mapa afastado (regra 15)	bounds sent to the API stay within ±180 even with the map zoomed out (rule 15)
+marca chips de filtro na URL e limpa os que não existem no novo modo	marks filter chips in the URL and clears those that do not exist in the new mode
+sem Geolocation (jsdom) não mostra o banner e o GPS abre a ajuda	without Geolocation (jsdom) does not show the banner and the GPS opens the help
+CamadaProblemas	IssueLayer
+clicar no marcador seleciona o problema e não chega ao toque do mapa (regra 7)	clicking the marker selects the issue and does not reach the map tap (rule 7)
+marcador selecionado fica por cima; alta acima de baixa	selected marker stays on top; high above low
+problema de categoria desativada continua no mapa, em cinza	issue of a deactivated category stays on the map, in gray
+MarcadorProblema	IssueMarker
+%s / %s	%s / %s
+Alta é maior que Média, que é maior que Baixa	High is larger than Medium, which is larger than Low
+tamanhos por faixa: alta 38, média 31, baixa 25 (+7 da ponta)	sizes by band: high 38, medium 31, low 25 (+7 for the tip)
+alta pulsa; nova e baixa não	high pulses; new and low do not
+Nova leva o selo e possivelmente resolvida leva borda tracejada com check	New gets the badge and possibly resolved gets a dashed border with check
+votos otimistas	optimistic votes
+primeiro voto entra no balde escolhido	first vote goes into the chosen bucket
+trocar o voto tira do balde anterior	changing the vote removes it from the previous bucket
+repetir o mesmo voto não muda nada	repeating the same vote changes nothing
+RecentesPage	RecentPage
+chip de grupo liga e desliga o filtro	group chip toggles the filter
+falha em GET /groups mostra erro com "Tentar novamente" em vez de lista sem filtros	failure on GET /groups shows an error with "Tentar novamente" instead of a list without filters
+MapaRegistro	ReportMap
+modo pino grava o centro do mapa como local ao parar de mover	pin mode saves the map center as the location when it stops moving
+moveend com o mesmo centro (redimensionar) não troca o local	moveend with the same center (resize) does not change the location
+modo área desenha o raio de 150 m	area mode draws the 150 m radius
+conferência mostra a distância entre os pinos	duplicate check shows the distance between the pins
+horário do incidente (regra 16)	incident time (rule 16)
+"Agora" envia agora − 1 min e "Há 1 hora" agora − 60 min	"Agora" sends now − 1 min and "Há 1 hora" now − 60 min
+"Outro horário" começa no último quarto de hora e anda de 15 em 15	"Outro horário" starts at the last quarter hour and moves in steps of 15
+não passa de 23 h 45 atrás	does not go beyond 23 h 45 ago
+no envio, um horário que saiu da janela volta para dentro dela	on submit, a time that left the window goes back inside it
+passo 1: tipo e categoria	step 1: type and category
+a tela de tipo leva à lista de categorias do tipo escolhido	the type screen leads to the category list of the chosen type
+tipo ausente ou inválido volta para a escolha do tipo	missing or invalid type goes back to choosing the type
+mostra as categorias do tipo agrupadas, uma seção por grupo, na ordem da API	shows the categories of the type grouped, one section per group, in API order
+chip de grupo filtra as seções; tocar de novo volta para Todas	group chip filters the sections; tapping again goes back to Todas
+a busca ignora acento e maiúsculas e avisa quando não acha nada	search ignores accents and case and shows a notice when nothing is found
+Continuar só habilita com uma categoria; segue para o local e vira "Recente" na próxima vez	Continuar only enables with a category; goes to the location and becomes "Recente" next time
+rascunho de outro tipo não conta como escolha	draft of another type does not count as a choice
+grupo e categoria criados pelo admin aparecem sem mudar o app	group and category created by the admin appear without changing the app
+falha ao carregar as categorias oferece tentar de novo	failure loading the categories offers to try again
+categoria cujo grupo sumiu aparece em "Outras" e continua escolhível	category whose group disappeared shows under "Outras" and stays selectable
+falha em /grupos oferece tentar de novo em vez de uma lista vazia	failure on /groups offers to try again instead of an empty list
+passo de local com categoria de outro tipo volta para a lista do tipo certo	location step with a category of another type goes back to the right type's list
+passo de local com categoria que foi desativada volta para a lista	location step with a category that was deactivated goes back to the list
+rascunho do registro (regra 5)	report draft (rule 5)
+começa vazio, com horário "agora"	starts empty, with time "now"
+guarda categoria, local, descrição e horário	stores category, location, description and time
+definirLocal com o mesmo centro mantém o objeto (não reinicia o debounce do endereço)	setLocation with the same center keeps the object (does not restart the address debounce)
+definirLocal com outro centro troca o objeto	setLocation with another center replaces the object
+limpar volta ao estado inicial	clear goes back to the initial state
+persiste no sessionStorage, para sobreviver a recarregar e à falha de envio	persists in sessionStorage, to survive a reload and a submit failure
+histórico	history
+agrupa em Hoje, Ontem, Esta semana e Anteriores	groups into Hoje, Ontem, Esta semana and Anteriores
+descreve cada tipo como no protótipo	describes each type as in the prototype
+mocks de registro usam as categorias do admin	report mocks use the admin categories
+categoria criada em runtime pode ser registrada	category created at runtime can be reported
+o resumo da área conta o incidente na categoria escolhida, não em Roubo	the area summary counts the incident in the chosen category, not in Roubo
+o calor de um incidente novo aparece só no filtro do grupo da sua categoria	the heatmap of a new incident only shows in the filter of its category's group
+sem categoria nova, quatro incidentes de roubo não inventam acidente nem somem do total	without a new category, four robbery incidents do not invent an accident nor vanish from the total
+a área lista toda categoria de incidente ativa, mesmo com zero	the area lists every active incident category, even with zero
+mover a categoria de grupo move o calor já registrado junto	moving the category to another group moves the already reported heatmap along
+editar a categoria atualiza também o histórico do usuário	editing the category also updates the user's history
+categoria desativada some da contagem da área	deactivated category disappears from the area count
+editar a categoria atualiza os problemas já registrados	editing the category updates the already reported issues
+categoria desativada não aceita novo registro	deactivated category does not accept new reports
+categoria de outro tipo continua sendo 422	category of another type is still 422
+DetalheProblema	IssueDetail
+Ativa: confiança e a pergunta única "Ainda está lá?" (tela 3)	Active: trust and the single question "Ainda está lá?" (screen 3)
+Nova: em avaliação com barra segmentada e a mesma pergunta (tela 22)	New: under evaluation with a segmented bar and the same question (screen 22)
+Possivelmente resolvida: "Ainda está lá?" em destaque (tela 23)	Possibly resolved: "Ainda está lá?" highlighted (screen 23)
+Resolvida (link salvo): só leitura, sem botões de voto	Resolved (saved link): read only, without vote buttons
+enquanto um voto está em andamento, os outros botões ficam desabilitados	while a vote is in progress, the other buttons are disabled
+aberto (folha expandida ou desktop), só o cartão completo pergunta "Ainda está lá?"	open (expanded sheet or desktop), only the full card asks "Ainda está lá?"
+souAutor: sem botões de voto, com a dica no cartão	isAuthor: no vote buttons, with the hint on the card
+logado, o voto vai num PUT só, atualiza na hora e fica marcado	logged in, the vote goes in a single PUT, updates immediately and stays marked
+trocar a resposta substitui o voto	changing the answer replaces the vote
+erro de regra desfaz o voto otimista e mostra a mensagem	rule error undoes the optimistic vote and shows the message
+visitante que tenta votar vê "Entre para votar" (tela 27)	guest who tries to vote sees "Entre para votar" (screen 27)
+ResumoAlerta	AlertSummary
+mostra categoria, endereço e confirmações	shows category, address and confirmations
+%s: "Ainda está lá?" com um voto só	%s: "Ainda está lá?" with a single vote
+aberto (folha expandida ou desktop), sem polegares: o cartão completo já pergunta	open (expanded sheet or desktop), without thumbs: the full card already asks
+autor não vê os polegares	author does not see the thumbs
+resolvida não tem botões	resolved has no buttons
+visitante tocando no polegar abre "Entre para votar"	guest tapping the thumb opens "Entre para votar"
+no celular, tocar no card expande a folha; os polegares votam sem expandir	on mobile, tapping the card expands the sheet; the thumbs vote without expanding

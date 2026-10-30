@@ -1,0 +1,1028 @@
+ 
+ · 
+ · agora
+ · por volta das 
+ · termos e privacidade
+ (
+ (anônimo)
+ / 100
+ 22 22)
+ 45%, 
+ 75%)
+ caracteres
+ de 
+ de você
+ dias
+ h
+ hover:brightness-105
+ hover:brightness-110 hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_6px_18px_color-mix(in_srgb,var(--primary)_40%,transparent)]
+ km
+ m
+ min
+ pessoas disseram
+ usuários
+-m-2.5 flex size-11 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2
+-mb-px flex-1 border-b-2 py-3 text-sm font-medium focus-visible:outline-2
+-mr-1 flex size-7 items-center justify-center rounded-full hover:bg-foreground/10 focus-visible:outline-2
+-mt-2 mb-3 text-xs text-muted-foreground
+-mt-2 text-xs text-muted-foreground
+-mx-2 rounded-xl px-2 hover:bg-card focus-visible:outline-2
+-mx-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1
+-mx-4 mb-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1
+— seu voto pesa mais por estar perto
+, 
+, de forma anônima. Ele não aparece como marcador e não recebe votos.
+, minmax(0, 1fr))
+, ponderados por proximidade e histórico de quem votou.
+, por volta das 
+.
+. A equipe de moderação vai analisar seu vínculo com a região.
+. Ainda está lá?
+. É o mesmo?
+. Ele não aparece mais no mapa nem recebe votos.
+·
+· até
+· desde
+'FILL' 
+'Hoje', d MMM. · HH:mm
+(min-width: 1024px)
+(prefers-color-scheme: dark)
+/
+0 0 
+0 0 24 24
+0 0 44 44
+0 0 60 100
+0 4px 10px rgba(0,0,0,.28)
+1 pessoa disse
+1 usuário
+1.5px solid #fff
+1.5px solid #ffffff
+15 minutos antes
+15 minutos depois
+1px 5px
+2.5px solid #ffffff
+30 dias
+50% 100%
+6px solid transparent
+7 dias
+a
+A comunidade confirmou que este problema foi resolvido
+A mudança vale para os votos seguintes; os votos já dados mantêm o peso que tinham.
+A recuperação de senha não faz parte desta versão do sistema.
+AbortError
+Abra Permissões ou Configurações do site.
+Abrir legenda
+absolute -right-0.5 -bottom-0.5 flex size-6 items-center justify-center rounded-full border-2 border-white bg-primary text-primary-foreground
+absolute -top-2 left-3 bg-background px-1 text-xs text-muted-foreground
+absolute bottom-[92px] left-1/2 z-[1000] flex h-12 -translate-x-1/2 pressable items-center gap-2 rounded-full bg-primary bg-linear-to-b from-black/0 to-black/12 px-5 font-semibold text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2
+absolute inset-0 rounded-[11px] bg-brand-soft shadow-1 ring-1 ring-brand/15
+absolute inset-0 rounded-[14px] ring-2 ring-brand
+absolute inset-0 rounded-[18px] bg-brand-soft
+absolute inset-0 rounded-full bg-brand-soft
+absolute inset-0 size-full
+absolute inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex h-[58px] items-stretch gap-1 rounded-[22px] p-1 shadow-2 glass
+absolute inset-y-0 left-0 z-[1001] flex w-[420px] animate-in flex-col border-y-0 border-l-0 shadow-3 glass duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] fade-in-0 slide-in-from-left-6 motion-reduce:animate-none
+absolute right-3 bottom-10 z-[1000] flex size-11 pressable items-center justify-center rounded-xl bg-surface-2 shadow-2 focus-visible:outline-2
+absolute top-1.5 right-1.5 flex size-11 pressable items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/5 focus-visible:outline-2
+absolute top-2 left-4 text-[11px] font-medium text-brand
+absolute top-2 right-2 flex size-10 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2
+absolute top-4 right-4
+absolute top-4 right-4 flex size-9 pressable items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 disabled:pointer-events-none
+absolute top-5 right-4
+absolute z-[1000] flex size-11 pressable animate-in items-center justify-center rounded-full shadow-2 glass duration-200 fade-in-0 zoom-in-75 focus-visible:outline-2 motion-reduce:animate-none
+Aceite os termos para criar a conta.
+Acesso total ao painel: fila, categorias e usuários.
+Acidentes
+Acompanhar o andamento dos seus registros
+Aconteceu e passou
+Aconteceu e passou. Entra de forma anônima no mapa de calor.
+Admin
+Administrador
+Agora
+Agora não
+Ainda está lá?
+Ainda não há grupo desse tipo. Crie um na aba Grupos.
+Ainda não tem conta?
+Algo deu errado
+Algo deu errado. Tente de novo.
+Alta
+Alterar perfil
+Ambos
+Analisar pedidos de verificação
+Anônimo. Entra no mapa de calor da região, sem ponto exato.
+Anteriores
+Apagando…
+Apagar
+Apagar 
+Apagar o grupo 
+Aparência
+ApiError
+Apontar para o norte
+Aprovadas
+Aprovar
+Área aproximada
+Área aproximada · raio de 150 m
+Área de incidentes
+Área do relato
+Área selecionada
+aria-invalid:border-destructive aria-invalid:focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--destructive)_18%,transparent)]
+Arraste o mapa para ajustar
+Arraste o mapa para ajustar a área
+Ativa
+Ativar
+Ativar localização
+Ativas
+Ative a localização para seu voto pesar mais quando estiver perto
+Authorization
+Automático
+Azul
+Baixa
+Bearer 
+Bem-vindo de volta
+bg-brand-soft text-brand
+bg-brand-soft text-brand hover:bg-brand/25
+bg-destructive text-destructive-foreground 
+bg-destructive/15 text-destructive
+bg-group-purple-light text-group-purple
+bg-linear-to-b from-black/0 to-black/12 shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_1px_2px_rgb(0_0_0/0.18)]
+bg-muted text-foreground
+bg-new-badge/15 text-new-badge
+bg-primary text-primary-foreground
+bg-primary text-primary-foreground 
+block cursor-pointer focus-visible:outline-2
+block font-medium
+block origin-top-left [&_.alert-pulse]:hidden
+block pressable space-y-3.5 rounded-[20px] border border-border bg-card p-5 shadow-1 hover:border-brand focus-visible:outline-2
+block rounded-full border-2 border-white shadow
+block size-[18px] rounded-full border-[3px] border-white bg-brand shadow-[0_0_0_6px_rgba(59,158,255,.18)]
+block text-[13px] font-medium
+block text-xs text-muted-foreground
+block truncate text-sm text-muted-foreground
+border border-border/60 bg-card
+border border-brand/60 bg-brand-soft text-brand backdrop-blur-xl
+border border-input
+border border-input bg-card/40 text-brand hover:bg-brand-soft
+border-border bg-card hover:bg-surface-2
+border-border bg-card shadow-1 hover:bg-surface-2
+border-brand bg-brand-soft
+border-brand bg-brand-soft text-brand
+border-brand text-brand
+border-brand/40 text-brand
+border-input hover:bg-foreground/5
+border-t border-border/60
+border-transparent text-brand
+border-transparent text-muted-foreground
+Buraco, poste apagado, lixo acumulado…
+Buscando endereço
+Buscando endereço…
+Buscando…
+Buscar categoria
+Buscar grupo
+Buscar ícone
+Buscar ícone (em inglês: flood, tree, fire…)
+Buscar por nome ou e-mail
+Buscar por nome ou grupo
+Buscar usuário
+BuscarDuplicatasResponse
+Cada registro fica ligado a uma conta — é isso que permite medir a confiança do que aparece no mapa. Sem conta, você continua vendo o mapa normalmente.
+Calculada com 
+Campo obrigatório — escreva pelo menos 30 caracteres.
+Cancelar
+Carregando incidentes
+Carregando perfil
+Carregando problema
+Carregando recentes
+Carregando…
+Carregar mais
+Categoria
+CategoriaAdminResponse
+CategoriaResumo
+Categorias
+Centralizar na minha localização
+check
+Cidadão
+Cinza
+Claro
+Com uma conta você registra ocorrências e avalia as que já estão no mapa.
+Com uma conta você registra ocorrências, vota no que está no mapa e acompanha seu histórico.
+Como ler o mapa
+Como liberar a localização
+Concentração alta
+Concentração baixa
+Concentração média
+Concentração nos últimos 7 dias
+Conferência
+Conferindo…
+Confiança
+Confiança alta
+Confiança baixa
+Confiança média
+Configurações
+confirmação
+Confirmação registrada
+confirmações
+Confirmar e avaliar ocorrências perto de você
+Confirmar local
+Confirmar que um problema existe
+Confirmar recusa
+confirmaram
+Conta
+Conte seu vínculo com a região (mínimo de 30 caracteres).
+Continua lá até alguém confirmar que foi resolvido. Vira ponto no mapa.
+Continua lá até ser resolvido
+Continuar
+Cor
+Criando conta…
+Criar conta
+Criar e editar categorias, grupos e ícones
+CriarCategoriaRequest
+CriarGrupoRequest
+Crie sua conta
+d MMM yyyy
+d MMM.
+d MMM. yyyy
+d MMM., HH:mm
+Data e hora
+data-[state=closed]:animate-out data-[state=closed]:duration-150 data-[state=closed]:ease-in data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-96 sm:max-w-lg
+data-[state=open]:animate-in data-[state=open]:duration-300 data-[state=open]:ease-[cubic-bezier(0.2,0.9,0.25,1.1)] data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-2 data-[state=open]:zoom-in-96
+data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[85dvh] data-[vaul-drawer-direction=bottom]:rounded-t-[28px]
+data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:left-0 data-[vaul-drawer-direction=left]:w-3/4 data-[vaul-drawer-direction=left]:border-r data-[vaul-drawer-direction=left]:sm:max-w-sm
+data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:border-l data-[vaul-drawer-direction=right]:sm:max-w-sm
+data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-lg data-[vaul-drawer-direction=top]:border-b
+de
+Desativar
+Desativar esconde a categoria sem apagar o histórico.
+Descrição (opcional)
+desde
+Detalhe do problema
+disabled:opacity-40 data-[state=checked]:border-primary data-[state=checked]:bg-primary
+Disse que está lá
+Disse que não está lá
+divide-y divide-border overflow-hidden rounded-[20px] bg-card shadow-1
+divide-y divide-border rounded-[20px] bg-card shadow-1
+Dizer se ele ainda está lá
+e a
+E-mail
+E-mail ou senha inválidos.
+Editar
+Editar 
+Editar categoria
+Editar grupo
+Editar nome
+EditarCategoriaRequest
+EditarGrupoRequest
+Em avaliação
+Em dúvida? Se daqui a uma semana ainda der pra ver no local, é
+Em Localização, escolha Permitir.
+Endereço aproximado
+Endereço indisponível agora; o registro segue com o ponto do mapa.
+Entendi
+Entrando…
+Entrar
+Entre com o e-mail da sua conta.
+Entre para acompanhar sua participação
+Entre para registrar
+Entre para votar
+Enviado em
+Enviando…
+Enviar pedido
+Enviar registro
+Erro HTTP 
+Escolha a aparência
+Escolha a cor.
+Escolha como registrar o que você viu.
+Escolha o grupo.
+Escolha o tipo de vínculo.
+Escolha um ícone da lista.
+Escolha um ícone.
+Escolha uma categoria para continuar
+Escuro
+Esqueci minha senha
+Essa ação não pode ser desfeita. O grupo some dos filtros e da escolha de categoria.
+Essa categoria é de incidente. Volte e escolha de novo.
+Essa categoria é de problema. Volte e escolha de novo.
+Esse registro é seu: quem registra não vota nele.
+Esta área é só para administradores.
+Esta semana
+estado
+Estado
+Estado do problema
+Estado ou evento?
+Este grupo ainda tem categorias (inclusive desativadas). Mova todas para outro grupo antes de apagar.
+Este navegador não oferece a localização nesta página. Ela só funciona em conexão segura (https).
+Este pedido já foi analisado por outra pessoa.
+Este problema já foi resolvido.
+Este problema não está mais disponível.
+Este problema não está mais no mapa.
+Evento
+Eventos são pontuais: aparecem apenas agregados, sem local exato, e não recebem votos de "Ainda está lá?".
+Ex.: moro na Rua São Clemente há 8 anos e passo pelo trecho todos os dias.
+Explique por que o pedido foi recusado
+FaixaConfianca
+Feature
+FeatureCollection
+Fechar
+Fechar aviso
+Fechar legenda
+Fechar registro
+Fica no mapa até ser resolvido
+Fila de verificação
+Filtrar histórico
+Filtrar por grupo
+Filtros
+fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0
+fixed inset-0 z-50 bg-black/40 backdrop-blur-sm data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0
+fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-[28px] border border-border bg-card p-6 shadow-3 outline-none
+flex aspect-square pressable items-center justify-center rounded-xl border-2 text-[26px] focus-visible:outline-2
+flex flex-1 flex-col
+flex flex-1 flex-col px-4 pb-6
+flex flex-col gap-0.5 p-4 group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center group-data-[vaul-drawer-direction=top]/drawer-content:text-center md:gap-1.5 md:text-left
+flex flex-col gap-2
+flex flex-col gap-2 sm:flex-row
+flex flex-col gap-2 text-center sm:text-left
+flex flex-col-reverse gap-2 sm:flex-row sm:justify-end
+flex flex-wrap gap-2
+flex flex-wrap gap-3
+flex flex-wrap items-center gap-x-3 gap-y-2
+flex gap-1.5
+flex gap-2 text-xs text-muted-foreground
+flex gap-2.5
+flex gap-3
+flex gap-3 rounded-2xl bg-brand-soft p-4 text-brand
+flex gap-3 rounded-2xl bg-surface-2 p-3 text-xs text-muted-foreground
+flex gap-4
+flex gap-4 px-4 py-3
+flex h-11 items-center gap-2 rounded-xl border border-transparent bg-muted px-3 text-muted-foreground transition-[border-color,box-shadow,background-color] duration-200 focus-within:border-ring focus-within:bg-card focus-within:shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_18%,transparent)]
+flex h-16 items-center gap-2 px-1
+flex h-16 items-center justify-between
+flex h-16 shrink-0 items-center gap-2 px-1
+flex h-8 shrink-0 pressable items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold shadow-1 focus-visible:outline-2
+flex h-dvh
+flex h-dvh flex-col items-center justify-center gap-4 p-6 text-center
+flex h-full flex-col
+flex items-center
+flex items-center gap-1 text-muted-foreground
+flex items-center gap-1.5
+flex items-center gap-1.5 text-sm
+flex items-center gap-2
+flex items-center gap-2 border-t border-border pt-3 text-[13px] text-muted-foreground
+flex items-center gap-3
+flex items-center gap-3 border-t border-border/60 px-4 py-3 first:border-t-0
+flex items-center gap-3 p-3
+flex items-center gap-3 pr-10
+flex items-center gap-3 py-2.5
+flex items-center gap-3 rounded-2xl bg-brand-soft p-3 text-brand
+flex items-center gap-3 rounded-2xl bg-surface-2 py-2 pr-2 pl-4
+flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-1
+flex items-center gap-3 text-sm
+flex items-center justify-between gap-2
+flex items-center justify-between gap-3
+flex items-end gap-0.5
+flex items-start gap-1.5
+flex items-start gap-3 rounded-2xl bg-brand-soft p-4 text-sm
+flex justify-center py-4
+flex min-h-0 flex-col bg-card shadow-3
+flex min-h-11 pressable items-center gap-2 rounded-full border py-1 pr-3 pl-1.5 text-sm font-medium focus-visible:outline-2
+flex min-h-24 pressable flex-col items-center gap-1.5 rounded-2xl border-2 p-2 text-center text-[13px] leading-tight font-medium focus-visible:outline-2
+flex min-h-dvh flex-col bg-background lg:min-h-[720px] lg:w-full lg:max-w-md lg:rounded-[28px] lg:shadow-3
+flex min-h-full animate-in flex-col duration-300 ease-out fade-in-0 slide-in-from-bottom-2 motion-reduce:animate-none
+flex min-h-full flex-col px-6 pt-20 pb-6 lg:pt-12
+flex pressable flex-col items-center gap-2 rounded-2xl py-3 focus-visible:outline-2
+flex pressable gap-3 rounded-[20px] border border-border bg-card p-3 shadow-1 hover:bg-surface-2 focus-visible:outline-2
+flex pressable items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-surface-2 focus-visible:outline-2
+flex size-[18px] shrink-0 items-center justify-center
+flex size-10 items-center justify-center rounded-full bg-brand-soft text-brand
+flex size-10 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2
+flex size-10 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2 disabled:opacity-30
+flex size-10 shrink-0 items-center justify-center rounded-full
+flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground
+flex size-11 items-center justify-center rounded-full border-2 border-card 
+flex size-11 pressable items-center justify-center rounded-full bg-foreground/8 hover:bg-foreground/12 focus-visible:outline-2 disabled:opacity-40
+flex size-11 pressable items-center justify-center text-brand transition-colors hover:bg-foreground/5 focus-visible:outline-2 focus-visible:-outline-offset-2
+flex size-12 items-center justify-center rounded-full bg-muted text-[26px]
+flex size-12 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2
+flex size-12 shrink-0 items-center justify-center rounded-full text-white
+flex size-5 shrink-0 pressable items-center justify-center rounded-[6px] border-2 border-input bg-card text-primary-foreground outline-none
+flex size-9 pressable items-center justify-center rounded-full bg-foreground/6 text-muted-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:outline-2 
+flex w-6 justify-center text-muted-foreground
+flex w-7 shrink-0 items-start justify-center pt-0.5
+flex w-full gap-3 rounded-2xl border bg-card p-3 text-left shadow-1 disabled:opacity-100
+flex w-full items-center gap-3 rounded-2xl border p-3 text-left focus-visible:outline-2
+flex w-full items-center gap-4 px-4 py-3
+flex-1 overflow-y-auto p-4 pt-5
+flex-1 pt-4 tabular-nums
+flex-1 space-y-2
+flex-1 text-[13px] leading-tight
+flex-1 text-sm
+flex-row justify-end
+focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive
+font-semibold text-brand
+font-semibold text-foreground
+Geral
+grid gap-3 sm:grid-cols-2
+grid grid-cols-3
+grid grid-cols-3 gap-2
+grid grid-cols-6 gap-2
+grid h-10 gap-[3px] rounded-[14px] p-[3px] glass
+grid h-full grid-cols-[420px_1fr]
+group flex w-full pressable flex-col items-center gap-1 text-xs font-medium focus-visible:outline-2
+group/drawer-content fixed z-50 flex h-auto flex-col border-t border-border bg-card shadow-[inset_0_1px_0_var(--highlight),0_-2px_8px_rgb(0_0_0/0.08),0_-16px_44px_rgb(0_0_0/0.22)] outline-none
+Grupo
+GrupoResponse
+Grupos
+Guardamos seu nome, e-mail e seus registros e votos. Sua localização serve só para calcular a distância do voto e é descartada; incidentes são anônimos e agregados.
+h-1 overflow-hidden rounded-full bg-brand-soft
+h-1.5 flex-1 rounded-full transition-colors duration-500
+h-1.5 overflow-hidden rounded-full bg-muted
+h-10 bg-muted
+h-11 px-6
+h-12 px-6 text-base
+h-14 appearance-none pt-5 pr-12 pb-1 pl-4
+h-14 px-4 pt-5 pb-1
+h-2 rounded-full
+h-24 rounded-2xl bg-muted
+h-24 w-[58px] rounded-xl shadow-1
+h-3 w-1/2 bg-muted
+h-3 w-20 bg-muted
+h-32 rounded-2xl bg-muted
+h-40 rounded-2xl bg-muted
+h-5 w-4/5 bg-muted
+h-6 w-40 bg-muted
+h-60 rounded-2xl bg-muted
+h-9 gap-1.5 px-4
+h-auto min-h-10 py-2 whitespace-normal
+h-full bg-background
+h-full rounded-full bg-brand
+h-full rounded-full bg-primary
+há 
+há 1 dia
+Há 1 hora
+Histórico
+Hoje
+hoje, 
+Hora aproximada
+hover:border-muted-foreground/40 focus:border-ring focus:bg-card focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_18%,transparent)]
+HttpValidationProblemDetails
+Ícone
+Ícone:
+Iconify respondeu 
+Igual ao celular
+Inativa
+Inativas
+Incidente — entra no mapa de calor
+Incidente · calor
+Incidentes
+Indisponível
+Informe a ordem.
+Informe o nome.
+Informe seu e-mail.
+Informe seu nome.
+Informe sua senha.
+Informe um e-mail válido.
+inline-block tabular-nums
+inline-block tabular-nums 
+inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-medium
+inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium
+inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium
+inline-flex min-h-11 items-center font-medium text-brand hover:underline
+inline-flex shrink-0 items-center gap-2 rounded-lg border border-input px-2.5 py-1 text-xs font-medium
+inline-flex shrink-0 items-center justify-center rounded-full
+inline-flex shrink-0 items-center rounded-md px-2 py-0.5 text-xs font-semibold
+items-center text-center sm:text-center
+Já existe um grupo com este nome.
+Já existe um registro de
+Já existe uma categoria com este nome.
+Já existe uma conta com este e-mail.
+Já tem conta?
+Já tenho conta
+Justificativa *
+km
+Laranja
+Li e aceito os
+Limpar busca
+Limpar filtros
+linear-gradient(to right, 
+LineString
+list-decimal space-y-2 pl-5 text-sm
+ListarCategoriasResponse
+ListarProblemasNaAreaResponse
+ListarProblemasRecentesItem
+ListarUsuariosItem
+ListarVerificacoesItem
+Local
+Local · 
+Local aproximado
+Localização
+Localização desativada — seus votos contam com peso base
+m · atualizado às
+M-5 30 65 48M22 -5 34 105
+M22 2.5 25 8H19Z
+M4.5 12.75l6 6 9-13.5
+M60 0V100H0Z
+M7.5 12.5l3 3 6-6.5
+main-map relative isolate size-full
+Maior e mais cheio = mais confiável
+Mais
+Mapa
+Mapa © colaboradores do OpenStreetMap.
+Mapa de ocorrências
+Marrom
+material-symbols-rounded shrink-0 select-none
+max-h-56 space-y-2 overflow-y-auto
+mb-1 flex items-center gap-2 font-medium
+mb-1 flex items-center justify-between
+mb-1 flex items-start gap-3
+mb-1 font-medium
+mb-1 text-sm font-medium text-muted-foreground
+mb-1.5 text-xs text-muted-foreground
+mb-2 flex items-center gap-2
+mb-2 flex items-center gap-2 text-new-badge
+mb-2 flex items-center gap-2 text-sm font-semibold
+mb-2 font-medium
+mb-2 text-2xl
+mb-2 text-left text-2xl leading-8 font-semibold tracking-tight
+mb-2 text-sm font-medium
+mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase
+mb-3 flex items-center gap-3
+mb-3 flex items-center justify-between
+mb-3 space-y-3
+mb-3 text-[28px] leading-9
+mb-3 text-sm text-destructive
+mb-3 text-sm text-muted-foreground
+mb-4 flex border-b border-border
+mb-4 flex gap-3 rounded-2xl bg-destructive/15 p-4 text-destructive
+mb-4 flex items-center gap-2 rounded-xl bg-destructive/15 p-3 text-sm text-destructive
+mb-4 flex items-center gap-4
+mb-4 flex items-center justify-between gap-3
+mb-4 flex size-14 items-center justify-center rounded-full bg-brand-soft text-brand
+mb-4 flex size-14 pressable items-center justify-center rounded-2xl bg-primary bg-linear-to-b from-black/0 to-black/12 text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2
+mb-4 grid grid-cols-2 gap-2
+mb-4 space-y-3
+mb-4 space-y-3 text-sm
+mb-4 text-[28px] leading-9
+mb-4 text-2xl
+mb-4 text-sm text-muted-foreground
+mb-6 space-y-3
+mb-6 text-[28px] leading-9
+mb-6 text-sm text-muted-foreground
+mb-8 flex size-[72px] items-center justify-center rounded-full bg-brand-soft text-brand
+mb-8 flex size-16 items-center justify-center rounded-full bg-brand-soft text-brand
+mb-8 text-muted-foreground
+Média
+Menor aparece primeiro nos filtros e na escolha de categoria.
+Menos
+min-h-[84px] min-w-0 flex-1
+min-h-0 flex-1 overflow-y-auto px-4 pb-4
+min-h-5 text-center text-[13px] text-muted-foreground
+min-h-dvh lg:flex lg:items-center lg:justify-center lg:bg-card lg:p-8
+min-w-0 flex-1
+min-w-0 flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden
+min-w-0 flex-1 text-[15px] font-semibold
+min-w-0 flex-1 text-left
+min-w-0 text-sm
+Mínimo de 8 caracteres
+ml-2 rounded-full bg-brand-soft px-2 py-0.5 text-xs font-semibold text-brand
+ml-2 text-2xl
+ml-auto flex items-center gap-1 text-xs text-muted-foreground
+ml-auto text-[24px] text-muted-foreground
+ml-auto text-sm
+ml-auto text-sm text-foreground
+MMM. yyyy
+Morador(a) da região
+Mostrar senha
+Motivo da recusa *
+Motivo da recusa:
+Motivo:
+mt-0! h-dvh max-h-none!
+mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground
+mt-0.5 size-4 rounded-full bg-heatmap blur-[1px]
+mt-0.5 text-[15px] font-medium text-foreground
+mt-0.5 text-[20px]
+mt-1 flex flex-wrap items-center gap-2 text-xs
+mt-1 flex items-center gap-1 text-xs font-medium text-brand
+mt-1 flex justify-between px-4 text-xs text-muted-foreground
+mt-1 flex justify-between text-[11px] text-muted-foreground
+mt-1 h-5 w-4/5 bg-muted
+mt-1 h-7 w-48 bg-muted
+mt-1 px-4 text-xs text-muted-foreground
+mt-1 space-y-1.5
+mt-1 text-[15px] leading-snug text-muted-foreground
+mt-1 text-xs text-destructive
+mt-1.5 flex items-start gap-1 px-4 text-xs
+mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground
+mt-2 flex justify-end
+mt-2 mb-5 text-[15px] text-muted-foreground
+mt-2 space-y-5
+mt-2 text-sm text-destructive
+mt-2 text-xs
+mt-2 text-xs font-medium text-muted-foreground
+mt-2 text-xs text-destructive
+mt-2 text-xs text-muted-foreground
+mt-3 border-t border-brand/15 pt-3 text-xs
+mt-3 flex flex-wrap items-center justify-between gap-2
+mt-3 flex gap-2
+mt-3 flex items-center gap-3 rounded-2xl bg-foreground/5 py-2 pr-2 pl-4
+mt-3 flex justify-end gap-2
+mt-3 space-y-1 text-[13px] text-muted-foreground
+mt-3 text-sm text-destructive
+mt-3 text-xs text-muted-foreground
+mt-4 flex justify-end gap-2
+mt-4 text-[28px] leading-9
+mt-4 text-sm text-destructive
+mt-5 flex justify-end gap-2
+mt-6 flex items-start gap-3 text-sm
+mt-auto flex flex-col gap-2 p-4
+mt-auto flex flex-col gap-2 pt-10
+mt-auto flex flex-col gap-2 pt-8
+mt-auto flex items-center justify-center gap-1 pt-10 text-sm text-muted-foreground
+mt-auto pt-10
+mt-auto w-full
+mt-px text-[14px]
+mt-px text-[16px]
+mx-auto flex h-full max-w-md flex-col px-6 pt-20 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:pt-16
+mx-auto h-full w-full lg:max-w-3xl
+mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-brand-soft text-brand
+mx-auto mt-2.5 mb-1 hidden h-[5px] w-10 shrink-0 rounded-full bg-muted-foreground/30 group-data-[vaul-drawer-direction=bottom]/drawer-content:block
+mx-auto w-full animate-in px-4 pb-6 duration-300 ease-out fade-in-0 slide-in-from-bottom-2 motion-reduce:animate-none lg:max-w-3xl lg:px-8
+Nada por aqui ainda.
+não
+Não definida
+Não está lá
+Não foi possível buscar ícones agora. Tente de novo.
+Não foi possível carregar a fila.
+Não foi possível carregar as categorias.
+Não foi possível carregar o histórico.
+Não foi possível carregar o mapa.
+Não foi possível carregar o problema.
+Não foi possível carregar os filtros.
+Não foi possível carregar os grupos.
+Não foi possível carregar os incidentes desta área.
+Não foi possível carregar os recentes.
+Não foi possível carregar os usuários.
+Não foi possível carregar seu perfil.
+Não foi possível concluir. Tente de novo.
+Não foi possível confirmar seu perfil.
+Não foi possível consultar os incidentes desta área
+Não foi possível continuar.
+Não foi possível enviar
+Não foi possível enviar. Tente de novo.
+Não foi possível registrar seu voto.
+Não foi possível salvar. Tente de novo.
+Não, é outro
+Navegação principal
+Negada
+Nenhum grupo com esses filtros.
+Nenhum ícone encontrado. A busca é em inglês.
+Nenhum ícone escolhido
+Nenhum pedido aqui.
+Nenhum problema registrado nesta região.
+Nenhum usuário encontrado.
+Nenhuma categoria com esse nome.
+Nenhuma categoria com esses filtros.
+Nenhuma ocorrência nesta área
+Ninguém registrou problemas por aqui. Afaste o mapa para ver bairros vizinhos.
+NivelConcentracao
+No automático, o app fica claro ou escuro junto com o seu celular. Dá para mudar quando quiser em Configurações.
+Nome
+Nome do grupo
+nos últimos 7 dias
+Nova
+Nova categoria
+Nova ocorrência
+Novo grupo
+O grupo escolhido é de outro tipo (Estado ou Evento).
+O horário precisa estar dentro das últimas 24 horas. Ajuste e envie de novo.
+O navegador não pergunta de novo depois que a permissão é negada. Para liberar:
+O ponto exato não é salvo nem exibido.
+O que ajuda a identificar o problema
+O que mostrar no mapa
+O sistema é um protótipo acadêmico (TCC). Registre apenas ocorrências reais e evite dados pessoais nas descrições.
+O tipo não muda depois de criada.
+O tipo não muda depois de criado.
+O voto passa a valer mais no cálculo de confiança.
+Obrigado. Seu relato já faz parte do mapa de calor
+Obrigatório. A pessoa verá este motivo.
+ObterAreaIncidentesResponse
+ObterCalorIncidentesResponse
+ObterDetalheProblemaResponse
+ObterHistoricoItem
+ObterMeResponse
+Ocorrências urbanas
+Ocre
+Ocultar senha
+Onde aconteceu?
+Onde fica?
+Ontem
+ontem, 
+Ordem de exibição
+Os grupos organizam as categorias no mapa e na escolha de categoria.
+Outras
+Outro horário
+Outro vínculo
+overflow-y-auto overscroll-contain px-4 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]
+overflow-y-auto px-6 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]
+Página não encontrada
+Parece que você está sem conexão. Os dados continuam preenchidos — é só tentar de novo quando a conexão voltar.
+Passo
+Passo 
+Pedido de 
+Pedido em análise
+peer w-full rounded-2xl border border-input bg-surface-2 text-base outline-none
+peer-[:placeholder-shown:not(:focus)]:top-[17px] peer-[:placeholder-shown:not(:focus)]:text-base peer-[:placeholder-shown:not(:focus)]:font-normal
+peer-[:placeholder-shown:not(:focus)]:top-4 peer-[:placeholder-shown:not(:focus)]:text-base peer-[:placeholder-shown:not(:focus)]:font-normal
+peer-focus:text-brand peer-aria-invalid:text-destructive
+Pendentes
+Perfil
+Perfil verificado
+Perfis verificados têm voto com peso maior no cálculo de confiança.
+Permissão de localização
+Permitida
+Permitir acesso à sua localização?
+Permitir localização
+Perto de Icaraí
+Perto de você
+pl-8 text-muted-foreground
+Point
+pointer-events-auto -mx-3 flex [scrollbar-width:none] gap-2 overflow-x-auto px-3 pb-1
+pointer-events-auto absolute right-3 bottom-[168px] z-[1000] flex flex-col divide-y divide-glass-border overflow-hidden rounded-[14px] shadow-2 glass lg:right-4 lg:bottom-14
+pointer-events-auto flex items-center gap-3 rounded-2xl bg-destructive/15 py-2 pr-2 pl-4 text-[13px] text-destructive shadow-2
+pointer-events-auto flex items-center gap-3 rounded-2xl py-2 pr-2 pl-4 shadow-2 glass
+pointer-events-auto relative mx-auto w-full max-w-sm rounded-[28px] p-6 text-center shadow-3 glass
+pointer-events-auto shadow-1 lg:max-w-[440px]
+pointer-events-auto w-60 rounded-[22px] p-4 shadow-3 glass
+pointer-events-none absolute bottom-[152px] left-3 z-[1000] lg:bottom-6 lg:left-4
+pointer-events-none absolute inset-x-0 bottom-[168px] z-[1000] mx-auto w-fit max-w-[90%] rounded-2xl px-4 py-2.5 text-sm shadow-3 glass lg:bottom-8
+pointer-events-none absolute inset-x-0 top-0 z-[1000] space-y-2 p-3 lg:right-auto lg:w-[620px] lg:p-4
+pointer-events-none absolute inset-x-0 top-3 z-[1000] mx-auto flex w-fit items-center gap-2 rounded-lg bg-background/95 px-3 py-1.5 text-sm shadow-2
+pointer-events-none absolute inset-x-6 top-1/2 z-[1000] -translate-y-1/2
+pointer-events-none absolute left-4 origin-left text-[11px] font-medium text-muted-foreground
+pointer-events-none absolute top-1/2 left-1/2 z-[1000] -translate-x-1/2 -translate-y-full
+pointer-events-none absolute top-4 right-4 text-muted-foreground transition-transform peer-focus:rotate-180
+pointer-events-none block
+Política de privacidade
+Polygon
+Possivelmente resolvida
+precisão de ±
+Problema
+Problema — fica no mapa até ser resolvido
+Problema · marcador
+Problemas
+Próximo a 
+px solid #ffffff
+px-2 pt-3 pb-2 text-right font-medium
+px-2 py-1
+px-2 py-3 text-right text-2xl
+px-4 pb-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase
+px-4 pb-3
+px-4 pt-3 pb-2 font-medium
+px-4 pt-3 pb-2 text-right font-medium
+px-4 py-3
+px-4 py-3 text-right text-2xl
+py-10 text-center text-sm text-muted-foreground
+py-4 text-sm text-muted-foreground
+py-8 text-center text-sm text-muted-foreground
+Qual é o estado?
+Qual foi o evento?
+Quando
+Quando aconteceu?
+que não está mais lá nas últimas 24 h. Se você passou por lá, ajude a confirmar.
+Quem está perto ajuda mais a avaliar registros novos.
+Quem já está com a sessão aberta pode manter o acesso de administrador até ela expirar (até 7 dias).
+radial-gradient(circle, 
+radial-gradient(circle, #ffd60a, #ff3b30 35%, #c026d3 60%, #5b2bff 85%)
+Raio aprox.
+Recarregue a página.
+Recente: 
+Recentes
+Recusada
+Recusadas
+Recusar
+Registra e vota com o peso padrão.
+Registrada
+Registrar
+Registrar ocorrência
+Registrar outra
+Registrar problemas e incidentes
+Registro anônimo e agregado
+Registro enviado
+Registro recente, com poucos votos
+Registro recente, com poucos votos. A confiança aparece depois de
+Registros
+Registros de incidentes aceitam até 24 h
+Registros e votos podem ser usados de forma agregada na pesquisa.
+Registros próximos
+Registrou
+relative flex
+relative flex flex-1 pressable flex-col items-center justify-center gap-0.5 rounded-[18px] text-[10px] font-semibold focus-visible:outline-2
+relative flex h-11 pressable items-center gap-1.5 rounded-full border px-4 text-sm font-medium focus-visible:outline-2
+relative flex h-14 items-center rounded-2xl border border-ring bg-card pr-2 pl-4 shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_14%,transparent)]
+relative flex h-8 w-14 items-center justify-center rounded-full transition-colors
+relative flex overflow-hidden
+relative flex pressable items-center justify-center rounded-[11px] text-[13px] font-semibold focus-visible:outline-2 focus-visible:-outline-offset-2
+relative flex shrink-0 items-center justify-center rounded-full bg-brand-soft font-medium text-brand
+relative h-dvh
+relative h-full overflow-y-auto
+relative inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold whitespace-nowrap pressable outline-none select-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4
+relative isolate
+relative isolate min-h-0 flex-1
+relative min-w-0 flex-1 overflow-y-auto
+relative rounded-[14px] p-[3px]
+relative text-[17px] leading-none font-bold
+relative transition-colors
+relative z-10 -mt-6 shrink-0 rounded-t-[28px] bg-card px-4 pt-5 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-2px_12px_rgb(0_0_0/0.12)]
+Relato enviado
+resize-none px-4 pt-7 pb-3
+Resolvida
+Resolvidas saem do mapa e ficam só no histórico
+RespostaAuth
+Resultados da busca
+Resumo
+Resumo do alerta
+ReversaResponse
+Revisão
+rgb(0 0 0 / 0.35)
+right-3 bottom-[267px] lg:right-4 lg:bottom-[155px]
+right-3 bottom-[92px]
+ring-2 ring-current
+ring-2 ring-foreground
+Rosa
+Roubo, acidente, rua inundada…
+Roubos
+rounded bg-new-badge px-1 text-[9px] leading-4 text-new-badge-foreground
+rounded bg-new-badge px-1.5 text-[11px] leading-4 text-new-badge-foreground
+rounded-[20px] bg-card py-10 text-center text-sm text-muted-foreground shadow-1
+rounded-[20px] border border-border bg-card p-4 shadow-1
+rounded-2xl bg-brand-soft p-4 text-brand
+rounded-2xl bg-card p-4 text-sm shadow-1
+rounded-2xl bg-card p-6 shadow-1
+rounded-2xl border border-border/60 bg-card p-4 shadow-1
+rounded-2xl border border-border/60 bg-card shadow-1
+rounded-2xl p-4
+rounded-lg bg-brand-soft px-2 py-1 text-xs font-medium text-brand
+rounded-md bg-foreground px-1.5 py-0.5 text-[11px] font-medium text-background
+rounded-md px-2 py-0.5 text-xs font-medium
+Roxo
+Sair da conta
+Salvando…
+Salvar
+Se for, sua confirmação reforça o registro existente em vez de criar uma duplicata.
+Se precisar, fale com a equipe do projeto.
+Seção
+Selecionada: 
+Sem conexão. Tente de novo.
+Sem incidentes por aqui nos últimos 7 dias
+Sem localização você continua votando, com peso base.
+Senha
+Servidor(a) público(a)
+Seu nome não aparece. O relato soma-se ao mapa de calor da região e não vira marcador individual. Incidentes não recebem votos.
+Seu perfil já é verificado.
+Seu registro entra com o selo "Nova" até receber avaliações de quem está por perto.
+Seu voto ajuda a mostrar o que é confiável no mapa. Para evitar votos repetidos, cada voto fica ligado a uma conta.
+Seu voto tem peso maior
+Seus registros e votos vão aparecer aqui.
+Seus votos pesam mais quando você está perto da ocorrência.
+shimmer rounded-md bg-accent
+shrink-0 pr-6
+shrink-0 px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]
+shrink-0 rounded-md px-2 py-0.5 text-xs font-medium
+shrink-0 select-none
+shrink-0 tabular-nums transition-colors
+sim
+Sim, confirmar esse
+Sim, está lá
+Sistema colaborativo de registro e validação de ocorrências urbanas — TCC de Sistemas de Informação, Unilasalle-RJ.
+Situação
+Situação dos pedidos
+size-10 rounded-full border-[3px] border-card ring-1 ring-border focus-visible:outline-2
+size-10 shrink-0 rounded-full blur-[1px]
+size-10 text-[22px]
+size-10 text-sm
+size-12 rounded-full bg-muted
+size-12 shrink-0 rounded-full blur-[1px]
+size-12 text-[26px]
+size-16 text-xl
+size-2.5 rounded-full
+size-3 rounded-full
+size-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent motion-reduce:animate-none
+size-8 text-[18px]
+Só grupos sem categorias podem ser apagados
+Sobre o app
+Solicitar verificação
+space-y-2 text-left
+space-y-3 py-10 text-center
+space-y-3 py-6
+space-y-3 py-6 pr-10
+space-y-4 text-sm
+space-y-4 transition-opacity duration-300
+space-y-6 pt-2
+StatusProblema
+StatusVerificacao
+Sua confirmação foi registrada e reforça o registro que já estava no mapa, em vez de criar uma duplicata.
+Sua localização é usada para dar mais peso ao seu voto quando você está perto da ocorrência. Ela não é exibida para outras pessoas.
+Sua localização só serve para calcular a distância do voto e é descartada. Incidentes são anônimos e aparecem só agregados no mapa de calor.
+Sua ocorrência já aparece no mapa com o selo "Nova". Ela fica em período de avaliação até que pessoas por perto confirmem.
+Sua sessão expirou. Entre de novo para continuar.
+Sua sessão expirou. Entre de novo para votar.
+Suas confirmações e respostas de “Ainda está lá?” contam mais no cálculo de confiança das ocorrências — ainda mais perto de onde você mora.
+tabular-nums 
+Tentar novamente
+Tente outra palavra ou escolha um grupo.
+Ter mais peso quando estiver perto
+Termos de uso
+Terracota
+text-[14px] font-bold
+text-[16px] text-brand
+text-[18px] text-brand
+text-[18px] text-muted-foreground
+text-[18px] text-new-badge
+text-[20px] leading-7 font-semibold tracking-tight
+text-[20px] text-brand
+text-[20px] text-muted-foreground
+text-[22px] leading-7
+text-[22px] text-brand
+text-[22px] text-destructive
+text-[22px] text-new-badge
+text-[23px] transition-colors
+text-[28px] leading-9 font-bold tracking-tight
+text-[28px] leading-tight font-bold tracking-tight
+text-[28px] text-destructive
+text-2xl leading-8
+text-base font-medium
+text-brand hover:bg-brand-soft
+text-brand underline underline-offset-2
+text-brand underline-offset-4 hover:underline
+text-center text-[13px] leading-snug text-muted-foreground
+text-foreground glass hover:bg-surface-2
+text-lg leading-6 font-medium
+text-muted-foreground hover:text-foreground
+text-sm font-medium
+text-sm text-destructive
+text-sm text-muted-foreground
+text-xl font-bold tracking-tight
+text-xs font-medium text-muted-foreground
+text-xs font-semibold
+text-xs text-destructive
+text-xs text-muted-foreground
+TimeoutError
+Tipo
+Tipo de vínculo
+TipoVinculo
+Todas
+Todos
+Todos os grupos
+Toque no cadeado (ou no ícone de ajustes) ao lado do endereço do site.
+Trabalha na região
+transition-[border-color,box-shadow,background-color] duration-200 ease-out
+transition-[top,font-size,color] duration-200 ease-out
+transition-colors hover:bg-foreground/5 focus-visible:outline-2 active:bg-foreground/8
+truncate font-medium
+truncate text-[20px] leading-7 font-semibold
+truncate text-sm text-muted-foreground
+truncate text-xs text-muted-foreground
+Tudo
+Último pedido
+Usar minha localização
+Use 1 ou mais.
+Use até 100000.
+Use até 120 caracteres.
+Use até 40 caracteres.
+Use até 500 caracteres.
+Use até 60 caracteres.
+Use um número inteiro.
+Usuário 
+Usuários
+ValorVotoContrato
+Ver área maior
+Ver no mapa
+Ver quem se cadastrou e alterar perfis
+Ver tudo
+Verde-água
+Verificado
+Verificado em 
+Verificamos pessoas com vínculo comprovado com a região ou com serviços urbanos. O pedido é analisado pela equipe de moderação.
+Verificando
+Verifique seu perfil
+Vermelho
+Versão 
+Vira um ponto no mapa até alguém confirmar que foi resolvido.
+Você
+Você chegou ao limite de relatos de incidente nas últimas 24 horas. Tente mais tarde.
+Você está a
+Você está a 
+Você já tem um pedido em análise. Aguarde a resposta da moderação.
+Você já tem um pedido em análise. Assim que a moderação responder, o resultado aparece no seu perfil.
+Você não pode alterar o seu próprio perfil.
+Você pode enviar um novo pedido.
+Você pode mudar isso a qualquer momento em Configurações.
+Você registrou este problema
+Você registrou este problema; quem registra não vota nele.
+Voltar
+Voltar ao mapa
+Voltar ao perfil
+Voto rápido: 
+votos
+Votos
+votos.
+w-full overflow-hidden rounded-2xl border border-border/60 bg-card text-left shadow-1
+w-full resize-none rounded-md border border-input bg-background px-4 py-4 text-base outline-none focus:border-2 focus:border-brand focus:px-[15px]
+z-[1002] flex w-[72px] shrink-0 flex-col items-center gap-3 border-y-0 border-l-0 py-4 glass
