@@ -20,7 +20,7 @@ export const useSessionStore = create<SessionState>()(
       logout: () => set({ session: null }),
     }),
     {
-      name: 'ocorrencias.sessao',
+      name: 'urbanReports.session',
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
         if (state?.session && expired(state.session)) {

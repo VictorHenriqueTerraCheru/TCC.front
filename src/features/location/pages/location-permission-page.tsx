@@ -17,7 +17,7 @@ export function LocationPermissionPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const [requesting, setRequesting] = useState(false)
-  const destination = (location.state as { de?: string } | null)?.de ?? '/mapa'
+  const destination = (location.state as { de?: string } | null)?.de ?? '/map'
 
   async function proceed() {
     markPrePermissionSeen()

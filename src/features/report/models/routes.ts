@@ -1,7 +1,7 @@
 import type { GroupType } from '@/features/categories'
 
 export function categoryPath(type: GroupType) {
-  return `/registrar/categoria?type=${type}`
+  return `/report/category?type=${type}`
 }
 
 export function readType(value: string | null): GroupType | null {

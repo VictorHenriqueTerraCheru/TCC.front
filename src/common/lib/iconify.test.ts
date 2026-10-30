@@ -81,7 +81,7 @@ describe('loadIcon', () => {
   it('stores in localStorage: another session does not ask again', async () => {
     server.use(iconifyIcons({ 'ico-a-rounded': validBody }))
     await loadIcon('ico_a')
-    const saved = localStorage.getItem('ocorrencias.iconesRemotos')
+    const saved = localStorage.getItem('urbanReports.remoteIcons')
 
     server.resetHandlers()
     expect(saved).toContain('ico_a')
@@ -120,7 +120,7 @@ describe('loadIcon: hostile inputs', () => {
   ])(
     'tampered localStorage cache (%s) is ignored and the icon comes from the network',
     async (_, lixo) => {
-      localStorage.setItem('ocorrencias.iconesRemotos', JSON.stringify({ ico_a: lixo }))
+      localStorage.setItem('urbanReports.remoteIcons', JSON.stringify({ ico_a: lixo }))
       server.use(iconifyIcons({ 'ico-a-rounded': validBody }))
 
       expect(await loadIcon('ico_a')).toEqual({
@@ -131,7 +131,7 @@ describe('loadIcon: hostile inputs', () => {
   )
 
   it('cache that is not an object does not break', async () => {
-    localStorage.setItem('ocorrencias.iconesRemotos', '[1,2]')
+    localStorage.setItem('urbanReports.remoteIcons', '[1,2]')
     server.use(iconifyIcons({ 'ico-a-rounded': validBody }))
 
     expect(await loadIcon('ico_a')).not.toBeNull()
@@ -150,7 +150,7 @@ describe('loadIcon: hostile inputs', () => {
       server.use(iconifyIcons({}))
 
       expect(await loadIcon(name)).toBeNull()
-      expect(localStorage.getItem('ocorrencias.iconesRemotos') ?? '').not.toContain(`"${name}"`)
+      expect(localStorage.getItem('urbanReports.remoteIcons') ?? '').not.toContain(`"${name}"`)
     },
   )
 

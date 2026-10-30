@@ -52,7 +52,7 @@ export const useGuardStore = create<GuardState>()(
       },
     }),
     {
-      name: 'ocorrencias.pendencia',
+      name: 'urbanReports.pendingAction',
       storage: createJSONStorage(() => sessionStorage),
       partialize: ({ pendingAction }) => ({ pendingAction }),
     },

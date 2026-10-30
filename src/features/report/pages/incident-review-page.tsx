@@ -20,12 +20,12 @@ export function IncidentReviewPage() {
   const { data: address } = useDraftAddress()
   const report = useReportIncident()
   useRequireCategory('incident')
-  useRequireStep(location !== null, '/registrar/incidente/local')
+  useRequireStep(location !== null, '/report/incident/location')
 
   const submission = useSubmission(
     report.mutateAsync,
     (area, { categoryId: chosenCategoryId, lat, lng }) => {
-      navigate('/registrar/incidente/sucesso', {
+      navigate('/report/incident/success', {
         replace: true,
         state: {
           area,
@@ -49,7 +49,7 @@ export function IncidentReviewPage() {
       title="Revisão"
       step={{ current: 3, total: 3, label: 'Revisão' }}
       topAction="back"
-      onTopAction={() => navigate('/registrar/incidente/local')}
+      onTopAction={() => navigate('/report/incident/location')}
       footer={
         <Button className="w-full" loading={report.isPending} onClick={send}>
           <Icon name="send" className="text-[18px]" />
@@ -87,13 +87,13 @@ export function IncidentReviewPage() {
             icon="location_on"
             label="Área aproximada"
             value={address ? (address.areaLabel ?? address.address) : 'Buscando endereço…'}
-            onEdit={() => navigate('/registrar/incidente/local')}
+            onEdit={() => navigate('/report/incident/location')}
           />
           <SummaryRow
             icon="schedule"
             label="Quando"
             value={describeTime(time)}
-            onEdit={() => navigate('/registrar/incidente/local')}
+            onEdit={() => navigate('/report/incident/location')}
           />
         </Summary>
 

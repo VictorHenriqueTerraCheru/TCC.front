@@ -27,16 +27,16 @@ export function IssueLocationPage() {
     setCheckingDuplicates(true)
     try {
       const duplicates = await queryClient.fetchQuery(duplicatesQuery(categoryId, location))
-      navigate(duplicates.length > 0 ? '/registrar/conferencia' : '/registrar/revisao')
+      navigate(duplicates.length > 0 ? '/report/duplicate-check' : '/report/review')
     } catch (error) {
       if (isApiError(error) && error.status === 401) {
         requireAccount('report', () => {}, {
-          returnTo: '/registrar/local',
+          returnTo: '/report/location',
           pending: { type: 'resumeReport', step: 'checkDuplicates' },
         })
         return
       }
-      navigate('/registrar/revisao')
+      navigate('/report/review')
     } finally {
       setCheckingDuplicates(false)
     }

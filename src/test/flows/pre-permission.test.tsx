@@ -23,23 +23,23 @@ describe('location pre-permission (screen 17)', () => {
     browserPrompting()
     setWidth(390)
     const user = userEvent.setup()
-    const { router } = renderRoutes(routes, '/mapa?mode=both')
+    const { router } = renderRoutes(routes, '/map?mode=both')
 
     expect(
       await screen.findByRole('heading', { name: 'Permitir acesso à sua localização?' }),
     ).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Agora não' }))
 
-    expect(router.state.location.pathname).toBe('/mapa')
+    expect(router.state.location.pathname).toBe('/map')
     expect(router.state.location.search).toBe('?mode=both')
-    expect(localStorage.getItem('ocorrencias.prePermissaoVista')).toBe('1')
+    expect(localStorage.getItem('urbanReports.prePermissionSeen')).toBe('1')
   })
 
   it('once seen, does not appear again', async () => {
     browserPrompting()
-    localStorage.setItem('ocorrencias.prePermissaoVista', '1')
+    localStorage.setItem('urbanReports.prePermissionSeen', '1')
     setWidth(390)
-    renderRoutes(routes, '/mapa')
+    renderRoutes(routes, '/map')
 
     expect(
       await screen.findByRole('radiogroup', { name: 'O que mostrar no mapa' }),

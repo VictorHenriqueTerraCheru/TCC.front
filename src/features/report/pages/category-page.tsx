@@ -12,7 +12,7 @@ import { useRecentStore } from '../stores/recent-store'
 
 export function CategoryPage() {
   const type = readType(useSearchParams()[0].get('type'))
-  if (!type) return <Navigate to="/registrar" replace />
+  if (!type) return <Navigate to="/report" replace />
   return <TypeCategory type={type} />
 }
 
@@ -30,7 +30,7 @@ function TypeCategory({ type }: { type: NonNullable<ReturnType<typeof readType>>
   function proceed() {
     if (!chosen) return
     addRecent(chosen.id)
-    navigate(type === 'incident' ? '/registrar/incidente/local' : '/registrar/local')
+    navigate(type === 'incident' ? '/report/incident/location' : '/report/location')
   }
 
   return (
@@ -38,7 +38,7 @@ function TypeCategory({ type }: { type: NonNullable<ReturnType<typeof readType>>
       title="Nova ocorrência"
       step={{ current: 1, total: 4, label: 'Categoria' }}
       topAction="back"
-      onTopAction={() => navigate('/registrar')}
+      onTopAction={() => navigate('/report')}
       footer={
         <div className="space-y-2">
           <p className="min-h-5 text-center text-[13px] text-muted-foreground" aria-live="polite">

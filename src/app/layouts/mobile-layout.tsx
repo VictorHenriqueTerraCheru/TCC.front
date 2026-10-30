@@ -9,8 +9,8 @@ import { navigationItems } from './navigation'
 
 export function MobileLayout() {
   const { pathname } = useLocation()
-  const fullScreen = /^\/(registrar|admin)(\/|$)|^\/perfil\/.+/.test(pathname)
-  const onMap = pathname.startsWith('/mapa')
+  const fullScreen = /^\/(report|admin)(\/|$)|^\/profile\/.+/.test(pathname)
+  const onMap = pathname.startsWith('/map')
   return (
     <div data-layout-mobile className="relative h-dvh">
       <main className={cn('relative h-full overflow-y-auto', !fullScreen && !onMap && 'pb-24')}>

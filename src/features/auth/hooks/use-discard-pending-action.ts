@@ -4,7 +4,7 @@ import { useLocation } from 'react-router'
 import { useGuardStore } from '../stores/guard-store'
 import { useSessionStore } from '../stores/session-store'
 
-const LOGIN_SCREENS = new Set(['/login', '/cadastro'])
+const LOGIN_SCREENS = new Set(['/login', '/register'])
 
 export function useDiscardPendingActionOnLeavingLogin() {
   const { pathname } = useLocation()

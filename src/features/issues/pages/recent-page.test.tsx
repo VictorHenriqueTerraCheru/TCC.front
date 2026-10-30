@@ -12,7 +12,7 @@ describe('RecentPage', () => {
   it('group chip toggles the filter', async () => {
     setWidth(390)
     const user = userEvent.setup()
-    renderRoutes([{ path: '/recentes', element: <RecentPage /> }], '/recentes')
+    renderRoutes([{ path: '/recent', element: <RecentPage /> }], '/recent')
 
     const chip = await screen.findByRole('button', { name: /Via pública/ })
     expect(chip).toHaveAttribute('aria-pressed', 'false')
@@ -30,10 +30,10 @@ describe('RecentPage', () => {
     )
   })
 
-  it('failure on GET /grupos shows an error with "Tentar novamente" instead of a list without filters', async () => {
+  it('failure on GET /groups shows an error with "Tentar novamente" instead of a list without filters', async () => {
     setWidth(390)
     server.use(http.get(route('/groups'), () => new HttpResponse(null, { status: 500 })))
-    renderRoutes([{ path: '/recentes', element: <RecentPage /> }], '/recentes')
+    renderRoutes([{ path: '/recent', element: <RecentPage /> }], '/recent')
 
     expect(await screen.findByText('Não foi possível carregar os filtros.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()

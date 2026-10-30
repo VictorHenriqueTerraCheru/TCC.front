@@ -44,7 +44,7 @@ try {
     'Visitante abre o app, escolhe o tema escuro e passa pela pré-permissão',
     p,
     async () => {
-      await p.goto(BASE + '/mapa')
+      await p.goto(BASE + '/map')
       await p.getByRole('heading', { name: 'Escolha a aparência' }).waitFor()
       const automatico = p.getByRole('radio', { name: /Automático/ })
       confere(
@@ -55,11 +55,11 @@ try {
       const tema = await p.evaluate(() => document.documentElement.dataset.theme)
       confere(tema === 'escuro', `o tema não mudou na hora (data-theme=${tema})`)
       await p.getByRole('button', { name: 'Continuar' }).click()
-      await p.waitForURL(/permissao|mapa/)
+      await p.waitForURL(/location-permission|map/)
       if (p.url().includes('permissao')) {
         await p.getByRole('button', { name: 'Continuar' }).click()
       }
-      await p.waitForURL(/\/mapa/)
+      await p.waitForURL(/\/map/)
     },
   )
 
@@ -75,8 +75,8 @@ try {
 
   await passo('Visitante toca num alerta e vê o card rápido com dados da API', p, async () => {
     await p.locator('[data-issue]').first().click({ force: true })
-    await p.waitForURL(/\/mapa\/problema\//)
-    estado.problemaSeed = p.url().split('/mapa/problema/')[1].split('?')[0]
+    await p.waitForURL(/\/map\/issue\//)
+    estado.problemaSeed = p.url().split('/map/issue/')[1].split('?')[0]
     const card = p.getByRole('region', { name: 'Resumo do alerta' })
     await card.waitFor()
     return `problema ${estado.problemaSeed.slice(0, 8)} · ${await card.locator('h2').innerText()}`
@@ -95,7 +95,7 @@ try {
     p,
     async () => {
       await p.getByRole('button', { name: 'Criar conta' }).click()
-      await p.waitForURL(/\/cadastro/)
+      await p.waitForURL(/\/register/)
       await p.getByLabel('Nome').fill(NOVO.nome)
       await p.getByLabel('E-mail').fill(NOVO.email)
       await p.getByLabel('Senha', { exact: true }).fill(NOVO.senha)
@@ -104,7 +104,7 @@ try {
         (r) => /\/voto$/.test(r.url()) && r.request().method() === 'PUT',
       )
       await p.getByRole('button', { name: /criar conta/i }).click()
-      await p.waitForURL(new RegExp(`/mapa/problema/${estado.problemaSeed}`))
+      await p.waitForURL(new RegExp(`/map/issue/${estado.problemaSeed}`))
       const resposta = await votou
       confere(resposta.ok(), `voto retomado respondeu ${resposta.status()}`)
       estado.usuarioId = sql(`select id from usuarios where email = '${NOVO.email}'`)
@@ -119,22 +119,22 @@ try {
   )
 
   await passo('Registrar problema: categoria → local (endereço da API) → revisão', p, async () => {
-    await p.goto(BASE + '/mapa')
+    await p.goto(BASE + '/map')
     await p.getByRole('link', { name: 'Registrar' }).click()
-    await p.waitForURL(/\/registrar$/)
+    await p.waitForURL(/\/report$/)
     await p.getByRole('link', { name: /^Estado/ }).click()
-    await p.waitForURL(/\/registrar\/categoria\?tipo=problema/)
+    await p.waitForURL(/\/report\/category\?type=issue/)
     await p.getByRole('button', { name: /Buraco na via/ }).click()
     await p.getByRole('button', { name: 'Continuar' }).click()
-    await p.waitForURL(/\/registrar\/local/)
+    await p.waitForURL(/\/report\/location/)
     const confirmar = p.getByRole('button', { name: 'Confirmar local' })
     await confirmar.waitFor()
     await esperarHabilitado(confirmar)
     await confirmar.click()
-    await p.waitForURL(/\/registrar\/(revisao|conferencia)/)
+    await p.waitForURL(/\/report\/(review|duplicate-check)/)
     if (p.url().includes('conferencia')) {
       await p.getByRole('button', { name: 'Não, é outro' }).click()
-      await p.waitForURL(/\/registrar\/revisao/)
+      await p.waitForURL(/\/report\/review/)
     }
     await p.locator('textarea').fill(DESCRICAO)
     await p.getByText('Buscando endereço…').waitFor({ state: 'detached', timeout: 20_000 })
@@ -168,21 +168,21 @@ try {
 
   await passo('"Ver no mapa" abre o alerta novo com o selo de autor', p, async () => {
     await p.getByRole('button', { name: 'Ver no mapa' }).click()
-    await p.waitForURL(new RegExp(`/mapa/problema/${estado.problemaNovo}`))
+    await p.waitForURL(new RegExp(`/map/issue/${estado.problemaNovo}`))
     const card = p.getByRole('region', { name: 'Resumo do alerta' })
     await card.getByText('Buraco na via').waitFor()
     confere((await card.getByRole('button').count()) === 0, 'autor viu polegares no próprio alerta')
   })
 
   await passo('Registrar incidente (anônimo) e conferir a área no banco', p, async () => {
-    await p.goto(BASE + '/registrar')
+    await p.goto(BASE + '/report')
     await p.getByRole('link', { name: /^Evento/ }).click()
-    await p.waitForURL(/\/registrar\/categoria\?tipo=incidente/)
+    await p.waitForURL(/\/report\/category\?type=incident/)
     await p.getByRole('button', { name: /Roubo/ }).click()
     await p.getByRole('button', { name: 'Continuar' }).click()
-    await p.waitForURL(/\/registrar\/incidente\/local/)
+    await p.waitForURL(/\/report\/incident\/location/)
     await p.getByRole('button', { name: /continuar|confirmar/i }).click()
-    await p.waitForURL(/\/registrar\/incidente\/revisao/)
+    await p.waitForURL(/\/report\/incident\/review/)
     const criou = p.waitForResponse(
       (r) => /\/api\/v1\/incidentes$/.test(r.url()) && r.request().method() === 'POST',
     )
@@ -201,7 +201,7 @@ try {
     'Modo Incidentes: tocar no mapa abre a área com o relato (GET /incidentes/area)',
     p,
     async () => {
-      await p.goto(BASE + '/mapa?mode=incidents')
+      await p.goto(BASE + '/map?mode=incidents')
       const mapa = p.locator('canvas.maplibregl-canvas')
       await mapa.waitFor()
       await p.waitForLoadState('networkidle')
@@ -211,7 +211,7 @@ try {
       const resposta = await area
       confere(resposta.status() === 200, `GET /incidentes/area respondeu ${resposta.status()}`)
       const corpo = await resposta.json()
-      await p.waitForURL(/\/mapa\/area/)
+      await p.waitForURL(/\/map\/area/)
       await p.getByRole('heading', { name: 'Área de incidentes' }).waitFor()
       const roubos = corpo.contagens.find((c) => c.nome === 'Roubo')
       confere(roubos?.dias7 >= 1, 'o roubo registrado não entrou na contagem da área')
@@ -220,7 +220,7 @@ try {
   )
 
   await passo('Perfil mostra os totais e o histórico vindos de GET /me', p, async () => {
-    await p.goto(BASE + '/perfil')
+    await p.goto(BASE + '/profile')
     await p.getByText(NOVO.nome).first().waitFor()
     await p.getByText('Buraco na via').first().waitFor()
     await p.getByText('Roubo').first().waitFor()
@@ -231,7 +231,7 @@ try {
   })
 
   await passo('Configurações → editar nome grava no banco (PATCH /me)', p, async () => {
-    await p.goto(BASE + '/perfil/configuracoes')
+    await p.goto(BASE + '/profile/settings')
     await p.getByRole('button', { name: /^Nome/ }).click()
     const campo = p.getByRole('dialog').getByRole('textbox')
     estado.nomeNovo = `${NOVO.nome} (editado)`
@@ -247,15 +247,15 @@ try {
   })
 
   await passo('Pedido de verificação fica pendente no banco', p, async () => {
-    await p.goto(BASE + '/perfil')
+    await p.goto(BASE + '/profile')
     await p.getByRole('link', { name: 'Solicitar verificação' }).click()
-    await p.waitForURL(/\/perfil\/verificacao/)
+    await p.waitForURL(/\/profile\/verification/)
     await p.getByLabel('Tipo de vínculo').selectOption({ index: 1 })
     await p
       .getByLabel(/Justificativa/)
       .fill('Moro em Botafogo há dez anos e passo por estas ruas todos os dias a pé.')
     await p.getByRole('button', { name: 'Enviar pedido' }).click()
-    await p.waitForURL(/\/perfil$/)
+    await p.waitForURL(/\/profile$/)
     await p.getByText('Pedido em análise').waitFor()
     const status = sql(
       `select status from solicitacoes_verificacao where usuario_id = '${estado.usuarioId}'`,
@@ -270,7 +270,7 @@ try {
     async () => {
       const q = vizinho.pagina
       await entrarPelaTela(q, 'cidadao2@tcc.local')
-      await q.goto(BASE + `/mapa/problema/${estado.problemaNovo}`)
+      await q.goto(BASE + `/map/issue/${estado.problemaNovo}`)
       const card = q.getByRole('region', { name: 'Resumo do alerta' })
       await card.waitFor()
       const antes = await card.innerText()
@@ -293,7 +293,7 @@ try {
     vizinho.pagina,
     async () => {
       const q = vizinho.pagina
-      await q.goto(BASE + '/recentes')
+      await q.goto(BASE + '/recent')
       const url = `${BASE}/api/v1/problemas/recentes?lat=${POSICAO.latitude}&lng=${POSICAO.longitude}&raioKm=10&tamanho=100`
       const corpo = await (await fetch(url)).json()
       confere(
@@ -309,7 +309,7 @@ try {
   await passo('Admin aprova o pedido na fila de verificação', admin.pagina, async () => {
     const q = admin.pagina
     await entrarPelaTela(q, 'admin@tcc.local')
-    await q.goto(BASE + '/admin/verificacoes')
+    await q.goto(BASE + '/admin/verifications')
     const cartao = q.getByRole('article', { name: `Pedido de ${estado.nomeNovo}` })
     await cartao.waitFor()
     await cartao.getByRole('button', { name: /aprovar/i }).click()
@@ -322,13 +322,13 @@ try {
   await admin.contexto.close()
 
   await passo('Usuário vê "Perfil verificado" sem sair da conta (GET /me)', p, async () => {
-    await p.goto(BASE + '/perfil')
+    await p.goto(BASE + '/profile')
     await p.getByText(/^Verificado em/).waitFor()
     await p.getByText('Seu voto tem peso maior').waitFor()
   })
 
   await passo('Bússola: girar o mapa mostra a direção e o toque volta ao norte', p, async () => {
-    await p.goto(BASE + '/mapa')
+    await p.goto(BASE + '/map')
     const mapa = p.locator('canvas.maplibregl-canvas')
     await mapa.waitFor()
     await mapa.focus()
@@ -348,12 +348,12 @@ try {
 
   await passo('Token inválido: o voto pede login de novo (regra 13)', p, async () => {
     await p.evaluate(() => {
-      const chave = 'ocorrencias.sessao'
+      const chave = 'urbanReports.session'
       const salvo = JSON.parse(localStorage.getItem(chave))
       salvo.state.sessao.token = 'token-invalido'
       localStorage.setItem(chave, JSON.stringify(salvo))
     })
-    await p.goto(BASE + `/mapa/problema/${estado.problemaSeed}`)
+    await p.goto(BASE + `/map/issue/${estado.problemaSeed}`)
     await p.getByRole('region', { name: 'Resumo do alerta' }).waitFor()
     await p
       .getByRole('button', { name: /^Voto rápido/ })
@@ -365,10 +365,10 @@ try {
 
   await passo('Sair da conta volta ao modo visitante', p, async () => {
     await entrarPelaTela(p, NOVO.email, NOVO.senha)
-    await p.goto(BASE + '/perfil/configuracoes')
+    await p.goto(BASE + '/profile/settings')
     await p.getByRole('button', { name: 'Sair da conta' }).click()
-    await p.waitForURL(/\/mapa/)
-    const sessao = await p.evaluate(() => localStorage.getItem('ocorrencias.sessao'))
+    await p.waitForURL(/\/map/)
+    const sessao = await p.evaluate(() => localStorage.getItem('urbanReports.session'))
     confere(!sessao || !JSON.parse(sessao).state.sessao, 'sessão continua no navegador')
   })
   await visitante.contexto.close()
@@ -376,7 +376,7 @@ try {
   const mesa = await novaPagina('desktop', DESKTOP)
   await passo('Desktop: alerta abre no painel lateral ao lado do mapa', mesa.pagina, async () => {
     const q = mesa.pagina
-    await q.goto(BASE + `/mapa/problema/${estado.problemaNovo}`)
+    await q.goto(BASE + `/map/issue/${estado.problemaNovo}`)
     if (q.url().includes('permissao')) await q.getByRole('button', { name: 'Continuar' }).click()
     await q.getByRole('region', { name: 'Resumo do alerta' }).getByText('Buraco na via').waitFor()
     await q.locator(`[data-issue="${estado.problemaNovo}"]`).waitFor()
@@ -435,11 +435,11 @@ async function novaPagina(nome, tela = CELULAR, { primeiraVez = false } = {}) {
     permissions: ['geolocation'],
     geolocation: POSICAO,
   })
-  await contexto.addInitScript(() => localStorage.setItem('ocorrencias.legendaVista', '1'))
+  await contexto.addInitScript(() => localStorage.setItem('urbanReports.legendSeen', '1'))
   if (!primeiraVez) {
     await contexto.addInitScript(() =>
       localStorage.setItem(
-        'ocorrencias.tema',
+        'urbanReports.theme',
         JSON.stringify({ state: { preferencia: 'claro', escolhido: true }, version: 0 }),
       ),
     )

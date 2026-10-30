@@ -25,10 +25,10 @@ export function IssueReviewPage() {
   const { data: address } = useDraftAddress()
   const report = useReportIssue()
   useRequireCategory('issue')
-  useRequireStep(location !== null, '/registrar/local')
+  useRequireStep(location !== null, '/report/location')
 
   const submission = useSubmission(report.mutateAsync, (issue) => {
-    navigate('/registrar/sucesso', { replace: true, state: { issue } })
+    navigate('/report/success', { replace: true, state: { issue } })
   })
 
   function send() {
@@ -42,7 +42,7 @@ export function IssueReviewPage() {
       title="Revisão"
       step={{ current: 4, total: 4, label: 'Revisão' }}
       topAction="back"
-      onTopAction={() => navigate('/registrar/local')}
+      onTopAction={() => navigate('/report/location')}
       footer={
         <Button className="w-full" loading={report.isPending} onClick={send}>
           <Icon name="send" className="text-[18px]" />
@@ -98,7 +98,7 @@ export function IssueReviewPage() {
             icon="location_on"
             label="Local aproximado"
             value={address?.address ?? 'Buscando endereço…'}
-            onEdit={() => navigate('/registrar/local')}
+            onEdit={() => navigate('/report/location')}
           />
           <SummaryRow
             icon="schedule"

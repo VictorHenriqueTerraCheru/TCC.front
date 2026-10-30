@@ -9,8 +9,8 @@ export function useRedirectToThemeChoice(): boolean {
   const { pathname, search } = useLocation()
 
   useEffect(() => {
-    if (chosen || !pathname.startsWith('/mapa')) return
-    navigate('/aparencia', { replace: true, state: { de: `${pathname}${search}` } })
+    if (chosen || !pathname.startsWith('/map')) return
+    navigate('/appearance', { replace: true, state: { de: `${pathname}${search}` } })
   }, [chosen, pathname, search, navigate])
 
   return chosen

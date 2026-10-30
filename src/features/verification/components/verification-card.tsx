@@ -57,7 +57,7 @@ export function VerificationCard({ me }: { me: Me }) {
         Perfis verificados têm voto com peso maior no cálculo de confiança.
       </p>
       <Button asChild>
-        <Link to="/perfil/verificacao">Solicitar verificação</Link>
+        <Link to="/profile/verification">Solicitar verificação</Link>
       </Button>
     </section>
   )

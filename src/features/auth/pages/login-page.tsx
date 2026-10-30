@@ -88,7 +88,7 @@ export function LoginPage() {
         <p className="mt-auto flex items-center justify-center gap-1 pt-10 text-sm text-muted-foreground">
           Ainda não tem conta?
           <Link
-            to="/cadastro"
+            to="/register"
             replace
             className="inline-flex min-h-11 items-center font-medium text-brand hover:underline"
           >

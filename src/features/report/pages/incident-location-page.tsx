@@ -27,7 +27,7 @@ export function IncidentLocationPage() {
         <Button
           className="w-full"
           disabled={!location}
-          onClick={() => navigate('/registrar/incidente/revisao')}
+          onClick={() => navigate('/report/incident/review')}
         >
           Continuar
         </Button>

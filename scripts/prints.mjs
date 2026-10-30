@@ -28,7 +28,7 @@ const erros = []
 try {
   const dados = await descobrirDados()
 
-  await capturar('00-escolha-tema', '/mapa', { primeiraVez: true })
+  await capturar('00-escolha-tema', '/map', { primeiraVez: true })
   for (const tema of ['claro', 'escuro']) {
     await capturarTudo(dados, tema)
   }
@@ -43,21 +43,21 @@ try {
 async function capturarTudo(dados, tema) {
   const capturar = (nome, rota, opcoes = {}) =>
     capturarTela(`${tema}/${nome}`, rota, { ...opcoes, tema })
-  await capturar('01-mapa-ambos-legenda', '/mapa?mode=both', { legenda: true })
-  await capturar('02-detalhe-alta', `/mapa/problema/${dados.alta.id}`)
-  await capturar('03-detalhe-nova', `/mapa/problema/${dados.nova.id}`)
+  await capturar('01-mapa-ambos-legenda', '/map?mode=both', { legenda: true })
+  await capturar('02-detalhe-alta', `/map/issue/${dados.alta.id}`)
+  await capturar('03-detalhe-nova', `/map/issue/${dados.nova.id}`)
   await capturar(
     '04-area-incidentes',
-    `/mapa/area?mode=both&lat=${dados.calor.lat}&lng=${dados.calor.lng}`,
+    `/map/area?mode=both&lat=${dados.calor.lat}&lng=${dados.calor.lng}`,
   )
-  await capturar('05-registro-duplicata', '/registrar/conferencia', {
+  await capturar('05-registro-duplicata', '/report/duplicate-check', {
     usuario: 'cidadao1',
     rascunho: {
       categoryId: dados.alta.categoryId,
       location: { lat: dados.alta.lat + 0.0001, lng: dados.alta.lng + 0.0001 },
     },
   })
-  await capturar('06-registro-incidente', '/registrar/incidente/revisao', {
+  await capturar('06-registro-incidente', '/report/incident/review', {
     usuario: 'cidadao1',
     rascunho: {
       categoryId: dados.incidente.id,
@@ -65,12 +65,12 @@ async function capturarTudo(dados, tema) {
       description: 'Celular levado na saída do metrô, por volta das 19h.',
     },
   })
-  await capturar('07-recentes', '/recentes')
-  await capturar('08-perfil-verificacao', '/perfil', { usuario: 'cidadao1' })
-  await capturar('09-fila-admin', '/admin/verificacoes', { usuario: 'admin' })
-  await capturar('10-cadastro', '/cadastro')
+  await capturar('07-recentes', '/recent')
+  await capturar('08-perfil-verificacao', '/profile', { usuario: 'cidadao1' })
+  await capturar('09-fila-admin', '/admin/verifications', { usuario: 'admin' })
+  await capturar('10-cadastro', '/register')
   await capturar('10b-login', '/login')
-  await capturar('11-desktop-mapa-painel', `/mapa/problema/${dados.alta.id}?mode=both`, {
+  await capturar('11-desktop-mapa-painel', `/map/issue/${dados.alta.id}?mode=both`, {
     tela: DESKTOP,
   })
 }
@@ -88,10 +88,10 @@ async function capturarTela(
   const sessao = usuario ? await entrar(contexto, usuario) : null
   await contexto.addInitScript(
     ({ sessao, rascunho, legenda, tema, primeiraVez }) => {
-      if (!legenda) localStorage.setItem('ocorrencias.legendaVista', '1')
+      if (!legenda) localStorage.setItem('urbanReports.legendSeen', '1')
       if (!primeiraVez)
         localStorage.setItem(
-          'ocorrencias.tema',
+          'urbanReports.theme',
           JSON.stringify({
             state: { preference: tema === 'claro' ? 'light' : 'dark', chosen: true },
             version: 0,
@@ -99,13 +99,13 @@ async function capturarTela(
         )
       if (sessao)
         localStorage.setItem(
-          'ocorrencias.sessao',
+          'urbanReports.session',
           JSON.stringify({ state: { session: sessao }, version: 0 }),
         )
       if (rascunho) {
         const estado = { description: '', time: { mode: 'now', otherAt: null }, ...rascunho }
         sessionStorage.setItem(
-          'ocorrencias.rascunhoRegistro',
+          'urbanReports.reportDraft',
           JSON.stringify({ state: estado, version: 0 }),
         )
       }

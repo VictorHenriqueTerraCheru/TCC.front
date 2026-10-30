@@ -8,6 +8,6 @@ export function useAfterLogin() {
   return () => {
     const returnTo = useGuardStore.getState().completeLogin()
     const de = (location.state as { de?: string } | null)?.de
-    navigate(returnTo ?? de ?? '/mapa', { replace: true })
+    navigate(returnTo ?? de ?? '/map', { replace: true })
   }
 }

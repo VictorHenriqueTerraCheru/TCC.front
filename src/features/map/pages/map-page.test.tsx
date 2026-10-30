@@ -16,9 +16,9 @@ function MapWithLocation() {
   return <MapPage />
 }
 
-function renderMap(path = '/mapa') {
+function renderMap(path = '/map') {
   setWidth(390)
-  return renderRoutes([{ path: '/mapa', element: <MapWithLocation /> }], path)
+  return renderRoutes([{ path: '/map', element: <MapWithLocation /> }], path)
 }
 
 describe('MapPage', () => {
@@ -38,7 +38,7 @@ describe('MapPage', () => {
   })
 
   it('link with a chip from another mode is ignored (does not clear the layers)', async () => {
-    renderMap('/mapa?groups=seguranca')
+    renderMap('/map?groups=seguranca')
 
     expect(screen.getByRole('radio', { name: /Problemas/ })).toHaveAttribute('aria-checked', 'true')
     for (const chip of [/Via pública/, /Elétrica/, /Limpeza/]) {
@@ -62,7 +62,7 @@ describe('MapPage', () => {
       }),
     )
     const user = userEvent.setup()
-    const { router } = renderMap('/mapa?mode=incidents&groups=seguranca')
+    const { router } = renderMap('/map?mode=incidents&groups=seguranca')
 
     await user.click(screen.getByRole('radio', { name: /Ambos/ }))
     expect(router.state.location.search).toContain('groups=seguranca')
@@ -73,7 +73,7 @@ describe('MapPage', () => {
     )
   })
 
-  it('failure on GET /grupos shows the map error instead of hiding the layers', async () => {
+  it('failure on GET /groups shows the map error instead of hiding the layers', async () => {
     server.use(http.get(route('/groups'), () => new HttpResponse(null, { status: 500 })))
     renderMap()
 
@@ -81,7 +81,7 @@ describe('MapPage', () => {
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
   })
 
-  it('failure on GET /categorias shows the map error with "Tentar novamente"', async () => {
+  it('failure on GET /categories shows the map error with "Tentar novamente"', async () => {
     server.use(http.get(route('/categories'), () => new HttpResponse(null, { status: 500 })))
     renderMap()
 
@@ -100,6 +100,15 @@ describe('MapPage', () => {
     expect(screen.queryByText('Nenhuma ocorrência nesta área')).not.toBeInTheDocument()
   })
 
+  it('closing the legend remembers it was seen', async () => {
+    const user = userEvent.setup()
+    renderMap()
+
+    await user.click(screen.getAllByRole('button', { name: 'Fechar legenda' })[0]!)
+
+    expect(localStorage.getItem('urbanReports.legendSeen')).toBe('1')
+  })
+
   it('the empty area notice X closes it for good', async () => {
     const user = userEvent.setup()
     let queries = 0
@@ -114,7 +123,7 @@ describe('MapPage', () => {
     await user.click(await screen.findByRole('button', { name: 'Fechar aviso' }))
 
     expect(screen.queryByText('Nenhuma ocorrência nesta área')).not.toBeInTheDocument()
-    expect(localStorage.getItem('ocorrencias.avisoVazioFechado')).toBe('1')
+    expect(localStorage.getItem('urbanReports.emptyNoticeDismissed')).toBe('1')
 
     unmount()
     const before = queries
@@ -126,7 +135,7 @@ describe('MapPage', () => {
 
   it('tapping the map in Ambos mode without incidents shows the notice and does not open the area', async () => {
     server.use(http.get(route('/incidents/area'), () => HttpResponse.json({ counts: [] })))
-    const { router } = renderMap('/mapa?mode=both')
+    const { router } = renderMap('/map?mode=both')
     await screen.findByTestId('map')
 
     act(() => fakeMap.tap(-22.95, -43.18))
@@ -134,7 +143,7 @@ describe('MapPage', () => {
     expect(
       await screen.findByText('Sem incidentes por aqui nos últimos 7 dias'),
     ).toBeInTheDocument()
-    expect(router.state.location.pathname).toBe('/mapa')
+    expect(router.state.location.pathname).toBe('/map')
   })
 
   it('bounds sent to the API stay within ±180 even with the map zoomed out (rule 15)', async () => {
@@ -158,7 +167,7 @@ describe('MapPage', () => {
 
   it('marks filter chips in the URL and clears those that do not exist in the new mode', async () => {
     const user = userEvent.setup()
-    const { router } = renderMap('/mapa?mode=both')
+    const { router } = renderMap('/map?mode=both')
 
     await user.click(await screen.findByRole('button', { name: /Elétrica/ }))
     await user.click(await screen.findByRole('button', { name: /Segurança/ }))

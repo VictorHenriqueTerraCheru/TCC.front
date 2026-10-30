@@ -58,7 +58,7 @@ describe('theme', () => {
       useThemeStore.getState().setPreference('dark')
       useThemeStore.getState().completeChoice()
     })
-    expect(JSON.parse(localStorage.getItem('ocorrencias.tema')!).state).toEqual({
+    expect(JSON.parse(localStorage.getItem('urbanReports.theme')!).state).toEqual({
       preference: 'dark',
       chosen: true,
     })

@@ -60,7 +60,7 @@ export function HistoryItemRow({ item, when }: { item: HistoryItem; when: string
   const cssClass = 'flex items-center gap-3 py-2.5'
   return item.reportId ? (
     <Link
-      to={`/mapa/problema/${item.reportId}`}
+      to={`/map/issue/${item.reportId}`}
       className={cn(cssClass, '-mx-2 rounded-xl px-2 hover:bg-card focus-visible:outline-2')}
     >
       {content}

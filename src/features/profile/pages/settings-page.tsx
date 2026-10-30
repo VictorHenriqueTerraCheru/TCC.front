@@ -96,18 +96,18 @@ export function SettingsPage() {
   const [leaving, setLeaving] = useState(false)
 
   if (!authenticated) {
-    return leaving ? null : <Navigate to="/login" replace state={{ de: '/perfil/configuracoes' }} />
+    return leaving ? null : <Navigate to="/login" replace state={{ de: '/profile/settings' }} />
   }
 
   function signOut() {
     setLeaving(true)
-    navigate('/mapa', { replace: true })
+    navigate('/map', { replace: true })
     logout()
   }
 
   return (
     <div className="mx-auto h-full w-full lg:max-w-3xl">
-      <ScreenWithBack title="Configurações" onBack={() => navigate('/perfil')}>
+      <ScreenWithBack title="Configurações" onBack={() => navigate('/profile')}>
         <Section title="Conta">
           <Row
             icon="person"

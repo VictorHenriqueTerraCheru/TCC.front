@@ -105,8 +105,8 @@ pré-permissão de localização (tela 17)	location pre-permission (screen 17)
 na primeira abertura em prompt, explica antes de pedir; "Agora não" volta ao mapa	on first open in prompt, explains before asking; "Agora não" goes back to the map
 depois de vista, não aparece de novo	once seen, does not appear again
 fluxo de registro	report flow
-visitante que abre /registrar vai para o login	guest who opens /registrar goes to login
-visitante em /registrar/categoria?type=incident volta para a mesma URL depois do login	guest on /registrar/categoria?type=incident returns to the same URL after login
+visitante que abre /registrar vai para o login	guest who opens /report goes to login
+visitante em /registrar/categoria?type=incident volta para a mesma URL depois do login	guest on /report/category?type=incident returns to the same URL after login
 aceite: registrar onde já há um buraco a menos de 50 m abre a conferência; "Não, é outro" segue e envia	acceptance: reporting where there is already a pothole within 50 m opens the duplicate check; "Não, é outro" continues and submits
 sessão expirada no envio (401): login e o registro é enviado ao voltar	session expired on submit (401): login and the report is submitted on return
 "Sim, confirmar esse" vota no existente e mostra a confirmação	"Sim, confirmar esse" votes on the existing one and shows the confirmation
@@ -119,8 +119,8 @@ mutations de categoria	category mutations
 recarregam tudo que traz a categoria embutida	reload everything that embeds the category
 administração de categorias e grupos	categories and groups administration
 cidadão comum não entra	regular citizen cannot enter
-falha em GET /grupos mostra erro com "Tentar novamente" em vez de chaves cruas	failure on GET /grupos shows an error with "Tentar novamente" instead of raw keys
-na aba Grupos, falha em GET /admin/categorias mostra erro em vez de travar o apagar	on the Grupos tab, failure on GET /admin/categorias shows an error instead of locking delete
+falha em GET /groups mostra erro com "Tentar novamente" em vez de chaves cruas	failure on GET /groups shows an error with "Tentar novamente" instead of raw keys
+na aba Grupos, falha em GET /admin/categories mostra erro em vez de travar o apagar	on the Grupos tab, failure on GET /admin/categories shows an error instead of locking delete
 visitante vai para o login	guest goes to login
 lista as categorias com grupo e tipo	lists the categories with group and type
 cria um grupo e depois uma categoria nele, com ícone buscado no Iconify	creates a group and then a category in it, with an icon searched on Iconify
@@ -215,8 +215,8 @@ MapaPage	MapPage
 troca de modo e mostra os chips do modo escolhido	switches mode and shows the chips of the chosen mode
 link com chip de outro modo é ignorado (não apaga as camadas)	link with a chip from another mode is ignored (does not clear the layers)
 trocar de modo antes de os grupos chegarem não apaga os chips do link	switching mode before the groups arrive does not clear the link chips
-falha em GET /grupos mostra o erro do mapa em vez de sumir com as camadas	failure on GET /grupos shows the map error instead of hiding the layers
-falha em GET /categorias mostra o erro do mapa com "Tentar novamente"	failure on GET /categorias shows the map error with "Tentar novamente"
+falha em GET /groups mostra o erro do mapa em vez de sumir com as camadas	failure on GET /groups shows the map error instead of hiding the layers
+falha em GET /categories mostra o erro do mapa com "Tentar novamente"	failure on GET /categories shows the map error with "Tentar novamente"
 aviso de área vazia some ao mexer no mapa e não volta a cada área vazia	empty area notice disappears when moving the map and does not come back on every empty area
 X do aviso de área vazia fecha de vez	the empty area notice X closes it for good
 toque no mapa no modo Ambos sem incidentes mostra o aviso e não abre a área	tapping the map in Ambos mode without incidents shows the notice and does not open the area
@@ -239,7 +239,7 @@ trocar o voto tira do balde anterior	changing the vote removes it from the previ
 repetir o mesmo voto não muda nada	repeating the same vote changes nothing
 RecentesPage	RecentPage
 chip de grupo liga e desliga o filtro	group chip toggles the filter
-falha em GET /grupos mostra erro com "Tentar novamente" em vez de lista sem filtros	failure on GET /grupos shows an error with "Tentar novamente" instead of a list without filters
+falha em GET /groups mostra erro com "Tentar novamente" em vez de lista sem filtros	failure on GET /groups shows an error with "Tentar novamente" instead of a list without filters
 MapaRegistro	ReportMap
 modo pino grava o centro do mapa como local ao parar de mover	pin mode saves the map center as the location when it stops moving
 moveend com o mesmo centro (redimensionar) não troca o local	moveend with the same center (resize) does not change the location
@@ -261,7 +261,7 @@ rascunho de outro tipo não conta como escolha	draft of another type does not co
 grupo e categoria criados pelo admin aparecem sem mudar o app	group and category created by the admin appear without changing the app
 falha ao carregar as categorias oferece tentar de novo	failure loading the categories offers to try again
 categoria cujo grupo sumiu aparece em "Outras" e continua escolhível	category whose group disappeared shows under "Outras" and stays selectable
-falha em /grupos oferece tentar de novo em vez de uma lista vazia	failure on /grupos offers to try again instead of an empty list
+falha em /grupos oferece tentar de novo em vez de uma lista vazia	failure on /groups offers to try again instead of an empty list
 passo de local com categoria de outro tipo volta para a lista do tipo certo	location step with a category of another type goes back to the right type's list
 passo de local com categoria que foi desativada volta para a lista	location step with a category that was deactivated goes back to the list
 rascunho do registro (regra 5)	report draft (rule 5)

@@ -17,8 +17,8 @@ export function IncidentSuccessPage() {
   }
   const count = area?.counts.find((c) => c.categoryId === categoryId)
   const viewOnMap = point
-    ? `/mapa/area?mode=incidents&lat=${point.lat.toFixed(5)}&lng=${point.lng.toFixed(5)}`
-    : '/mapa?mode=incidents'
+    ? `/map/area?mode=incidents&lat=${point.lat.toFixed(5)}&lng=${point.lng.toFixed(5)}`
+    : '/map?mode=incidents'
 
   return (
     <SuccessScreen

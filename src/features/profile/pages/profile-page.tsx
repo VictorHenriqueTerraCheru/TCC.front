@@ -72,7 +72,7 @@ function HistorySummary() {
           Histórico
         </h2>
         <Button asChild variant="link" size="sm">
-          <Link to="/perfil/historico">Ver tudo</Link>
+          <Link to="/profile/history">Ver tudo</Link>
         </Button>
       </div>
       {isPending ? (
@@ -104,7 +104,7 @@ export function ProfilePage() {
       actions={
         authenticated && (
           <Link
-            to="/perfil/configuracoes"
+            to="/profile/settings"
             aria-label="Configurações"
             className="flex size-12 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
           >
@@ -137,7 +137,7 @@ export function ProfilePage() {
           {me.role === 'administrator' && (
             <div className="space-y-2">
               <Link
-                to="/admin/verificacoes"
+                to="/admin/verifications"
                 className="flex pressable items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-surface-2 focus-visible:outline-2"
               >
                 <Icon name="admin_panel_settings" className="text-brand" />
@@ -150,7 +150,7 @@ export function ProfilePage() {
                 <Icon name="chevron_right" />
               </Link>
               <Link
-                to="/admin/categorias"
+                to="/admin/categories"
                 className="flex pressable items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-surface-2 focus-visible:outline-2"
               >
                 <Icon name="category" className="text-brand" />
@@ -163,7 +163,7 @@ export function ProfilePage() {
                 <Icon name="chevron_right" />
               </Link>
               <Link
-                to="/admin/usuarios"
+                to="/admin/users"
                 className="flex pressable items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-surface-2 focus-visible:outline-2"
               >
                 <Icon name="group" className="text-brand" />

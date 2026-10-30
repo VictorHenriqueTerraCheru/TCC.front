@@ -23,7 +23,7 @@ describe('profile, verification and admin queue', () => {
     const user = userEvent.setup()
 
     loginAsCitizen()
-    const citizen = openAt('/perfil')
+    const citizen = openAt('/profile')
     expect(await screen.findByRole('heading', { name: 'Ana Lima' })).toBeInTheDocument()
     expect(screen.getByText('Cidadão')).toBeInTheDocument()
     await user.click(screen.getByRole('link', { name: 'Solicitar verificação' }))
@@ -34,7 +34,7 @@ describe('profile, verification and admin queue', () => {
 
     logout()
     loginAsAdmin()
-    const admin = openAt('/admin/verificacoes')
+    const admin = openAt('/admin/verifications')
     const request = await screen.findByRole('article', { name: 'Pedido de Ana Lima' })
     expect(screen.getByRole('tab', { name: 'Pendentes · 4' })).toHaveAttribute(
       'aria-selected',
@@ -48,7 +48,7 @@ describe('profile, verification and admin queue', () => {
 
     logout()
     loginAsCitizen()
-    openAt('/perfil')
+    openAt('/profile')
     expect(await screen.findByText('Perfil verificado')).toBeInTheDocument()
     expect(screen.getByText('Seu voto tem peso maior')).toBeInTheDocument()
   })
@@ -57,7 +57,7 @@ describe('profile, verification and admin queue', () => {
     const user = userEvent.setup()
 
     loginAsCitizen()
-    const citizen = openAt('/perfil/verificacao')
+    const citizen = openAt('/profile/verification')
     await user.type(await screen.findByLabelText('Justificativa *'), JUSTIFICATION)
     await user.click(screen.getByRole('button', { name: 'Enviar pedido' }))
     await screen.findByText('Pedido em análise')
@@ -65,7 +65,7 @@ describe('profile, verification and admin queue', () => {
 
     logout()
     loginAsAdmin()
-    const admin = openAt('/admin/verificacoes')
+    const admin = openAt('/admin/verifications')
     const request = await screen.findByRole('article', { name: 'Pedido de Ana Lima' })
     await user.click(within(request).getByRole('button', { name: 'Recusar' }))
     const confirm = within(request).getByRole('button', { name: 'Confirmar recusa' })
@@ -82,7 +82,7 @@ describe('profile, verification and admin queue', () => {
 
     logout()
     loginAsCitizen()
-    openAt('/perfil/verificacao')
+    openAt('/profile/verification')
     expect(await screen.findByText('Recusada')).toBeInTheDocument()
     expect(screen.getByText('Motivo: Sem vínculo com a região.')).toBeInTheDocument()
   })
@@ -90,7 +90,7 @@ describe('profile, verification and admin queue', () => {
   it('short justification shows the prototype error', async () => {
     const user = userEvent.setup()
     loginAsCitizen()
-    openAt('/perfil/verificacao')
+    openAt('/profile/verification')
 
     await user.type(await screen.findByLabelText('Justificativa *'), 'curta')
     await user.click(screen.getByRole('button', { name: 'Enviar pedido' }))
@@ -102,14 +102,14 @@ describe('profile, verification and admin queue', () => {
 
   it('citizen cannot access the admin queue', async () => {
     loginAsCitizen()
-    openAt('/admin/verificacoes')
+    openAt('/admin/verifications')
     expect(await screen.findByText('Esta área é só para administradores.')).toBeInTheDocument()
   })
 
   it('admin with /me down sees "Tentar novamente", not "só para administradores"', async () => {
     loginAsAdmin()
     server.use(http.get(route('/me'), () => new HttpResponse(null, { status: 500 })))
-    openAt('/admin/verificacoes')
+    openAt('/admin/verifications')
 
     expect(
       await screen.findByText('Não foi possível confirmar seu perfil.', {}, { timeout: 5000 }),
@@ -121,7 +121,7 @@ describe('profile, verification and admin queue', () => {
   it('"Cancelar" while editing the name discards the typed text', async () => {
     loginAsCitizen()
     const user = userEvent.setup()
-    openAt('/perfil/configuracoes')
+    openAt('/profile/settings')
 
     await user.click(await screen.findByRole('button', { name: /Nome\s*Ana Lima/ }))
     await user.clear(screen.getByLabelText('Nome'))
@@ -141,7 +141,7 @@ describe('profile, verification and admin queue', () => {
     database.reset()
     const user = userEvent.setup()
     loginAsCitizen()
-    openAt('/perfil/historico')
+    openAt('/profile/history')
 
     expect(await screen.findByRole('heading', { name: 'Hoje' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Ontem' })).toBeInTheDocument()
@@ -155,7 +155,7 @@ describe('profile, verification and admin queue', () => {
   it('settings: edits the name and signs out', async () => {
     const user = userEvent.setup()
     loginAsCitizen()
-    const { router } = openAt('/perfil/configuracoes')
+    const { router } = openAt('/profile/settings')
 
     await user.click(await screen.findByRole('button', { name: /Nome\s*Ana Lima/ }))
     const field = screen.getByLabelText('Nome')
@@ -165,11 +165,11 @@ describe('profile, verification and admin queue', () => {
     expect(await screen.findByRole('button', { name: /Nome\s*Ana L\./ })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Sair da conta' }))
-    expect(router.state.location.pathname).toBe('/mapa')
+    expect(router.state.location.pathname).toBe('/map')
   })
 
   it('guest sees the invitation to log in on the profile', async () => {
-    openAt('/perfil')
+    openAt('/profile')
     expect(
       await screen.findByRole('heading', { name: 'Entre para acompanhar sua participação' }),
     ).toBeInTheDocument()
@@ -179,7 +179,7 @@ describe('profile, verification and admin queue', () => {
 describe('recent', () => {
   it('lists the issues near Icaraí and filters by group', async () => {
     const user = userEvent.setup()
-    openAt('/recentes')
+    openAt('/recent')
 
     expect(await screen.findAllByRole('link', { name: /Buraco na via/ })).not.toHaveLength(0)
     expect(screen.getByText('Perto de Icaraí · até 10 km')).toBeInTheDocument()

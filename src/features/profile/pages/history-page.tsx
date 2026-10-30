@@ -67,11 +67,11 @@ export function HistoryPage() {
   const authenticated = useAuthenticated()
   const [filter, setFilter] = useState<HistoryFilter>('all')
 
-  if (!authenticated) return <Navigate to="/login" replace state={{ de: '/perfil/historico' }} />
+  if (!authenticated) return <Navigate to="/login" replace state={{ de: '/profile/history' }} />
 
   return (
     <div className="mx-auto h-full w-full lg:max-w-3xl">
-      <ScreenWithBack title="Histórico" onBack={() => navigate('/perfil')}>
+      <ScreenWithBack title="Histórico" onBack={() => navigate('/profile')}>
         <SegmentedControl<HistoryFilter>
           label="Filtrar histórico"
           options={filters}

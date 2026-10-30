@@ -7,7 +7,7 @@ export interface NavigationItem {
 }
 
 export const navigationItems: NavigationItem[] = [
-  { route: '/mapa', label: 'Mapa', icon: 'map' },
-  { route: '/recentes', label: 'Recentes', icon: 'history' },
-  { route: '/perfil', label: 'Perfil', icon: 'person' },
+  { route: '/map', label: 'Mapa', icon: 'map' },
+  { route: '/recent', label: 'Recentes', icon: 'history' },
+  { route: '/profile', label: 'Perfil', icon: 'person' },
 ]

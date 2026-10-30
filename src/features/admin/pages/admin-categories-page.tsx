@@ -17,7 +17,7 @@ export function AdminCategoriesPage() {
   const [section, setSection] = useState<Section>('categories')
 
   return (
-    <AdminGuard title="Categorias" path="/admin/categorias">
+    <AdminGuard title="Categorias" path="/admin/categories">
       <SegmentedControl<Section>
         label="Seção"
         options={sections}

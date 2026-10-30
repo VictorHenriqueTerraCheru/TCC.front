@@ -82,3 +82,14 @@ A partir daqui a execução passou do Codex para o Claude. O inventário do Code
 - `index.html` (`dataset.theme`) e `scripts/contraste.test.mjs` (lê o bloco `:root[data-theme='dark']`) acompanham.
 - A busca da seção 5 da Task 4 (`rg ... src scripts`) volta vazia fora de `src/assets`.
 - Gate: typecheck ok; lint ok; format ok; `Tests 340 passed`; textos idênticos; prints idênticos (claro e escuro).
+
+## Task 5 — Rotas do app e chaves de storage
+
+- Testes escritos antes: `src/app/router.test.tsx` (24 rotas novas, cada uma renderizada com sessão de admin: sem erro de rota e sem "Página não encontrada"); `recent-store.test.ts` (chave `urbanReports.recentCategories`); `MapPage › closing the legend remembers it was seen` (`urbanReports.legendSeen`); os testes que já liam `ocorrencias.*` passaram a ler a chave nova (troca de literal exato). Rodada antes da troca: `Tests 44 failed | 322 passed (366)`.
+- Troca via AST: segmentos de caminho em literais que começam com `/` (e partes de template), `path:` do `router.tsx`, chaves `ocorrencias.* → urbanReports.*`, expressões regulares (`mobile-layout.tsx`, `scripts/e2e.mjs`) e o script de tema do `index.html`. Os mocks do MSW ficaram de fora da troca de caminhos (as rotas da API já estavam em inglês).
+- `scripts/e2e.mjs` também estava desatualizado desde o Task 3 (`?tipo=problema`); passou a `?type=issue` e `?type=incident`.
+- Títulos de teste que citavam rotas ou endpoints antigos (`/registrar`, `GET /grupos`) acompanharam.
+- Decisão: o `describe` novo se chama `'app routes'` e não `'router'`, porque `router` é nome de ícone Material Symbols e o coletor do subset de ícones lê todo literal de `src/`. Custo se estiver errado: nenhum.
+- Busca da Task 5 (`rg ... src scripts`) vazia.
+- Efeito para quem já usa o app: entrar de novo, escolher o tema de novo, ver a pré-permissão de novo; links antigos (`/mapa/problema/{id}`) caem na página não encontrada.
+- Gate: typecheck ok; lint ok; format ok; `Tests 366 passed` (340 + 26 novos); textos idênticos; prints idênticos.

@@ -38,7 +38,7 @@ function RecentCard({ item }: { item: RecentItem }) {
   const possible = item.status === 'possiblyResolved'
   return (
     <Link
-      to={`/mapa/problema/${item.id}`}
+      to={`/map/issue/${item.id}`}
       className="flex pressable gap-3 rounded-[20px] border border-border bg-card p-3 shadow-1 hover:bg-surface-2 focus-visible:outline-2"
     >
       <CategoryIcon category={item.category} />

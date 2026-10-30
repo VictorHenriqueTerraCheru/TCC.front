@@ -65,7 +65,7 @@ export function DuplicateCheckPage() {
   const navigate = useNavigate()
   const { category, categoryId, location } = useDraft()
   useRequireCategory('issue')
-  useRequireStep(location !== null, '/registrar/local')
+  useRequireStep(location !== null, '/report/location')
 
   const { data: duplicates } = useQuery({
     ...duplicatesQuery(categoryId ?? 0, location ?? { lat: 0, lng: 0 }),
@@ -79,13 +79,13 @@ export function DuplicateCheckPage() {
     enabled: chosen !== undefined,
   })
 
-  useRequireStep(duplicates === undefined || duplicates.length > 0, '/registrar/revisao')
+  useRequireStep(duplicates === undefined || duplicates.length > 0, '/report/review')
 
   function confirmExisting() {
     if (!chosen) return
     confirm.mutate('yes', {
       onSuccess: (issue) => {
-        navigate('/registrar/sucesso', {
+        navigate('/report/success', {
           replace: true,
           state: { issue, confirmation: true },
         })
@@ -99,7 +99,7 @@ export function DuplicateCheckPage() {
       title="Conferência"
       step={{ current: 3, total: 4, label: 'Registros próximos' }}
       topAction="back"
-      onTopAction={() => navigate('/registrar/local')}
+      onTopAction={() => navigate('/report/location')}
       map={
         location && chosen && neighbor?.id === chosen.id ? (
           <ReportMap
@@ -116,7 +116,7 @@ export function DuplicateCheckPage() {
           <Button disabled={!chosen || confirm.isPending} onClick={confirmExisting}>
             Sim, confirmar esse
           </Button>
-          <Button variant="outline" onClick={() => navigate('/registrar/revisao')}>
+          <Button variant="outline" onClick={() => navigate('/report/review')}>
             Não, é outro
           </Button>
         </div>

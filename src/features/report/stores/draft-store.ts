@@ -40,6 +40,6 @@ export const useDraftStore = create<DraftState>()(
       setTime: (time) => set({ time }),
       clear: () => set(empty),
     }),
-    { name: 'ocorrencias.rascunhoRegistro', storage: createJSONStorage(() => sessionStorage) },
+    { name: 'urbanReports.reportDraft', storage: createJSONStorage(() => sessionStorage) },
   ),
 )

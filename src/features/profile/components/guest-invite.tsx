@@ -15,12 +15,12 @@ export function GuestInvite() {
       </p>
       <div className="flex flex-col gap-2 sm:flex-row">
         <Button asChild>
-          <Link to="/cadastro" state={{ de: '/perfil' }}>
+          <Link to="/register" state={{ de: '/profile' }}>
             Criar conta
           </Link>
         </Button>
         <Button asChild variant="outline">
-          <Link to="/login" state={{ de: '/perfil' }}>
+          <Link to="/login" state={{ de: '/profile' }}>
             Já tenho conta
           </Link>
         </Button>

@@ -11,7 +11,7 @@ import { AdminUsersPage } from './admin-users-page'
 
 function openAt() {
   setWidth(390)
-  return renderRoutes([{ path: '/admin/usuarios', element: <AdminUsersPage /> }], '/admin/usuarios')
+  return renderRoutes([{ path: '/admin/users', element: <AdminUsersPage /> }], '/admin/users')
 }
 
 const card = (name: string) => screen.findByRole('article', { name: `Usuário ${name}` })

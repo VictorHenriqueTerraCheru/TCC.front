@@ -45,7 +45,7 @@ describe('login and sign up', () => {
 
   it('sign up with an existing e-mail marks the field (409 email-already-registered)', async () => {
     const user = userEvent.setup()
-    openAt('/cadastro')
+    openAt('/register')
 
     await user.type(await screen.findByLabelText('Nome'), 'Ana')
     await user.type(screen.getByLabelText('E-mail'), 'cidadao1@tcc.local')
@@ -58,7 +58,7 @@ describe('login and sign up', () => {
 
   it('sign up requires accepting the terms', async () => {
     const user = userEvent.setup()
-    openAt('/cadastro')
+    openAt('/register')
 
     await user.type(await screen.findByLabelText('Nome'), 'Ana')
     await user.type(screen.getByLabelText('E-mail'), 'nova@x.com')

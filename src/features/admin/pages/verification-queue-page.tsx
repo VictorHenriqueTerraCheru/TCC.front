@@ -53,7 +53,7 @@ export function VerificationQueuePage() {
   const [aba, setAba] = useState<VerificationStatus>('pending')
 
   return (
-    <AdminGuard title="Fila de verificação" path="/admin/verificacoes">
+    <AdminGuard title="Fila de verificação" path="/admin/verifications">
       <div
         role="tablist"
         aria-label="Situação dos pedidos"

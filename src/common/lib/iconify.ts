@@ -1,6 +1,6 @@
 const HOST = 'https://api.iconify.design'
 const PREFIX = 'material-symbols'
-const CACHE_KEY = 'ocorrencias.iconesRemotos'
+const CACHE_KEY = 'urbanReports.remoteIcons'
 const VALID_D = /^[MmLlHhVvCcSsQqTtAaZz0-9eE+\-.,\s]+$/
 const MAX_D_LENGTH = 4000
 const MAX_VIEWBOX_LENGTH = 512

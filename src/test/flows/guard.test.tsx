@@ -31,7 +31,7 @@ describe('guard "guests see, accounts act"', () => {
 
   it('acceptance of stage 3: guest votes → login → back to the detail with the vote applied', async () => {
     const user = userEvent.setup()
-    const { router } = openAt(`/mapa/problema/${ACTIVE}?mode=both`)
+    const { router } = openAt(`/map/issue/${ACTIVE}?mode=both`)
 
     await user.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
     await user.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
@@ -45,14 +45,14 @@ describe('guard "guests see, accounts act"', () => {
         'true',
       ),
     )
-    expect(router.state.location.pathname).toBe(`/mapa/problema/${ACTIVE}`)
+    expect(router.state.location.pathname).toBe(`/map/issue/${ACTIVE}`)
     expect(router.state.location.search).toBe('?mode=both')
     expect(screen.getByText(/Calculada com 17 votos/)).toBeInTheDocument()
   })
 
   it('quick card: guest taps the thumb → login → the vote is resumed (rule 1)', async () => {
     const user = userEvent.setup()
-    const { router } = openAt(`/mapa/problema/${ACTIVE}`)
+    const { router } = openAt(`/map/issue/${ACTIVE}`)
 
     await user.click(await screen.findByRole('button', { name: 'Voto rápido: Sim, está lá' }))
     await user.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
@@ -64,19 +64,19 @@ describe('guard "guests see, accounts act"', () => {
         'true',
       ),
     )
-    expect(router.state.location.pathname).toBe(`/mapa/problema/${ACTIVE}`)
+    expect(router.state.location.pathname).toBe(`/map/issue/${ACTIVE}`)
   })
 
   it('"Agora não" forgets the vote: a later login does not vote by itself', async () => {
     const user = userEvent.setup()
-    const { router } = openAt(`/mapa/problema/${ACTIVE}`)
+    const { router } = openAt(`/map/issue/${ACTIVE}`)
 
     await user.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
     await user.click(await screen.findByRole('button', { name: 'Agora não' }))
     expect(
-      JSON.parse(sessionStorage.getItem('ocorrencias.pendencia')!).state.pendingAction,
+      JSON.parse(sessionStorage.getItem('urbanReports.pendingAction')!).state.pendingAction,
     ).toBeNull()
-    await router.navigate('/login', { state: { de: `/mapa/problema/${ACTIVE}` } })
+    await router.navigate('/login', { state: { de: `/map/issue/${ACTIVE}` } })
     await loginAs(user, 'cidadao1@tcc.local')
 
     expect(await screen.findByRole('button', { name: 'Sim, está lá' })).toHaveAttribute(
@@ -88,7 +88,7 @@ describe('guard "guests see, accounts act"', () => {
 
   it('browser "back" on login also forgets the vote', async () => {
     const user = userEvent.setup()
-    const { router } = openAt(`/mapa/problema/${ACTIVE}`)
+    const { router } = openAt(`/map/issue/${ACTIVE}`)
 
     await user.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
     await user.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
@@ -97,7 +97,7 @@ describe('guard "guests see, accounts act"', () => {
 
     await waitFor(() =>
       expect(
-        JSON.parse(sessionStorage.getItem('ocorrencias.pendencia')!).state.pendingAction,
+        JSON.parse(sessionStorage.getItem('urbanReports.pendingAction')!).state.pendingAction,
       ).toBeNull(),
     )
   })
@@ -107,19 +107,19 @@ describe('guard "guests see, accounts act"', () => {
     const { session } = useSessionStore.getState()
     useSessionStore.setState({ session: { ...session!, expiresAt: '2020-01-01T00:00:00Z' } })
     const user = userEvent.setup()
-    const { router } = openAt('/mapa')
+    const { router } = openAt('/map')
 
     await user.click(await screen.findByRole('link', { name: /Registrar/ }))
 
     expect(await screen.findByRole('heading', { name: 'Entre para registrar' })).toBeInTheDocument()
-    expect(router.state.location.pathname).toBe('/mapa')
+    expect(router.state.location.pathname).toBe('/map')
     expect(useSessionStore.getState().session).toBeNull()
     await user.click(screen.getByRole('button', { name: 'Agora não' }))
   })
 
   it('guest on "Registrar" → sign up → lands in the report flow', async () => {
     const user = userEvent.setup()
-    const { router } = openAt('/mapa')
+    const { router } = openAt('/map')
 
     await user.click(await screen.findByRole('link', { name: /Registrar/ }))
     expect(await screen.findByRole('heading', { name: 'Entre para registrar' })).toBeInTheDocument()
@@ -132,7 +132,7 @@ describe('guard "guests see, accounts act"', () => {
     await user.click(screen.getByRole('button', { name: 'Criar conta' }))
 
     expect(await screen.findByRole('heading', { name: 'Nova ocorrência' })).toBeInTheDocument()
-    expect(router.state.location.pathname).toBe('/registrar')
+    expect(router.state.location.pathname).toBe('/report')
     expect(useSessionStore.getState().session?.user.name).toBe('Nova Pessoa')
   })
 
@@ -140,7 +140,7 @@ describe('guard "guests see, accounts act"', () => {
     loginAsCitizen()
     server.use(http.put(route('/issues/:id/vote'), () => new HttpResponse(null, { status: 401 })))
     const user = userEvent.setup()
-    openAt(`/mapa/problema/${ACTIVE}`)
+    openAt(`/map/issue/${ACTIVE}`)
 
     await user.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
 
@@ -150,7 +150,7 @@ describe('guard "guests see, accounts act"', () => {
     ).toBeInTheDocument()
     expect(useSessionStore.getState().session).toBeNull()
     expect(
-      JSON.parse(sessionStorage.getItem('ocorrencias.pendencia')!).state.pendingAction.action,
+      JSON.parse(sessionStorage.getItem('urbanReports.pendingAction')!).state.pendingAction.action,
     ).toEqual({
       type: 'vote',
       issueId: ACTIVE,

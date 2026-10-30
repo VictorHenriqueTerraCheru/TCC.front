@@ -68,7 +68,7 @@ describe('report draft (rule 5)', () => {
   it('persists in sessionStorage, to survive a reload and a submit failure', () => {
     useDraftStore.getState().setDescription('Poste apagado')
 
-    const stored = JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro') ?? '{}')
+    const stored = JSON.parse(sessionStorage.getItem('urbanReports.reportDraft') ?? '{}')
     expect(stored.state.description).toBe('Poste apagado')
   })
 })

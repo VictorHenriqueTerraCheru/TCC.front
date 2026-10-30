@@ -10,8 +10,7 @@ export function useRedirectToPrePermission(active = true) {
   const { pathname, search } = useLocation()
 
   useEffect(() => {
-    if (!active || state !== 'prompt' || !pathname.startsWith('/mapa') || prePermissionSeen())
-      return
-    navigate('/permissao-localizacao', { replace: true, state: { de: `${pathname}${search}` } })
+    if (!active || state !== 'prompt' || !pathname.startsWith('/map') || prePermissionSeen()) return
+    navigate('/location-permission', { replace: true, state: { de: `${pathname}${search}` } })
   }, [active, state, pathname, search, navigate])
 }

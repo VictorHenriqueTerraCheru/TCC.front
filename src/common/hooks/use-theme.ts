@@ -25,7 +25,7 @@ export const useThemeStore = create<ThemeState>()(
       completeChoice: () => set({ chosen: true }),
     }),
     {
-      name: 'ocorrencias.tema',
+      name: 'urbanReports.theme',
       partialize: ({ preference, chosen }) => ({ preference, chosen }),
     },
   ),

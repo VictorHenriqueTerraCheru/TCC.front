@@ -27,26 +27,26 @@ describe('step 1: type and category', () => {
 
   it('the type screen leads to the category list of the chosen type', async () => {
     const user = userEvent.setup()
-    const { router } = openAt('/registrar')
+    const { router } = openAt('/report')
 
     await user.click(await screen.findByRole('link', { name: /^Evento/ }))
 
     expect(router.state.location.pathname + router.state.location.search).toBe(
-      '/registrar/categoria?type=incident',
+      '/report/category?type=incident',
     )
     expect(await screen.findByRole('button', { name: 'Roubo' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Buraco na via' })).not.toBeInTheDocument()
   })
 
   it('missing or invalid type goes back to choosing the type', async () => {
-    const { router } = openAt('/registrar/categoria?type=qualquer')
+    const { router } = openAt('/report/category?type=qualquer')
 
-    await waitFor(() => expect(router.state.location.pathname).toBe('/registrar'))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/report'))
     expect(await screen.findByRole('heading', { name: 'Estado ou evento?' })).toBeInTheDocument()
   })
 
   it('shows the categories of the type grouped, one section per group, in API order', async () => {
-    openAt('/registrar/categoria?type=issue')
+    openAt('/report/category?type=issue')
 
     for (const group of ['Via pública', 'Elétrica', 'Limpeza']) {
       expect(await screen.findByRole('region', { name: group })).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('step 1: type and category', () => {
 
   it('group chip filters the sections; tapping again goes back to Todas', async () => {
     const user = userEvent.setup()
-    openAt('/registrar/categoria?type=issue')
+    openAt('/report/category?type=issue')
 
     await user.click(await screen.findByRole('button', { name: 'Elétrica' }))
     expect(screen.queryByRole('region', { name: 'Limpeza' })).not.toBeInTheDocument()
@@ -74,7 +74,7 @@ describe('step 1: type and category', () => {
 
   it('search ignores accents and case and shows a notice when nothing is found', async () => {
     const user = userEvent.setup()
-    openAt('/registrar/categoria?type=issue')
+    openAt('/report/category?type=issue')
 
     await user.type(await screen.findByRole('searchbox', { name: 'Buscar categoria' }), 'CALCADA')
     expect(screen.getByRole('button', { name: 'Calçada danificada' })).toBeInTheDocument()
@@ -87,7 +87,7 @@ describe('step 1: type and category', () => {
 
   it('Continuar only enables with a category; goes to the location and becomes "Recente" next time', async () => {
     const user = userEvent.setup()
-    const { router } = openAt('/registrar/categoria?type=issue')
+    const { router } = openAt('/report/category?type=issue')
 
     const proceed = await screen.findByRole('button', { name: 'Continuar' })
     expect(proceed).toBeDisabled()
@@ -95,9 +95,9 @@ describe('step 1: type and category', () => {
     await user.click(await screen.findByRole('button', { name: 'Poste apagado' }))
     expect(screen.getByText('Selecionada: Poste apagado')).toBeInTheDocument()
     await user.click(proceed)
-    await waitFor(() => expect(router.state.location.pathname).toBe('/registrar/local'))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/report/location'))
 
-    await router.navigate('/registrar/categoria?type=issue')
+    await router.navigate('/report/category?type=issue')
     const recent = await screen.findByRole('region', { name: 'Recentes' })
     expect(
       within(recent).getByRole('button', { name: 'Recente: Poste apagado' }),
@@ -106,7 +106,7 @@ describe('step 1: type and category', () => {
 
   it('draft of another type does not count as a choice', async () => {
     useDraftStore.getState().chooseCategory(7)
-    openAt('/registrar/categoria?type=issue')
+    openAt('/report/category?type=issue')
 
     expect(await screen.findByRole('button', { name: 'Continuar' })).toBeDisabled()
   })
@@ -132,7 +132,7 @@ describe('step 1: type and category', () => {
         }),
       ),
     )
-    openAt('/registrar/categoria?type=incident')
+    openAt('/report/category?type=incident')
 
     const weather = await screen.findByRole('region', { name: 'Clima' })
     expect(within(weather).getByRole('button', { name: 'Rua inundada' })).toBeInTheDocument()
@@ -142,7 +142,7 @@ describe('step 1: type and category', () => {
 
   it('failure loading the categories offers to try again', async () => {
     server.use(http.get(route('/categories'), () => new HttpResponse(null, { status: 500 })))
-    openAt('/registrar/categoria?type=issue')
+    openAt('/report/category?type=issue')
 
     expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
@@ -158,16 +158,16 @@ describe('step 1: type and category', () => {
       ),
     )
     const user = userEvent.setup()
-    openAt('/registrar/categoria?type=issue')
+    openAt('/report/category?type=issue')
 
     const others = await screen.findByRole('region', { name: 'Outras' })
     await user.click(within(others).getByRole('button', { name: 'Sem grupo' }))
     expect(screen.getByText('Selecionada: Sem grupo')).toBeInTheDocument()
   })
 
-  it('failure on /grupos offers to try again instead of an empty list', async () => {
+  it('failure on /groups offers to try again instead of an empty list', async () => {
     server.use(http.get(route('/groups'), () => new HttpResponse(null, { status: 500 })))
-    openAt('/registrar/categoria?type=issue')
+    openAt('/report/category?type=issue')
 
     expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()
     expect(screen.queryByText(/Nenhuma categoria com esse nome/)).not.toBeInTheDocument()
@@ -175,22 +175,22 @@ describe('step 1: type and category', () => {
 
   it("location step with a category of another type goes back to the right type's list", async () => {
     useDraftStore.getState().chooseCategory(7)
-    const { router } = openAt('/registrar/local')
+    const { router } = openAt('/report/location')
 
     await waitFor(() =>
       expect(router.state.location.pathname + router.state.location.search).toBe(
-        '/registrar/categoria?type=issue',
+        '/report/category?type=issue',
       ),
     )
   })
 
   it('location step with a category that was deactivated goes back to the list', async () => {
     useDraftStore.getState().chooseCategory(99)
-    const { router } = openAt('/registrar/incidente/local')
+    const { router } = openAt('/report/incident/location')
 
     await waitFor(() =>
       expect(router.state.location.pathname + router.state.location.search).toBe(
-        '/registrar/categoria?type=incident',
+        '/report/category?type=incident',
       ),
     )
   })

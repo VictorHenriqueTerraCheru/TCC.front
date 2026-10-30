@@ -73,7 +73,7 @@ export function LoginToContinue() {
         ))}
       </ul>
       <div className="flex flex-col gap-2">
-        <Button onClick={() => goTo('/cadastro')}>Criar conta</Button>
+        <Button onClick={() => goTo('/register')}>Criar conta</Button>
         <Button variant="outline" onClick={() => goTo('/login')}>
           Já tenho conta
         </Button>

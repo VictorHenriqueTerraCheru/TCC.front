@@ -57,7 +57,7 @@ export function TypePage() {
 
   function close() {
     clear()
-    navigate('/mapa')
+    navigate('/map')
   }
 
   return (

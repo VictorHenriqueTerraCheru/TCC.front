@@ -22,7 +22,7 @@ export function AdminGuard({ title, path, children }: AdminGuardProps) {
 
   return (
     <div className="mx-auto h-full w-full lg:max-w-3xl">
-      <ScreenWithBack title={title} onBack={() => navigate('/perfil')}>
+      <ScreenWithBack title={title} onBack={() => navigate('/profile')}>
         {isPending ? (
           <Skeleton className="h-60 rounded-2xl bg-muted" />
         ) : isError ? (
@@ -36,7 +36,7 @@ export function AdminGuard({ title, path, children }: AdminGuardProps) {
           <div className="space-y-3 py-10 text-center">
             <p>Esta área é só para administradores.</p>
             <Button asChild variant="outline">
-              <Link to="/perfil">Voltar ao perfil</Link>
+              <Link to="/profile">Voltar ao perfil</Link>
             </Button>
           </div>
         ) : (

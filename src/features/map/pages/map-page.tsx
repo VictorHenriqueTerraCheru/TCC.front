@@ -37,8 +37,8 @@ import { pointFromUrl } from '../models/point'
 import { DEFAULT_CENTER, DASH_COLOR, DEFAULT_ZOOM } from '@/common/lib/map'
 import type { Bounds } from '../models/bounds'
 
-const LEGEND_SEEN_KEY = 'ocorrencias.legendaVista'
-const EMPTY_NOTICE_DISMISSED_KEY = 'ocorrencias.avisoVazioFechado'
+const LEGEND_SEEN_KEY = 'urbanReports.legendSeen'
+const EMPTY_NOTICE_DISMISSED_KEY = 'urbanReports.emptyNoticeDismissed'
 const PANEL_WIDTH = 420
 
 function checked(key: string): boolean {
@@ -70,8 +70,8 @@ export function MapPage() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const issueRoute = useMatch('/mapa/problema/:id')
-  const areaRoute = useMatch('/mapa/area')
+  const issueRoute = useMatch('/map/issue/:id')
+  const areaRoute = useMatch('/map/area')
   const [params] = useSearchParams()
   const panelOpen = issueRoute !== null || areaRoute !== null
 
@@ -313,10 +313,10 @@ export function MapPage() {
 
       {!desktop && (
         <Link
-          to="/registrar"
+          to="/report"
           onClick={(event) => {
             event.preventDefault()
-            requireAccount('report', () => navigate('/registrar'), { returnTo: '/registrar' })
+            requireAccount('report', () => navigate('/report'), { returnTo: '/report' })
           }}
           className="absolute bottom-[92px] left-1/2 z-[1000] flex h-12 -translate-x-1/2 pressable items-center gap-2 rounded-full bg-primary bg-linear-to-b from-black/0 to-black/12 px-5 font-semibold text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2"
         >

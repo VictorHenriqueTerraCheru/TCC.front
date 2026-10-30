@@ -28,13 +28,14 @@ export function RequestVerificationPage() {
   })
   const justification = useWatch({ control, name: 'justification' })
 
-  if (!authenticated) return <Navigate to="/login" replace state={{ de: '/perfil/verificacao' }} />
-  if (me && me.role !== 'citizen') return <Navigate to="/perfil" replace />
+  if (!authenticated)
+    return <Navigate to="/login" replace state={{ de: '/profile/verification' }} />
+  if (me && me.role !== 'citizen') return <Navigate to="/profile" replace />
 
   const send = handleSubmit((form) =>
     request.mutate(
       { affiliationType: form.affiliationType, justification: form.justification },
-      { onSuccess: () => navigate('/perfil', { replace: true }) },
+      { onSuccess: () => navigate('/profile', { replace: true }) },
     ),
   )
   const rejection = me?.verification?.status === 'rejected' ? me.verification : null
@@ -42,7 +43,7 @@ export function RequestVerificationPage() {
 
   return (
     <div className="mx-auto h-full w-full lg:max-w-3xl">
-      <ScreenWithBack title="Solicitar verificação" onBack={() => navigate('/perfil')}>
+      <ScreenWithBack title="Solicitar verificação" onBack={() => navigate('/profile')}>
         {isPending ? (
           <Skeleton className="h-60 rounded-2xl bg-muted" />
         ) : (

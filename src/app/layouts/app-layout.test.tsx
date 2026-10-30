@@ -14,12 +14,12 @@ describe('AppLayout', () => {
       expect(within(nav).getByRole('link', { name: new RegExp(label) })).toBeInTheDocument()
     }
     expect(within(nav).getByRole('link', { name: /Mapa/ })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByRole('link', { name: /Registrar/ })).toHaveAttribute('href', '/registrar')
+    expect(screen.getByRole('link', { name: /Registrar/ })).toHaveAttribute('href', '/report')
   })
 
   it('on desktop shows the rail with the Registrar button highlighted', async () => {
     setWidth(1440)
-    renderRoutes(routes, '/recentes')
+    renderRoutes(routes, '/recent')
 
     const nav = await screen.findByRole('navigation', { name: 'Navegação principal' })
     expect(within(nav).getByRole('link', { name: 'Registrar ocorrência' })).toBeInTheDocument()

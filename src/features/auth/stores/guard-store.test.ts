@@ -52,9 +52,9 @@ describe('guard-store (rules 1 and 13)', () => {
   })
 
   it('completeLogin without a pending action returns the return route but stores nothing', () => {
-    useGuardStore.getState().askForAccount('report', { returnTo: '/mapa', action: null })
+    useGuardStore.getState().askForAccount('report', { returnTo: '/map', action: null })
 
-    expect(useGuardStore.getState().completeLogin()).toBe('/mapa')
+    expect(useGuardStore.getState().completeLogin()).toBe('/map')
     expect(useGuardStore.getState().pendingAction).toBeNull()
   })
 
@@ -79,7 +79,7 @@ describe('guard-store (rules 1 and 13)', () => {
   it('only the pending action goes to sessionStorage; the open sheet does not survive a reload', () => {
     useGuardStore.getState().askForAccount('vote', pendingAction, true)
 
-    const stored = JSON.parse(sessionStorage.getItem('ocorrencias.pendencia') ?? '{}')
+    const stored = JSON.parse(sessionStorage.getItem('urbanReports.pendingAction') ?? '{}')
     expect(stored.state).toEqual({ pendingAction })
   })
 })

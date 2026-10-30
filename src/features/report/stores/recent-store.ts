@@ -15,7 +15,7 @@ export const useRecentStore = create<RecentState>()(
       report: (id) => set((s) => ({ ids: [id, ...s.ids.filter((i) => i !== id)].slice(0, MAX) })),
     }),
     {
-      name: 'ocorrencias.categoriasRecentes',
+      name: 'urbanReports.recentCategories',
       storage: createJSONStorage(() => localStorage),
       merge: (saved, current) => {
         const ids = (saved as Partial<RecentState> | undefined)?.ids

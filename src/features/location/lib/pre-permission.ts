@@ -1,4 +1,4 @@
-const KEY = 'ocorrencias.prePermissaoVista'
+const KEY = 'urbanReports.prePermissionSeen'
 
 export function prePermissionSeen(): boolean {
   try {

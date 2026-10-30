@@ -15,12 +15,12 @@ export function useMapNavigation() {
   }
 
   return {
-    openIssue: (id: string) => navigate({ pathname: `/mapa/problema/${id}`, search: filters() }),
+    openIssue: (id: string) => navigate({ pathname: `/map/issue/${id}`, search: filters() }),
     openArea: (lat: number, lng: number) =>
       navigate({
-        pathname: '/mapa/area',
+        pathname: '/map/area',
         search: filters({ lat: lat.toFixed(5), lng: lng.toFixed(5) }),
       }),
-    close: () => navigate({ pathname: '/mapa', search: filters() }),
+    close: () => navigate({ pathname: '/map', search: filters() }),
   }
 }

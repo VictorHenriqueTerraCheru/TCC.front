@@ -10,7 +10,7 @@ export function ChooseThemePage() {
   const navigate = useNavigate()
   const location = useLocation()
   const completeChoice = useThemeStore((s) => s.completeChoice)
-  const destination = (location.state as { de?: string } | null)?.de ?? '/mapa'
+  const destination = (location.state as { de?: string } | null)?.de ?? '/map'
 
   function proceed() {
     completeChoice()

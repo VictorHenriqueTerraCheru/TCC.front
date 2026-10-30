@@ -81,11 +81,11 @@ describe('geolocation-store', () => {
     clear = startWatching()
 
     await vi.waitFor(() => expect(useGeolocationStore.getState().state).toBe('granted'))
-    expect(localStorage.getItem('ocorrencias.localizacaoConcedida')).toBe('1')
+    expect(localStorage.getItem('urbanReports.locationGranted')).toBe('1')
   })
 
   it('in prompt, if it was granted before (iOS forgets), asks again without waiting for Ativar', async () => {
-    localStorage.setItem('ocorrencias.localizacaoConcedida', '1')
+    localStorage.setItem('urbanReports.locationGranted', '1')
     const geo = installBrowser('prompt')
     clear = startWatching()
 
@@ -116,7 +116,7 @@ describe('geolocation-store', () => {
   })
 
   it('if the automatic request is denied, forgets the grant and stays denied', async () => {
-    localStorage.setItem('ocorrencias.localizacaoConcedida', '1')
+    localStorage.setItem('urbanReports.locationGranted', '1')
     const geo = installBrowser('prompt')
     clear = startWatching()
 
@@ -124,11 +124,11 @@ describe('geolocation-store', () => {
     geo.getCurrentPosition.mock.calls[0]![1](denied)
 
     expect(useGeolocationStore.getState()).toMatchObject({ state: 'denied', position: null })
-    expect(localStorage.getItem('ocorrencias.localizacaoConcedida')).toBeNull()
+    expect(localStorage.getItem('urbanReports.locationGranted')).toBeNull()
   })
 
   it('if the automatic request fails for another reason, goes back to prompt', async () => {
-    localStorage.setItem('ocorrencias.localizacaoConcedida', '1')
+    localStorage.setItem('urbanReports.locationGranted', '1')
     const geo = installBrowser('prompt')
     clear = startWatching()
 

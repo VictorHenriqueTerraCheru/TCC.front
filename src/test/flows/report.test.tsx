@@ -11,7 +11,7 @@ import { server } from '@/infrastructure/mocks/server'
 import { setWidth, renderRoutes } from '@/test/render'
 import { loginAsCitizen, logout } from '@/test/session'
 
-function openAt(path = '/registrar') {
+function openAt(path = '/report') {
   setWidth(390)
   return renderRoutes(routes, path)
 }
@@ -41,18 +41,18 @@ describe('report flow', () => {
     sessionStorage.clear()
   })
 
-  it('guest who opens /registrar goes to login', async () => {
+  it('guest who opens /report goes to login', async () => {
     logout()
     const { router } = openAt()
     await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
   })
 
-  it('guest on /registrar/categoria?type=incident returns to the same URL after login', async () => {
+  it('guest on /report/category?type=incident returns to the same URL after login', async () => {
     logout()
-    const { router } = openAt('/registrar/categoria?type=incident')
+    const { router } = openAt('/report/category?type=incident')
     await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
 
-    expect(router.state.location.state).toEqual({ de: '/registrar/categoria?type=incident' })
+    expect(router.state.location.state).toEqual({ de: '/report/category?type=incident' })
   })
 
   it('acceptance: reporting where there is already a pothole within 50 m opens the duplicate check; "Não, é outro" continues and submits', async () => {
@@ -75,10 +75,10 @@ describe('report flow', () => {
     await user.click(screen.getByRole('button', { name: /Enviar registro/ }))
 
     expect(await screen.findByRole('heading', { name: 'Registro enviado' })).toBeInTheDocument()
-    expect(router.state.location.pathname).toBe('/registrar/sucesso')
+    expect(router.state.location.pathname).toBe('/report/success')
     await waitFor(() =>
       expect(
-        JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro')!).state.categoryId,
+        JSON.parse(sessionStorage.getItem('urbanReports.reportDraft')!).state.categoryId,
       ).toBeNull(),
     )
   })
@@ -104,7 +104,7 @@ describe('report flow', () => {
     await user.click(screen.getByRole('button', { name: 'Entrar' }))
 
     expect(await screen.findByRole('heading', { name: 'Registro enviado' })).toBeInTheDocument()
-    expect(router.state.location.pathname).toBe('/registrar/sucesso')
+    expect(router.state.location.pathname).toBe('/report/success')
   })
 
   it('"Sim, confirmar esse" votes on the existing one and shows the confirmation', async () => {
@@ -122,7 +122,7 @@ describe('report flow', () => {
 
   it('review with a deactivated category goes back to choosing the category', async () => {
     sessionStorage.setItem(
-      'ocorrencias.rascunhoRegistro',
+      'urbanReports.reportDraft',
       JSON.stringify({
         state: {
           categoryId: 3,
@@ -135,14 +135,14 @@ describe('report flow', () => {
     )
     await useDraftStore.persist.rehydrate()
     database.setCategoryActive(3, false)
-    const { router } = openAt('/registrar/revisao')
+    const { router } = openAt('/report/review')
 
-    await waitFor(() => expect(router.state.location.pathname).toBe('/registrar/categoria'))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/report/category'))
   })
 
   it('acceptance: reloading in the middle of the flow does not lose the draft', async () => {
     sessionStorage.setItem(
-      'ocorrencias.rascunhoRegistro',
+      'urbanReports.reportDraft',
       JSON.stringify({
         state: {
           categoryId: 3,
@@ -154,7 +154,7 @@ describe('report flow', () => {
       }),
     )
     await useDraftStore.persist.rehydrate()
-    openAt('/registrar/revisao')
+    openAt('/report/review')
 
     expect(await screen.findByDisplayValue('Poste piscando a noite toda')).toBeInTheDocument()
     expect(await screen.findByText('Poste apagado')).toBeInTheDocument()
@@ -172,9 +172,7 @@ describe('report flow', () => {
     expect(
       await screen.findByRole('dialog', { name: 'Não foi possível enviar' }),
     ).toBeInTheDocument()
-    expect(
-      JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro')!).state.categoryId,
-    ).toBe(4)
+    expect(JSON.parse(sessionStorage.getItem('urbanReports.reportDraft')!).state.categoryId).toBe(4)
 
     server.resetHandlers()
     await user.click(screen.getByRole('button', { name: 'Tentar novamente' }))

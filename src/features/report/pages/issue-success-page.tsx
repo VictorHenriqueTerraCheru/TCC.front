@@ -54,7 +54,7 @@ export function SuccessScreen({ title, text, card, viewOnMap }: SuccessScreenPro
           variant="outline"
           onClick={() => {
             clear()
-            navigate('/registrar', { replace: true })
+            navigate('/report', { replace: true })
           }}
         >
           Registrar outra
@@ -95,7 +95,7 @@ export function IssueSuccessPage() {
         title="Confirmação registrada"
         text="Sua confirmação foi registrada e reforça o registro que já estava no mapa, em vez de criar uma duplicata."
         card={card}
-        viewOnMap={issue ? `/mapa/problema/${issue.id}` : '/mapa'}
+        viewOnMap={issue ? `/map/issue/${issue.id}` : '/map'}
       />
     )
   }
@@ -105,7 +105,7 @@ export function IssueSuccessPage() {
       title="Registro enviado"
       text='Sua ocorrência já aparece no mapa com o selo "Nova". Ela fica em período de avaliação até que pessoas por perto confirmem.'
       card={card}
-      viewOnMap={issue ? `/mapa/problema/${issue.id}` : '/mapa'}
+      viewOnMap={issue ? `/map/issue/${issue.id}` : '/map'}
     />
   )
 }

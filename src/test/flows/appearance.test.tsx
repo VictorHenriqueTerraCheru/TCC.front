@@ -32,7 +32,7 @@ describe('appearance (light, dark or system)', () => {
 
   it('on first open asks for the theme, with Automático checked, and returns to where it was', async () => {
     const user = userEvent.setup()
-    const { router } = renderRoutes(routes, '/mapa?mode=both')
+    const { router } = renderRoutes(routes, '/map?mode=both')
 
     expect(await screen.findByRole('heading', { name: 'Escolha a aparência' })).toBeInTheDocument()
     expect(option('Automático')).toHaveAttribute('aria-checked', 'true')
@@ -42,14 +42,14 @@ describe('appearance (light, dark or system)', () => {
     expect(document.documentElement.dataset.theme).toBe('dark')
 
     await user.click(screen.getByRole('button', { name: 'Continuar' }))
-    expect(router.state.location.pathname).toBe('/mapa')
+    expect(router.state.location.pathname).toBe('/map')
     expect(router.state.location.search).toBe('?mode=both')
     expect(useThemeStore.getState()).toMatchObject({ preference: 'dark', chosen: true })
   })
 
   it('once chosen, does not appear again', async () => {
     useThemeStore.setState({ chosen: true })
-    renderRoutes(routes, '/mapa')
+    renderRoutes(routes, '/map')
 
     expect(
       await screen.findByRole('radiogroup', { name: 'O que mostrar no mapa' }),
@@ -60,7 +60,7 @@ describe('appearance (light, dark or system)', () => {
   it('comes before the location pre-permission', async () => {
     browserPrompting()
     const user = userEvent.setup()
-    renderRoutes(routes, '/mapa')
+    renderRoutes(routes, '/map')
 
     expect(await screen.findByRole('heading', { name: 'Escolha a aparência' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Continuar' }))
@@ -74,7 +74,7 @@ describe('appearance (light, dark or system)', () => {
     useThemeStore.setState({ preference: 'dark', chosen: true })
     loginAsCitizen()
     const user = userEvent.setup()
-    renderRoutes(routes, '/perfil/configuracoes')
+    renderRoutes(routes, '/profile/settings')
 
     expect(await screen.findByRole('radiogroup', { name: 'Aparência' })).toBeInTheDocument()
     expect(option('Escuro')).toHaveAttribute('aria-checked', 'true')

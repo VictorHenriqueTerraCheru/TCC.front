@@ -84,7 +84,7 @@ function UserList() {
 
 export function AdminUsersPage() {
   return (
-    <AdminGuard title="Usuários" path="/admin/usuarios">
+    <AdminGuard title="Usuários" path="/admin/users">
       <UserList />
     </AdminGuard>
   )

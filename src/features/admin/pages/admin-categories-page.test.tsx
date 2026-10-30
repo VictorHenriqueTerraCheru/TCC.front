@@ -31,8 +31,8 @@ function fakeIconify() {
 function openAt() {
   setWidth(390)
   return renderRoutes(
-    [{ path: '/admin/categorias', element: <AdminCategoriesPage /> }],
-    '/admin/categorias',
+    [{ path: '/admin/categories', element: <AdminCategoriesPage /> }],
+    '/admin/categories',
   )
 }
 
@@ -52,7 +52,7 @@ describe('categories and groups administration', () => {
     expect(screen.queryByRole('button', { name: 'Nova categoria' })).not.toBeInTheDocument()
   })
 
-  it('failure on GET /grupos shows an error with "Tentar novamente" instead of raw keys', async () => {
+  it('failure on GET /groups shows an error with "Tentar novamente" instead of raw keys', async () => {
     server.use(http.get(route('/groups'), () => new HttpResponse(null, { status: 500 })))
     openAt()
 
@@ -61,7 +61,7 @@ describe('categories and groups administration', () => {
     expect(screen.queryByRole('button', { name: 'Nova categoria' })).not.toBeInTheDocument()
   })
 
-  it('on the Grupos tab, failure on GET /admin/categorias shows an error instead of locking delete', async () => {
+  it('on the Grupos tab, failure on GET /admin/categories shows an error instead of locking delete', async () => {
     server.use(http.get(route('/admin/categories'), () => new HttpResponse(null, { status: 500 })))
     const user = userEvent.setup()
     openAt()

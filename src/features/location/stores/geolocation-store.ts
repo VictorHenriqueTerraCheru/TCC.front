@@ -48,7 +48,7 @@ function stopTracking() {
   watchId = null
 }
 
-const GRANTED_KEY = 'ocorrencias.localizacaoConcedida'
+const GRANTED_KEY = 'urbanReports.locationGranted'
 
 function grantedBefore(): boolean {
   try {

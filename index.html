@@ -11,7 +11,7 @@
       ;(function () {
         var preference = 'system'
         try {
-          var saved = JSON.parse(localStorage.getItem('ocorrencias.tema'))
+          var saved = JSON.parse(localStorage.getItem('urbanReports.theme'))
           if (saved && saved.state && saved.state.preference) preference = saved.state.preference
         } catch (e) {}
         var dark =

@@ -85,7 +85,7 @@ describe('session (rules 11 and 13)', () => {
   it('the session is saved in localStorage', () => {
     loginExpiring(HOUR)
 
-    const stored = JSON.parse(localStorage.getItem('ocorrencias.sessao') ?? '{}')
+    const stored = JSON.parse(localStorage.getItem('urbanReports.session') ?? '{}')
     expect(stored.state.session.token).toBe('jwt-test')
   })
 })
