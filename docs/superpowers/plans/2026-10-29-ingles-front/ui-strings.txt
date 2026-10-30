@@ -183,7 +183,6 @@ Buscar ícone (em inglês: flood, tree, fire…)
 Buscar por nome ou e-mail
 Buscar por nome ou grupo
 Buscar usuário
-BuscarDuplicatasResponse
 Cada registro fica ligado a uma conta — é isso que permite medir a confiança do que aparece no mapa. Sem conta, você continua vendo o mapa normalmente.
 Calculada com 
 Campo obrigatório — escreva pelo menos 30 caracteres.
@@ -195,8 +194,6 @@ Carregando recentes
 Carregando…
 Carregar mais
 Categoria
-CategoriaAdminResponse
-CategoriaResumo
 Categorias
 Centralizar na minha localização
 check
@@ -235,8 +232,6 @@ Cor
 Criando conta…
 Criar conta
 Criar e editar categorias, grupos e ícones
-CriarCategoriaRequest
-CriarGrupoRequest
 Crie sua conta
 d MMM yyyy
 d MMM.
@@ -269,8 +264,6 @@ Editar
 Editar categoria
 Editar grupo
 Editar nome
-EditarCategoriaRequest
-EditarGrupoRequest
 Em avaliação
 Em dúvida? Se daqui a uma semana ainda der pra ver no local, é
 Em Localização, escolha Permitir.
@@ -304,21 +297,15 @@ Essa categoria é de problema. Volte e escolha de novo.
 Esse registro é seu: quem registra não vota nele.
 Esta área é só para administradores.
 Esta semana
-estado
-Estado
 Estado do problema
-Estado ou evento?
 Este grupo ainda tem categorias (inclusive desativadas). Mova todas para outro grupo antes de apagar.
 Este navegador não oferece a localização nesta página. Ela só funciona em conexão segura (https).
 Este pedido já foi analisado por outra pessoa.
 Este problema já foi resolvido.
 Este problema não está mais disponível.
 Este problema não está mais no mapa.
-Evento
-Eventos são pontuais: aparecem apenas agregados, sem local exato, e não recebem votos de "Ainda está lá?".
 Ex.: moro na Rua São Clemente há 8 anos e passo pelo trecho todos os dias.
 Explique por que o pedido foi recusado
-FaixaConfianca
 Feature
 FeatureCollection
 Fechar
@@ -428,7 +415,6 @@ grid h-full grid-cols-[420px_1fr]
 group flex w-full pressable flex-col items-center gap-1 text-xs font-medium focus-visible:outline-2
 group/drawer-content fixed z-50 flex h-auto flex-col border-t border-border bg-card shadow-[inset_0_1px_0_var(--highlight),0_-2px_8px_rgb(0_0_0/0.08),0_-16px_44px_rgb(0_0_0/0.22)] outline-none
 Grupo
-GrupoResponse
 Grupos
 Guardamos seu nome, e-mail e seus registros e votos. Sua localização serve só para calcular a distância do voto e é descartada; incidentes são anônimos e agregados.
 h-1 overflow-hidden rounded-full bg-brand-soft
@@ -462,16 +448,17 @@ Hoje
 hoje, 
 Hora aproximada
 hover:border-muted-foreground/40 focus:border-ring focus:bg-card focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_18%,transparent)]
-HttpValidationProblemDetails
 Ícone
 Ícone:
 Iconify respondeu 
 Igual ao celular
 Inativa
 Inativas
+Incidente
 Incidente — entra no mapa de calor
 Incidente · calor
 Incidentes
+Incidentes são pontuais: aparecem apenas agregados, sem local exato, e não recebem votos de "Ainda está lá?".
 Indisponível
 Informe a ordem.
 Informe o nome.
@@ -504,11 +491,6 @@ Limpar filtros
 linear-gradient(to right, 
 LineString
 list-decimal space-y-2 pl-5 text-sm
-ListarCategoriasResponse
-ListarProblemasNaAreaResponse
-ListarProblemasRecentesItem
-ListarUsuariosItem
-ListarVerificacoesItem
 Local
 Local · 
 Local aproximado
@@ -681,7 +663,6 @@ Nenhuma categoria com esse nome.
 Nenhuma categoria com esses filtros.
 Nenhuma ocorrência nesta área
 Ninguém registrou problemas por aqui. Afaste o mapa para ver bairros vizinhos.
-NivelConcentracao
 No automático, o app fica claro ou escuro junto com o seu celular. Dá para mudar quando quiser em Configurações.
 Nome
 Nome do grupo
@@ -690,7 +671,7 @@ Nova
 Nova categoria
 Nova ocorrência
 Novo grupo
-O grupo escolhido é de outro tipo (Estado ou Evento).
+O grupo escolhido é de outro tipo (Problema ou Incidente).
 O horário precisa estar dentro das últimas 24 horas. Ajuste e envie de novo.
 O navegador não pergunta de novo depois que a permissão é negada. Para liberar:
 O ponto exato não é salvo nem exibido.
@@ -702,11 +683,6 @@ O tipo não muda depois de criado.
 O voto passa a valer mais no cálculo de confiança.
 Obrigado. Seu relato já faz parte do mapa de calor
 Obrigatório. A pessoa verá este motivo.
-ObterAreaIncidentesResponse
-ObterCalorIncidentesResponse
-ObterDetalheProblemaResponse
-ObterHistoricoItem
-ObterMeResponse
 Ocorrências urbanas
 Ocre
 Ocultar senha
@@ -763,9 +739,11 @@ Política de privacidade
 Polygon
 Possivelmente resolvida
 precisão de ±
+problema
 Problema
 Problema — fica no mapa até ser resolvido
 Problema · marcador
+Problema ou incidente?
 Problemas
 Próximo a 
 px solid #ffffff
@@ -781,8 +759,8 @@ px-4 py-3 text-right text-2xl
 py-10 text-center text-sm text-muted-foreground
 py-4 text-sm text-muted-foreground
 py-8 text-center text-sm text-muted-foreground
-Qual é o estado?
-Qual foi o evento?
+Qual é o problema?
+Qual foi o incidente?
 Quando
 Quando aconteceu?
 que não está mais lá nas últimas 24 h. Se você passou por lá, ajude a confirmar.
@@ -834,11 +812,9 @@ Relato enviado
 resize-none px-4 pt-7 pb-3
 Resolvida
 Resolvidas saem do mapa e ficam só no histórico
-RespostaAuth
 Resultados da busca
 Resumo
 Resumo do alerta
-ReversaResponse
 Revisão
 rgb(0 0 0 / 0.35)
 right-3 bottom-[267px] lg:right-4 lg:bottom-[155px]
@@ -915,8 +891,6 @@ space-y-3 py-6 pr-10
 space-y-4 text-sm
 space-y-4 transition-opacity duration-300
 space-y-6 pt-2
-StatusProblema
-StatusVerificacao
 Sua confirmação foi registrada e reforça o registro que já estava no mapa, em vez de criar uma duplicata.
 Sua localização é usada para dar mais peso ao seu voto quando você está perto da ocorrência. Ela não é exibida para outras pessoas.
 Sua localização só serve para calcular a distância do voto e é descartada. Incidentes são anônimos e aparecem só agregados no mapa de calor.
@@ -966,7 +940,6 @@ text-xs text-muted-foreground
 TimeoutError
 Tipo
 Tipo de vínculo
-TipoVinculo
 Todas
 Todos
 Todos os grupos
@@ -991,7 +964,6 @@ Use até 60 caracteres.
 Use um número inteiro.
 Usuário 
 Usuários
-ValorVotoContrato
 Ver área maior
 Ver no mapa
 Ver quem se cadastrou e alterar perfis

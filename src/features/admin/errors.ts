@@ -2,7 +2,7 @@ import { isApiError, isNetworkError } from '@/infrastructure/api'
 
 const messages: Record<string, string> = {
   'duplicate-name': 'Já existe uma categoria com este nome.',
-  'group-type-mismatch': 'O grupo escolhido é de outro tipo (Estado ou Evento).',
+  'group-type-mismatch': 'O grupo escolhido é de outro tipo (Problema ou Incidente).',
   'duplicate-group-label': 'Já existe um grupo com este nome.',
   'own-role': 'Você não pode alterar o seu próprio perfil.',
   'group-in-use':

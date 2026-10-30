@@ -1,8 +1,8 @@
 import type { GroupType } from '@/features/categories'
 
 export const typeLabel: Record<GroupType, string> = {
-  issue: 'Estado',
-  incident: 'Evento',
+  issue: 'Problema',
+  incident: 'Incidente',
 }
 
 export const typeHelp: Record<GroupType, string> = {

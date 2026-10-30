@@ -83,10 +83,10 @@ describe('categories and groups administration', () => {
     openAt()
 
     const line = (await screen.findByText('Buraco na via')).closest('li')!
-    expect(within(line).getByText('Estado')).toBeInTheDocument()
+    expect(within(line).getByText('Problema')).toBeInTheDocument()
     expect(within(line).getByText('Via pública')).toBeInTheDocument()
     const roubo = screen.getByText('Roubo').closest('li')!
-    expect(within(roubo).getByText('Evento')).toBeInTheDocument()
+    expect(within(roubo).getByText('Incidente')).toBeInTheDocument()
     expect(within(roubo).getByText('Segurança')).toBeInTheDocument()
   })
 
@@ -98,7 +98,7 @@ describe('categories and groups administration', () => {
     await user.click(await screen.findByRole('radio', { name: 'Grupos' }))
     await user.click(screen.getByRole('button', { name: 'Novo grupo' }))
     await user.type(await screen.findByLabelText('Nome do grupo'), 'Clima')
-    await user.click(screen.getByRole('radio', { name: 'Evento' }))
+    await user.click(screen.getByRole('radio', { name: 'Incidente' }))
     await user.click(screen.getByRole('radio', { name: 'Azul' }))
     await user.click(screen.getByRole('button', { name: 'Salvar' }))
     expect(await screen.findByText('Clima')).toBeInTheDocument()
@@ -106,7 +106,7 @@ describe('categories and groups administration', () => {
     await user.click(screen.getByRole('radio', { name: 'Categorias' }))
     await user.click(await screen.findByRole('button', { name: 'Nova categoria' }))
     await user.type(await screen.findByLabelText('Nome'), 'Rua inundada')
-    await user.click(screen.getByRole('radio', { name: 'Evento' }))
+    await user.click(screen.getByRole('radio', { name: 'Incidente' }))
     await user.click(
       within(screen.getByRole('group', { name: 'Grupo' })).getByRole('button', { name: 'Clima' }),
     )
@@ -117,7 +117,7 @@ describe('categories and groups administration', () => {
     await user.click(screen.getByRole('button', { name: 'Salvar' }))
 
     const line = (await screen.findByText('Rua inundada')).closest('li')!
-    expect(within(line).getByText('Evento')).toBeInTheDocument()
+    expect(within(line).getByText('Incidente')).toBeInTheDocument()
     expect(within(line).getByText('Clima')).toBeInTheDocument()
     await waitFor(() => expect(line.querySelector('svg path')).toHaveAttribute('d', 'M1 1h4v4z'))
   })
@@ -153,7 +153,7 @@ describe('categories and groups administration', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Editar Fio caído' }))
     expect(await screen.findByText(/O tipo não muda depois de criada/)).toBeInTheDocument()
-    expect(screen.queryByRole('radio', { name: 'Evento' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: 'Incidente' })).not.toBeInTheDocument()
     const name = screen.getByLabelText('Nome')
     await user.clear(name)
     await user.type(name, 'Fio solto')
@@ -221,13 +221,13 @@ describe('categories and groups administration', () => {
     expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()
   })
 
-  it('Estado and Evento have labels of different colors', async () => {
+  it('Problema and Incidente have labels of different colors', async () => {
     openAt()
 
     const state = within((await screen.findByText('Buraco na via')).closest('li')!).getByText(
-      'Estado',
+      'Problema',
     )
-    const event = within(screen.getByText('Roubo').closest('li')!).getByText('Evento')
+    const event = within(screen.getByText('Roubo').closest('li')!).getByText('Incidente')
     expect(state.className).toContain('text-brand')
     expect(event.className).toContain('text-group-purple')
   })
@@ -257,7 +257,7 @@ describe('categories and groups administration', () => {
       openAt()
       await screen.findByText('Buraco na via')
 
-      await user.click(screen.getByRole('radio', { name: 'Evento' }))
+      await user.click(screen.getByRole('radio', { name: 'Incidente' }))
       expect(visibleNames()).toEqual(['Roubo', 'Acidente de trânsito'])
       const chips = within(screen.getByRole('group', { name: 'Filtrar por grupo' }))
       expect(chips.getByRole('button', { name: 'Segurança' })).toBeInTheDocument()
@@ -266,7 +266,7 @@ describe('categories and groups administration', () => {
       await user.click(chips.getByRole('button', { name: 'Trânsito' }))
       expect(visibleNames()).toEqual(['Acidente de trânsito'])
 
-      await user.click(screen.getByRole('radio', { name: 'Estado' }))
+      await user.click(screen.getByRole('radio', { name: 'Problema' }))
       expect(visibleNames()).toHaveLength(6)
     })
 
@@ -309,7 +309,7 @@ describe('categories and groups administration', () => {
       expect(screen.queryByRole('button', { name: 'Editar Limpeza' })).not.toBeInTheDocument()
 
       await user.clear(screen.getByRole('searchbox', { name: 'Buscar grupo' }))
-      await user.click(screen.getByRole('radio', { name: 'Estado' }))
+      await user.click(screen.getByRole('radio', { name: 'Problema' }))
       expect(screen.getByRole('button', { name: 'Editar Limpeza' })).toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Editar Segurança' })).not.toBeInTheDocument()
       expect(screen.getByText('3 de 5 grupos')).toBeInTheDocument()

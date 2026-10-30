@@ -29,7 +29,7 @@ describe('step 1: type and category', () => {
     const user = userEvent.setup()
     const { router } = openAt('/report')
 
-    await user.click(await screen.findByRole('link', { name: /^Evento/ }))
+    await user.click(await screen.findByRole('link', { name: /^Incidente/ }))
 
     expect(router.state.location.pathname + router.state.location.search).toBe(
       '/report/category?type=incident',
@@ -42,7 +42,9 @@ describe('step 1: type and category', () => {
     const { router } = openAt('/report/category?type=qualquer')
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/report'))
-    expect(await screen.findByRole('heading', { name: 'Estado ou evento?' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: 'Problema ou incidente?' }),
+    ).toBeInTheDocument()
   })
 
   it('shows the categories of the type grouped, one section per group, in API order', async () => {
