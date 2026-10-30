@@ -41,6 +41,17 @@ describe('categories and groups administration', () => {
   })
   afterEach(logout)
 
+  it('on the Grupos tab, each group shows its category count in Portuguese', async () => {
+    const user = userEvent.setup()
+    openAt()
+
+    await user.click(await screen.findByRole('radio', { name: 'Grupos' }))
+
+    const row = async (label: string) => (await screen.findByText(label)).closest('li')!
+    expect(within(await row('Limpeza')).getByText('2 categorias')).toBeInTheDocument()
+    expect(within(await row('Trânsito')).getByText('1 categoria')).toBeInTheDocument()
+  })
+
   it('regular citizen cannot enter', async () => {
     logout()
     loginAsCitizen()

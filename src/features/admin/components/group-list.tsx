@@ -106,7 +106,7 @@ export function GroupList() {
                     <TypeLabel type={group.type} />
                     {howMany !== undefined && (
                       <span>
-                        {howMany} {howMany === 1 ? 'category' : 'categories'}
+                        {howMany} {howMany === 1 ? 'categoria' : 'categorias'}
                       </span>
                     )}
                   </p>
