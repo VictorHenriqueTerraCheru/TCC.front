@@ -111,3 +111,11 @@ A partir daqui a execução passou do Codex para o Claude. O inventário do Code
 - Removidos `ts-morph` e `postcss` (só serviam à migração) e os scripts temporários `inventory.mjs`, `migrate-contract.mjs`, `fix-contract-diagnostics.mjs`, `translate-contract-properties.mjs`, `strip-comments.mjs`. Ficam no histórico do git (último commit com eles: `274e777`). As ferramentas que usei nas Tasks 4–6 (rename com LanguageService, valores, caminhos, CSS) ficaram fora do repo; os mapas que elas aplicaram estão nesta pasta.
 - `scripts/e2e.mjs`: identificadores traduzidos; as mensagens dos passos e as consultas SQL ainda citam o modelo antigo (tabelas e rotas da API em português). Fica para a Task 8, que roda o roteiro contra o back do #19.
 - Gate: typecheck ok; lint ok; format ok; `Tests 366 passed`; textos idênticos; prints idênticos; `npm run build` ok.
+
+## Task 7 — Documentação
+
+- `CLAUDE.md`: nomes de código, pastas, rotas, chaves de storage, tokens CSS, scripts e comandos novos (`dotnet run --project src/UrbanReports.Api`, `gen:icons`, `gen:map-style`, `E2E_HEADED`, `PRINTS_BROWSER`, `Cors__Origins__0`). A regra 10 passou a ser: textos da interface em português; código, identificadores, rotas, chaves de storage e CSS em inglês; sem comentários; dados em português.
+- `docs/TELAS.md` e `docs/PLAN.md`: só os trechos de código (entre crases) mudaram — rotas do app, rotas da API (estavam no contrato antigo desde o Task 3), campos e nomes. A prosa continua em português. Cada rota da API citada foi conferida com os títulos de `docs/API.md`.
+- `README.md`: sem mudança de comando; saiu um `.` solto no fim.
+- `docs/openapi.json` e `docs/API.md` idênticos aos de `contrato-novo/` (`cmp`).
+- Gate: typecheck ok; lint ok; format ok; `Tests 366 passed`; textos idênticos; prints idênticos.
