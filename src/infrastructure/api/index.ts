@@ -1,6 +1,6 @@
 export { api, unwrapData, unwrapEmpty } from './client'
 export { ApiError, isApiError, isNetworkError } from './api-error'
-export { registerAuthProvider, type AuthProvider } from './autenticacao'
+export { registerAuthProvider, type AuthProvider } from './authentication'
 export type { components, paths } from './schema'
 
 import type { components } from './schema'

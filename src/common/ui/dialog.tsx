@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 
-import { Icon } from '@/common/components/icone'
+import { Icon } from '@/common/components/icon'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 

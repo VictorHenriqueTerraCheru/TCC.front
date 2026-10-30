@@ -1,9 +1,9 @@
 import { http, HttpResponse } from 'msw'
 
 import type { Schema } from '../../api'
-import { database } from '../banco'
-import { route } from '../rota'
-import { ruleError } from './comum'
+import { database } from '../database'
+import { route } from '../route'
+import { ruleError } from './common'
 
 function authResponse({ id, name, email, role }: Schema<'AuthResponseUserSummary'>) {
   return {

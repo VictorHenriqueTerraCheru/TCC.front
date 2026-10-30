@@ -1,12 +1,12 @@
 import { m } from 'motion/react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router'
 
-import { Icon } from '@/common/components/icone'
-import { SOFT_SPRING } from '@/common/lib/movimento'
+import { Icon } from '@/common/components/icon'
+import { SOFT_SPRING } from '@/common/lib/motion'
 import { cn } from '@/common/lib/utils'
 import { useRequireAccount } from '@/features/auth'
 
-import { navigationItems } from './navegacao'
+import { navigationItems } from './navigation'
 
 export function DesktopLayout() {
   const requireAccount = useRequireAccount()

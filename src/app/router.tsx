@@ -1,10 +1,10 @@
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 
-import { ChooseThemePage } from '@/features/aparencia'
+import { ChooseThemePage } from '@/features/appearance'
 import { RegisterPage, LoginPage } from '@/features/auth'
-import { LocationPermissionPage } from '@/features/localizacao'
-import { IncidentAreaPage, IssueDetailPage, MapPage } from '@/features/mapa'
-import { RecentPage } from '@/features/problemas'
+import { LocationPermissionPage } from '@/features/location'
+import { IncidentAreaPage, IssueDetailPage, MapPage } from '@/features/map'
+import { RecentPage } from '@/features/issues'
 import {
   CategoryPage,
   DuplicateCheckPage,
@@ -16,15 +16,15 @@ import {
   IssueReviewPage,
   IncidentSuccessPage,
   IssueSuccessPage,
-} from '@/features/registro'
+} from '@/features/report'
 import { AdminCategoriesPage, VerificationQueuePage, AdminUsersPage } from '@/features/admin'
-import { SettingsPage, HistoryPage, ProfilePage } from '@/features/perfil'
-import { RequestVerificationPage } from '@/features/verificacao'
+import { SettingsPage, HistoryPage, ProfilePage } from '@/features/profile'
+import { RequestVerificationPage } from '@/features/verification'
 
 import { AppLayout } from './layouts/app-layout'
-import { RootLayout } from './layouts/raiz-layout'
-import { FullScreenLayout } from './layouts/tela-cheia-layout'
-import { NotFoundPage } from './pagina-nao-encontrada'
+import { RootLayout } from './layouts/root-layout'
+import { FullScreenLayout } from './layouts/full-screen-layout'
+import { NotFoundPage } from './not-found-page'
 
 export const routes: RouteObject[] = [
   {

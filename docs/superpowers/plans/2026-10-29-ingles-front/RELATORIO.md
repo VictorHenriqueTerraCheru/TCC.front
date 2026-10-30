@@ -64,3 +64,11 @@ A partir daqui a execução passou do Codex para o Claude. O inventário do Code
 - Decisão: a referência `ui-strings.txt` ganhou a linha `E-mail`: o texto já existia (`<Linha titulo="E-mail">`), mas o coletor só reconhece a prop `title`, então ele passou a aparecer quando `titulo` virou `title`. Nenhum texto mudou.
 - Ficam em português, por serem dados: chaves de ícone (`buraco`, `calcada`, `poste`, `fio`, `descarte`, `lixo`, `roubo`, `acidente`), chaves de grupo, nomes de pessoas das fixtures (`ana`, `mariana`), entradas digitadas nos testes (`'Provisório'`, `'curta'`), e os nomes de estilo do mapa `ocorrencias-claro/escuro`, que vêm dos arquivos gerados em `src/assets/mapa` (Task 6).
 - Gate: `npm run typecheck` ok; `npm run lint` ok; `npm run format:check` ok; `npm test` → `Tests 340 passed`; `node scripts/ui-strings.mjs --check` idêntico; `node scripts/compare-prints.mjs` → prints idênticos.
+
+### Commit 2 — arquivos e pastas
+
+- `mapa-caminhos-front.tsv`: 231 arquivos (features pelo glossário: `mapa → map`, `problemas → issues`, `registro → report`...; `test/fluxos → test/flows`, `maplibre-falso → fake-maplibre`, `banco.ts → database.ts`). O nome do arquivo segue o export principal (`seletor-horario.tsx → time-picker.tsx`).
+- Aplicado com `git mv` (o histórico segue cada arquivo) e reescrita dos especificadores de módulo via AST: `import`/`export`, `import()`, `vi.mock()` e `import('...')` em tipos, mantendo o estilo de cada um (`@/...` continua alias, relativo continua relativo).
+- `eslint.config.js` e `components.json` não citam nomes de pasta de feature: nada a mudar.
+- Fica para a Task 6: `src/assets/mapa/estilo-{claro,escuro}.json`, gerados por `scripts/gen-estilo-mapa.mjs` (regra 8: `src/assets/` só muda pelo gerador).
+- Gate: typecheck ok; lint ok; format ok; `Tests 340 passed`; textos idênticos; prints idênticos.

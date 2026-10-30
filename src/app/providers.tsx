@@ -1,8 +1,8 @@
 import { QueryClientProvider } from '@tanstack/react-query'
 import { useEffect, useState, type ReactNode } from 'react'
 
-import { MotionProvider } from '@/common/components/provedor-movimento'
-import { categoriesQuery, groupsQuery } from '@/features/categorias'
+import { MotionProvider } from '@/common/components/motion-provider'
+import { categoriesQuery, groupsQuery } from '@/features/categories'
 import { createQueryClient } from '@/infrastructure/query/query-client'
 
 export function Providers({ children }: { children: ReactNode }) {

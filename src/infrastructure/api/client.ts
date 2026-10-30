@@ -2,7 +2,7 @@ import createClient, { type Middleware } from 'openapi-fetch'
 
 import { env } from '../env'
 import { ApiError } from './api-error'
-import { getAuthProvider } from './autenticacao'
+import { getAuthProvider } from './authentication'
 import type { paths } from './schema'
 
 const baseUrl = new URL(env.apiUrl, globalThis.location?.origin ?? 'http://localhost').href.replace(

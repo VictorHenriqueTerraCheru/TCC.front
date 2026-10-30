@@ -4,7 +4,7 @@ import type { ReactElement } from 'react'
 import { createMemoryRouter, type RouteObject } from 'react-router'
 import { RouterProvider } from 'react-router/dom'
 
-import { MotionProvider } from '@/common/components/provedor-movimento'
+import { MotionProvider } from '@/common/components/motion-provider'
 import { createQueryClient } from '@/infrastructure/query/query-client'
 
 export function setWidth(width: number) {

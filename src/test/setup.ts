@@ -2,13 +2,13 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { MotionGlobalConfig } from 'motion/react'
 
-import { useThemeStore } from '@/common/hooks/use-tema'
+import { useThemeStore } from '@/common/hooks/use-theme'
 import { authProvider } from '@/features/auth'
 import { registerAuthProvider } from '@/infrastructure/api'
-import { database } from '@/infrastructure/mocks/banco'
+import { database } from '@/infrastructure/mocks/database'
 import { server } from '@/infrastructure/mocks/server'
 
-vi.mock('@vis.gl/react-maplibre', () => import('./maplibre-falso'))
+vi.mock('@vis.gl/react-maplibre', () => import('./fake-maplibre'))
 
 MotionGlobalConfig.skipAnimations = true
 

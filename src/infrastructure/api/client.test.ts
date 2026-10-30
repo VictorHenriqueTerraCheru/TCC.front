@@ -1,9 +1,9 @@
 import { http, HttpResponse } from 'msw'
 
 import { server } from '../mocks/server'
-import { route } from '../mocks/rota'
+import { route } from '../mocks/route'
 import { ApiError } from './api-error'
-import { registerAuthProvider } from './autenticacao'
+import { registerAuthProvider } from './authentication'
 import { api, unwrapData } from './client'
 
 describe('API client', () => {
