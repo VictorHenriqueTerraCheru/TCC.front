@@ -2,7 +2,6 @@ import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 
-import { clearIconCache } from '@/common/lib/iconify'
 import { route } from '@/infrastructure/mocks/route'
 import { server } from '@/infrastructure/mocks/server'
 import { setWidth, renderRoutes } from '@/test/render'
@@ -39,7 +38,6 @@ function openAt() {
 describe('categories and groups administration', () => {
   beforeEach(() => {
     loginAsAdmin()
-    clearIconCache()
   })
   afterEach(logout)
 

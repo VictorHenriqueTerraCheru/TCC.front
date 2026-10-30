@@ -1,8 +1,9 @@
 import type { MaterialSymbol } from 'material-symbols'
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import type { CSSProperties } from 'react'
 
 import { cn } from '@/common/lib/utils'
-import { loadIcon, type RemoteIconData } from '@/common/lib/iconify'
+import { loadIcon } from '@/common/lib/iconify'
 import bundledIcons from '@/assets/material-symbols/icons.json'
 
 import { Icon } from './icon'
@@ -54,17 +55,12 @@ function RemoteIcon({
   className?: string
   style?: CSSProperties
 }) {
-  const [iconData, setIconData] = useState<RemoteIconData | null>(null)
-
-  useEffect(() => {
-    let active = true
-    void loadIcon(name).then((result) => {
-      if (active) setIconData(result)
-    })
-    return () => {
-      active = false
-    }
-  }, [name])
+  const { data: iconData } = useQuery({
+    queryKey: ['remote-icon', name],
+    queryFn: () => loadIcon(name),
+    staleTime: Infinity,
+    retry: false,
+  })
 
   if (!iconData) {
     return <Icon name={alternative} filled={filled} className={className} style={style} />
