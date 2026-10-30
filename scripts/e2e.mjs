@@ -24,7 +24,7 @@ const NEW = {
 const DESCRIPTION = `Buraco aberto perto do meio-fio (e2e ${RUN_ID}).`
 
 const results = []
-const fetchedIssues = []
+const apiErrors = []
 const consoleErrors = []
 const state = {}
 
@@ -37,49 +37,49 @@ const browser = await chromium.launch({
 })
 
 try {
-  const guest = await newPage('visitante', MOBILE, { firstTime: true })
+  const guest = await newPage('guest', MOBILE, { firstTime: true })
   const p = guest.page
 
   await step(
-    'Visitante abre o app, escolhe o tema escuro e passa pela pré-permissão',
+    'Guest opens the app, picks the dark theme and goes through the pre-permission',
     p,
     async () => {
       await p.goto(BASE + '/map')
       await p.getByRole('heading', { name: 'Escolha a aparência' }).waitFor()
       const system = p.getByRole('radio', { name: /Automático/ })
-      assert((await system.getAttribute('aria-checked')) === 'true', 'Automático não veio marcado')
+      assert((await system.getAttribute('aria-checked')) === 'true', 'Automático was not checked')
       await p.getByRole('radio', { name: /Escuro/ }).click()
       const theme = await p.evaluate(() => document.documentElement.dataset.theme)
-      assert(theme === 'escuro', `o tema não mudou na hora (data-theme=${theme})`)
+      assert(theme === 'dark', `the theme did not change immediately (data-theme=${theme})`)
       await p.getByRole('button', { name: 'Continuar' }).click()
       await p.waitForURL(/location-permission|map/)
-      if (p.url().includes('permissao')) {
+      if (p.url().includes('location-permission')) {
         await p.getByRole('button', { name: 'Continuar' }).click()
       }
       await p.waitForURL(/\/map/)
     },
   )
 
-  await step('Mapa carrega os marcadores da API (GET /problemas)', p, async () => {
-    const response = await p.waitForResponse((r) => /\/api\/v1\/problemas\?/.test(r.url()))
-    assert(response.status() === 200, `GET /problemas respondeu ${response.status()}`)
+  await step('Map loads the markers from the API (GET /issues)', p, async () => {
+    const response = await p.waitForResponse((r) => /\/api\/v1\/issues\?/.test(r.url()))
+    assert(response.status() === 200, `GET /issues answered ${response.status()}`)
     const body = await response.json()
     await p.locator('[data-issue]').first().waitFor()
     const markers = await p.locator('[data-issue]').count()
-    assert(markers > 0, 'nenhum marcador na tela')
-    return `${body.length} da API, ${markers} na tela`
+    assert(markers > 0, 'no marker on screen')
+    return `${body.length} from the API, ${markers} on screen`
   })
 
-  await step('Visitante toca num alerta e vê o card rápido com dados da API', p, async () => {
+  await step('Guest taps an alert and sees the quick card with API data', p, async () => {
     await p.locator('[data-issue]').first().click({ force: true })
     await p.waitForURL(/\/map\/issue\//)
     state.seedIssue = p.url().split('/map/issue/')[1].split('?')[0]
     const card = p.getByRole('region', { name: 'Resumo do alerta' })
     await card.waitFor()
-    return `problema ${state.seedIssue.slice(0, 8)} · ${await card.locator('h2').innerText()}`
+    return `issue ${state.seedIssue.slice(0, 8)} · ${await card.locator('h2').innerText()}`
   })
 
-  await step('Voto como visitante abre a folha "Entre para votar"', p, async () => {
+  await step('Voting as a guest opens the "Entre para votar" sheet', p, async () => {
     await p
       .getByRole('button', { name: /^Voto rápido/ })
       .first()
@@ -88,7 +88,7 @@ try {
   })
 
   await step(
-    'Cadastro pela folha cria a conta e volta ao alerta com o voto retomado',
+    'Signing up from the sheet creates the account and returns to the alert with the vote resumed',
     p,
     async () => {
       await p.getByRole('button', { name: 'Criar conta' }).click()
@@ -96,82 +96,93 @@ try {
       await p.getByLabel('Nome').fill(NEW.name)
       await p.getByLabel('E-mail').fill(NEW.email)
       await p.getByLabel('Senha', { exact: true }).fill(NEW.password)
-      await p.locator('#aceitou-termos').check()
+      await p.locator('#accepted-terms').check()
       const voted = p.waitForResponse(
-        (r) => /\/voto$/.test(r.url()) && r.request().method() === 'PUT',
+        (r) => /\/vote$/.test(r.url()) && r.request().method() === 'PUT',
       )
       await p.getByRole('button', { name: /criar conta/i }).click()
       await p.waitForURL(new RegExp(`/map/issue/${state.seedIssue}`))
       const response = await voted
-      assert(response.ok(), `voto retomado respondeu ${response.status()}`)
-      state.userId = sql(`select id from usuarios where email = '${NEW.email}'`)
-      assert(state.userId, 'usuário novo não está no banco')
+      assert(response.ok(), `resumed vote answered ${response.status()}`)
+      state.userId = sql(`select id from users where email = '${NEW.email}'`)
+      assert(state.userId, 'new user is not in the database')
       await p.getByRole('button', { name: /^Voto rápido/, pressed: true }).waitFor()
       const votes = sql(
-        `select count(*) from votos where usuario_id = '${state.userId}' and problema_id = '${state.seedIssue}'`,
+        `select count(*) from votes where user_id = '${state.userId}' and issue_id = '${state.seedIssue}'`,
       )
-      assert(votes === '1', `esperava 1 voto no banco, há ${votes}`)
-      return `usuário ${state.userId.slice(0, 8)} no banco, voto gravado e marcado na tela`
+      assert(votes === '1', `expected 1 vote in the database, found ${votes}`)
+      return `user ${state.userId.slice(0, 8)} in the database, vote saved and marked on screen`
     },
   )
 
-  await step('Registrar problema: categoria → local (endereço da API) → revisão', p, async () => {
-    await p.goto(BASE + '/map')
-    await p.getByRole('link', { name: 'Registrar' }).click()
-    await p.waitForURL(/\/report$/)
-    await p.getByRole('link', { name: /^Estado/ }).click()
-    await p.waitForURL(/\/report\/category\?type=issue/)
-    await p.getByRole('button', { name: /Buraco na via/ }).click()
-    await p.getByRole('button', { name: 'Continuar' }).click()
-    await p.waitForURL(/\/report\/location/)
-    const confirm = p.getByRole('button', { name: 'Confirmar local' })
-    await confirm.waitFor()
-    await waitUntilEnabled(confirm)
-    await confirm.click()
-    await p.waitForURL(/\/report\/(review|duplicate-check)/)
-    if (p.url().includes('conferencia')) {
-      await p.getByRole('button', { name: 'Não, é outro' }).click()
-      await p.waitForURL(/\/report\/review/)
-    }
-    await p.locator('textarea').fill(DESCRIPTION)
-    await p.getByText('Buscando endereço…').waitFor({ state: 'detached', timeout: 20_000 })
-  })
+  await step(
+    'Report an issue: category → location (address from the API) → review',
+    p,
+    async () => {
+      await p.goto(BASE + '/map')
+      await p.getByRole('link', { name: 'Registrar' }).click()
+      await p.waitForURL(/\/report$/)
+      await p.getByRole('link', { name: /^Estado/ }).click()
+      await p.waitForURL(/\/report\/category\?type=issue/)
+      await p.getByRole('button', { name: /Buraco na via/ }).click()
+      await p.getByRole('button', { name: 'Continuar' }).click()
+      await p.waitForURL(/\/report\/location/)
+      const confirm = p.getByRole('button', { name: 'Confirmar local' })
+      await confirm.waitFor()
+      await waitUntilEnabled(confirm)
+      await confirm.click()
+      await p.waitForURL(/\/report\/(review|duplicate-check)/)
+      if (p.url().includes('duplicate-check')) {
+        await p.getByRole('button', { name: 'Não, é outro' }).click()
+        await p.waitForURL(/\/report\/review/)
+      }
+      await p.locator('textarea').fill(DESCRIPTION)
+      await p.getByText('Buscando endereço…').waitFor({ state: 'detached', timeout: 20_000 })
+    },
+  )
 
-  await step('Sem internet o envio falha sem perder o rascunho (tela 26)', p, async () => {
-    await guest.context.setOffline(true)
-    await p.getByRole('button', { name: 'Enviar registro' }).click()
-    await p.getByText('Não foi possível enviar').waitFor({ timeout: 25_000 })
-    await guest.context.setOffline(false)
-  })
+  await step(
+    'Without internet the submission fails without losing the draft (screen 26)',
+    p,
+    async () => {
+      await guest.context.setOffline(true)
+      await p.getByRole('button', { name: 'Enviar registro' }).click()
+      await p.getByText('Não foi possível enviar').waitFor({ timeout: 25_000 })
+      await guest.context.setOffline(false)
+    },
+  )
 
-  await step('"Tentar novamente" envia e o problema chega ao banco', p, async () => {
+  await step('"Tentar novamente" submits and the issue reaches the database', p, async () => {
     const didCreate = p.waitForResponse(
-      (r) => /\/api\/v1\/problemas$/.test(r.url()) && r.request().method() === 'POST',
+      (r) => /\/api\/v1\/issues$/.test(r.url()) && r.request().method() === 'POST',
     )
     await p.getByRole('button', { name: 'Tentar novamente' }).click()
     const response = await didCreate
-    assert(response.status() === 201, `POST /problemas respondeu ${response.status()}`)
+    assert(response.status() === 201, `POST /issues answered ${response.status()}`)
     state.newIssue = (await response.json()).id
     await p.getByRole('heading', { name: 'Registro enviado' }).waitFor()
     const line = sql(
-      `select descricao, autor_id, endereco_aproximado, round(st_distance(localizacao, st_makepoint(${POSITION.longitude}, ${POSITION.latitude})::geography)) from problemas where id = '${state.newIssue}'`,
+      `select description, author_id, approximate_address, round(st_distance(location, st_makepoint(${POSITION.longitude}, ${POSITION.latitude})::geography)) from issues where id = '${state.newIssue}'`,
     ).split('|')
-    assert(line[0] === DESCRIPTION, 'descrição diferente no banco')
-    assert(line[1] === state.userId, 'autor diferente no banco')
-    assert(Number(line[3]) < 60, `ponto a ${line[3]} m da posição do GPS`)
+    assert(line[0] === DESCRIPTION, 'different description in the database')
+    assert(line[1] === state.userId, 'different author in the database')
+    assert(Number(line[3]) < 60, `point ${line[3]} m away from the GPS position`)
     state.address = line[2]
-    return `"${line[2]}", a ${line[3]} m do GPS`
+    return `"${line[2]}", ${line[3]} m from the GPS`
   })
 
-  await step('"Ver no mapa" abre o alerta novo com o selo de autor', p, async () => {
+  await step('"Ver no mapa" opens the new alert with the author badge', p, async () => {
     await p.getByRole('button', { name: 'Ver no mapa' }).click()
     await p.waitForURL(new RegExp(`/map/issue/${state.newIssue}`))
     const card = p.getByRole('region', { name: 'Resumo do alerta' })
     await card.getByText('Buraco na via').waitFor()
-    assert((await card.getByRole('button').count()) === 0, 'autor viu polegares no próprio alerta')
+    assert(
+      (await card.getByRole('button').count()) === 0,
+      'the author saw thumbs on their own alert',
+    )
   })
 
-  await step('Registrar incidente (anônimo) e conferir a área no banco', p, async () => {
+  await step('Report an incident (anonymous) and check the area in the database', p, async () => {
     await p.goto(BASE + '/report')
     await p.getByRole('link', { name: /^Evento/ }).click()
     await p.waitForURL(/\/report\/category\?type=incident/)
@@ -181,53 +192,53 @@ try {
     await p.getByRole('button', { name: /continuar|confirmar/i }).click()
     await p.waitForURL(/\/report\/incident\/review/)
     const didCreate = p.waitForResponse(
-      (r) => /\/api\/v1\/incidentes$/.test(r.url()) && r.request().method() === 'POST',
+      (r) => /\/api\/v1\/incidents$/.test(r.url()) && r.request().method() === 'POST',
     )
     await p.getByRole('button', { name: /enviar/i }).click()
     const response = await didCreate
-    assert(response.status() === 201, `POST /incidentes respondeu ${response.status()}`)
+    assert(response.status() === 201, `POST /incidents answered ${response.status()}`)
     await p.getByRole('heading', { name: 'Relato enviado' }).waitFor()
     const line = sql(
-      `select raio_metros, rotulo_area from incidentes where autor_id = '${state.userId}' order by registrado_em desc limit 1`,
+      `select radius_meters, area_label from incidents where author_id = '${state.userId}' order by registered_at desc limit 1`,
     ).split('|')
-    assert(line[0], 'incidente não está no banco')
-    return `raio ${line[0]} m · ${line[1] || 'sem rótulo'}`
+    assert(line[0], 'incident is not in the database')
+    return `radius ${line[0]} m · ${line[1] || 'no label'}`
   })
 
   await step(
-    'Modo Incidentes: tocar no mapa abre a área com o relato (GET /incidentes/area)',
+    'Incidents mode: tapping the map opens the area with the report (GET /incidents/area)',
     p,
     async () => {
       await p.goto(BASE + '/map?mode=incidents')
       const map = p.locator('canvas.maplibregl-canvas')
       await map.waitFor()
       await p.waitForLoadState('networkidle')
-      const area = p.waitForResponse((r) => /\/incidentes\/area/.test(r.url()))
+      const area = p.waitForResponse((r) => /\/incidents\/area/.test(r.url()))
       const box = await map.boundingBox()
       await p.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
       const response = await area
-      assert(response.status() === 200, `GET /incidentes/area respondeu ${response.status()}`)
+      assert(response.status() === 200, `GET /incidents/area answered ${response.status()}`)
       const body = await response.json()
       await p.waitForURL(/\/map\/area/)
       await p.getByRole('heading', { name: 'Área de incidentes' }).waitFor()
       const robberies = body.counts.find((c) => c.name === 'Roubo')
-      assert(robberies?.sevenDays >= 1, 'o roubo registrado não entrou na contagem da área')
-      return `nível ${body.level} · ${robberies.sevenDays} roubo(s) em 7 dias no raio de ${body.radiusMeters} m`
+      assert(robberies?.days7 >= 1, 'the reported robbery did not enter the area count')
+      return `level ${body.level} · ${robberies.days7} robbery(ies) in 7 days within ${body.radiusMeters} m`
     },
   )
 
-  await step('Perfil mostra os totais e o histórico vindos de GET /me', p, async () => {
+  await step('Profile shows the totals and the history from GET /me', p, async () => {
     await p.goto(BASE + '/profile')
     await p.getByText(NEW.name).first().waitFor()
     await p.getByText('Buraco na via').first().waitFor()
     await p.getByText('Roubo').first().waitFor()
     const total = sql(
-      `select (select count(*) from problemas where autor_id = '${state.userId}') + (select count(*) from incidentes where autor_id = '${state.userId}')`,
+      `select (select count(*) from issues where author_id = '${state.userId}') + (select count(*) from incidents where author_id = '${state.userId}')`,
     )
-    assert(total === '2', `esperava 2 registros no banco, há ${total}`)
+    assert(total === '2', `expected 2 reports in the database, found ${total}`)
   })
 
-  await step('Configurações → editar nome grava no banco (PATCH /me)', p, async () => {
+  await step('Settings → editing the name saves it in the database (PATCH /me)', p, async () => {
     await p.goto(BASE + '/profile/settings')
     await p.getByRole('button', { name: /^Nome/ }).click()
     const field = p.getByRole('dialog').getByRole('textbox')
@@ -239,71 +250,61 @@ try {
       .click()
     await p.getByRole('dialog').waitFor({ state: 'detached' })
     await p.getByText(state.newName).waitFor()
-    const name = sql(`select nome from usuarios where id = '${state.userId}'`)
-    assert(name === state.newName, `nome no banco: ${name}`)
+    const name = sql(`select name from users where id = '${state.userId}'`)
+    assert(name === state.newName, `name in the database: ${name}`)
   })
 
-  await step('Pedido de verificação fica pendente no banco', p, async () => {
+  await step('Verification request stays pending in the database', p, async () => {
     await p.goto(BASE + '/profile')
     await p.getByRole('link', { name: 'Solicitar verificação' }).click()
     await p.waitForURL(/\/profile\/verification/)
     await p.getByLabel('Tipo de vínculo').selectOption({ index: 1 })
     await p
       .getByLabel(/Justificativa/)
-      .fill('Moro em Botafogo há dez anos e passo por estas ruas todos os dias a pé.')
+      .fill('Moro em Icaraí há dez anos e passo por estas ruas todos os dias a pé.')
     await p.getByRole('button', { name: 'Enviar pedido' }).click()
     await p.waitForURL(/\/profile$/)
     await p.getByText('Pedido em análise').waitFor()
-    const status = sql(
-      `select status from solicitacoes_verificacao where usuario_id = '${state.userId}'`,
-    )
-    assert(status !== '', 'pedido não está no banco')
+    const status = sql(`select status from verification_requests where user_id = '${state.userId}'`)
+    assert(status !== '', 'request is not in the database')
   })
 
   const neighbor = await newPage('cidadao2')
-  await step(
-    'Outro cidadão entra pelo login e confirma o problema novo',
-    neighbor.page,
-    async () => {
-      const q = neighbor.page
-      await loginThroughScreen(q, 'cidadao2@tcc.local')
-      await q.goto(BASE + `/map/issue/${state.newIssue}`)
-      const card = q.getByRole('region', { name: 'Resumo do alerta' })
-      await card.waitFor()
-      const before = await card.innerText()
-      const voted = q.waitForResponse((r) => /\/voto$/.test(r.url()))
-      await q.getByRole('button', { name: 'Voto rápido: Sim, está lá' }).click()
-      const response = await voted
-      assert(response.ok(), `voto respondeu ${response.status()}`)
-      await q.getByRole('button', { name: 'Voto rápido: Sim, está lá', pressed: true }).waitFor()
-      await card.getByText('1 confirmaram').waitFor()
-      const votes = sql(
-        `select count(*) from votos where problema_id = '${state.newIssue}' and usuario_id <> '${state.userId}'`,
-      )
-      assert(votes === '1', `esperava 1 voto no banco, há ${votes}`)
-      return `antes: "${before.split('\n').find((l) => l.includes('confirmaram'))}" → 1 confirmaram`
-    },
-  )
+  await step('Another citizen logs in and confirms the new issue', neighbor.page, async () => {
+    const q = neighbor.page
+    await loginThroughScreen(q, 'cidadao2@tcc.local')
+    await q.goto(BASE + `/map/issue/${state.newIssue}`)
+    const card = q.getByRole('region', { name: 'Resumo do alerta' })
+    await card.waitFor()
+    const before = await card.innerText()
+    const voted = q.waitForResponse((r) => /\/vote$/.test(r.url()))
+    await q.getByRole('button', { name: 'Voto rápido: Sim, está lá' }).click()
+    const response = await voted
+    assert(response.ok(), `vote answered ${response.status()}`)
+    await q.getByRole('button', { name: 'Voto rápido: Sim, está lá', pressed: true }).waitFor()
+    await card.getByText('1 confirmaram').waitFor()
+    const votes = sql(
+      `select count(*) from votes where issue_id = '${state.newIssue}' and user_id <> '${state.userId}'`,
+    )
+    assert(votes === '1', `expected 1 vote in the database, found ${votes}`)
+    return `before: "${before.split('\n').find((l) => l.includes('confirmaram'))}" → 1 confirmaram`
+  })
 
-  await step(
-    'Recentes lista o problema novo (GET /problemas/recentes)',
-    neighbor.page,
-    async () => {
-      const q = neighbor.page
-      await q.goto(BASE + '/recent')
-      const url = `${BASE}/api/v1/problemas/recentes?lat=${POSITION.latitude}&lng=${POSITION.longitude}&raioKm=10&tamanho=100`
-      const body = await (await fetch(url)).json()
-      assert(
-        body.items.some((i) => i.id === state.newIssue),
-        'problema novo fora da resposta de recentes',
-      )
-      await q.getByText(state.address).first().waitFor()
-    },
-  )
+  await step('Recent lists the new issue (GET /issues/recent)', neighbor.page, async () => {
+    const q = neighbor.page
+    await q.goto(BASE + '/recent')
+    const url = `${BASE}/api/v1/issues/recent?lat=${POSITION.latitude}&lng=${POSITION.longitude}&radiusKm=10&pageSize=100`
+    const body = await (await fetch(url)).json()
+    assert(
+      body.items.some((i) => i.id === state.newIssue),
+      'new issue missing from the recent response',
+    )
+    await q.getByText(state.address).first().waitFor()
+  })
   await neighbor.context.close()
 
   const admin = await newPage('admin')
-  await step('Admin aprova o pedido na fila de verificação', admin.page, async () => {
+  await step('Admin approves the request in the verification queue', admin.page, async () => {
     const q = admin.page
     await loginThroughScreen(q, 'admin@tcc.local')
     await q.goto(BASE + '/admin/verifications')
@@ -312,42 +313,46 @@ try {
     await card.getByRole('button', { name: /aprovar/i }).click()
     await card.waitFor({ state: 'detached' })
     const line = sql(
-      `select s.status, u.perfil, u.verificado_em is not null from solicitacoes_verificacao s join usuarios u on u.id = s.usuario_id where s.usuario_id = '${state.userId}'`,
+      `select s.status, u.role, u.verified_at is not null from verification_requests s join users u on u.id = s.user_id where s.user_id = '${state.userId}'`,
     )
-    return `banco: status/perfil/verificado = ${line}`
+    return `database: status/role/verified = ${line}`
   })
   await admin.context.close()
 
-  await step('Usuário vê "Perfil verificado" sem sair da conta (GET /me)', p, async () => {
+  await step('User sees "Perfil verificado" without signing out (GET /me)', p, async () => {
     await p.goto(BASE + '/profile')
     await p.getByText(/^Verificado em/).waitFor()
     await p.getByText('Seu voto tem peso maior').waitFor()
   })
 
-  await step('Bússola: girar o mapa mostra a direção e o toque volta ao norte', p, async () => {
-    await p.goto(BASE + '/map')
-    const map = p.locator('canvas.maplibregl-canvas')
-    await map.waitFor()
-    await map.focus()
-    for (let i = 0; i < 6; i++) {
-      await p.keyboard.press('Shift+ArrowRight')
-      await delay(250)
-    }
-    const compass = p.getByRole('button', { name: 'Apontar para o norte' })
-    await compass.waitFor()
-    await delay(800)
-    const letter = await compass.innerText()
-    assert(letter !== 'N', `a letra continuou N com o mapa girado`)
-    await compass.click()
-    await compass.waitFor({ state: 'detached' })
-    return `letra ${letter} com o mapa girado`
-  })
+  await step(
+    'Compass: rotating the map shows the heading and a tap points north again',
+    p,
+    async () => {
+      await p.goto(BASE + '/map')
+      const map = p.locator('canvas.maplibregl-canvas')
+      await map.waitFor()
+      await map.focus()
+      for (let i = 0; i < 6; i++) {
+        await p.keyboard.press('Shift+ArrowRight')
+        await delay(250)
+      }
+      const compass = p.getByRole('button', { name: 'Apontar para o norte' })
+      await compass.waitFor()
+      await delay(800)
+      const letter = await compass.innerText()
+      assert(letter !== 'N', 'the letter stayed N with the map rotated')
+      await compass.click()
+      await compass.waitFor({ state: 'detached' })
+      return `letter ${letter} with the map rotated`
+    },
+  )
 
-  await step('Token inválido: o voto pede login de novo (regra 13)', p, async () => {
+  await step('Invalid token: voting asks for login again (rule 13)', p, async () => {
     await p.evaluate(() => {
       const key = 'urbanReports.session'
       const saved = JSON.parse(localStorage.getItem(key))
-      saved.state.session.token = 'token-invalido'
+      saved.state.session.token = 'invalid-token'
       localStorage.setItem(key, JSON.stringify(saved))
     })
     await p.goto(BASE + `/map/issue/${state.seedIssue}`)
@@ -360,28 +365,29 @@ try {
     await p.getByRole('button', { name: 'Agora não' }).click()
   })
 
-  await step('Sair da conta volta ao modo visitante', p, async () => {
+  await step('Signing out goes back to guest mode', p, async () => {
     await loginThroughScreen(p, NEW.email, NEW.password)
     await p.goto(BASE + '/profile/settings')
     await p.getByRole('button', { name: 'Sair da conta' }).click()
     await p.waitForURL(/\/map/)
     const session = await p.evaluate(() => localStorage.getItem('urbanReports.session'))
-    assert(!session || !JSON.parse(session).state.session, 'sessão continua no navegador')
+    assert(!session || !JSON.parse(session).state.session, 'session is still in the browser')
   })
   await guest.context.close()
 
   const desktopPage = await newPage('desktop', DESKTOP)
   await step(
-    'Desktop: alerta abre no painel lateral ao lado do mapa',
+    'Desktop: the alert opens in the side panel next to the map',
     desktopPage.page,
     async () => {
       const q = desktopPage.page
       await q.goto(BASE + `/map/issue/${state.newIssue}`)
-      if (q.url().includes('permissao')) await q.getByRole('button', { name: 'Continuar' }).click()
+      if (q.url().includes('location-permission'))
+        await q.getByRole('button', { name: 'Continuar' }).click()
       await q.getByRole('region', { name: 'Resumo do alerta' }).getByText('Buraco na via').waitFor()
       await q.locator(`[data-issue="${state.newIssue}"]`).waitFor()
       await q.waitForLoadState('networkidle')
-      await q.screenshot({ path: `${OUTPUT}/desktop-painel.png` })
+      await q.screenshot({ path: `${OUTPUT}/desktop-panel.png` })
     },
   )
   await desktopPage.context.close()
@@ -398,7 +404,7 @@ async function step(name, page, action) {
     results.push({ ok: true, name, detail, ms: Date.now() - start })
     console.log(`✓ ${name}${detail ? ` — ${detail}` : ''}`)
   } catch (error) {
-    const file = `${OUTPUT}/falha-${results.length + 1}.png`
+    const file = `${OUTPUT}/failure-${results.length + 1}.png`
     await page.screenshot({ path: file }).catch(() => {})
     results.push({
       ok: false,
@@ -420,7 +426,7 @@ function assert(condition, message) {
 async function waitUntilEnabled(button, limit = 20_000) {
   const end = Date.now() + limit
   while (await button.isDisabled()) {
-    if (Date.now() > end) throw new Error('botão continuou desabilitado')
+    if (Date.now() > end) throw new Error('button stayed disabled')
     await delay(200)
   }
 }
@@ -441,7 +447,7 @@ async function newPage(name, device = MOBILE, { firstTime = false } = {}) {
     await context.addInitScript(() =>
       localStorage.setItem(
         'urbanReports.theme',
-        JSON.stringify({ state: { preference: 'claro', chosen: true }, version: 0 }),
+        JSON.stringify({ state: { preference: 'light', chosen: true }, version: 0 }),
       ),
     )
   }
@@ -453,7 +459,7 @@ async function newPage(name, device = MOBILE, { firstTime = false } = {}) {
   page.on('response', (r) => {
     const url = new URL(r.url())
     if (url.pathname.startsWith('/api/') && r.status() >= 400) {
-      fetchedIssues.push(`[${name}] ${r.request().method()} ${url.pathname} → ${r.status()}`)
+      apiErrors.push(`[${name}] ${r.request().method()} ${url.pathname} → ${r.status()}`)
     }
   })
   return { context, page }
@@ -461,7 +467,7 @@ async function newPage(name, device = MOBILE, { firstTime = false } = {}) {
 
 async function loginThroughScreen(page, email, password = PASSWORD) {
   await page.goto(BASE + '/login')
-  if (page.url().includes('permissao')) {
+  if (page.url().includes('location-permission')) {
     await page.getByRole('button', { name: 'Continuar' }).click()
     await page.goto(BASE + '/login')
   }
@@ -470,7 +476,7 @@ async function loginThroughScreen(page, email, password = PASSWORD) {
   const loggedIn = page.waitForResponse((r) => /\/auth\/login/.test(r.url()))
   await page.getByRole('button', { name: 'Entrar' }).click()
   const response = await loggedIn
-  assert(response.ok(), `login de ${email} respondeu ${response.status()}`)
+  assert(response.ok(), `login of ${email} answered ${response.status()}`)
   await page.waitForURL((url) => !url.pathname.startsWith('/login'))
 }
 
@@ -488,23 +494,23 @@ async function checkEnvironment() {
       const r = await fetch(url)
       if (!r.ok) throw new Error(`${r.status}`)
     } catch (error) {
-      console.error(`${label} fora do ar (${url}): ${error.message}`)
+      console.error(`${label} is down (${url}): ${error.message}`)
       process.exit(1)
     }
   }
   await check(BASE, 'Front')
-  await check(BASE + '/api/v1/saude/banco', 'API/banco')
+  await check(BASE + '/api/v1/health/database', 'API/database')
   sql('select 1')
 }
 
 function report() {
   const ok = results.filter((r) => r.ok).length
-  console.log(`\n${ok}/${results.length} passos ok · conta ${NEW.email}`)
-  const unexpected = fetchedIssues.filter((l) => !l.endsWith('→ 401'))
-  if (unexpected.length) console.log('\nRespostas de erro da API:\n  ' + unexpected.join('\n  '))
-  const console_ = consoleErrors.filter(
+  console.log(`\n${ok}/${results.length} steps ok · account ${NEW.email}`)
+  const unexpected = apiErrors.filter((l) => !l.endsWith('→ 401'))
+  if (unexpected.length) console.log('\nAPI error responses:\n  ' + unexpected.join('\n  '))
+  const browserErrors = consoleErrors.filter(
     (l) => !l.includes('ERR_INTERNET_DISCONNECTED') && !l.includes('status of 401'),
   )
-  if (console_.length) console.log('\nErros no console:\n  ' + console_.join('\n  '))
+  if (browserErrors.length) console.log('\nConsole errors:\n  ' + browserErrors.join('\n  '))
   if (ok !== results.length) process.exitCode = 1
 }

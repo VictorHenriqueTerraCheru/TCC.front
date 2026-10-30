@@ -119,3 +119,13 @@ A partir daqui a execução passou do Codex para o Claude. O inventário do Code
 - `README.md`: sem mudança de comando; saiu um `.` solto no fim.
 - `docs/openapi.json` e `docs/API.md` idênticos aos de `contrato-novo/` (`cmp`).
 - Gate: typecheck ok; lint ok; format ok; `Tests 366 passed`; textos idênticos; prints idênticos.
+
+## Task 8 — Verificação final com a API real
+
+- `scripts/e2e.mjs` acompanhou o contrato e o banco novos: rotas da API (`/issues`, `/incidents`, `/issues/recent?radiusKm&pageSize`, `/health/database`), tabelas e colunas da migration `RenameToEnglish` (`users`, `issues`, `votes`, `incidents`, `verification_requests`), rotas do app, ids (`#accepted-terms`), tema `light/dark` e mensagens em inglês. Duas sobras do rename automático corrigidas aqui: `fetchedIssues` (era a lista de respostas de erro da API → `apiErrors`) e `robberies.sevenDays` (o campo do contrato é `days7`; o rename tinha alcançado o acesso sobre um JSON sem tipo).
+- Back do PR #19 (`refactor/ingles`, `docker compose up -d db` + `dotnet run --project src/UrbanReports.Api`) e `npm run dev`: **19 de 20 passos ok** — tema, marcadores, card rápido, voto como visitante → cadastro → voto retomado, registro com falha offline e "Tentar novamente", incidente, área de incidentes, perfil e histórico, edição do nome, pedido de verificação aprovado pelo admin, voto de outro cidadão, recentes, bússola. Cada escrita conferida no PostgreSQL.
+- **Falha (pré-existente, não é do refactor):** "Invalid token: voting asks for login again (rule 13)". Reproduzido à parte: o `PUT /issues/{id}/vote` volta 401, o middleware limpa a sessão, e o `useSyncCacheWithSession` faz `resetQueries` do detalhe; o card do alerta desmonta e o TanStack Query descarta o `onError` passado ao `mutate`, então a folha "Entre para votar" não abre. O código é o mesmo de antes do refactor (`git show b6782fc:src/features/auth/hooks/use-sincronizar-cache.ts`, introduzido em `bfe5411`, 20/10). Não corrigi: é mudança de comportamento (regra 11) e fica para o dono decidir. O passo do painel desktop não rodou porque o roteiro para na primeira falha; o painel desktop está nos prints (`11-desktop-map-panel`).
+- Conferência à mão com a API real (Playwright, admin): `/admin/categories` (claro, desktop) com as cores de grupo certas e `/admin/users` (escuro, celular), sem nenhuma resposta de erro da API.
+- Gate final: typecheck ok; lint ok; format ok; `Tests 366 passed` (340 + 26); textos idênticos; prints idênticos; `npm run build` ok.
+
+Pronto para revisão.
