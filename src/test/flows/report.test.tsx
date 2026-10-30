@@ -83,7 +83,7 @@ describe('report flow', () => {
     )
   })
 
-  it('session expired on submit (401): login and the report is submitted on return', async () => {
+  it('session expired on submit (401): login returns to the review with the draft kept', async () => {
     server.use(
       http.post(route('/issues'), () => new HttpResponse(null, { status: 401 }), {
         once: true,
@@ -102,6 +102,9 @@ describe('report flow', () => {
     await user.type(await screen.findByLabelText('E-mail'), 'cidadao1@tcc.local')
     await user.type(screen.getByLabelText('Senha'), 'tcc12345')
     await user.click(screen.getByRole('button', { name: 'Entrar' }))
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/report/review'))
+    await user.click(await screen.findByRole('button', { name: /Enviar registro/ }))
 
     expect(await screen.findByRole('heading', { name: 'Registro enviado' })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/report/success')

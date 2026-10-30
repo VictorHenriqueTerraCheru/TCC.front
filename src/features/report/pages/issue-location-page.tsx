@@ -11,7 +11,6 @@ import { AddressCard } from '../components/address-card'
 import { ReportMap } from '../components/report-map'
 import { ReportStep } from '../components/report-step'
 import { useRequireCategory, useDraft } from '../hooks/use-draft'
-import { useResumeReport } from '../hooks/use-resume-report'
 import { categoryPath } from '../models/routes'
 
 export function IssueLocationPage() {
@@ -30,10 +29,7 @@ export function IssueLocationPage() {
       navigate(duplicates.length > 0 ? '/report/duplicate-check' : '/report/review')
     } catch (error) {
       if (isApiError(error) && error.status === 401) {
-        requireAccount('report', () => {}, {
-          returnTo: '/report/location',
-          pending: { type: 'resumeReport', step: 'checkDuplicates' },
-        })
+        requireAccount('report', () => {})
         return
       }
       navigate('/report/review')
@@ -41,7 +37,6 @@ export function IssueLocationPage() {
       setCheckingDuplicates(false)
     }
   }
-  useResumeReport('checkDuplicates', () => void confirm())
 
   return (
     <ReportStep

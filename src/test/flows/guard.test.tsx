@@ -1,6 +1,6 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { http, HttpResponse } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 
 import { routes } from '@/app/router'
 import { useSessionStore } from '@/features/auth'
@@ -29,7 +29,11 @@ describe('guard "guests see, accounts act"', () => {
     sessionStorage.clear()
   })
 
-  it('acceptance of stage 3: guest votes → login → back to the detail with the vote applied', async () => {
+  it('guest votes → login → back to the same detail, without voting by itself', async () => {
+    const votes: string[] = []
+    server.events.on('request:start', ({ request }) => {
+      if (request.method === 'PUT') votes.push(request.url)
+    })
     const user = userEvent.setup()
     const { router } = openAt(`/map/issue/${ACTIVE}?mode=both`)
 
@@ -39,67 +43,14 @@ describe('guard "guests see, accounts act"', () => {
 
     await loginAs(user, 'cidadao1@tcc.local')
 
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Sim, está lá' })).toHaveAttribute(
-        'aria-pressed',
-        'true',
-      ),
-    )
-    expect(router.state.location.pathname).toBe(`/map/issue/${ACTIVE}`)
-    expect(router.state.location.search).toBe('?mode=both')
-    expect(screen.getByText(/Calculada com 17 votos/)).toBeInTheDocument()
-  })
-
-  it('quick card: guest taps the thumb → login → the vote is resumed (rule 1)', async () => {
-    const user = userEvent.setup()
-    const { router } = openAt(`/map/issue/${ACTIVE}`)
-
-    await user.click(await screen.findByRole('button', { name: 'Voto rápido: Sim, está lá' }))
-    await user.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
-    await loginAs(user, 'cidadao1@tcc.local')
-
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Voto rápido: Sim, está lá' })).toHaveAttribute(
-        'aria-pressed',
-        'true',
-      ),
-    )
-    expect(router.state.location.pathname).toBe(`/map/issue/${ACTIVE}`)
-  })
-
-  it('"Agora não" forgets the vote: a later login does not vote by itself', async () => {
-    const user = userEvent.setup()
-    const { router } = openAt(`/map/issue/${ACTIVE}`)
-
-    await user.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
-    await user.click(await screen.findByRole('button', { name: 'Agora não' }))
-    expect(
-      JSON.parse(sessionStorage.getItem('urbanReports.pendingAction')!).state.pendingAction,
-    ).toBeNull()
-    await router.navigate('/login', { state: { de: `/map/issue/${ACTIVE}` } })
-    await loginAs(user, 'cidadao1@tcc.local')
-
     expect(await screen.findByRole('button', { name: 'Sim, está lá' })).toHaveAttribute(
       'aria-pressed',
       'false',
     )
-    expect(screen.getByText(/Calculada com 16 votos/)).toBeInTheDocument()
-  })
-
-  it('browser "back" on login also forgets the vote', async () => {
-    const user = userEvent.setup()
-    const { router } = openAt(`/map/issue/${ACTIVE}`)
-
-    await user.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
-    await user.click(await screen.findByRole('button', { name: 'Já tenho conta' }))
-    expect(router.state.location.pathname).toBe('/login')
-    await router.navigate(-1)
-
-    await waitFor(() =>
-      expect(
-        JSON.parse(sessionStorage.getItem('urbanReports.pendingAction')!).state.pendingAction,
-      ).toBeNull(),
-    )
+    expect(router.state.location.pathname).toBe(`/map/issue/${ACTIVE}`)
+    expect(router.state.location.search).toBe('?mode=both')
+    expect(votes).toEqual([])
+    server.events.removeAllListeners()
   })
 
   it('expired session (expiresAt in the past) counts as guest in the guard', async () => {
@@ -136,9 +87,16 @@ describe('guard "guests see, accounts act"', () => {
     expect(useSessionStore.getState().session?.user.name).toBe('Nova Pessoa')
   })
 
-  it('expired token (401) clears the session and reopens the guard with the stored vote (rule 13)', async () => {
+  it('expired token (401) clears the session and reopens the guard', async () => {
     loginAsCitizen()
-    server.use(http.put(route('/issues/:id/vote'), () => new HttpResponse(null, { status: 401 })))
+    let detailCalls = 0
+    server.use(
+      http.put(route('/issues/:id/vote'), () => new HttpResponse(null, { status: 401 })),
+      http.get(route('/issues/:id'), async () => {
+        detailCalls += 1
+        if (detailCalls > 1) await delay('infinite')
+      }),
+    )
     const user = userEvent.setup()
     openAt(`/map/issue/${ACTIVE}`)
 
@@ -149,12 +107,5 @@ describe('guard "guests see, accounts act"', () => {
       screen.getByText('Sua sessão expirou. Entre de novo para continuar.'),
     ).toBeInTheDocument()
     expect(useSessionStore.getState().session).toBeNull()
-    expect(
-      JSON.parse(sessionStorage.getItem('urbanReports.pendingAction')!).state.pendingAction.action,
-    ).toEqual({
-      type: 'vote',
-      issueId: ACTIVE,
-      value: 'yes',
-    })
   })
 })

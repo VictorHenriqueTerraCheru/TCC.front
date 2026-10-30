@@ -316,7 +316,7 @@ export function MapPage() {
           to="/report"
           onClick={(event) => {
             event.preventDefault()
-            requireAccount('report', () => navigate('/report'), { returnTo: '/report' })
+            requireAccount('report', () => navigate('/report'), '/report')
           }}
           className="absolute bottom-[92px] left-1/2 z-[1000] flex h-12 -translate-x-1/2 pressable items-center gap-2 rounded-full bg-primary bg-linear-to-b from-black/0 to-black/12 px-5 font-semibold text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2"
         >

@@ -12,7 +12,6 @@ import { SubmissionFailedDialog } from '../components/submission-failed-dialog'
 import { ReportStep } from '../components/report-step'
 import { SummaryRow, Summary } from '../components/summary'
 import { useSubmission } from '../hooks/use-submission'
-import { useResumeReport } from '../hooks/use-resume-report'
 import { useDraftAddress, useRequireCategory, useRequireStep, useDraft } from '../hooks/use-draft'
 import { categoryPath } from '../models/routes'
 
@@ -35,7 +34,6 @@ export function IssueReviewPage() {
     if (categoryId === null || !location) return
     submission.send({ categoryId, ...location, description })
   }
-  useResumeReport('submit', send)
 
   return (
     <ReportStep
