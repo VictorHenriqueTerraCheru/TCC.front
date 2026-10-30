@@ -88,7 +88,7 @@ try {
   })
 
   await step(
-    'Signing up from the sheet creates the account and returns to the alert with the vote resumed',
+    'Signing up from the sheet creates the account, returns to the alert and the vote is sent on the next tap',
     p,
     async () => {
       await p.getByRole('button', { name: 'Criar conta' }).click()
@@ -97,13 +97,17 @@ try {
       await p.getByLabel('E-mail').fill(NEW.email)
       await p.getByLabel('Senha', { exact: true }).fill(NEW.password)
       await p.locator('#accepted-terms').check()
+      await p.getByRole('button', { name: /criar conta/i }).click()
+      await p.waitForURL(new RegExp(`/map/issue/${state.seedIssue}`))
       const voted = p.waitForResponse(
         (r) => /\/vote$/.test(r.url()) && r.request().method() === 'PUT',
       )
-      await p.getByRole('button', { name: /criar conta/i }).click()
-      await p.waitForURL(new RegExp(`/map/issue/${state.seedIssue}`))
+      await p
+        .getByRole('button', { name: /^Voto rápido/ })
+        .first()
+        .click()
       const response = await voted
-      assert(response.ok(), `resumed vote answered ${response.status()}`)
+      assert(response.ok(), `vote answered ${response.status()}`)
       state.userId = sql(`select id from users where email = '${NEW.email}'`)
       assert(state.userId, 'new user is not in the database')
       await p.getByRole('button', { name: /^Voto rápido/, pressed: true }).waitFor()
