@@ -1,94 +1,94 @@
 import { AnimatePresence, m } from 'motion/react'
 import { useId } from 'react'
 
-import { Icone } from '@/common/components/icone'
-import { MOLA_SUAVE, SURGIR } from '@/common/lib/movimento'
+import { Icon } from '@/common/components/icone'
+import { SOFT_SPRING, APPEAR } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
 
 import {
-  descreverHorarioCurto,
-  horarioInicialOutro,
-  passoHorario,
-  type Horario,
-  type ModoHorario,
+  describeTimeShort,
+  initialOtherTime,
+  timeStep,
+  type OccurrenceTime,
+  type TimeMode,
 } from '../models/horario'
 
-const opcoes: { modo: ModoHorario; label: string }[] = [
-  { modo: 'agora', label: 'Agora' },
-  { modo: 'umaHora', label: 'Há 1 hora' },
-  { modo: 'other', label: 'Outro horário' },
+const options: { mode: TimeMode; label: string }[] = [
+  { mode: 'now', label: 'Agora' },
+  { mode: 'oneHour', label: 'Há 1 hora' },
+  { mode: 'other', label: 'Outro horário' },
 ]
 
-interface SeletorHorarioProps {
-  horario: Horario
-  aoMudar(horario: Horario): void
+interface TimePickerProps {
+  time: OccurrenceTime
+  onChange(time: OccurrenceTime): void
 }
 
-export function SeletorHorario({ horario, aoMudar }: SeletorHorarioProps) {
-  const agora = new Date()
-  const escolhido = horario.outroEm ? new Date(horario.outroEm) : horarioInicialOutro(agora)
-  const anterior = passoHorario(escolhido, -1, agora)
-  const proximo = passoHorario(escolhido, 1, agora)
+export function TimePicker({ time, onChange }: TimePickerProps) {
+  const now = new Date()
+  const chosen = time.otherAt ? new Date(time.otherAt) : initialOtherTime(now)
+  const previous = timeStep(chosen, -1, now)
+  const next = timeStep(chosen, 1, now)
 
-  const idPilula = useId()
+  const pillId = useId()
   return (
-    <section aria-labelledby="titulo-quando">
-      <h2 id="titulo-quando" className="mb-2 text-sm font-medium">
+    <section aria-labelledby="when-title">
+      <h2 id="when-title" className="mb-2 text-sm font-medium">
         Quando aconteceu?
       </h2>
-      <div role="radiogroup" aria-labelledby="titulo-quando" className="flex flex-wrap gap-2">
-        {opcoes.map(({ modo, label: rotulo }) => {
-          const selecionado = horario.modo === modo
+      <div role="radiogroup" aria-labelledby="when-title" className="flex flex-wrap gap-2">
+        {options.map(({ mode, label }) => {
+          const selected = time.mode === mode
           return (
             <button
-              key={modo}
+              key={mode}
               type="button"
               role="radio"
-              aria-checked={selecionado}
+              aria-checked={selected}
               onClick={() =>
-                aoMudar({
-                  modo,
-                  outroEm: modo === 'other' ? escolhido.toISOString() : null,
+                onChange({
+                  mode,
+                  otherAt: mode === 'other' ? chosen.toISOString() : null,
                 })
               }
               className={cn(
                 'relative flex h-11 pressionavel items-center gap-1.5 rounded-full border px-4 text-sm font-medium focus-visible:outline-2',
-                selecionado
+                selected
                   ? 'border-transparent text-primario'
                   : 'border-input hover:bg-foreground/5',
               )}
             >
-              {selecionado && (
+              {selected && (
                 <m.span
-                  layoutId={idPilula}
-                  transition={MOLA_SUAVE}
+                  layoutId={pillId}
+                  transition={SOFT_SPRING}
                   className="absolute inset-0 rounded-full bg-primario-suave"
                 />
               )}
               <AnimatePresence initial={false}>
-                {selecionado && (
+                {selected && (
                   <m.span
                     initial={{ width: 0, opacity: 0 }}
                     animate={{ width: 'auto', opacity: 1 }}
                     exit={{ width: 0, opacity: 0 }}
-                    transition={SURGIR}
+                    transition={APPEAR}
                     className="relative flex overflow-hidden"
                   >
-                    <Icone name="check" className="text-[18px]" />
+                    <Icon name="check" className="text-[18px]" />
                   </m.span>
                 )}
               </AnimatePresence>
-              <span className="relative">{rotulo}</span>
+              <span className="relative">{label}</span>
             </button>
           )
         })}
       </div>
 
-      {horario.modo === 'other' && (
+      {time.mode === 'other' && (
         <m.div
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={SURGIR}
+          transition={APPEAR}
           className="mt-4"
         >
           <div className="relative flex h-14 items-center rounded-2xl border border-ring bg-card pr-2 pl-4 shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_14%,transparent)]">
@@ -96,27 +96,27 @@ export function SeletorHorario({ horario, aoMudar }: SeletorHorarioProps) {
               Hora aproximada
             </span>
             <output aria-live="polite" className="flex-1 pt-4 tabular-nums">
-              {descreverHorarioCurto(escolhido)}
+              {describeTimeShort(chosen)}
             </output>
             <button
               type="button"
               aria-label="15 minutos antes"
-              disabled={!anterior}
+              disabled={!previous}
               onClick={() =>
-                anterior && aoMudar({ modo: 'other', outroEm: anterior.toISOString() })
+                previous && onChange({ mode: 'other', otherAt: previous.toISOString() })
               }
               className="flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2 disabled:opacity-30"
             >
-              <Icone name="remove" />
+              <Icon name="remove" />
             </button>
             <button
               type="button"
               aria-label="15 minutos depois"
-              disabled={!proximo}
-              onClick={() => proximo && aoMudar({ modo: 'other', outroEm: proximo.toISOString() })}
+              disabled={!next}
+              onClick={() => next && onChange({ mode: 'other', otherAt: next.toISOString() })}
               className="flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2 disabled:opacity-30"
             >
-              <Icone name="add" />
+              <Icon name="add" />
             </button>
           </div>
           <p className="mt-1 px-4 text-xs text-muted-foreground">

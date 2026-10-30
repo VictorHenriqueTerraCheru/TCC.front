@@ -8,32 +8,28 @@ import {
 } from '@/common/ui/dialog'
 import { Button } from '@/common/ui/button'
 
-import type { EstadoLocalizacao } from '../stores/localizacao-store'
+import type { LocationStatus } from '../stores/localizacao-store'
 
-interface AjudaLocalizacaoDialogProps {
-  aberto: boolean
-  aoMudarAberto(aberto: boolean): void
-  estado: EstadoLocalizacao
+interface LocationHelpDialogProps {
+  open: boolean
+  onOpenChange(open: boolean): void
+  state: LocationStatus
 }
 
-export function AjudaLocalizacaoDialog({
-  aberto,
-  aoMudarAberto,
-  estado,
-}: AjudaLocalizacaoDialogProps) {
-  const indisponivel = estado === 'indisponivel'
+export function LocationHelpDialog({ open, onOpenChange, state }: LocationHelpDialogProps) {
+  const unavailable = state === 'unavailable'
   return (
-    <Dialog open={aberto} onOpenChange={aoMudarAberto}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
           <DialogTitle>Como liberar a localização</DialogTitle>
           <DialogDescription>
-            {indisponivel
+            {unavailable
               ? 'Este navegador não oferece a localização nesta página. Ela só funciona em conexão segura (https).'
               : 'O navegador não pergunta de novo depois que a permissão é negada. Para liberar:'}
           </DialogDescription>
         </DialogHeader>
-        {!indisponivel && (
+        {!unavailable && (
           <ol className="list-decimal space-y-2 pl-5 text-sm">
             <li>Toque no cadeado (ou no ícone de ajustes) ao lado do endereço do site.</li>
             <li>Abra Permissões ou Configurações do site.</li>
@@ -45,7 +41,7 @@ export function AjudaLocalizacaoDialog({
           Sem localização você continua votando, com peso base.
         </p>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => aoMudarAberto(false)}>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Entendi
           </Button>
         </DialogFooter>

@@ -1,62 +1,62 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { api, dados } from '@/infrastructure/api'
+import { api, unwrapData } from '@/infrastructure/api'
 
-import type { Ponto } from '../stores/rascunho-store'
+import type { Point } from '../stores/rascunho-store'
 
-const TEMPO_LIMITE_ENVIO_MS = 20_000
+const SUBMIT_TIMEOUT_MS = 20_000
 
-export function duplicatasQuery(categoriaId: number, { lat, lng }: Ponto) {
+export function duplicatesQuery(categoryId: number, { lat, lng }: Point) {
   return queryOptions({
-    queryKey: ['problemas', 'duplicatas', { categoryId: categoriaId, lat, lng }],
+    queryKey: ['issues', 'duplicates', { categoryId, lat, lng }],
     queryFn: ({ signal }) =>
       api
         .GET('/issues/duplicates', {
-          params: { query: { categoryId: categoriaId, lat, lng } },
+          params: { query: { categoryId, lat, lng } },
           signal,
         })
-        .then(dados),
+        .then(unwrapData),
     staleTime: 60_000,
   })
 }
 
-interface NovoProblema extends Ponto {
+interface NewIssue extends Point {
   categoryId: number
   description: string
 }
 
-export function useRegistrarProblema() {
+export function useReportIssue() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ categoryId: categoriaId, lat, lng, description: descricao }: NovoProblema) =>
+    mutationFn: ({ categoryId, lat, lng, description }: NewIssue) =>
       api
         .POST('/issues', {
-          body: { categoryId: categoriaId, lat, lng, description: descricao.trim() || null },
-          signal: AbortSignal.timeout(TEMPO_LIMITE_ENVIO_MS),
+          body: { categoryId, lat, lng, description: description.trim() || null },
+          signal: AbortSignal.timeout(SUBMIT_TIMEOUT_MS),
         })
-        .then(dados),
-    onSuccess: (detalhe) => {
-      queryClient.setQueryData(['problemas', 'detalhe', detalhe.id], detalhe)
-      void queryClient.invalidateQueries({ queryKey: ['problemas', 'area'] })
+        .then(unwrapData),
+    onSuccess: (detail) => {
+      queryClient.setQueryData(['issues', 'detail', detail.id], detail)
+      void queryClient.invalidateQueries({ queryKey: ['issues', 'area'] })
     },
   })
 }
 
-interface NovoIncidente extends Ponto {
+interface NewIncident extends Point {
   categoryId: number
   occurredAt: Date
 }
 
-export function useRegistrarIncidente() {
+export function useReportIncident() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ categoryId: categoriaId, lat, lng, occurredAt: ocorridoEm }: NovoIncidente) =>
+    mutationFn: ({ categoryId, lat, lng, occurredAt }: NewIncident) =>
       api
         .POST('/incidents', {
-          body: { categoryId: categoriaId, lat, lng, occurredAt: ocorridoEm.toISOString() },
-          signal: AbortSignal.timeout(TEMPO_LIMITE_ENVIO_MS),
+          body: { categoryId, lat, lng, occurredAt: occurredAt.toISOString() },
+          signal: AbortSignal.timeout(SUBMIT_TIMEOUT_MS),
         })
-        .then(dados),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['incidentes'] }),
+        .then(unwrapData),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['incidents'] }),
   })
 }

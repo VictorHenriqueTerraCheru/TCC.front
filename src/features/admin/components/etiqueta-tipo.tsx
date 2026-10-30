@@ -1,18 +1,18 @@
 import { cn } from '@/common/lib/utils'
-import type { TipoGrupo } from '@/features/categorias'
+import type { GroupType } from '@/features/categorias'
 
-import { classeDoTipo, rotuloDoTipo } from '../models/tipo'
+import { typeClass, typeLabel } from '../models/tipo'
 
-export function EtiquetaTipo({ type: tipo, className }: { type: TipoGrupo; className?: string }) {
+export function TypeLabel({ type, className }: { type: GroupType; className?: string }) {
   return (
     <span
       className={cn(
         'inline-flex shrink-0 items-center rounded-md px-2 py-0.5 text-xs font-semibold',
-        classeDoTipo[tipo],
+        typeClass[type],
         className,
       )}
     >
-      {rotuloDoTipo[tipo]}
+      {typeLabel[type]}
     </span>
   )
 }

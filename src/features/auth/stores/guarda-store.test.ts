@@ -1,81 +1,85 @@
-import { useGuardaStore, type AcaoPendente } from './guarda-store'
+import { useGuardStore, type PendingActionKind } from './guarda-store'
 
-const voto: AcaoPendente = { type: 'votar', problemaId: 'p-1', value: 'yes' }
-const pendencia = { retorno: '/problemas/p-1?aba=1', acao: voto }
+const vote: PendingActionKind = { type: 'vote', issueId: 'p-1', value: 'yes' }
+const pendingAction = { returnTo: '/problemas/p-1?tab=1', action: vote }
 
 beforeEach(() => {
-  useGuardaStore.setState({ reason: null, expirou: false, pendencia: null })
+  useGuardStore.setState({ reason: null, expired: false, pendingAction: null })
   sessionStorage.clear()
 })
 
-describe('guarda-store (regras 1 e 13)', () => {
-  it('pedirConta abre a folha e guarda a ação com a rota de retorno', () => {
-    useGuardaStore.getState().pedirConta('votar', pendencia)
+describe('guard-store (rules 1 and 13)', () => {
+  it('askForAccount opens the sheet and stores the action with the return route', () => {
+    useGuardStore.getState().askForAccount('vote', pendingAction)
 
-    expect(useGuardaStore.getState()).toMatchObject({ reason: 'votar', expirou: false, pendencia })
-  })
-
-  it('pedirConta marca a expiração quando o token venceu', () => {
-    useGuardaStore.getState().pedirConta('votar', pendencia, true)
-
-    expect(useGuardaStore.getState().expirou).toBe(true)
-  })
-
-  it('fecharFolha mantém a pendência (o visitante foi para login/cadastro)', () => {
-    useGuardaStore.getState().pedirConta('registrar', pendencia)
-    useGuardaStore.getState().fecharFolha()
-
-    expect(useGuardaStore.getState().reason).toBeNull()
-    expect(useGuardaStore.getState().pendencia).toEqual(pendencia)
-  })
-
-  it('descartar ("Agora não") esquece folha, ação e expiração', () => {
-    useGuardaStore.getState().pedirConta('votar', pendencia, true)
-    useGuardaStore.getState().descartar()
-
-    expect(useGuardaStore.getState()).toMatchObject({
-      reason: null,
-      expirou: false,
-      pendencia: null,
+    expect(useGuardStore.getState()).toMatchObject({
+      reason: 'vote',
+      expired: false,
+      pendingAction,
     })
   })
 
-  it('concluirLogin devolve o retorno e mantém a ação para a tela de destino', () => {
-    useGuardaStore.getState().pedirConta('votar', pendencia, true)
+  it('askForAccount marks the expiration when the token expired', () => {
+    useGuardStore.getState().askForAccount('vote', pendingAction, true)
 
-    expect(useGuardaStore.getState().concluirLogin()).toBe('/problemas/p-1?aba=1')
-    expect(useGuardaStore.getState()).toMatchObject({ reason: null, expirou: false, pendencia })
+    expect(useGuardStore.getState().expired).toBe(true)
   })
 
-  it('concluirLogin sem ação pendente devolve o retorno mas não guarda nada', () => {
-    useGuardaStore.getState().pedirConta('registrar', { retorno: '/mapa', acao: null })
+  it('closeSheet keeps the pending action (the guest went to login/sign up)', () => {
+    useGuardStore.getState().askForAccount('report', pendingAction)
+    useGuardStore.getState().closeSheet()
 
-    expect(useGuardaStore.getState().concluirLogin()).toBe('/mapa')
-    expect(useGuardaStore.getState().pendencia).toBeNull()
+    expect(useGuardStore.getState().reason).toBeNull()
+    expect(useGuardStore.getState().pendingAction).toEqual(pendingAction)
   })
 
-  it('concluirLogin sem pendência devolve null', () => {
-    expect(useGuardaStore.getState().concluirLogin()).toBeNull()
+  it('discard ("Agora não") forgets sheet, action and expiration', () => {
+    useGuardStore.getState().askForAccount('vote', pendingAction, true)
+    useGuardStore.getState().discard()
+
+    expect(useGuardStore.getState()).toMatchObject({
+      reason: null,
+      expired: false,
+      pendingAction: null,
+    })
   })
 
-  it('consumirAcao entrega a ação uma só vez', () => {
-    useGuardaStore.getState().pedirConta('votar', pendencia)
+  it('completeLogin returns the return route and keeps the action for the destination screen', () => {
+    useGuardStore.getState().askForAccount('vote', pendingAction, true)
 
-    expect(useGuardaStore.getState().consumirAcao((a) => a.type === 'votar')).toEqual(voto)
-    expect(useGuardaStore.getState().consumirAcao((a) => a.type === 'votar')).toBeNull()
+    expect(useGuardStore.getState().completeLogin()).toBe('/problemas/p-1?tab=1')
+    expect(useGuardStore.getState()).toMatchObject({ reason: null, expired: false, pendingAction })
   })
 
-  it('consumirAcao deixa a ação quando ela não é da tela que perguntou', () => {
-    useGuardaStore.getState().pedirConta('votar', pendencia)
+  it('completeLogin without a pending action returns the return route but stores nothing', () => {
+    useGuardStore.getState().askForAccount('report', { returnTo: '/mapa', action: null })
 
-    expect(useGuardaStore.getState().consumirAcao((a) => a.type === 'continuarRegistro')).toBeNull()
-    expect(useGuardaStore.getState().pendencia).toEqual(pendencia)
+    expect(useGuardStore.getState().completeLogin()).toBe('/mapa')
+    expect(useGuardStore.getState().pendingAction).toBeNull()
   })
 
-  it('só a pendência vai para o sessionStorage; a folha aberta não sobrevive ao recarregar', () => {
-    useGuardaStore.getState().pedirConta('votar', pendencia, true)
+  it('completeLogin without pending returns null', () => {
+    expect(useGuardStore.getState().completeLogin()).toBeNull()
+  })
 
-    const guardado = JSON.parse(sessionStorage.getItem('ocorrencias.pendencia') ?? '{}')
-    expect(guardado.state).toEqual({ pendencia })
+  it('consumeAction delivers the action only once', () => {
+    useGuardStore.getState().askForAccount('vote', pendingAction)
+
+    expect(useGuardStore.getState().consumeAction((a) => a.type === 'vote')).toEqual(vote)
+    expect(useGuardStore.getState().consumeAction((a) => a.type === 'vote')).toBeNull()
+  })
+
+  it('consumeAction keeps the action when it does not belong to the asking screen', () => {
+    useGuardStore.getState().askForAccount('vote', pendingAction)
+
+    expect(useGuardStore.getState().consumeAction((a) => a.type === 'resumeReport')).toBeNull()
+    expect(useGuardStore.getState().pendingAction).toEqual(pendingAction)
+  })
+
+  it('only the pending action goes to sessionStorage; the open sheet does not survive a reload', () => {
+    useGuardStore.getState().askForAccount('vote', pendingAction, true)
+
+    const stored = JSON.parse(sessionStorage.getItem('ocorrencias.pendencia') ?? '{}')
+    expect(stored.state).toEqual({ pendingAction })
   })
 })

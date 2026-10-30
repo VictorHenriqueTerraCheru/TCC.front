@@ -1,37 +1,35 @@
 import type { MaterialSymbol } from 'material-symbols'
 import { useNavigate } from 'react-router'
 
-import { FolhaResponsiva } from '@/common/components/folha-responsiva'
-import { Icone } from '@/common/components/icone'
+import { ResponsiveSheet } from '@/common/components/folha-responsiva'
+import { Icon } from '@/common/components/icone'
 import { Button } from '@/common/ui/button'
 
-import { useGuardaStore, type MotivoConta } from '../stores/guarda-store'
-import { AvisoExpirou } from './aviso-expirou'
+import { useGuardStore, type AccountReason } from '../stores/guarda-store'
+import { ExpiredNotice } from './aviso-expirou'
 
-interface Conteudo {
+interface Content {
   icon: MaterialSymbol
-  titulo: string
-  texto: string
+  title: string
+  text: string
   items: [MaterialSymbol, string][]
 }
 
-const conteudos: Record<MotivoConta, Conteudo> = {
-  votar: {
+const contents: Record<AccountReason, Content> = {
+  vote: {
     icon: 'how_to_vote',
-    titulo: 'Entre para votar',
-    texto:
-      'Seu voto ajuda a mostrar o que é confiável no mapa. Para evitar votos repetidos, cada voto fica ligado a uma conta.',
+    title: 'Entre para votar',
+    text: 'Seu voto ajuda a mostrar o que é confiável no mapa. Para evitar votos repetidos, cada voto fica ligado a uma conta.',
     items: [
       ['verified', 'Confirmar que um problema existe'],
       ['autorenew', 'Dizer se ele ainda está lá'],
       ['near_me', 'Ter mais peso quando estiver perto'],
     ],
   },
-  registrar: {
+  report: {
     icon: 'person_add',
-    titulo: 'Entre para registrar',
-    texto:
-      'Cada registro fica ligado a uma conta — é isso que permite medir a confiança do que aparece no mapa. Sem conta, você continua vendo o mapa normalmente.',
+    title: 'Entre para registrar',
+    text: 'Cada registro fica ligado a uma conta — é isso que permite medir a confiança do que aparece no mapa. Sem conta, você continua vendo o mapa normalmente.',
     items: [
       ['add_location_alt', 'Registrar problemas e incidentes'],
       ['how_to_vote', 'Confirmar e avaliar ocorrências perto de você'],
@@ -40,49 +38,49 @@ const conteudos: Record<MotivoConta, Conteudo> = {
   },
 }
 
-export function EntreParaContinuar() {
-  const motivo = useGuardaStore((s) => s.reason)
-  const expirou = useGuardaStore((s) => s.expirou)
-  const fecharFolha = useGuardaStore((s) => s.fecharFolha)
-  const descartar = useGuardaStore((s) => s.descartar)
+export function LoginToContinue() {
+  const reason = useGuardStore((s) => s.reason)
+  const expired = useGuardStore((s) => s.expired)
+  const closeSheet = useGuardStore((s) => s.closeSheet)
+  const discard = useGuardStore((s) => s.discard)
   const navigate = useNavigate()
-  const conteudo = conteudos[motivo ?? 'votar']
+  const content = contents[reason ?? 'vote']
 
-  function irPara(rota: string) {
-    fecharFolha()
-    navigate(rota)
+  function goTo(route: string) {
+    closeSheet()
+    navigate(route)
   }
 
   return (
-    <FolhaResponsiva
-      aberto={motivo !== null}
-      aoMudarAberto={(aberto) => !aberto && descartar()}
-      titulo={conteudo.titulo}
+    <ResponsiveSheet
+      open={reason !== null}
+      onOpenChange={(open) => !open && discard()}
+      title={content.title}
       icon={
         <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-primario-suave text-primario">
-          <Icone name={conteudo.icon} className="text-[28px]" />
+          <Icon name={content.icon} className="text-[28px]" />
         </span>
       }
     >
-      {expirou && <AvisoExpirou />}
-      <p className="mb-4 text-sm text-muted-foreground">{conteudo.texto}</p>
+      {expired && <ExpiredNotice />}
+      <p className="mb-4 text-sm text-muted-foreground">{content.text}</p>
       <ul className="mb-6 space-y-3">
-        {conteudo.items.map(([icone, texto]) => (
-          <li key={texto} className="flex items-center gap-3 text-sm">
-            <Icone name={icone} className="text-[22px] text-primario" />
-            {texto}
+        {content.items.map(([icon, text]) => (
+          <li key={text} className="flex items-center gap-3 text-sm">
+            <Icon name={icon} className="text-[22px] text-primario" />
+            {text}
           </li>
         ))}
       </ul>
       <div className="flex flex-col gap-2">
-        <Button onClick={() => irPara('/cadastro')}>Criar conta</Button>
-        <Button variant="outline" onClick={() => irPara('/login')}>
+        <Button onClick={() => goTo('/cadastro')}>Criar conta</Button>
+        <Button variant="outline" onClick={() => goTo('/login')}>
           Já tenho conta
         </Button>
-        <Button variant="ghost" onClick={descartar}>
+        <Button variant="ghost" onClick={discard}>
           Agora não
         </Button>
       </div>
-    </FolhaResponsiva>
+    </ResponsiveSheet>
   )
 }

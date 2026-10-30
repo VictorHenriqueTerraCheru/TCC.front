@@ -4,44 +4,44 @@ import { persist } from 'zustand/middleware'
 
 import { useMediaQuery } from './use-media-query'
 
-export type PreferenciaTema = 'automatico' | 'claro' | 'escuro'
-export type Tema = 'claro' | 'escuro'
+export type ThemePreference = 'system' | 'light' | 'dark'
+export type Theme = 'light' | 'dark'
 
-const COR_DA_BARRA: Record<Tema, string> = { claro: '#f2f2f7', escuro: '#121a24' }
+const BAR_COLOR: Record<Theme, string> = { light: '#f2f2f7', dark: '#121a24' }
 
-interface TemaState {
-  preferencia: PreferenciaTema
-  escolhido: boolean
-  definirPreferencia(preferencia: PreferenciaTema): void
-  concluirEscolha(): void
+interface ThemeState {
+  preference: ThemePreference
+  chosen: boolean
+  setPreference(preference: ThemePreference): void
+  completeChoice(): void
 }
 
-export const useTemaStore = create<TemaState>()(
+export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      preferencia: 'automatico',
-      escolhido: false,
-      definirPreferencia: (preferencia) => set({ preferencia }),
-      concluirEscolha: () => set({ escolhido: true }),
+      preference: 'system',
+      chosen: false,
+      setPreference: (preference) => set({ preference }),
+      completeChoice: () => set({ chosen: true }),
     }),
     {
       name: 'ocorrencias.tema',
-      partialize: ({ preferencia, escolhido }) => ({ preferencia, escolhido }),
+      partialize: ({ preference, chosen }) => ({ preference, chosen }),
     },
   ),
 )
 
-export function useTema(): Tema {
-  const preferencia = useTemaStore((s) => s.preferencia)
-  const sistemaEscuro = useMediaQuery('(prefers-color-scheme: dark)')
-  if (preferencia !== 'automatico') return preferencia
-  return sistemaEscuro ? 'escuro' : 'claro'
+export function useTheme(): Theme {
+  const preference = useThemeStore((s) => s.preference)
+  const systemDark = useMediaQuery('(prefers-color-scheme: dark)')
+  if (preference !== 'system') return preference
+  return systemDark ? 'dark' : 'light'
 }
 
-export function useAplicarTema() {
-  const tema = useTema()
+export function useApplyTheme() {
+  const theme = useTheme()
   useEffect(() => {
-    document.documentElement.dataset.tema = tema
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', COR_DA_BARRA[tema])
-  }, [tema])
+    document.documentElement.dataset.tema = theme
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', BAR_COLOR[theme])
+  }, [theme])
 }

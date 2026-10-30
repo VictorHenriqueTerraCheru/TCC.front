@@ -1,91 +1,91 @@
-import { entrarComoCidadao } from '@/test/sessao'
+import { loginAsCitizen } from '@/test/sessao'
 
-import { useGuardaStore } from './guarda-store'
-import { provedorAutenticacao, sessaoAtual, useSessaoStore } from './sessao-store'
+import { useGuardStore } from './guarda-store'
+import { authProvider, currentSession, useSessionStore } from './sessao-store'
 
-const HORA = 3_600_000
+const HOUR = 3_600_000
 
-function entrarExpirando(emMs: number) {
-  useSessaoStore.getState().entrar({
-    token: 'jwt-teste',
-    expiresAt: new Date(Date.now() + emMs).toISOString(),
+function loginExpiring(inMs: number) {
+  useSessionStore.getState().login({
+    token: 'jwt-test',
+    expiresAt: new Date(Date.now() + inMs).toISOString(),
     user: { id: 'u-1', name: 'Ana', email: 'ana@tcc.local', role: 'citizen' },
   })
 }
 
 beforeEach(() => {
-  useSessaoStore.setState({ sessao: null })
-  useGuardaStore.setState({ reason: null, expirou: false, pendencia: null })
+  useSessionStore.setState({ session: null })
+  useGuardStore.setState({ reason: null, expired: false, pendingAction: null })
 })
 
-describe('sessão (regras 11 e 13)', () => {
-  it('sessaoAtual devolve a sessão enquanto ela vale', () => {
-    entrarExpirando(HORA)
+describe('session (rules 11 and 13)', () => {
+  it('currentSession returns the session while it is valid', () => {
+    loginExpiring(HOUR)
 
-    expect(sessaoAtual()?.token).toBe('jwt-teste')
-    expect(useGuardaStore.getState().expirou).toBe(false)
+    expect(currentSession()?.token).toBe('jwt-test')
+    expect(useGuardStore.getState().expired).toBe(false)
   })
 
-  it('sessaoAtual sem sessão devolve null e não marca expiração', () => {
-    expect(sessaoAtual()).toBeNull()
-    expect(useGuardaStore.getState().expirou).toBe(false)
+  it('currentSession without session returns null and does not mark expiration', () => {
+    expect(currentSession()).toBeNull()
+    expect(useGuardStore.getState().expired).toBe(false)
   })
 
-  it('sessaoAtual limpa a sessão vencida e marca a expiração para a guarda', () => {
-    entrarExpirando(-1000)
+  it('currentSession clears the expired session and marks the expiration for the guard', () => {
+    loginExpiring(-1000)
 
-    expect(sessaoAtual()).toBeNull()
-    expect(useSessaoStore.getState().sessao).toBeNull()
-    expect(useGuardaStore.getState().expirou).toBe(true)
+    expect(currentSession()).toBeNull()
+    expect(useSessionStore.getState().session).toBeNull()
+    expect(useGuardStore.getState().expired).toBe(true)
   })
 
-  it('expiraEm exatamente agora já conta como vencida', () => {
+  it('expiresAt exactly now already counts as expired', () => {
     vi.useFakeTimers()
     try {
       vi.setSystemTime(new Date('2026-10-20T12:00:00Z'))
-      useSessaoStore.getState().entrar({
-        token: 'jwt-teste',
+      useSessionStore.getState().login({
+        token: 'jwt-test',
         expiresAt: '2026-10-20T12:00:00Z',
         user: { id: 'u-1', name: 'Ana', email: 'ana@tcc.local', role: 'citizen' },
       })
 
-      expect(sessaoAtual()).toBeNull()
+      expect(currentSession()).toBeNull()
     } finally {
       vi.useRealTimers()
     }
   })
 
-  it('o provedor entrega o token da sessão válida e null para visitante ou sessão vencida', () => {
-    expect(provedorAutenticacao.obterToken()).toBeNull()
+  it('the provider hands the token of the valid session and null for a guest or expired session', () => {
+    expect(authProvider.getToken()).toBeNull()
 
-    entrarExpirando(HORA)
-    expect(provedorAutenticacao.obterToken()).toBe('jwt-teste')
+    loginExpiring(HOUR)
+    expect(authProvider.getToken()).toBe('jwt-test')
 
-    entrarExpirando(-1000)
-    expect(provedorAutenticacao.obterToken()).toBeNull()
+    loginExpiring(-1000)
+    expect(authProvider.getToken()).toBeNull()
   })
 
-  it('aoExpirarSessao (401) limpa a sessão e marca a expiração', () => {
-    entrarComoCidadao()
+  it('onSessionExpired (401) clears the session and marks the expiration', () => {
+    loginAsCitizen()
 
-    provedorAutenticacao.aoExpirarSessao()
+    authProvider.onSessionExpired()
 
-    expect(useSessaoStore.getState().sessao).toBeNull()
-    expect(useGuardaStore.getState().expirou).toBe(true)
+    expect(useSessionStore.getState().session).toBeNull()
+    expect(useGuardStore.getState().expired).toBe(true)
   })
 
-  it('sair não marca expiração (só o vencimento marca)', () => {
-    entrarComoCidadao()
+  it('logout does not mark expiration (only expiry does)', () => {
+    loginAsCitizen()
 
-    useSessaoStore.getState().sair()
+    useSessionStore.getState().logout()
 
-    expect(useGuardaStore.getState().expirou).toBe(false)
+    expect(useGuardStore.getState().expired).toBe(false)
   })
 
-  it('a sessão é gravada no localStorage', () => {
-    entrarExpirando(HORA)
+  it('the session is saved in localStorage', () => {
+    loginExpiring(HOUR)
 
-    const guardado = JSON.parse(localStorage.getItem('ocorrencias.sessao') ?? '{}')
-    expect(guardado.state.sessao.token).toBe('jwt-teste')
+    const stored = JSON.parse(localStorage.getItem('ocorrencias.sessao') ?? '{}')
+    expect(stored.state.session.token).toBe('jwt-test')
   })
 })

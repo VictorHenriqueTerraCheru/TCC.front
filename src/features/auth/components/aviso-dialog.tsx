@@ -11,21 +11,21 @@ import {
   DialogTrigger,
 } from '@/common/ui/dialog'
 
-export function AvisoDialog({
-  gatilho,
-  titulo,
+export function NoticeDialog({
+  trigger,
+  title,
   children,
 }: {
-  gatilho: ReactNode
-  titulo: string
+  trigger: ReactNode
+  title: string
   children: ReactNode
 }) {
   return (
     <Dialog>
-      <DialogTrigger asChild>{gatilho}</DialogTrigger>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>{titulo}</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
           <DialogDescription asChild>
             <div className="space-y-2 text-left">{children}</div>
           </DialogDescription>

@@ -1,18 +1,18 @@
 import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router'
 
-import { useGuardaStore } from '../stores/guarda-store'
-import { useSessaoStore } from '../stores/sessao-store'
+import { useGuardStore } from '../stores/guarda-store'
+import { useSessionStore } from '../stores/sessao-store'
 
-const TELAS_DE_LOGIN = new Set(['/login', '/cadastro'])
+const LOGIN_SCREENS = new Set(['/login', '/cadastro'])
 
-export function useDescartarPendenciaAoSairDoLogin() {
+export function useDiscardPendingActionOnLeavingLogin() {
   const { pathname } = useLocation()
-  const anteriorRef = useRef(pathname)
+  const previousRef = useRef(pathname)
 
   useEffect(() => {
-    const saiuDoLogin = TELAS_DE_LOGIN.has(anteriorRef.current) && !TELAS_DE_LOGIN.has(pathname)
-    anteriorRef.current = pathname
-    if (saiuDoLogin && !useSessaoStore.getState().sessao) useGuardaStore.getState().descartar()
+    const leftLogin = LOGIN_SCREENS.has(previousRef.current) && !LOGIN_SCREENS.has(pathname)
+    previousRef.current = pathname
+    if (leftLogin && !useSessionStore.getState().session) useGuardStore.getState().discard()
   }, [pathname])
 }

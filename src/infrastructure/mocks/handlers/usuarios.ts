@@ -1,23 +1,23 @@
 import { http, HttpResponse } from 'msw'
 
 import type { Schema } from '../../api'
-import { banco } from '../banco'
-import { rota } from '../rota'
-import { erroDeRegra, paginar } from './comum'
+import { database } from '../banco'
+import { route } from '../rota'
+import { ruleError, paginate } from './comum'
 
-const exigirToken = (request: Request) =>
+const requireToken = (request: Request) =>
   request.headers.has('Authorization') ? null : new HttpResponse(null, { status: 401 })
 
-export const usuariosHandlers = [
+export const userHandlers = [
   http.get(
-    rota('/me'),
-    ({ request }) => exigirToken(request) ?? HttpResponse.json(banco.me(request)),
+    route('/me'),
+    ({ request }) => requireToken(request) ?? HttpResponse.json(database.me(request)),
   ),
-  http.patch<never, Schema<'UpdateMeRequest'>>(rota('/me'), async ({ request }) => {
-    const semToken = exigirToken(request)
-    if (semToken) return semToken
-    const nome = (await request.json()).name.trim()
-    if (nome.length < 1 || nome.length > 120) {
+  http.patch<never, Schema<'UpdateMeRequest'>>(route('/me'), async ({ request }) => {
+    const noToken = requireToken(request)
+    if (noToken) return noToken
+    const name = (await request.json()).name.trim()
+    if (name.length < 1 || name.length > 120) {
       return HttpResponse.json(
         {
           title: 'Erro de validação.',
@@ -27,23 +27,25 @@ export const usuariosHandlers = [
         { status: 400 },
       )
     }
-    banco.renomear(banco.usuarioDoToken(request).id, nome)
-    return HttpResponse.json(banco.me(request))
+    database.rename(database.userFromToken(request).id, name)
+    return HttpResponse.json(database.me(request))
   }),
-  http.get(rota('/me/history'), ({ request }) => {
-    const semToken = exigirToken(request)
-    if (semToken) return semToken
+  http.get(route('/me/history'), ({ request }) => {
+    const noToken = requireToken(request)
+    if (noToken) return noToken
     const url = new URL(request.url)
-    return HttpResponse.json(paginar(banco.historico(url.searchParams.get('filter') ?? 'all'), url))
+    return HttpResponse.json(
+      paginate(database.history(url.searchParams.get('filter') ?? 'all'), url),
+    )
   }),
   http.post<never, Schema<'RequestVerificationRequest'>>(
-    rota('/verifications'),
+    route('/verifications'),
     async ({ request }) => {
-      const semToken = exigirToken(request)
-      if (semToken) return semToken
-      const { affiliationType: tipoVinculo, justification: justificativa } = await request.json()
-      const texto = justificativa.trim()
-      if (texto.length < 30 || texto.length > 500) {
+      const noToken = requireToken(request)
+      if (noToken) return noToken
+      const { affiliationType, justification } = await request.json()
+      const text = justification.trim()
+      if (text.length < 30 || text.length > 500) {
         return HttpResponse.json(
           {
             title: 'Erro de validação.',
@@ -53,92 +55,84 @@ export const usuariosHandlers = [
           { status: 400 },
         )
       }
-      const resultado = banco.solicitarVerificacao(request, tipoVinculo, texto)
-      if (resultado === 'already-verified')
-        return erroDeRegra(422, resultado, 'Usuário já verificado.')
-      if (resultado === 'verification-already-pending') {
-        return erroDeRegra(409, resultado, 'Já existe uma solicitação pendente.')
+      const result = database.requestVerification(request, affiliationType, text)
+      if (result === 'already-verified') return ruleError(422, result, 'Usuário já verificado.')
+      if (result === 'verification-already-pending') {
+        return ruleError(409, result, 'Já existe uma solicitação pendente.')
       }
-      const { id, status, createdAt: criadaEm } = resultado
+      const { id, status, createdAt } = result
       return HttpResponse.json(
-        { id, affiliationType: tipoVinculo, justification: texto, status, createdAt: criadaEm },
+        { id, affiliationType, justification: text, status, createdAt },
         { status: 201 },
       )
     },
   ),
 ]
 
-export function exigirAdmin(request: Request) {
-  const semToken = exigirToken(request)
-  if (semToken) return semToken
-  return banco.usuarioDoToken(request).role === 'administrator'
+export function requireAdmin(request: Request) {
+  const noToken = requireToken(request)
+  if (noToken) return noToken
+  return database.userFromToken(request).role === 'administrator'
     ? null
     : new HttpResponse(null, { status: 403 })
 }
 
 export const adminHandlers = [
-  http.get(rota('/admin/verifications'), ({ request }) => {
-    const negado = exigirAdmin(request)
-    if (negado) return negado
+  http.get(route('/admin/verifications'), ({ request }) => {
+    const denied = requireAdmin(request)
+    if (denied) return denied
     const url = new URL(request.url)
-    return HttpResponse.json(paginar(banco.verificacoes(url.searchParams.get('status')), url))
+    return HttpResponse.json(paginate(database.verifications(url.searchParams.get('status')), url))
   }),
-  http.post<{ id: string }>(rota('/admin/verifications/:id/approve'), ({ request, params }) => {
-    const negado = exigirAdmin(request)
-    if (negado) return negado
-    return respostaAnalise(banco.analisarVerificacao(params.id, 'approved', null))
+  http.post<{ id: string }>(route('/admin/verifications/:id/approve'), ({ request, params }) => {
+    const denied = requireAdmin(request)
+    if (denied) return denied
+    return reviewResponse(database.reviewVerification(params.id, 'approved', null))
   }),
   http.post<{ id: string }, Schema<'RejectVerificationRequest'>>(
-    rota('/admin/verifications/:id/reject'),
+    route('/admin/verifications/:id/reject'),
     async ({ request, params }) => {
-      const negado = exigirAdmin(request)
-      if (negado) return negado
-      const { reason: motivo } = await request.json()
-      return respostaAnalise(banco.analisarVerificacao(params.id, 'rejected', motivo))
+      const denied = requireAdmin(request)
+      if (denied) return denied
+      const { reason } = await request.json()
+      return reviewResponse(database.reviewVerification(params.id, 'rejected', reason))
     },
   ),
 ]
 
 adminHandlers.push(
-  http.get(rota('/admin/users'), ({ request }) => {
-    const negado = exigirAdmin(request)
-    if (negado) return negado
+  http.get(route('/admin/users'), ({ request }) => {
+    const denied = requireAdmin(request)
+    if (denied) return denied
     const url = new URL(request.url)
-    const perfil = url.searchParams.get('role')
-    if (
-      perfil &&
-      !['citizen', 'cidadaoverificado', 'administrator'].includes(perfil.toLowerCase())
-    ) {
+    const role = url.searchParams.get('role')
+    if (role && !['citizen', 'verifiedcitizen', 'administrator'].includes(role.toLowerCase())) {
       return new HttpResponse(null, { status: 400 })
     }
     return HttpResponse.json(
-      paginar(banco.usuariosAdmin(url.searchParams.get('search'), perfil), url),
+      paginate(database.adminUsers(url.searchParams.get('search'), role), url),
     )
   }),
   http.patch<{ id: string }, Schema<'ChangeRoleRequest'>>(
-    rota('/admin/users/:id/role'),
+    route('/admin/users/:id/role'),
     async ({ request, params }) => {
-      const negado = exigirAdmin(request)
-      if (negado) return negado
-      const { role: perfil } = await request.json()
-      const resultado = banco.alterarPerfilUsuario(
-        banco.usuarioDoToken(request).id,
-        params.id,
-        perfil,
-      )
-      if (resultado === 'nao-encontrado') return new HttpResponse(null, { status: 404 })
-      if (resultado === 'own-role') {
-        return erroDeRegra(422, resultado, 'Você não pode alterar o seu próprio perfil.')
+      const denied = requireAdmin(request)
+      if (denied) return denied
+      const { role } = await request.json()
+      const result = database.setUserRole(database.userFromToken(request).id, params.id, role)
+      if (result === 'not-found') return new HttpResponse(null, { status: 404 })
+      if (result === 'own-role') {
+        return ruleError(422, result, 'Você não pode alterar o seu próprio perfil.')
       }
       return new HttpResponse(null, { status: 204 })
     },
   ),
 )
 
-function respostaAnalise(resultado: 'ok' | 'nao-encontrada' | 'verification-already-reviewed') {
-  if (resultado === 'nao-encontrada') return new HttpResponse(null, { status: 404 })
-  if (resultado === 'verification-already-reviewed') {
-    return erroDeRegra(409, resultado, 'A solicitação já foi analisada.')
+function reviewResponse(result: 'ok' | 'not-found' | 'verification-already-reviewed') {
+  if (result === 'not-found') return new HttpResponse(null, { status: 404 })
+  if (result === 'verification-already-reviewed') {
+    return ruleError(409, result, 'A solicitação já foi analisada.')
   }
   return new HttpResponse(null, { status: 204 })
 }

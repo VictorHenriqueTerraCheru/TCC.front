@@ -1,21 +1,21 @@
-import type { TipoGrupo } from '@/features/categorias'
+import type { GroupType } from '@/features/categorias'
 
-export const rotuloDoTipo: Record<TipoGrupo, string> = {
+export const typeLabel: Record<GroupType, string> = {
   issue: 'Estado',
   incident: 'Evento',
 }
 
-export const ajudaDoTipo: Record<TipoGrupo, string> = {
+export const typeHelp: Record<GroupType, string> = {
   issue: 'Continua lá até alguém confirmar que foi resolvido. Vira ponto no mapa.',
   incident: 'Aconteceu e passou. Entra de forma anônima no mapa de calor.',
 }
 
-export const opcoesDeTipo: { value: TipoGrupo; label: string }[] = [
-  { value: 'issue', label: rotuloDoTipo.issue },
-  { value: 'incident', label: rotuloDoTipo.incident },
+export const typeOptions: { value: GroupType; label: string }[] = [
+  { value: 'issue', label: typeLabel.issue },
+  { value: 'incident', label: typeLabel.incident },
 ]
 
-export const classeDoTipo: Record<TipoGrupo, string> = {
+export const typeClass: Record<GroupType, string> = {
   issue: 'bg-primario-suave text-primario',
   incident: 'bg-cat-roxo-claro text-cat-roxo',
 }

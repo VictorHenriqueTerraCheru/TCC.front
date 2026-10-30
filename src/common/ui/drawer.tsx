@@ -37,14 +37,14 @@ function DrawerOverlay({
 function DrawerContent({
   className,
   children,
-  semFundo = false,
+  transparent = false,
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Content> & {
-  semFundo?: boolean
+  transparent?: boolean
 }) {
   return (
     <DrawerPortal data-slot="drawer-portal">
-      {!semFundo && <DrawerOverlay />}
+      {!transparent && <DrawerOverlay />}
       <DrawerPrimitive.Content
         data-slot="drawer-content"
         className={cn(

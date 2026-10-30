@@ -1,56 +1,53 @@
-import { gruposDoTipo, type Grupo } from '@/features/categorias'
-import type { StatusProblema } from '@/features/problemas'
+import { groupsOfType, type Group } from '@/features/categorias'
+import type { IssueStatus } from '@/features/problemas'
 
-export type ModoMapa = 'problemas' | 'incidentes' | 'ambos'
+export type MapMode = 'issues' | 'incidents' | 'both'
 
-export const modosMapa: { value: ModoMapa; label: string }[] = [
-  { value: 'problemas', label: 'Problemas' },
-  { value: 'incidentes', label: 'Incidentes' },
-  { value: 'ambos', label: 'Ambos' },
+export const mapModes: { value: MapMode; label: string }[] = [
+  { value: 'issues', label: 'Problemas' },
+  { value: 'incidents', label: 'Incidentes' },
+  { value: 'both', label: 'Ambos' },
 ]
 
-export interface FiltrosMapa {
-  modo: ModoMapa
-  grupos: string[]
-  somenteNovas: boolean
+export interface MapFilters {
+  mode: MapMode
+  groups: string[]
+  onlyNew: boolean
 }
 
-export function gruposDoModo(grupos: Grupo[], modo: ModoMapa): Grupo[] {
-  if (modo === 'problemas') return gruposDoTipo(grupos, 'issue')
-  if (modo === 'incidentes') return gruposDoTipo(grupos, 'incident')
-  return grupos.filter((g) => g.type === 'issue' || g.type === 'incident')
+export function modeGroups(groups: Group[], mode: MapMode): Group[] {
+  if (mode === 'issues') return groupsOfType(groups, 'issue')
+  if (mode === 'incidents') return groupsOfType(groups, 'incident')
+  return groups.filter((g) => g.type === 'issue' || g.type === 'incident')
 }
 
-export function mostraProblemas(modo: ModoMapa) {
-  return modo !== 'incidentes'
+export function showsIssues(mode: MapMode) {
+  return mode !== 'incidents'
 }
 
-export function mostraCalor(modo: ModoMapa) {
-  return modo !== 'problemas'
+export function showsHeatmap(mode: MapMode) {
+  return mode !== 'issues'
 }
 
-interface FiltrosCamadas {
-  problemas: { grupos: string[]; status: StatusProblema[] } | null
-  calor: { grupos: string[] } | null
+interface LayerFilters {
+  issues: { groups: string[]; status: IssueStatus[] } | null
+  heatmap: { groups: string[] } | null
 }
 
-export function filtrosDasCamadas(
-  { modo, grupos, somenteNovas }: FiltrosMapa,
-  todos: Grupo[],
-): FiltrosCamadas {
-  const doTipo = (tipo: Grupo['type']) => {
-    const chaves = new Set(gruposDoTipo(todos, tipo).map((g) => g.key))
-    return grupos.filter((g) => chaves.has(g))
+export function layerFilters({ mode, groups, onlyNew }: MapFilters, all: Group[]): LayerFilters {
+  const ofType = (type: Group['type']) => {
+    const keys = new Set(groupsOfType(all, type).map((g) => g.key))
+    return groups.filter((g) => keys.has(g))
   }
-  const algumMarcado = grupos.length > 0
-  const deProblema = doTipo('issue')
-  const deIncidente = doTipo('incident')
+  const anyChecked = groups.length > 0
+  const forIssue = ofType('issue')
+  const forIncident = ofType('incident')
 
-  const problemasLigado = mostraProblemas(modo) && (!algumMarcado || deProblema.length > 0)
-  const calorLigado = mostraCalor(modo) && (!algumMarcado || deIncidente.length > 0)
+  const issuesOn = showsIssues(mode) && (!anyChecked || forIssue.length > 0)
+  const heatmapOn = showsHeatmap(mode) && (!anyChecked || forIncident.length > 0)
 
   return {
-    problemas: problemasLigado ? { grupos: deProblema, status: somenteNovas ? ['new'] : [] } : null,
-    calor: calorLigado ? { grupos: deIncidente } : null,
+    issues: issuesOn ? { groups: forIssue, status: onlyNew ? ['new'] : [] } : null,
+    heatmap: heatmapOn ? { groups: forIncident } : null,
   }
 }

@@ -43,25 +43,25 @@ try {
 async function capturarTudo(dados, tema) {
   const capturar = (nome, rota, opcoes = {}) =>
     capturarTela(`${tema}/${nome}`, rota, { ...opcoes, tema })
-  await capturar('01-mapa-ambos-legenda', '/mapa?modo=ambos', { legenda: true })
+  await capturar('01-mapa-ambos-legenda', '/mapa?mode=both', { legenda: true })
   await capturar('02-detalhe-alta', `/mapa/problema/${dados.alta.id}`)
   await capturar('03-detalhe-nova', `/mapa/problema/${dados.nova.id}`)
   await capturar(
     '04-area-incidentes',
-    `/mapa/area?modo=ambos&lat=${dados.calor.lat}&lng=${dados.calor.lng}`,
+    `/mapa/area?mode=both&lat=${dados.calor.lat}&lng=${dados.calor.lng}`,
   )
   await capturar('05-registro-duplicata', '/registrar/conferencia', {
     usuario: 'cidadao1',
     rascunho: {
       categoryId: dados.alta.categoryId,
-      local: { lat: dados.alta.lat + 0.0001, lng: dados.alta.lng + 0.0001 },
+      location: { lat: dados.alta.lat + 0.0001, lng: dados.alta.lng + 0.0001 },
     },
   })
   await capturar('06-registro-incidente', '/registrar/incidente/revisao', {
     usuario: 'cidadao1',
     rascunho: {
       categoryId: dados.incidente.id,
-      local: { lat: dados.calor.lat, lng: dados.calor.lng },
+      location: { lat: dados.calor.lat, lng: dados.calor.lng },
       description: 'Celular levado na saída do metrô, por volta das 19h.',
     },
   })
@@ -70,7 +70,7 @@ async function capturarTudo(dados, tema) {
   await capturar('09-fila-admin', '/admin/verificacoes', { usuario: 'admin' })
   await capturar('10-cadastro', '/cadastro')
   await capturar('10b-login', '/login')
-  await capturar('11-desktop-mapa-painel', `/mapa/problema/${dados.alta.id}?modo=ambos`, {
+  await capturar('11-desktop-mapa-painel', `/mapa/problema/${dados.alta.id}?mode=both`, {
     tela: DESKTOP,
   })
 }
@@ -92,15 +92,18 @@ async function capturarTela(
       if (!primeiraVez)
         localStorage.setItem(
           'ocorrencias.tema',
-          JSON.stringify({ state: { preferencia: tema, escolhido: true }, version: 0 }),
+          JSON.stringify({
+            state: { preference: tema === 'claro' ? 'light' : 'dark', chosen: true },
+            version: 0,
+          }),
         )
       if (sessao)
         localStorage.setItem(
           'ocorrencias.sessao',
-          JSON.stringify({ state: { sessao }, version: 0 }),
+          JSON.stringify({ state: { session: sessao }, version: 0 }),
         )
       if (rascunho) {
-        const estado = { description: '', horario: { modo: 'agora', outroEm: null }, ...rascunho }
+        const estado = { description: '', time: { mode: 'now', otherAt: null }, ...rascunho }
         sessionStorage.setItem(
           'ocorrencias.rascunhoRegistro',
           JSON.stringify({ state: estado, version: 0 }),

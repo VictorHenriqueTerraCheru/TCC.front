@@ -1,42 +1,41 @@
 import { useIsMutating } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
-import { useAutenticado, useConsumirAcaoPendente, useExigirConta } from '@/features/auth'
+import { useAuthenticated, useConsumePendingAction, useRequireAccount } from '@/features/auth'
 import { isApiError } from '@/infrastructure/api'
 
-import { chaveVotos, useVotar } from '../api/use-votar'
-import type { DetalheProblema, ValorVoto } from '../models/problema'
+import { votesKey, useVote } from '../api/use-votar'
+import type { IssueDetail, VoteValue } from '../models/problema'
 
-export function useVotos(problema: DetalheProblema) {
-  const exigirConta = useExigirConta()
-  const consumirAcao = useConsumirAcaoPendente()
-  const autenticado = useAutenticado()
-  const mutacao = useVotar(problema.id)
-  const votosEmAndamento = useIsMutating({ mutationKey: chaveVotos(problema.id) })
+export function useVotes(issue: IssueDetail) {
+  const requireAccount = useRequireAccount()
+  const consumeAction = useConsumePendingAction()
+  const authenticated = useAuthenticated()
+  const mutation = useVote(issue.id)
+  const pendingVotes = useIsMutating({ mutationKey: votesKey(issue.id) })
 
-  const mutar = mutacao.mutate
+  const mutate = mutation.mutate
   useEffect(() => {
-    if (!autenticado) return
-    const acao = consumirAcao((a) => 'problemaId' in a && a.problemaId === problema.id)
-    if (acao?.type === 'votar') mutar(acao.value)
-  }, [autenticado, consumirAcao, problema.id, mutar])
+    if (!authenticated) return
+    const action = consumeAction((a) => 'issueId' in a && a.issueId === issue.id)
+    if (action?.type === 'vote') mutate(action.value)
+  }, [authenticated, consumeAction, issue.id, mutate])
 
-  function votar(valor: ValorVoto) {
-    const pendente = { type: 'votar', problemaId: problema.id, value: valor } as const
-    const reabrirGuardaSeExpirou = (erro: unknown) => {
-      if (isApiError(erro) && erro.status === 401)
-        exigirConta('votar', () => {}, { pending: pendente })
+  function vote(value: VoteValue) {
+    const pending = { type: 'vote', issueId: issue.id, value } as const
+    const reopenGuardIfExpired = (error: unknown) => {
+      if (isApiError(error) && error.status === 401) requireAccount('vote', () => {}, { pending })
     }
-    exigirConta('votar', () => mutacao.mutate(valor, { onError: reabrirGuardaSeExpirou }), {
-      pending: pendente,
+    requireAccount('vote', () => mutation.mutate(value, { onError: reopenGuardIfExpired }), {
+      pending,
     })
   }
 
   return {
-    erro: mutacao.error,
-    votando: votosEmAndamento > 0,
-    myVote: problema.myVote ?? null,
-    podeVotar: !problema.isAuthor && problema.status !== 'resolved',
-    votar,
+    error: mutation.error,
+    voting: pendingVotes > 0,
+    myVote: issue.myVote ?? null,
+    canVote: !issue.isAuthor && issue.status !== 'resolved',
+    vote,
   }
 }

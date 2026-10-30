@@ -1,204 +1,202 @@
 import type { Schema } from '../api'
-import { categorias } from './fixtures/categorias'
-import { criarDetalhes, ID_DO_AUTOR } from './fixtures/detalhes'
-import { grupos as gruposIniciais } from './fixtures/grupos'
-import { historicoInicial, verificacoesIniciais } from './fixtures/perfil'
-import { calorIncidentes, grupoDasCelulas } from './fixtures/problemas'
-import { usuariosIniciais } from './fixtures/usuarios'
+import { categories } from './fixtures/categorias'
+import { createDetails, AUTHOR_ID } from './fixtures/detalhes'
+import { groups as initialGroups } from './fixtures/grupos'
+import { initialHistory, initialVerifications } from './fixtures/perfil'
+import { incidentHeatmap, cellGroup } from './fixtures/problemas'
+import { initialUsers } from './fixtures/usuarios'
 
-type ValorVoto = Schema<'VoteAnswer'>
-type Detalhe = Schema<'GetIssueDetailResponse'>
-type CelulaCalor = Schema<'GetIncidentHeatmapResponse'>
-type Verificacao = Schema<'ListVerificationsItem'>
-type Perfil = Schema<'Role'>
-type Grupo = Schema<'GroupResponse'>
-type CategoriaAdmin = Schema<'CategoryAdminResponse'>
+type VoteValue = Schema<'VoteAnswer'>
+type Detail = Schema<'GetIssueDetailResponse'>
+type HeatmapCell = Schema<'GetIncidentHeatmapResponse'>
+type Verification = Schema<'ListVerificationsItem'>
+type Role = Schema<'Role'>
+type Group = Schema<'GroupResponse'>
+type AdminCategory = Schema<'CategoryAdminResponse'>
 
-const LIMITE_INCIDENTES = 10
+const INCIDENT_LIMIT = 10
 const isReportType = (type: string) => type === 'issueReport' || type === 'incidentReport'
 
-export function metrosEntre(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
+export function metersBetween(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
   const dLat = (b.lat - a.lat) * 111_320
   const dLng = (b.lng - a.lng) * 111_320 * Math.cos((a.lat * Math.PI) / 180)
   return Math.hypot(dLat, dLng)
 }
 
-let detalhes = criarDetalhes()
-let votos = new Map<string, ValorVoto>()
-let usuarios = [...usuariosIniciais]
-let autoria = new Set([ID_DO_AUTOR])
-let incidentesRegistrados = 0
-let incidentesNovos: { categoryId: number; lat: number; lng: number }[] = []
-let verificacoes = verificacoesIniciais()
-let historico = historicoInicial()
-let perfis = new Map<string, { role: Perfil; verifiedAt: string | null }>()
-let grupos: Grupo[] = [...gruposIniciais]
-let categoriasAdmin: CategoriaAdmin[] = categorias.map((c) => ({ ...c, active: true }))
+let details = createDetails()
+let votes = new Map<string, VoteValue>()
+let users = [...initialUsers]
+let authorship = new Set([AUTHOR_ID])
+let reportedIncidents = 0
+let newIncidents: { categoryId: number; lat: number; lng: number }[] = []
+let verifications = initialVerifications()
+let history = initialHistory()
+let roles = new Map<string, { role: Role; verifiedAt: string | null }>()
+let groups: Group[] = [...initialGroups]
+let adminCategories: AdminCategory[] = categories.map((c) => ({ ...c, active: true }))
 
-function chaveDe(rotulo: string) {
-  const palavras = rotulo
+function keyOf(label: string) {
+  const words = label
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9]+/g, ' ')
     .trim()
     .split(' ')
     .filter(Boolean)
-  const chave = palavras
+  const key = words
     .map((p, i) => (i === 0 ? p.toLowerCase() : p[0]!.toUpperCase() + p.slice(1).toLowerCase()))
     .join('')
     .slice(0, 30)
-  return /^[a-z]/i.test(chave) ? chave : `grupo${chave}`.slice(0, 30)
+  return /^[a-z]/i.test(key) ? key : `grupo${key}`.slice(0, 30)
 }
 
-const mesmoRotulo = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase()
+const sameLabel = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase()
 
-const iniciais = (nome: string) =>
-  nome
+const initials = (name: string) =>
+  name
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((parte) => parte[0]!.toUpperCase())
+    .map((part) => part[0]!.toUpperCase())
     .join('')
 
-export const banco = {
-  usuarioPorEmail(email: string) {
-    return usuarios.find((u) => u.email.toLowerCase() === email.toLowerCase()) ?? null
+export const database = {
+  userByEmail(email: string) {
+    return users.find((u) => u.email.toLowerCase() === email.toLowerCase()) ?? null
   },
-  cadastrar(nome: string, email: string, senha: string) {
-    const usuario = {
-      id: `u-${usuarios.length + 1}`,
-      name: nome,
+  register(name: string, email: string, password: string) {
+    const user = {
+      id: `u-${users.length + 1}`,
+      name,
       email,
-      password: senha,
+      password,
       role: 'citizen' as const,
     }
-    usuarios = [...usuarios, usuario]
-    return usuario
+    users = [...users, user]
+    return user
   },
 
-  usuarioDoToken(request: Request) {
-    const id = request.headers.get('Authorization')?.match(/mock-jwt-(.+)$/)?.[1] ?? 'u-cidadao1'
-    const usuario =
-      usuarios.find((u) => u.id === id) ?? usuarios.find((u) => u.id === 'u-cidadao1')!
-    const atual = perfis.get(usuario.id)
+  userFromToken(request: Request) {
+    const id = request.headers.get('Authorization')?.match(/mock-jwt-(.+)$/)?.[1] ?? 'u-citizen1'
+    const user = users.find((u) => u.id === id) ?? users.find((u) => u.id === 'u-citizen1')!
+    const current = roles.get(user.id)
     return {
-      ...usuario,
-      role: atual?.role ?? usuario.role,
-      verifiedAt: atual?.verifiedAt ?? (usuario.role === 'citizen' ? null : '2026-09-25T15:00:00Z'),
+      ...user,
+      role: current?.role ?? user.role,
+      verifiedAt: current?.verifiedAt ?? (user.role === 'citizen' ? null : '2026-09-25T15:00:00Z'),
     }
   },
-  usuariosAdmin(busca: string | null, perfil: string | null): Schema<'ListUsersItem'>[] {
-    const termo = busca?.trim().toLowerCase() ?? ''
-    return usuarios
-      .map((u, indice) => {
-        const atual = perfis.get(u.id)
-        const efetivo = atual?.role ?? u.role
+  adminUsers(search: string | null, role: string | null): Schema<'ListUsersItem'>[] {
+    const term = search?.trim().toLowerCase() ?? ''
+    return users
+      .map((u, index) => {
+        const current = roles.get(u.id)
+        const effective = current?.role ?? u.role
         return {
           id: u.id,
           name: u.name,
           email: u.email,
-          role: efetivo,
-          createdAt: new Date(Date.UTC(2026, 2, 2 + indice, 12)).toISOString(),
-          verifiedAt: atual?.verifiedAt ?? (efetivo === 'citizen' ? null : '2026-09-25T15:00:00Z'),
+          role: effective,
+          createdAt: new Date(Date.UTC(2026, 2, 2 + index, 12)).toISOString(),
+          verifiedAt:
+            current?.verifiedAt ?? (effective === 'citizen' ? null : '2026-09-25T15:00:00Z'),
         }
       })
       .filter(
         (u) =>
-          (!perfil || u.role.toLowerCase() === perfil.toLowerCase()) &&
-          (termo === '' ||
-            u.name.toLowerCase().includes(termo) ||
-            u.email.toLowerCase().includes(termo)),
+          (!role || u.role.toLowerCase() === role.toLowerCase()) &&
+          (term === '' ||
+            u.name.toLowerCase().includes(term) ||
+            u.email.toLowerCase().includes(term)),
       )
       .reverse()
   },
-  alterarPerfilUsuario(adminId: string, id: string, perfil: Perfil) {
+  setUserRole(adminId: string, id: string, role: Role) {
     if (id === adminId) return 'own-role' as const
-    const usuario = usuarios.find((u) => u.id === id)
-    if (!usuario) return 'nao-encontrado' as const
-    const atual = perfis.get(id)
-    const verificadoEm =
-      perfil === 'citizen'
+    const user = users.find((u) => u.id === id)
+    if (!user) return 'not-found' as const
+    const current = roles.get(id)
+    const verifiedAt =
+      role === 'citizen'
         ? null
-        : (atual?.verifiedAt ??
-          (usuario.role === 'citizen' ? null : '2026-09-25T15:00:00Z') ??
-          null)
-    perfis.set(id, {
-      role: perfil,
+        : (current?.verifiedAt ?? (user.role === 'citizen' ? null : '2026-09-25T15:00:00Z') ?? null)
+    roles.set(id, {
+      role,
       verifiedAt:
-        perfil === 'verifiedCitizen' ? (verificadoEm ?? new Date().toISOString()) : verificadoEm,
+        role === 'verifiedCitizen' ? (verifiedAt ?? new Date().toISOString()) : verifiedAt,
     })
     return 'ok' as const
   },
-  renomear(id: string, nome: string) {
-    usuarios = usuarios.map((u) => (u.id === id ? { ...u, name: nome } : u))
+  rename(id: string, name: string) {
+    users = users.map((u) => (u.id === id ? { ...u, name } : u))
   },
   me(request: Request): Schema<'GetMeResponse'> {
-    const usuario = banco.usuarioDoToken(request)
-    const ultima = verificacoes.find((v) => v.user.id === usuario.id)
+    const user = database.userFromToken(request)
+    const last = verifications.find((v) => v.user.id === user.id)
     return {
-      id: usuario.id,
-      name: usuario.name,
-      email: usuario.email,
-      role: usuario.role,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
       createdAt: '2026-03-02T12:00:00Z',
-      verifiedAt: usuario.verifiedAt,
-      totalReports: historico.filter((h) => isReportType(h.type)).length,
-      totalVotes: historico.filter((h) => h.type.startsWith('vote')).length,
-      verification: ultima
+      verifiedAt: user.verifiedAt,
+      totalReports: history.filter((h) => isReportType(h.type)).length,
+      totalVotes: history.filter((h) => h.type.startsWith('vote')).length,
+      verification: last
         ? {
-            status: ultima.status,
-            affiliationType: ultima.affiliationType,
-            rejectionReason: ultima.rejectionReason,
-            createdAt: ultima.createdAt,
+            status: last.status,
+            affiliationType: last.affiliationType,
+            rejectionReason: last.rejectionReason,
+            createdAt: last.createdAt,
           }
         : null,
     }
   },
-  historico(filtro: string) {
-    if (filtro === 'reports') return historico.filter((h) => isReportType(h.type))
-    if (filtro === 'votes') return historico.filter((h) => h.type.startsWith('vote'))
-    return historico
+  history(filter: string) {
+    if (filter === 'reports') return history.filter((h) => isReportType(h.type))
+    if (filter === 'votes') return history.filter((h) => h.type.startsWith('vote'))
+    return history
   },
 
-  verificacoes(status: string | null) {
-    const lista = verificacoes.filter((v) => !status || v.status === status)
-    return [...lista].sort((a, b) =>
+  verifications(status: string | null) {
+    const list = verifications.filter((v) => !status || v.status === status)
+    return [...list].sort((a, b) =>
       status === 'pending'
         ? a.createdAt.localeCompare(b.createdAt)
         : b.createdAt.localeCompare(a.createdAt),
     )
   },
-  solicitarVerificacao(
+  requestVerification(
     request: Request,
-    tipoVinculo: Verificacao['affiliationType'],
-    justificativa: string,
+    affiliationType: Verification['affiliationType'],
+    justification: string,
   ) {
-    const usuario = banco.usuarioDoToken(request)
-    if (usuario.role !== 'citizen') return 'already-verified' as const
-    if (verificacoes.some((v) => v.user.id === usuario.id && v.status === 'pending')) {
+    const user = database.userFromToken(request)
+    if (user.role !== 'citizen') return 'already-verified' as const
+    if (verifications.some((v) => v.user.id === user.id && v.status === 'pending')) {
       return 'verification-already-pending' as const
     }
-    const nova: Verificacao = {
-      id: `v-${verificacoes.length + 1}`,
-      user: { id: usuario.id, name: usuario.name, initials: iniciais(usuario.name) },
-      affiliationType: tipoVinculo,
-      justification: justificativa,
+    const fresh: Verification = {
+      id: `v-${verifications.length + 1}`,
+      user: { id: user.id, name: user.name, initials: initials(user.name) },
+      affiliationType,
+      justification,
       status: 'pending',
       createdAt: new Date().toISOString(),
       rejectionReason: null,
     }
-    verificacoes = [nova, ...verificacoes]
-    return nova
+    verifications = [fresh, ...verifications]
+    return fresh
   },
-  analisarVerificacao(id: string, decisao: 'approved' | 'rejected', motivo: string | null) {
-    const verificacao = verificacoes.find((v) => v.id === id)
-    if (!verificacao) return 'nao-encontrada' as const
-    if (verificacao.status !== 'pending') return 'verification-already-reviewed' as const
-    verificacoes = verificacoes.map((v) =>
-      v.id === id ? { ...v, status: decisao, rejectionReason: motivo } : v,
+  reviewVerification(id: string, decision: 'approved' | 'rejected', reason: string | null) {
+    const verification = verifications.find((v) => v.id === id)
+    if (!verification) return 'not-found' as const
+    if (verification.status !== 'pending') return 'verification-already-reviewed' as const
+    verifications = verifications.map((v) =>
+      v.id === id ? { ...v, status: decision, rejectionReason: reason } : v,
     )
-    if (decisao === 'approved') {
-      perfis.set(verificacao.user.id, {
+    if (decision === 'approved') {
+      roles.set(verification.user.id, {
         role: 'verifiedCitizen',
         verifiedAt: new Date().toISOString(),
       })
@@ -206,209 +204,208 @@ export const banco = {
     return 'ok' as const
   },
 
-  problemas(): Schema<'ListIssuesInAreaResponse'>[] {
-    return [...detalhes.values()]
+  issues(): Schema<'ListIssuesInAreaResponse'>[] {
+    return [...details.values()]
       .filter((d) => d.status !== 'resolved')
-      .map(({ id, category: categoria, lat, lng, status, trustScore: confianca, band: faixa }) => ({
+      .map(({ id, category, lat, lng, status, trustScore: trust, band }) => ({
         id,
-        categoryId: categoria.id,
+        categoryId: category.id,
         lat,
         lng,
         status,
-        trustScore: confianca,
-        band: faixa,
+        trustScore: trust,
+        band,
       }))
   },
-  detalhe(id: string, autenticado: boolean): Detalhe | null {
-    const detalhe = detalhes.get(id)
-    if (!detalhe) return null
+  detail(id: string, authenticated: boolean): Detail | null {
+    const detail = details.get(id)
+    if (!detail) return null
     return {
-      ...detalhe,
-      myVote: autenticado ? (votos.get(id) ?? null) : null,
-      isAuthor: autenticado && autoria.has(id),
+      ...detail,
+      myVote: authenticated ? (votes.get(id) ?? null) : null,
+      isAuthor: authenticated && authorship.has(id),
     }
   },
-  duplicatas(categoriaId: number, ponto: { lat: number; lng: number }) {
-    return [...detalhes.values()]
-      .filter((d) => d.category.id === categoriaId && d.status !== 'resolved')
-      .map((d) => ({ d, distancia: metrosEntre(ponto, d) }))
-      .filter(({ distancia }) => distancia <= 50)
-      .sort((a, b) => a.distancia - b.distancia)
+  duplicates(categoryId: number, point: { lat: number; lng: number }) {
+    return [...details.values()]
+      .filter((d) => d.category.id === categoryId && d.status !== 'resolved')
+      .map((d) => ({ d, distance: metersBetween(point, d) }))
+      .filter(({ distance }) => distance <= 50)
+      .sort((a, b) => a.distance - b.distance)
       .slice(0, 20)
-      .map(({ d, distancia }) => ({
+      .map(({ d, distance }) => ({
         id: d.id,
         category: d.category,
         address: d.address,
         createdAt: d.createdAt,
-        distanceMeters: Math.round(distancia),
+        distanceMeters: Math.round(distance),
         band: d.band,
         confirmations: d.votes.yes,
       }))
   },
-  registrarProblema(categoriaId: number, lat: number, lng: number, descricao: string | null) {
-    const { type: _tipo, active: _ativa, ...categoria } = banco.categoriaPorId(categoriaId)!
-    const agora = new Date()
-    const detalhe: Detalhe = {
+  reportIssue(categoryId: number, lat: number, lng: number, description: string | null) {
+    const { type: _type, active: _active, ...category } = database.categoryById(categoryId)!
+    const now = new Date()
+    const detail: Detail = {
       id: crypto.randomUUID(),
-      category: categoria,
-      description: descricao,
+      category,
+      description,
       lat,
       lng,
       address: 'Rua Voluntários da Pátria, 170 — Botafogo',
-      createdAt: agora.toISOString(),
+      createdAt: now.toISOString(),
       status: 'new',
       trustScore: null,
       band: null,
       evaluation: {
         voters: 0,
         required: 5,
-        closesAt: new Date(agora.getTime() + 72 * 3_600_000).toISOString(),
+        closesAt: new Date(now.getTime() + 72 * 3_600_000).toISOString(),
       },
       votes: { yes: 0, no: 0, noLast24h: 0 },
       myVote: null,
       isAuthor: false,
     }
-    detalhes.set(detalhe.id, detalhe)
-    autoria.add(detalhe.id)
-    return banco.detalhe(detalhe.id, true)!
+    details.set(detail.id, detail)
+    authorship.add(detail.id)
+    return database.detail(detail.id, true)!
   },
-  votar(id: string, valor: ValorVoto) {
-    const detalhe = detalhes.get(id)!
-    const anterior = votos.get(id) ?? null
-    if (anterior === valor) return
-    const contagem = { ...detalhe.votes }
-    if (anterior === 'yes') contagem.yes--
-    if (anterior === 'no') {
-      contagem.no--
-      contagem.noLast24h--
+  vote(id: string, value: VoteValue) {
+    const detail = details.get(id)!
+    const previous = votes.get(id) ?? null
+    if (previous === value) return
+    const count = { ...detail.votes }
+    if (previous === 'yes') count.yes--
+    if (previous === 'no') {
+      count.no--
+      count.noLast24h--
     }
-    if (valor === 'yes') contagem.yes++
+    if (value === 'yes') count.yes++
     else {
-      contagem.no++
-      contagem.noLast24h++
+      count.no++
+      count.noLast24h++
     }
-    detalhes.set(id, { ...detalhe, votes: contagem })
-    votos.set(id, valor)
+    details.set(id, { ...detail, votes: count })
+    votes.set(id, value)
   },
 
-  calor(filtroGrupos: string[] = []): CelulaCalor[] {
-    const entra = (grupo: string) => filtroGrupos.length === 0 || filtroGrupos.includes(grupo)
-    const grupoDe = (categoriaId: number) =>
-      categoriasAdmin.find((c) => c.id === categoriaId)?.group ?? grupoDasCelulas
-    const celulas = entra(grupoDasCelulas) ? calorIncidentes.map((c) => ({ ...c })) : []
-    for (const novo of incidentesNovos.filter((i) => entra(grupoDe(i.categoryId)))) {
-      const existente = celulas.find((c) => c.lat === novo.lat && c.lng === novo.lng)
-      if (existente) existente.count++
-      else celulas.push({ lat: novo.lat, lng: novo.lng, count: 1 })
+  heatmap(groupFilter: string[] = []): HeatmapCell[] {
+    const matchesGroup = (group: string) => groupFilter.length === 0 || groupFilter.includes(group)
+    const groupOf = (categoryId: number) =>
+      adminCategories.find((c) => c.id === categoryId)?.group ?? cellGroup
+    const cells = matchesGroup(cellGroup) ? incidentHeatmap.map((c) => ({ ...c })) : []
+    for (const newPoint of newIncidents.filter((i) => matchesGroup(groupOf(i.categoryId)))) {
+      const existing = cells.find((c) => c.lat === newPoint.lat && c.lng === newPoint.lng)
+      if (existing) existing.count++
+      else cells.push({ lat: newPoint.lat, lng: newPoint.lng, count: 1 })
     }
-    return celulas
+    return cells
   },
-  registrarIncidente(categoriaId: number, lat: number, lng: number) {
-    if (incidentesRegistrados >= LIMITE_INCIDENTES) return null
-    incidentesRegistrados++
-    const ponto = { lat: Math.round(lat * 1000) / 1000, lng: Math.round(lng * 1000) / 1000 }
-    incidentesNovos = [...incidentesNovos, { categoryId: categoriaId, ...ponto }]
-    return ponto
+  reportIncident(categoryId: number, lat: number, lng: number) {
+    if (reportedIncidents >= INCIDENT_LIMIT) return null
+    reportedIncidents++
+    const point = { lat: Math.round(lat * 1000) / 1000, lng: Math.round(lng * 1000) / 1000 }
+    newIncidents = [...newIncidents, { categoryId, ...point }]
+    return point
   },
-  incidentesNovos() {
-    return incidentesNovos
+  newIncidents() {
+    return newIncidents
   },
 
-  grupos(): Grupo[] {
-    return [...grupos].sort((a, b) => a.sortOrder - b.sortOrder || a.label.localeCompare(b.label))
+  groups(): Group[] {
+    return [...groups].sort((a, b) => a.sortOrder - b.sortOrder || a.label.localeCompare(b.label))
   },
-  categoriasAtivas() {
-    return categoriasAdmin.filter((c) => c.active).map(({ active: _ativa, ...c }) => c)
+  activeCategories() {
+    return adminCategories.filter((c) => c.active).map(({ active: _active, ...c }) => c)
   },
-  categoriaPorId(id: number): CategoriaAdmin | undefined {
-    return categoriasAdmin.find((c) => c.id === id)
+  categoryById(id: number): AdminCategory | undefined {
+    return adminCategories.find((c) => c.id === id)
   },
-  categoriasTodas(): CategoriaAdmin[] {
-    return categoriasAdmin
+  allCategories(): AdminCategory[] {
+    return adminCategories
   },
-  criarGrupo(rotulo: string, tipo: Grupo['type'], cor: Grupo['color']) {
-    if (grupos.some((g) => mesmoRotulo(g.label, rotulo))) return 'duplicate-group-label' as const
-    const base = chaveDe(rotulo)
-    let chave = base
-    for (let n = 2; grupos.some((g) => g.key === chave); n++) chave = `${base}${n}`
-    const grupo: Grupo = {
-      key: chave,
-      label: rotulo.trim(),
-      type: tipo,
-      color: cor,
-      sortOrder: Math.max(0, ...grupos.map((g) => g.sortOrder)) + 1,
+  createGroup(label: string, type: Group['type'], color: Group['color']) {
+    if (groups.some((g) => sameLabel(g.label, label))) return 'duplicate-group-label' as const
+    const base = keyOf(label)
+    let key = base
+    for (let n = 2; groups.some((g) => g.key === key); n++) key = `${base}${n}`
+    const group: Group = {
+      key,
+      label: label.trim(),
+      type,
+      color,
+      sortOrder: Math.max(0, ...groups.map((g) => g.sortOrder)) + 1,
     }
-    grupos = [...grupos, grupo]
-    return grupo
+    groups = [...groups, group]
+    return group
   },
-  editarGrupo(chave: string, rotulo: string, cor: Grupo['color'], ordem: number) {
-    const atual = grupos.find((g) => g.key === chave)
-    if (!atual) return 'nao-encontrado' as const
-    if (grupos.some((g) => g.key !== chave && mesmoRotulo(g.label, rotulo))) {
+  editGroup(key: string, label: string, color: Group['color'], order: number) {
+    const current = groups.find((g) => g.key === key)
+    if (!current) return 'not-found' as const
+    if (groups.some((g) => g.key !== key && sameLabel(g.label, label))) {
       return 'duplicate-group-label' as const
     }
-    const novo = { ...atual, label: rotulo.trim(), color: cor, sortOrder: ordem }
-    grupos = grupos.map((g) => (g.key === chave ? novo : g))
-    return novo
+    const newPoint = { ...current, label: label.trim(), color, sortOrder: order }
+    groups = groups.map((g) => (g.key === key ? newPoint : g))
+    return newPoint
   },
-  apagarGrupo(chave: string) {
-    if (!grupos.some((g) => g.key === chave)) return 'nao-encontrado' as const
-    if (categoriasAdmin.some((c) => c.group === chave)) return 'group-in-use' as const
-    grupos = grupos.filter((g) => g.key !== chave)
+  deleteGroup(key: string) {
+    if (!groups.some((g) => g.key === key)) return 'not-found' as const
+    if (adminCategories.some((c) => c.group === key)) return 'group-in-use' as const
+    groups = groups.filter((g) => g.key !== key)
     return 'ok' as const
   },
-  criarCategoria(corpo: Schema<'CreateCategoryRequest'>) {
-    const grupo = grupos.find((g) => g.key === corpo.group)
-    if (!grupo) return 'grupo-inexistente' as const
-    if (grupo.type !== corpo.type) return 'group-type-mismatch' as const
-    if (categoriasAdmin.some((c) => mesmoRotulo(c.name, corpo.name)))
-      return 'duplicate-name' as const
-    const categoria: CategoriaAdmin = {
-      id: Math.max(0, ...categoriasAdmin.map((c) => c.id)) + 1,
-      name: corpo.name.trim(),
-      group: corpo.group,
-      type: corpo.type,
-      icon: corpo.icon,
+  createCategory(body: Schema<'CreateCategoryRequest'>) {
+    const group = groups.find((g) => g.key === body.group)
+    if (!group) return 'missing-group' as const
+    if (group.type !== body.type) return 'group-type-mismatch' as const
+    if (adminCategories.some((c) => sameLabel(c.name, body.name))) return 'duplicate-name' as const
+    const category: AdminCategory = {
+      id: Math.max(0, ...adminCategories.map((c) => c.id)) + 1,
+      name: body.name.trim(),
+      group: body.group,
+      type: body.type,
+      icon: body.icon,
       active: true,
     }
-    categoriasAdmin = [...categoriasAdmin, categoria]
-    return categoria
+    adminCategories = [...adminCategories, category]
+    return category
   },
-  editarCategoria(id: number, corpo: Schema<'EditCategoryRequest'>) {
-    const atual = categoriasAdmin.find((c) => c.id === id)
-    if (!atual) return 'nao-encontrado' as const
-    const grupo = grupos.find((g) => g.key === corpo.group)
-    if (!grupo) return 'grupo-inexistente' as const
-    if (grupo.type !== atual.type) return 'group-type-mismatch' as const
-    if (categoriasAdmin.some((c) => c.id !== id && mesmoRotulo(c.name, corpo.name))) {
+  editCategory(id: number, body: Schema<'EditCategoryRequest'>) {
+    const current = adminCategories.find((c) => c.id === id)
+    if (!current) return 'not-found' as const
+    const group = groups.find((g) => g.key === body.group)
+    if (!group) return 'missing-group' as const
+    if (group.type !== current.type) return 'group-type-mismatch' as const
+    if (adminCategories.some((c) => c.id !== id && sameLabel(c.name, body.name))) {
       return 'duplicate-name' as const
     }
-    const nova = { ...atual, name: corpo.name.trim(), group: corpo.group, icon: corpo.icon }
-    categoriasAdmin = categoriasAdmin.map((c) => (c.id === id ? nova : c))
-    const embutida = { id, name: nova.name, group: nova.group, icon: nova.icon }
-    for (const [chave, d] of detalhes) {
-      if (d.category.id === id) detalhes.set(chave, { ...d, category: embutida })
+    const fresh = { ...current, name: body.name.trim(), group: body.group, icon: body.icon }
+    adminCategories = adminCategories.map((c) => (c.id === id ? fresh : c))
+    const builtIn = { id, name: fresh.name, group: fresh.group, icon: fresh.icon }
+    for (const [key, d] of details) {
+      if (d.category.id === id) details.set(key, { ...d, category: builtIn })
     }
-    historico = historico.map((h) => (h.category.id === id ? { ...h, category: embutida } : h))
-    return nova
+    history = history.map((h) => (h.category.id === id ? { ...h, category: builtIn } : h))
+    return fresh
   },
-  alterarAtivaCategoria(id: number, ativa: boolean) {
-    if (!categoriasAdmin.some((c) => c.id === id)) return false
-    categoriasAdmin = categoriasAdmin.map((c) => (c.id === id ? { ...c, active: ativa } : c))
+  setCategoryActive(id: number, active: boolean) {
+    if (!adminCategories.some((c) => c.id === id)) return false
+    adminCategories = adminCategories.map((c) => (c.id === id ? { ...c, active } : c))
     return true
   },
 
-  reiniciar() {
-    grupos = [...gruposIniciais]
-    categoriasAdmin = categorias.map((c) => ({ ...c, active: true }))
-    detalhes = criarDetalhes()
-    votos = new Map()
-    usuarios = [...usuariosIniciais]
-    autoria = new Set([ID_DO_AUTOR])
-    incidentesRegistrados = 0
-    incidentesNovos = []
-    verificacoes = verificacoesIniciais()
-    historico = historicoInicial()
-    perfis = new Map()
+  reset() {
+    groups = [...initialGroups]
+    adminCategories = categories.map((c) => ({ ...c, active: true }))
+    details = createDetails()
+    votes = new Map()
+    users = [...initialUsers]
+    authorship = new Set([AUTHOR_ID])
+    reportedIncidents = 0
+    newIncidents = []
+    verifications = initialVerifications()
+    history = initialHistory()
+    roles = new Map()
   },
 }

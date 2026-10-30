@@ -3,54 +3,58 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 
 import type { Schema } from '@/infrastructure/api'
 
-export type MotivoConta = 'votar' | 'registrar'
+export type AccountReason = 'vote' | 'report'
 
-export type AcaoPendente =
-  | { type: 'votar'; problemaId: string; value: Schema<'VoteAnswer'> }
-  | { type: 'continuarRegistro'; passo: 'conferir' | 'enviar' }
+export type PendingActionKind =
+  | { type: 'vote'; issueId: string; value: Schema<'VoteAnswer'> }
+  | { type: 'resumeReport'; step: 'checkDuplicates' | 'submit' }
 
-export interface Pendencia {
-  retorno: string
-  acao: AcaoPendente | null
+export interface PendingAction {
+  returnTo: string
+  action: PendingActionKind | null
 }
 
-interface GuardaState {
-  reason: MotivoConta | null
-  expirou: boolean
-  pendencia: Pendencia | null
-  pedirConta(motivo: MotivoConta, pendencia: Pendencia, expirou?: boolean): void
-  fecharFolha(): void
-  descartar(): void
-  concluirLogin(): string | null
-  consumirAcao(filtro: (acao: AcaoPendente) => boolean): AcaoPendente | null
+interface GuardState {
+  reason: AccountReason | null
+  expired: boolean
+  pendingAction: PendingAction | null
+  askForAccount(reason: AccountReason, pendingAction: PendingAction, expired?: boolean): void
+  closeSheet(): void
+  discard(): void
+  completeLogin(): string | null
+  consumeAction(filter: (action: PendingActionKind) => boolean): PendingActionKind | null
 }
 
-export const useGuardaStore = create<GuardaState>()(
+export const useGuardStore = create<GuardState>()(
   persist(
     (set, get) => ({
       reason: null,
-      expirou: false,
-      pendencia: null,
-      pedirConta: (motivo, pendencia, expirou = false) =>
-        set({ reason: motivo, pendencia, expirou }),
-      fecharFolha: () => set({ reason: null }),
-      descartar: () => set({ reason: null, pendencia: null, expirou: false }),
-      concluirLogin: () => {
-        const { pendencia } = get()
-        set({ reason: null, expirou: false, pendencia: pendencia?.acao ? pendencia : null })
-        return pendencia?.retorno ?? null
+      expired: false,
+      pendingAction: null,
+      askForAccount: (reason, pendingAction, expired = false) =>
+        set({ reason, pendingAction, expired }),
+      closeSheet: () => set({ reason: null }),
+      discard: () => set({ reason: null, pendingAction: null, expired: false }),
+      completeLogin: () => {
+        const { pendingAction } = get()
+        set({
+          reason: null,
+          expired: false,
+          pendingAction: pendingAction?.action ? pendingAction : null,
+        })
+        return pendingAction?.returnTo ?? null
       },
-      consumirAcao: (filtro) => {
-        const acao = get().pendencia?.acao ?? null
-        if (!acao || !filtro(acao)) return null
-        set({ pendencia: null })
-        return acao
+      consumeAction: (filter) => {
+        const action = get().pendingAction?.action ?? null
+        if (!action || !filter(action)) return null
+        set({ pendingAction: null })
+        return action
       },
     }),
     {
       name: 'ocorrencias.pendencia',
       storage: createJSONStorage(() => sessionStorage),
-      partialize: ({ pendencia }) => ({ pendencia }),
+      partialize: ({ pendingAction }) => ({ pendingAction }),
     },
   ),
 )

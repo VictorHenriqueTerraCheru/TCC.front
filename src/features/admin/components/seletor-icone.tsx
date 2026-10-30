@@ -1,45 +1,45 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
-import { CampoBusca } from '@/common/components/campo-busca'
-import { Icone } from '@/common/components/icone'
-import { IconeDinamico } from '@/common/components/icone-remoto'
+import { SearchField } from '@/common/components/campo-busca'
+import { Icon } from '@/common/components/icone'
+import { DynamicIcon } from '@/common/components/icone-remoto'
 import { useDebouncedValue } from '@/common/hooks/use-debounced-value'
-import { buscarIcones } from '@/common/lib/iconify'
+import { fetchIcons } from '@/common/lib/iconify'
 import { cn } from '@/common/lib/utils'
-import { iconeDe } from '@/features/categorias'
+import { iconOf } from '@/features/categorias'
 
-const MINIMO_LETRAS = 2
-const MAXIMO_RESULTADOS = 48
+const MIN_LETTERS = 2
+const MAX_RESULTS = 48
 
-interface SeletorIconeProps {
+interface IconPickerProps {
   value: string
-  aoMudar(nome: string): void
-  erro?: string
+  onChange(name: string): void
+  error?: string
 }
 
-export function SeletorIcone({ value: valor, aoMudar, erro }: SeletorIconeProps) {
-  const [busca, setBusca] = useState('')
-  const termo = useDebouncedValue(busca.trim().toLowerCase(), 350)
-  const resultado = useQuery({
-    queryKey: ['iconify', 'busca', termo],
-    queryFn: ({ signal }) => buscarIcones(termo, signal),
-    enabled: termo.length >= MINIMO_LETRAS,
+export function IconPicker({ value, onChange, error }: IconPickerProps) {
+  const [search, setSearch] = useState('')
+  const term = useDebouncedValue(search.trim().toLowerCase(), 350)
+  const result = useQuery({
+    queryKey: ['iconify', 'search', term],
+    queryFn: ({ signal }) => fetchIcons(term, signal),
+    enabled: term.length >= MIN_LETTERS,
     staleTime: Infinity,
     retry: false,
   })
-  const nomes = resultado.data?.slice(0, MAXIMO_RESULTADOS) ?? []
+  const names = result.data?.slice(0, MAX_RESULTS) ?? []
 
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3 text-sm">
         <span className="flex size-12 items-center justify-center rounded-full bg-muted text-[26px]">
-          {valor ? <IconeDinamico name={iconeDe({ icon: valor })} /> : <Icone name="category" />}
+          {value ? <DynamicIcon name={iconOf({ icon: value })} /> : <Icon name="category" />}
         </span>
-        <span className={cn(!valor && 'text-muted-foreground')}>
-          {valor ? (
+        <span className={cn(!value && 'text-muted-foreground')}>
+          {value ? (
             <>
-              Ícone: <span className="font-mono">{valor}</span>
+              Ícone: <span className="font-mono">{value}</span>
             </>
           ) : (
             'Nenhum ícone escolhido'
@@ -47,51 +47,51 @@ export function SeletorIcone({ value: valor, aoMudar, erro }: SeletorIconeProps)
         </span>
       </div>
 
-      <CampoBusca
-        value={busca}
-        aoMudar={setBusca}
+      <SearchField
+        value={search}
+        onChange={setSearch}
         label="Buscar ícone"
         placeholder="Buscar ícone (em inglês: flood, tree, fire…)"
       />
 
-      {termo.length >= MINIMO_LETRAS && resultado.isPending && (
+      {term.length >= MIN_LETTERS && result.isPending && (
         <p className="text-sm text-muted-foreground">Buscando…</p>
       )}
-      {resultado.isError && (
+      {result.isError && (
         <p role="alert" className="text-sm text-destructive">
           Não foi possível buscar ícones agora. Tente de novo.
         </p>
       )}
-      {resultado.isSuccess && nomes.length === 0 && (
+      {result.isSuccess && names.length === 0 && (
         <p className="text-sm text-muted-foreground">
           Nenhum ícone encontrado. A busca é em inglês.
         </p>
       )}
-      {nomes.length > 0 && (
+      {names.length > 0 && (
         <div role="group" aria-label="Resultados da busca" className="grid grid-cols-6 gap-2">
-          {nomes.map((nome) => (
+          {names.map((name) => (
             <button
-              key={nome}
+              key={name}
               type="button"
-              aria-label={nome}
-              aria-pressed={nome === valor}
-              title={nome}
-              onClick={() => aoMudar(nome)}
+              aria-label={name}
+              aria-pressed={name === value}
+              title={name}
+              onClick={() => onChange(name)}
               className={cn(
                 'flex aspect-square pressionavel items-center justify-center rounded-xl border-2 text-[26px] focus-visible:outline-2',
-                nome === valor
+                name === value
                   ? 'border-primario bg-primario-suave text-primario'
                   : 'border-border bg-card hover:bg-superficie-2',
               )}
             >
-              <IconeDinamico name={nome} />
+              <DynamicIcon name={name} />
             </button>
           ))}
         </div>
       )}
-      {erro && (
+      {error && (
         <p role="alert" className="text-xs text-destructive">
-          {erro}
+          {error}
         </p>
       )}
     </div>

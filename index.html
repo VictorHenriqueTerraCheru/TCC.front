@@ -9,16 +9,16 @@
     <meta name="theme-color" content="#f2f2f7" />
     <script>
       ;(function () {
-        var preferencia = 'automatico'
+        var preference = 'system'
         try {
-          var salvo = JSON.parse(localStorage.getItem('ocorrencias.tema'))
-          if (salvo && salvo.state && salvo.state.preferencia) preferencia = salvo.state.preferencia
+          var saved = JSON.parse(localStorage.getItem('ocorrencias.tema'))
+          if (saved && saved.state && saved.state.preference) preference = saved.state.preference
         } catch (e) {}
-        var escuro =
-          preferencia === 'escuro' ||
-          (preferencia === 'automatico' && matchMedia('(prefers-color-scheme: dark)').matches)
-        document.documentElement.dataset.tema = escuro ? 'escuro' : 'claro'
-        if (escuro) document.querySelector('meta[name="theme-color"]').content = '#121a24'
+        var dark =
+          preference === 'dark' ||
+          (preference === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.tema = dark ? 'dark' : 'light'
+        if (dark) document.querySelector('meta[name="theme-color"]').content = '#121a24'
       })()
     </script>
     <meta name="apple-mobile-web-app-title" content="Ocorrências" />

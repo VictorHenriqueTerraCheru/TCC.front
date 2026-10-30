@@ -1,6 +1,6 @@
 import type { Schema } from '../../api'
 
-export const grupos: Schema<'GroupResponse'>[] = [
+export const groups: Schema<'GroupResponse'>[] = [
   { key: 'viaPublica', label: 'Via pública', type: 'issue', color: 'orange', sortOrder: 1 },
   { key: 'eletrica', label: 'Elétrica', type: 'issue', color: 'ochre', sortOrder: 2 },
   { key: 'limpeza', label: 'Limpeza', type: 'issue', color: 'brown', sortOrder: 3 },

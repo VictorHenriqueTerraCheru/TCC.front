@@ -263,6 +263,7 @@ divide-y divide-border overflow-hidden rounded-[20px] bg-card shadow-1
 divide-y divide-border rounded-[20px] bg-card shadow-1
 Dizer se ele ainda está lá
 e a
+E-mail
 E-mail ou senha inválidos.
 Editar
 Editar 

@@ -2,23 +2,23 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@/common/lib/utils'
 
-export function ChipFiltro({
-  selecionado,
-  aoClicar,
+export function FilterChip({
+  selected,
+  onClick,
   children,
 }: {
-  selecionado: boolean
-  aoClicar(): void
+  selected: boolean
+  onClick(): void
   children: ReactNode
 }) {
   return (
     <button
       type="button"
-      aria-pressed={selecionado}
-      onClick={aoClicar}
+      aria-pressed={selected}
+      onClick={onClick}
       className={cn(
         'flex h-8 shrink-0 pressionavel items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold shadow-1 focus-visible:outline-2',
-        selecionado
+        selected
           ? 'border border-primario/60 bg-primario-suave text-primario backdrop-blur-xl'
           : 'text-foreground vidro hover:bg-superficie-2',
       )}

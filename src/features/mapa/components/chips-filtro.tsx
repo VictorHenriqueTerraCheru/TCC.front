@@ -1,50 +1,46 @@
-import { ChipFiltro } from '@/common/components/chip-filtro'
-import { Icone } from '@/common/components/icone'
-import { aparenciaDaCor, PontoGrupo, useAparencia } from '@/features/categorias'
+import { FilterChip } from '@/common/components/chip-filtro'
+import { Icon } from '@/common/components/icone'
+import { colorAppearance, GroupDot, useAppearance } from '@/features/categorias'
 
-import { gruposDoModo, mostraProblemas, type FiltrosMapa } from '../models/filtros'
+import { modeGroups, showsIssues, type MapFilters } from '../models/filtros'
 
-interface ChipsFiltroProps extends FiltrosMapa {
-  aoAlternarGrupo(grupo: string): void
-  aoAlternarNovas(): void
+interface FilterChipsProps extends MapFilters {
+  onToggleGroup(group: string): void
+  onToggleNew(): void
 }
 
-export function ChipsFiltro({
-  modo,
-  grupos,
-  somenteNovas,
-  aoAlternarGrupo,
-  aoAlternarNovas,
-}: ChipsFiltroProps) {
-  const { grupos: todos } = useAparencia()
+export function FilterChips({
+  mode,
+  groups,
+  onlyNew,
+  onToggleGroup,
+  onToggleNew,
+}: FilterChipsProps) {
+  const { groups: all } = useAppearance()
   return (
     <div
       role="group"
       aria-label="Filtros"
       className="pointer-events-auto -mx-3 flex [scrollbar-width:none] gap-2 overflow-x-auto px-3 pb-1"
     >
-      {gruposDoModo(todos, modo).map((grupo) => {
-        const selecionado = grupos.includes(grupo.key)
+      {modeGroups(all, mode).map((group) => {
+        const selected = groups.includes(group.key)
         return (
-          <ChipFiltro
-            key={grupo.key}
-            selecionado={selecionado}
-            aoClicar={() => aoAlternarGrupo(grupo.key)}
-          >
-            {selecionado ? (
-              <Icone name="check" preenchido className="text-[18px]" />
+          <FilterChip key={group.key} selected={selected} onClick={() => onToggleGroup(group.key)}>
+            {selected ? (
+              <Icon name="check" filled className="text-[18px]" />
             ) : (
-              <PontoGrupo color={aparenciaDaCor[grupo.color]} />
+              <GroupDot color={colorAppearance[group.color]} />
             )}
-            {grupo.label}
-          </ChipFiltro>
+            {group.label}
+          </FilterChip>
         )
       })}
-      {mostraProblemas(modo) && (
-        <ChipFiltro selecionado={somenteNovas} aoClicar={aoAlternarNovas}>
-          <Icone name={somenteNovas ? 'check' : 'hourglass'} className="text-[18px] text-nova" />
+      {showsIssues(mode) && (
+        <FilterChip selected={onlyNew} onClick={onToggleNew}>
+          <Icon name={onlyNew ? 'check' : 'hourglass'} className="text-[18px] text-nova" />
           Em avaliação
-        </ChipFiltro>
+        </FilterChip>
       )}
     </div>
   )

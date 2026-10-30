@@ -2,129 +2,126 @@ import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 
-import { rotas } from '@/app/router'
-import { categorias } from '@/infrastructure/mocks/fixtures/categorias'
-import { grupos } from '@/infrastructure/mocks/fixtures/grupos'
-import { rota } from '@/infrastructure/mocks/rota'
+import { routes } from '@/app/router'
+import { categories } from '@/infrastructure/mocks/fixtures/categorias'
+import { groups } from '@/infrastructure/mocks/fixtures/grupos'
+import { route } from '@/infrastructure/mocks/rota'
 import { server } from '@/infrastructure/mocks/server'
-import { definirLargura, renderizarRotas } from '@/test/render'
-import { entrarComoCidadao, sair } from '@/test/sessao'
+import { setWidth, renderRoutes } from '@/test/render'
+import { loginAsCitizen, logout } from '@/test/sessao'
 
-import { useRascunhoStore } from '../stores/rascunho-store'
+import { useDraftStore } from '../stores/rascunho-store'
 
-function abrir(caminho: string) {
-  definirLargura(390)
-  return renderizarRotas(rotas, caminho)
+function openAt(path: string) {
+  setWidth(390)
+  return renderRoutes(routes, path)
 }
 
-describe('passo 1: tipo e categoria', () => {
-  beforeEach(entrarComoCidadao)
+describe('step 1: type and category', () => {
+  beforeEach(loginAsCitizen)
   afterEach(() => {
-    sair()
-    useRascunhoStore.getState().limpar()
+    logout()
+    useDraftStore.getState().clear()
     sessionStorage.clear()
   })
 
-  it('a tela de tipo leva à lista de categorias do tipo escolhido', async () => {
-    const usuario = userEvent.setup()
-    const { router } = abrir('/registrar')
+  it('the type screen leads to the category list of the chosen type', async () => {
+    const user = userEvent.setup()
+    const { router } = openAt('/registrar')
 
-    await usuario.click(await screen.findByRole('link', { name: /^Evento/ }))
+    await user.click(await screen.findByRole('link', { name: /^Evento/ }))
 
     expect(router.state.location.pathname + router.state.location.search).toBe(
-      '/registrar/categoria?tipo=incident',
+      '/registrar/categoria?type=incident',
     )
     expect(await screen.findByRole('button', { name: 'Roubo' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Buraco na via' })).not.toBeInTheDocument()
   })
 
-  it('tipo ausente ou inválido volta para a escolha do tipo', async () => {
-    const { router } = abrir('/registrar/categoria?tipo=qualquer')
+  it('missing or invalid type goes back to choosing the type', async () => {
+    const { router } = openAt('/registrar/categoria?type=qualquer')
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/registrar'))
     expect(await screen.findByRole('heading', { name: 'Estado ou evento?' })).toBeInTheDocument()
   })
 
-  it('mostra as categorias do tipo agrupadas, uma seção por grupo, na ordem da API', async () => {
-    abrir('/registrar/categoria?tipo=issue')
+  it('shows the categories of the type grouped, one section per group, in API order', async () => {
+    openAt('/registrar/categoria?type=issue')
 
-    for (const grupo of ['Via pública', 'Elétrica', 'Limpeza']) {
-      expect(await screen.findByRole('region', { name: grupo })).toBeInTheDocument()
+    for (const group of ['Via pública', 'Elétrica', 'Limpeza']) {
+      expect(await screen.findByRole('region', { name: group })).toBeInTheDocument()
     }
-    const botoes = within(screen.getByRole('region', { name: 'Via pública' })).getAllByRole(
+    const buttons = within(screen.getByRole('region', { name: 'Via pública' })).getAllByRole(
       'button',
     )
-    expect(botoes).toHaveLength(2)
-    expect(botoes[0]).toHaveAccessibleName('Buraco na via')
-    expect(botoes[1]).toHaveAccessibleName('Calçada danificada')
+    expect(buttons).toHaveLength(2)
+    expect(buttons[0]).toHaveAccessibleName('Buraco na via')
+    expect(buttons[1]).toHaveAccessibleName('Calçada danificada')
     expect(screen.queryByRole('region', { name: 'Segurança' })).not.toBeInTheDocument()
   })
 
-  it('chip de grupo filtra as seções; tocar de novo volta para Todas', async () => {
-    const usuario = userEvent.setup()
-    abrir('/registrar/categoria?tipo=issue')
+  it('group chip filters the sections; tapping again goes back to Todas', async () => {
+    const user = userEvent.setup()
+    openAt('/registrar/categoria?type=issue')
 
-    await usuario.click(await screen.findByRole('button', { name: 'Elétrica' }))
+    await user.click(await screen.findByRole('button', { name: 'Elétrica' }))
     expect(screen.queryByRole('region', { name: 'Limpeza' })).not.toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Elétrica' })).toBeInTheDocument()
 
-    await usuario.click(screen.getByRole('button', { name: 'Elétrica' }))
+    await user.click(screen.getByRole('button', { name: 'Elétrica' }))
     expect(screen.getByRole('region', { name: 'Limpeza' })).toBeInTheDocument()
   })
 
-  it('a busca ignora acento e maiúsculas e avisa quando não acha nada', async () => {
-    const usuario = userEvent.setup()
-    abrir('/registrar/categoria?tipo=issue')
+  it('search ignores accents and case and shows a notice when nothing is found', async () => {
+    const user = userEvent.setup()
+    openAt('/registrar/categoria?type=issue')
 
-    await usuario.type(
-      await screen.findByRole('searchbox', { name: 'Buscar categoria' }),
-      'CALCADA',
-    )
+    await user.type(await screen.findByRole('searchbox', { name: 'Buscar categoria' }), 'CALCADA')
     expect(screen.getByRole('button', { name: 'Calçada danificada' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Buraco na via' })).not.toBeInTheDocument()
 
-    await usuario.clear(screen.getByRole('searchbox', { name: 'Buscar categoria' }))
-    await usuario.type(screen.getByRole('searchbox', { name: 'Buscar categoria' }), 'xyz')
+    await user.clear(screen.getByRole('searchbox', { name: 'Buscar categoria' }))
+    await user.type(screen.getByRole('searchbox', { name: 'Buscar categoria' }), 'xyz')
     expect(screen.getByText(/Nenhuma categoria com esse nome/)).toBeInTheDocument()
   })
 
-  it('Continuar só habilita com uma categoria; segue para o local e vira "Recente" na próxima vez', async () => {
-    const usuario = userEvent.setup()
-    const { router } = abrir('/registrar/categoria?tipo=issue')
+  it('Continuar only enables with a category; goes to the location and becomes "Recente" next time', async () => {
+    const user = userEvent.setup()
+    const { router } = openAt('/registrar/categoria?type=issue')
 
-    const continuar = await screen.findByRole('button', { name: 'Continuar' })
-    expect(continuar).toBeDisabled()
+    const proceed = await screen.findByRole('button', { name: 'Continuar' })
+    expect(proceed).toBeDisabled()
 
-    await usuario.click(await screen.findByRole('button', { name: 'Poste apagado' }))
+    await user.click(await screen.findByRole('button', { name: 'Poste apagado' }))
     expect(screen.getByText('Selecionada: Poste apagado')).toBeInTheDocument()
-    await usuario.click(continuar)
+    await user.click(proceed)
     await waitFor(() => expect(router.state.location.pathname).toBe('/registrar/local'))
 
-    await router.navigate('/registrar/categoria?tipo=issue')
-    const recentes = await screen.findByRole('region', { name: 'Recentes' })
+    await router.navigate('/registrar/categoria?type=issue')
+    const recent = await screen.findByRole('region', { name: 'Recentes' })
     expect(
-      within(recentes).getByRole('button', { name: 'Recente: Poste apagado' }),
+      within(recent).getByRole('button', { name: 'Recente: Poste apagado' }),
     ).toBeInTheDocument()
   })
 
-  it('rascunho de outro tipo não conta como escolha', async () => {
-    useRascunhoStore.getState().escolherCategoria(7)
-    abrir('/registrar/categoria?tipo=issue')
+  it('draft of another type does not count as a choice', async () => {
+    useDraftStore.getState().chooseCategory(7)
+    openAt('/registrar/categoria?type=issue')
 
     expect(await screen.findByRole('button', { name: 'Continuar' })).toBeDisabled()
   })
 
-  it('grupo e categoria criados pelo admin aparecem sem mudar o app', async () => {
+  it('group and category created by the admin appear without changing the app', async () => {
     server.use(
-      http.get(rota('/groups'), () =>
+      http.get(route('/groups'), () =>
         HttpResponse.json([
-          ...grupos,
+          ...groups,
           { key: 'clima', label: 'Clima', type: 'incident', color: 'blue', sortOrder: 6 },
         ]),
       ),
-      http.get(rota('/categories'), () =>
+      http.get(route('/categories'), () =>
         HttpResponse.json([
-          ...categorias,
+          ...categories,
           { id: 9, name: 'Rua inundada', group: 'clima', type: 'incident', icon: 'ico_a' },
         ]),
       ),
@@ -135,65 +132,65 @@ describe('passo 1: tipo e categoria', () => {
         }),
       ),
     )
-    abrir('/registrar/categoria?tipo=incident')
+    openAt('/registrar/categoria?type=incident')
 
-    const clima = await screen.findByRole('region', { name: 'Clima' })
-    expect(within(clima).getByRole('button', { name: 'Rua inundada' })).toBeInTheDocument()
+    const weather = await screen.findByRole('region', { name: 'Clima' })
+    expect(within(weather).getByRole('button', { name: 'Rua inundada' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Clima' })).toBeInTheDocument()
-    await waitFor(() => expect(clima.querySelector('svg path')).toHaveAttribute('d', 'M1 1h4v4z'))
+    await waitFor(() => expect(weather.querySelector('svg path')).toHaveAttribute('d', 'M1 1h4v4z'))
   })
 
-  it('falha ao carregar as categorias oferece tentar de novo', async () => {
-    server.use(http.get(rota('/categories'), () => new HttpResponse(null, { status: 500 })))
-    abrir('/registrar/categoria?tipo=issue')
+  it('failure loading the categories offers to try again', async () => {
+    server.use(http.get(route('/categories'), () => new HttpResponse(null, { status: 500 })))
+    openAt('/registrar/categoria?type=issue')
 
     expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
   })
 
-  it('categoria cujo grupo sumiu aparece em "Outras" e continua escolhível', async () => {
+  it('category whose group disappeared shows under "Outras" and stays selectable', async () => {
     server.use(
-      http.get(rota('/categories'), () =>
+      http.get(route('/categories'), () =>
         HttpResponse.json([
-          ...categorias,
+          ...categories,
           { id: 9, name: 'Sem grupo', group: 'removido', type: 'issue', icon: 'ico_a' },
         ]),
       ),
     )
-    const usuario = userEvent.setup()
-    abrir('/registrar/categoria?tipo=issue')
+    const user = userEvent.setup()
+    openAt('/registrar/categoria?type=issue')
 
-    const outras = await screen.findByRole('region', { name: 'Outras' })
-    await usuario.click(within(outras).getByRole('button', { name: 'Sem grupo' }))
+    const others = await screen.findByRole('region', { name: 'Outras' })
+    await user.click(within(others).getByRole('button', { name: 'Sem grupo' }))
     expect(screen.getByText('Selecionada: Sem grupo')).toBeInTheDocument()
   })
 
-  it('falha em /grupos oferece tentar de novo em vez de uma lista vazia', async () => {
-    server.use(http.get(rota('/groups'), () => new HttpResponse(null, { status: 500 })))
-    abrir('/registrar/categoria?tipo=issue')
+  it('failure on /grupos offers to try again instead of an empty list', async () => {
+    server.use(http.get(route('/groups'), () => new HttpResponse(null, { status: 500 })))
+    openAt('/registrar/categoria?type=issue')
 
     expect(await screen.findByText('Não foi possível carregar as categorias.')).toBeInTheDocument()
     expect(screen.queryByText(/Nenhuma categoria com esse nome/)).not.toBeInTheDocument()
   })
 
-  it('passo de local com categoria de outro tipo volta para a lista do tipo certo', async () => {
-    useRascunhoStore.getState().escolherCategoria(7)
-    const { router } = abrir('/registrar/local')
+  it("location step with a category of another type goes back to the right type's list", async () => {
+    useDraftStore.getState().chooseCategory(7)
+    const { router } = openAt('/registrar/local')
 
     await waitFor(() =>
       expect(router.state.location.pathname + router.state.location.search).toBe(
-        '/registrar/categoria?tipo=issue',
+        '/registrar/categoria?type=issue',
       ),
     )
   })
 
-  it('passo de local com categoria que foi desativada volta para a lista', async () => {
-    useRascunhoStore.getState().escolherCategoria(99)
-    const { router } = abrir('/registrar/incidente/local')
+  it('location step with a category that was deactivated goes back to the list', async () => {
+    useDraftStore.getState().chooseCategory(99)
+    const { router } = openAt('/registrar/incidente/local')
 
     await waitFor(() =>
       expect(router.state.location.pathname + router.state.location.search).toBe(
-        '/registrar/categoria?tipo=incident',
+        '/registrar/categoria?type=incident',
       ),
     )
   })

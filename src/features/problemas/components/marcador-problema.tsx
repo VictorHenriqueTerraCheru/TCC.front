@@ -1,42 +1,36 @@
-import { IconeDinamico } from '@/common/components/icone-remoto'
+import { DynamicIcon } from '@/common/components/icone-remoto'
 
-import { dimensoesMarcador, PONTA, varianteDo } from '../models/marcador'
-import type { FaixaConfianca, StatusProblema } from '../models/problema'
+import { markerSize, TIP, variantFor } from '../models/marcador'
+import type { TrustBand, IssueStatus } from '../models/problema'
 
-interface MarcadorProblemaProps {
+interface IssueMarkerProps {
   color: string
   icon: string
-  status: StatusProblema
-  band: FaixaConfianca | null
-  selecionado?: boolean
+  status: IssueStatus
+  band: TrustBand | null
+  selected?: boolean
 }
 
-export function MarcadorProblema({
-  color: cor,
-  icon: icone,
-  status,
-  band: faixa,
-  selecionado = false,
-}: MarcadorProblemaProps) {
-  const { opacidade } = varianteDo(status, faixa)
-  const { largura: d, altura } = dimensoesMarcador(status, faixa)
-  const tracejado = status === 'possiblyResolved'
-  const pulsa = faixa === 'high' && status !== 'new'
+export function IssueMarker({ color, icon, status, band, selected = false }: IssueMarkerProps) {
+  const { opacity } = variantFor(status, band)
+  const { width: d, height } = markerSize(status, band)
+  const dashed = status === 'possiblyResolved'
+  const pulses = band === 'high' && status !== 'new'
 
   return (
     <div
-      className="marcador-problema"
+      className="issue-marker"
       data-status={status}
-      data-faixa={faixa ?? 'nenhuma'}
+      data-faixa={band ?? 'none'}
       style={{
         position: 'relative',
         width: d,
-        height: altura,
-        transform: selecionado ? 'scale(1.15)' : undefined,
+        height,
+        transform: selected ? 'scale(1.15)' : undefined,
         transformOrigin: '50% 100%',
       }}
     >
-      {selecionado && (
+      {selected && (
         <span
           style={{
             position: 'absolute',
@@ -50,11 +44,11 @@ export function MarcadorProblema({
           }}
         />
       )}
-      {pulsa && (
+      {pulses && (
         <span
           className="pulso-alerta"
           aria-hidden="true"
-          style={{ position: 'absolute', left: 0, top: 0, width: d, height: d, background: cor }}
+          style={{ position: 'absolute', left: 0, top: 0, width: d, height: d, background: color }}
         />
       )}
 
@@ -67,8 +61,8 @@ export function MarcadorProblema({
           transform: 'translateX(-50%)',
           borderLeft: '6px solid transparent',
           borderRight: '6px solid transparent',
-          borderTop: `${PONTA + 2}px solid #ffffff`,
-          opacity: opacidade,
+          borderTop: `${TIP + 2}px solid #ffffff`,
+          opacity,
         }}
       />
       <span
@@ -81,22 +75,22 @@ export function MarcadorProblema({
           height: d,
           boxSizing: 'border-box',
           borderRadius: '50%',
-          background: cor,
+          background: color,
           border: '2.5px solid #ffffff',
-          borderStyle: tracejado ? 'dashed' : 'solid',
+          borderStyle: dashed ? 'dashed' : 'solid',
           boxShadow: '0 4px 10px rgba(0,0,0,.28)',
-          opacity: opacidade,
+          opacity,
           display: 'grid',
           placeItems: 'center',
         }}
       >
-        <IconeDinamico
-          name={icone}
-          preenchido
+        <DynamicIcon
+          name={icon}
+          filled
           style={{ fontSize: Math.round(d * 0.56), lineHeight: 1, color: '#ffffff' }}
         />
       </span>
-      {tracejado && (
+      {dashed && (
         <span
           className="material-symbols-rounded"
           aria-hidden="true"

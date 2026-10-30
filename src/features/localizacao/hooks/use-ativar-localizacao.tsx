@@ -1,23 +1,21 @@
 import { useState } from 'react'
 
-import { AjudaLocalizacaoDialog } from '../components/ajuda-localizacao-dialog'
-import { useLocalizacao } from './use-localizacao'
+import { LocationHelpDialog } from '../components/ajuda-localizacao-dialog'
+import { useGeolocation } from './use-localizacao'
 
-export function useAtivarLocalizacao() {
-  const { estado, solicitar } = useLocalizacao()
-  const [ajudaAberta, setAjudaAberta] = useState(false)
+export function useEnableLocation() {
+  const { state, request } = useGeolocation()
+  const [helpOpen, setHelpOpen] = useState(false)
 
-  async function ativar() {
-    if (estado === 'denied' || estado === 'indisponivel') {
-      setAjudaAberta(true)
+  async function activate() {
+    if (state === 'denied' || state === 'unavailable') {
+      setHelpOpen(true)
       return null
     }
-    return solicitar()
+    return request()
   }
 
-  const dialogo = (
-    <AjudaLocalizacaoDialog aberto={ajudaAberta} aoMudarAberto={setAjudaAberta} estado={estado} />
-  )
+  const dialog = <LocationHelpDialog open={helpOpen} onOpenChange={setHelpOpen} state={state} />
 
-  return { ativar, dialogo }
+  return { activate, dialog }
 }

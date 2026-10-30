@@ -1,18 +1,18 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
-import { useSessaoStore } from '../stores/sessao-store'
+import { useSessionStore } from '../stores/sessao-store'
 
-const DA_CONTA = [['me'], ['admin']]
+const ACCOUNT_QUERY_KEYS = [['me'], ['admin']]
 
-export function useSincronizarCacheComSessao() {
+export function useSyncCacheWithSession() {
   const queryClient = useQueryClient()
   useEffect(
     () =>
-      useSessaoStore.subscribe((atual, anterior) => {
-        if (atual.sessao?.token === anterior.sessao?.token) return
-        DA_CONTA.forEach((queryKey) => queryClient.removeQueries({ queryKey }))
-        void queryClient.resetQueries({ queryKey: ['problemas', 'detalhe'] })
+      useSessionStore.subscribe((current, previous) => {
+        if (current.session?.token === previous.session?.token) return
+        ACCOUNT_QUERY_KEYS.forEach((queryKey) => queryClient.removeQueries({ queryKey }))
+        void queryClient.resetQueries({ queryKey: ['issues', 'detail'] })
         void queryClient.invalidateQueries()
       }),
     [queryClient],

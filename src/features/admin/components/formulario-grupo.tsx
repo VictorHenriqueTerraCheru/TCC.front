@@ -1,122 +1,122 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 
-import { CampoTexto } from '@/common/components/campo-texto'
-import { Segmentado } from '@/common/components/segmentado'
+import { TextField } from '@/common/components/campo-texto'
+import { SegmentedControl } from '@/common/components/segmentado'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
-import { aparenciaDaCor, coresGrupo, nomeDaCor, type Grupo } from '@/features/categorias'
+import { colorAppearance, groupColors, colorName, type Group } from '@/features/categorias'
 
-import { useCriarGrupo, useEditarGrupo } from '../api/use-grupos-admin'
-import { mensagemErroCategorias } from '../errors'
-import { ajudaDoTipo, opcoesDeTipo } from '../models/tipo'
-import { EtiquetaTipo } from './etiqueta-tipo'
-import { grupoSchema, type GrupoForm } from '../validators/grupo'
+import { useCreateGroup, useEditGroup } from '../api/use-grupos-admin'
+import { categoryErrorMessage } from '../errors'
+import { typeHelp, typeOptions } from '../models/tipo'
+import { TypeLabel } from './etiqueta-tipo'
+import { groupSchema, type GroupFormValues } from '../validators/grupo'
 
-interface FormularioGrupoProps {
-  group?: Grupo
-  aoConcluir(): void
+interface GroupFormProps {
+  group?: Group
+  onDone(): void
 }
 
-export function FormularioGrupo({ group: grupo, aoConcluir }: FormularioGrupoProps) {
-  const criar = useCriarGrupo()
-  const editar = useEditarGrupo()
-  const mutacao = grupo ? editar : criar
-  const { register, handleSubmit, control, setValue, formState } = useForm<GrupoForm>({
-    resolver: zodResolver(grupoSchema),
+export function GroupForm({ group, onDone }: GroupFormProps) {
+  const create = useCreateGroup()
+  const edit = useEditGroup()
+  const mutation = group ? edit : create
+  const { register, handleSubmit, control, setValue, formState } = useForm<GroupFormValues>({
+    resolver: zodResolver(groupSchema),
     defaultValues: {
-      label: grupo?.label ?? '',
-      type: grupo?.type ?? 'issue',
-      color: grupo?.color ?? 'blue',
-      sortOrder: grupo?.sortOrder ?? 1,
+      label: group?.label ?? '',
+      type: group?.type ?? 'issue',
+      color: group?.color ?? 'blue',
+      sortOrder: group?.sortOrder ?? 1,
     },
   })
-  const [tipo, cor] = useWatch({ control, name: ['type', 'color'] })
+  const [type, color] = useWatch({ control, name: ['type', 'color'] })
 
-  const enviar = handleSubmit((form) => {
-    const opcoes = { onSuccess: aoConcluir }
-    if (grupo) {
-      editar.mutate(
-        { key: grupo.key, label: form.label, color: form.color, sortOrder: form.sortOrder },
-        opcoes,
+  const send = handleSubmit((form) => {
+    const options = { onSuccess: onDone }
+    if (group) {
+      edit.mutate(
+        { key: group.key, label: form.label, color: form.color, sortOrder: form.sortOrder },
+        options,
       )
     } else {
-      criar.mutate({ label: form.label, type: form.type, color: form.color }, opcoes)
+      create.mutate({ label: form.label, type: form.type, color: form.color }, options)
     }
   })
 
   return (
-    <form onSubmit={enviar} noValidate className="mt-2 space-y-5">
-      <CampoTexto
+    <form onSubmit={send} noValidate className="mt-2 space-y-5">
+      <TextField
         label="Nome do grupo"
         maxLength={40}
-        erro={formState.errors.label?.message}
+        error={formState.errors.label?.message}
         {...register('label')}
       />
 
       <div className="space-y-2">
         <p className="text-sm font-medium">Tipo</p>
-        {grupo ? (
+        {group ? (
           <p className="text-sm text-muted-foreground">
-            <EtiquetaTipo type={grupo.type} className="mr-2" />O tipo não muda depois de criado.
+            <TypeLabel type={group.type} className="mr-2" />O tipo não muda depois de criado.
           </p>
         ) : (
-          <Segmentado
+          <SegmentedControl
             label="Tipo"
-            opcoes={opcoesDeTipo}
-            value={tipo}
-            aoMudar={(valor) => setValue('type', valor)}
+            options={typeOptions}
+            value={type}
+            onChange={(value) => setValue('type', value)}
           />
         )}
-        <p className="text-xs text-muted-foreground">{ajudaDoTipo[grupo?.type ?? tipo]}</p>
+        <p className="text-xs text-muted-foreground">{typeHelp[group?.type ?? type]}</p>
       </div>
 
       <div className="space-y-2">
         <p className="text-sm font-medium">Cor</p>
         <div role="radiogroup" aria-label="Cor" className="flex flex-wrap gap-3">
-          {coresGrupo.map((c) => (
+          {groupColors.map((c) => (
             <button
               key={c}
               type="button"
               role="radio"
-              aria-checked={c === cor}
-              aria-label={nomeDaCor[c]}
-              title={nomeDaCor[c]}
+              aria-checked={c === color}
+              aria-label={colorName[c]}
+              title={colorName[c]}
               onClick={() => setValue('color', c, { shouldValidate: true })}
               className={cn(
                 'size-10 rounded-full border-[3px] border-card ring-1 ring-border focus-visible:outline-2',
-                c === cor && 'ring-2 ring-foreground',
+                c === color && 'ring-2 ring-foreground',
               )}
-              style={{ background: aparenciaDaCor[c].corForte }}
+              style={{ background: colorAppearance[c].strongColor }}
             />
           ))}
         </div>
       </div>
 
-      {grupo && (
-        <CampoTexto
+      {group && (
+        <TextField
           label="Ordem de exibição"
           type="number"
           inputMode="numeric"
           min={1}
           max={100000}
-          erro={formState.errors.sortOrder?.message}
-          ajuda="Menor aparece primeiro nos filtros e na escolha de categoria."
+          error={formState.errors.sortOrder?.message}
+          help="Menor aparece primeiro nos filtros e na escolha de categoria."
           {...register('sortOrder', { valueAsNumber: true })}
         />
       )}
 
-      {mutacao.isError && (
+      {mutation.isError && (
         <p role="alert" className="text-sm text-destructive">
-          {mensagemErroCategorias(mutacao.error)}
+          {categoryErrorMessage(mutation.error)}
         </p>
       )}
       <div className="flex gap-3">
-        <Button type="button" variant="outline" className="flex-1" onClick={aoConcluir}>
+        <Button type="button" variant="outline" className="flex-1" onClick={onDone}>
           Cancelar
         </Button>
-        <Button type="submit" className="flex-1" carregando={mutacao.isPending}>
-          {mutacao.isPending ? 'Salvando…' : 'Salvar'}
+        <Button type="submit" className="flex-1" loading={mutation.isPending}>
+          {mutation.isPending ? 'Salvando…' : 'Salvar'}
         </Button>
       </div>
     </form>

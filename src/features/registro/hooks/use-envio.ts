@@ -1,46 +1,46 @@
 import { useState } from 'react'
 import { useLocation } from 'react-router'
 
-import { useExigirConta } from '@/features/auth'
-import { isApiError, isErroDeRede } from '@/infrastructure/api'
+import { useRequireAccount } from '@/features/auth'
+import { isApiError, isNetworkError } from '@/infrastructure/api'
 
-import { mensagemErroRegistro } from '../errors'
+import { reportErrorMessage } from '../errors'
 
-export function useEnvio<Variaveis, Resultado>(
-  executar: (variaveis: Variaveis) => Promise<Resultado>,
-  aoSucesso: (resultado: Resultado, variaveis: Variaveis) => void,
+export function useSubmission<Variables, Result>(
+  run: (variables: Variables) => Promise<Result>,
+  onSuccess: (result: Result, variables: Variables) => void,
 ) {
-  const exigirConta = useExigirConta()
+  const requireAccount = useRequireAccount()
   const { pathname } = useLocation()
-  const [falhaAberta, setFalhaAberta] = useState(false)
-  const [erroRegra, setErroRegra] = useState<string | null>(null)
-  const [ultimas, setUltimas] = useState<Variaveis | null>(null)
+  const [failureOpen, setFailureOpen] = useState(false)
+  const [ruleError, setRuleError] = useState<string | null>(null)
+  const [ultimas, setUltimas] = useState<Variables | null>(null)
 
-  function enviar(variaveis: Variaveis) {
-    setErroRegra(null)
-    setFalhaAberta(false)
-    setUltimas(variaveis)
-    executar(variaveis).then(
-      (resultado) => aoSucesso(resultado, variaveis),
-      (erro: unknown) => {
-        if (isErroDeRede(erro)) setFalhaAberta(true)
-        else if (isApiError(erro) && erro.status === 401)
-          exigirConta('registrar', () => {}, {
-            retorno: pathname,
-            pending: { type: 'continuarRegistro', passo: 'enviar' },
+  function send(variables: Variables) {
+    setRuleError(null)
+    setFailureOpen(false)
+    setUltimas(variables)
+    run(variables).then(
+      (result) => onSuccess(result, variables),
+      (error: unknown) => {
+        if (isNetworkError(error)) setFailureOpen(true)
+        else if (isApiError(error) && error.status === 401)
+          requireAccount('report', () => {}, {
+            returnTo: pathname,
+            pending: { type: 'resumeReport', step: 'submit' },
           })
-        else setErroRegra(mensagemErroRegistro(erro))
+        else setRuleError(reportErrorMessage(error))
       },
     )
   }
 
   return {
-    enviar,
-    erroRegra,
-    falha: {
-      aberto: falhaAberta,
-      aoMudarAberto: setFalhaAberta,
-      aoTentarNovamente: () => ultimas !== null && enviar(ultimas),
+    send,
+    ruleError,
+    failure: {
+      open: failureOpen,
+      onOpenChange: setFailureOpen,
+      onRetry: () => ultimas !== null && send(ultimas),
     },
   }
 }

@@ -1,36 +1,36 @@
 import { act, render, screen } from '@testing-library/react'
 
-import { useTemaStore } from '@/common/hooks/use-tema'
-import { mapaFalso } from '@/test/maplibre-falso'
+import { useThemeStore } from '@/common/hooks/use-tema'
+import { fakeMap } from '@/test/maplibre-falso'
 
-import { MapaVetorial } from './mapa-vetorial'
+import { VectorMap } from './mapa-vetorial'
 
-describe('MapaVetorial', () => {
-  it('nasce no centro [lat, lng] e devolve o toque como { lat, lng }', () => {
-    const aoTocar = vi.fn()
-    render(<MapaVetorial centro={[-22.95, -43.18]} aoTocar={aoTocar} />)
+describe('VectorMap', () => {
+  it('starts at center [lat, lng] and reports taps as { lat, lng }', () => {
+    const onTap = vi.fn()
+    render(<VectorMap center={[-22.95, -43.18]} onTap={onTap} />)
 
-    expect(screen.getByTestId('mapa')).toBeInTheDocument()
-    expect(mapaFalso.atual()!.getCenter()).toEqual({ lat: -22.95, lng: -43.18 })
+    expect(screen.getByTestId('map')).toBeInTheDocument()
+    expect(fakeMap.current()!.getCenter()).toEqual({ lat: -22.95, lng: -43.18 })
 
-    mapaFalso.tocar(-22.9, -43.1)
-    expect(aoTocar).toHaveBeenCalledWith({ lat: -22.9, lng: -43.1 })
+    fakeMap.tap(-22.9, -43.1)
+    expect(onTap).toHaveBeenCalledWith({ lat: -22.9, lng: -43.1 })
   })
 
-  it('usa o estilo do tema atual e troca junto com ele', () => {
-    useTemaStore.setState({ preferencia: 'claro' })
-    render(<MapaVetorial centro={[0, 0]} />)
-    expect(screen.getByTestId('mapa')).toHaveAttribute('data-estilo', 'ocorrencias-claro')
+  it('uses the current theme style and switches along with it', () => {
+    useThemeStore.setState({ preference: 'light' })
+    render(<VectorMap center={[0, 0]} />)
+    expect(screen.getByTestId('map')).toHaveAttribute('data-estilo', 'ocorrencias-claro')
 
-    act(() => useTemaStore.getState().definirPreferencia('escuro'))
-    expect(screen.getByTestId('mapa')).toHaveAttribute('data-estilo', 'ocorrencias-escuro')
+    act(() => useThemeStore.getState().setPreference('dark'))
+    expect(screen.getByTestId('map')).toHaveAttribute('data-estilo', 'ocorrencias-escuro')
   })
 
-  it('avisa ao parar de mover', () => {
-    const aoParar = vi.fn()
-    render(<MapaVetorial centro={[0, 0]} aoParar={aoParar} />)
+  it('notifies when it stops moving', () => {
+    const onStop = vi.fn()
+    render(<VectorMap center={[0, 0]} onStop={onStop} />)
 
-    mapaFalso.mover({ lat: 1, lng: 2 })
-    expect(aoParar).toHaveBeenCalledTimes(1)
+    fakeMap.move({ lat: 1, lng: 2 })
+    expect(onStop).toHaveBeenCalledTimes(1)
   })
 })

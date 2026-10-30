@@ -1,33 +1,33 @@
 import { ApiError } from '@/infrastructure/api'
 
-import { mensagemErroRegistro } from './errors'
+import { reportErrorMessage } from './errors'
 
-describe('mensagemErroRegistro', () => {
-  it('mapeia os códigos de regra', () => {
-    expect(mensagemErroRegistro(new ApiError(422, { type: 'time-outside-window' }))).toBe(
+describe('reportErrorMessage', () => {
+  it('maps the rule codes', () => {
+    expect(reportErrorMessage(new ApiError(422, { type: 'time-outside-window' }))).toBe(
       'O horário precisa estar dentro das últimas 24 horas. Ajuste e envie de novo.',
     )
-    expect(mensagemErroRegistro(new ApiError(429, { type: 'daily-incident-limit' }))).toContain(
+    expect(reportErrorMessage(new ApiError(429, { type: 'daily-incident-limit' }))).toContain(
       'limite de relatos de incidente',
     )
-    expect(mensagemErroRegistro(new ApiError(403, { type: 'category-not-issue' }))).toContain(
+    expect(reportErrorMessage(new ApiError(403, { type: 'category-not-issue' }))).toContain(
       'categoria é de incidente',
     )
   })
 
-  it('sem código conhecido, usa a primeira mensagem de validação, depois o título', () => {
+  it('without a known code, uses the first validation message, then the title', () => {
     expect(
-      mensagemErroRegistro(
-        new ApiError(400, { type: 'desconhecido', errors: { description: ['Muito longa.'] } }),
+      reportErrorMessage(
+        new ApiError(400, { type: 'unknown', errors: { description: ['Muito longa.'] } }),
       ),
     ).toBe('Muito longa.')
-    expect(mensagemErroRegistro(new ApiError(400, { title: 'Requisição inválida' }))).toBe(
+    expect(reportErrorMessage(new ApiError(400, { title: 'Requisição inválida' }))).toBe(
       'Requisição inválida',
     )
   })
 
-  it('erro de rede cai na mensagem padrão (a tela 26 trata à parte)', () => {
-    expect(mensagemErroRegistro(new TypeError('Failed to fetch'))).toBe(
+  it('network error falls back to the default message (screen 26 handles it separately)', () => {
+    expect(reportErrorMessage(new TypeError('Failed to fetch'))).toBe(
       'Não foi possível enviar. Tente de novo.',
     )
   })

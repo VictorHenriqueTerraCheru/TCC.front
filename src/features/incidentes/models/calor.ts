@@ -1,39 +1,39 @@
 import type { FeatureCollection, Point } from 'geojson'
 import type { ExpressionSpecification } from 'maplibre-gl'
 
-import type { CelulaCalor } from './incidente'
+import type { HeatmapCell } from './incidente'
 
-export const gradienteCalor: Record<number, string> = {
+export const heatmapGradient: Record<number, string> = {
   0.2: '#5b2bff',
   0.45: '#c026d3',
   0.7: '#ff3b30',
   1: '#ffd60a',
 }
 
-const paradas = Object.entries(gradienteCalor).sort(([a], [b]) => Number(a) - Number(b))
+const stops = Object.entries(heatmapGradient).sort(([a], [b]) => Number(a) - Number(b))
 
-export const gradienteCalorCss = `linear-gradient(to right, ${paradas
-  .map(([parada, cor]) => `${cor} ${Number(parada) * 100}%`)
+export const heatmapGradientCss = `linear-gradient(to right, ${stops
+  .map(([halted, color]) => `${color} ${Number(halted) * 100}%`)
   .join(', ')})`
 
-export function expressaoGradienteCalor(): ExpressionSpecification {
+export function heatmapGradientExpression(): ExpressionSpecification {
   return [
     'interpolate',
     ['linear'],
     ['heatmap-density'],
     0,
     'rgba(0,0,0,0)',
-    ...paradas.flatMap(([parada, cor]) => [Number(parada), cor]),
+    ...stops.flatMap(([halted, color]) => [Number(halted), color]),
   ] as ExpressionSpecification
 }
 
-export function pesosCalor(celulas: CelulaCalor[]): FeatureCollection<Point, { peso: number }> {
-  const maximo = Math.max(4, ...celulas.map((c) => c.count))
+export function heatmapWeights(cells: HeatmapCell[]): FeatureCollection<Point, { weight: number }> {
+  const maximum = Math.max(4, ...cells.map((c) => c.count))
   return {
     type: 'FeatureCollection',
-    features: celulas.map((c) => ({
+    features: cells.map((c) => ({
       type: 'Feature',
-      properties: { peso: c.count / maximo },
+      properties: { weight: c.count / maximum },
       geometry: { type: 'Point', coordinates: [c.lng, c.lat] },
     })),
   }

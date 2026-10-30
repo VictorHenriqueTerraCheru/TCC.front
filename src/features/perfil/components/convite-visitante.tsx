@@ -1,13 +1,13 @@
 import { Link } from 'react-router'
 
-import { Icone } from '@/common/components/icone'
+import { Icon } from '@/common/components/icone'
 import { Button } from '@/common/ui/button'
 
-export function ConviteVisitante() {
+export function GuestInvite() {
   return (
     <section className="rounded-2xl bg-card p-6 shadow-1">
       <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-primario-suave text-primario">
-        <Icone name="person_add" className="text-[28px]" />
+        <Icon name="person_add" className="text-[28px]" />
       </span>
       <h2 className="mb-2 text-2xl">Entre para acompanhar sua participação</h2>
       <p className="mb-6 text-sm text-muted-foreground">

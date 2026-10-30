@@ -1,31 +1,31 @@
 import { useState } from 'react'
 
-import { Segmentado } from '@/common/components/segmentado'
+import { SegmentedControl } from '@/common/components/segmentado'
 
-import { GuardaAdmin } from '../components/guarda-admin'
-import { ListaCategorias } from '../components/lista-categorias'
-import { ListaGrupos } from '../components/lista-grupos'
+import { AdminGuard } from '../components/guarda-admin'
+import { CategoryList } from '../components/lista-categorias'
+import { GroupList } from '../components/lista-grupos'
 
-type Secao = 'categorias' | 'grupos'
+type Section = 'categories' | 'groups'
 
-const secoes: { value: Secao; label: string }[] = [
-  { value: 'categorias', label: 'Categorias' },
-  { value: 'grupos', label: 'Grupos' },
+const sections: { value: Section; label: string }[] = [
+  { value: 'categories', label: 'Categorias' },
+  { value: 'groups', label: 'Grupos' },
 ]
 
-export function CategoriasAdminPage() {
-  const [secao, setSecao] = useState<Secao>('categorias')
+export function AdminCategoriesPage() {
+  const [section, setSection] = useState<Section>('categories')
 
   return (
-    <GuardaAdmin titulo="Categorias" caminho="/admin/categorias">
-      <Segmentado<Secao>
+    <AdminGuard title="Categorias" path="/admin/categorias">
+      <SegmentedControl<Section>
         label="Seção"
-        opcoes={secoes}
-        value={secao}
-        aoMudar={setSecao}
+        options={sections}
+        value={section}
+        onChange={setSection}
         className="mb-4"
       />
-      {secao === 'categorias' ? <ListaCategorias /> : <ListaGrupos />}
-    </GuardaAdmin>
+      {section === 'categories' ? <CategoryList /> : <GroupList />}
+    </AdminGuard>
   )
 }

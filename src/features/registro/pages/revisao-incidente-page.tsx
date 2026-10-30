@@ -1,67 +1,70 @@
 import { useNavigate } from 'react-router'
 
-import { Icone } from '@/common/components/icone'
+import { Icon } from '@/common/components/icone'
 import { Button } from '@/common/ui/button'
-import { CategoriaIcone } from '@/features/categorias'
+import { CategoryIcon } from '@/features/categorias'
 
-import { useRegistrarIncidente } from '../api/use-registro'
-import { FalhaEnvioDialog } from '../components/falha-envio-dialog'
-import { PassoRegistro } from '../components/passo-registro'
-import { LinhaResumo, Resumo } from '../components/resumo'
-import { useEnvio } from '../hooks/use-envio'
-import { useRetomarRegistro } from '../hooks/use-retomar-registro'
+import { useReportIncident } from '../api/use-registro'
+import { SubmissionFailedDialog } from '../components/falha-envio-dialog'
+import { ReportStep } from '../components/passo-registro'
+import { SummaryRow, Summary } from '../components/resumo'
+import { useSubmission } from '../hooks/use-envio'
+import { useResumeReport } from '../hooks/use-retomar-registro'
 import {
-  useEnderecoDoRascunho,
-  useExigirCategoria,
-  useExigirPasso,
-  useRascunho,
+  useDraftAddress,
+  useRequireCategory,
+  useRequireStep,
+  useDraft,
 } from '../hooks/use-rascunho'
-import { descreverHorario, ocorridoEm } from '../models/horario'
-import { caminhoDaCategoria } from '../models/rotas'
+import { describeTime, occurredAt } from '../models/horario'
+import { categoryPath } from '../models/rotas'
 
-export function RevisaoIncidentePage() {
+export function IncidentReviewPage() {
   const navigate = useNavigate()
-  const { category: categoria, categoryId: categoriaId, local, horario } = useRascunho()
-  const { data: endereco } = useEnderecoDoRascunho()
-  const registrar = useRegistrarIncidente()
-  useExigirCategoria('incident')
-  useExigirPasso(local !== null, '/registrar/incidente/local')
+  const { category, categoryId, location, time } = useDraft()
+  const { data: address } = useDraftAddress()
+  const report = useReportIncident()
+  useRequireCategory('incident')
+  useRequireStep(location !== null, '/registrar/incidente/local')
 
-  const envio = useEnvio(registrar.mutateAsync, (area, { categoryId: idCategoria, lat, lng }) => {
-    navigate('/registrar/incidente/sucesso', {
-      replace: true,
-      state: {
-        area,
-        categoryId: idCategoria,
-        areaLabel: endereco?.areaLabel ?? null,
-        neighborhood: endereco?.neighborhood ?? null,
-        ponto: { lat, lng },
-      },
-    })
-  })
+  const submission = useSubmission(
+    report.mutateAsync,
+    (area, { categoryId: chosenCategoryId, lat, lng }) => {
+      navigate('/registrar/incidente/sucesso', {
+        replace: true,
+        state: {
+          area,
+          categoryId: chosenCategoryId,
+          areaLabel: address?.areaLabel ?? null,
+          neighborhood: address?.neighborhood ?? null,
+          point: { lat, lng },
+        },
+      })
+    },
+  )
 
-  function enviar() {
-    if (categoriaId === null || !local) return
-    envio.enviar({ categoryId: categoriaId, ...local, occurredAt: ocorridoEm(horario) })
+  function send() {
+    if (categoryId === null || !location) return
+    submission.send({ categoryId, ...location, occurredAt: occurredAt(time) })
   }
-  useRetomarRegistro('enviar', enviar)
+  useResumeReport('submit', send)
 
   return (
-    <PassoRegistro
-      titulo="Revisão"
-      passo={{ atual: 3, total: 3, label: 'Revisão' }}
-      acaoTopo="voltar"
-      aoTopo={() => navigate('/registrar/incidente/local')}
-      rodape={
-        <Button className="w-full" carregando={registrar.isPending} onClick={enviar}>
-          <Icone name="send" className="text-[18px]" />
-          {registrar.isPending ? 'Enviando…' : 'Enviar registro'}
+    <ReportStep
+      title="Revisão"
+      step={{ current: 3, total: 3, label: 'Revisão' }}
+      topAction="back"
+      onTopAction={() => navigate('/registrar/incidente/local')}
+      footer={
+        <Button className="w-full" loading={report.isPending} onClick={send}>
+          <Icon name="send" className="text-[18px]" />
+          {report.isPending ? 'Enviando…' : 'Enviar registro'}
         </Button>
       }
     >
       <div className="space-y-6 pt-2">
         <section className="flex gap-3 rounded-2xl bg-primario-suave p-4 text-primario">
-          <Icone name="visibility_off" className="text-[22px]" />
+          <Icon name="visibility_off" className="text-[22px]" />
           <div>
             <h2 className="font-medium">Registro anônimo e agregado</h2>
             <p className="text-sm">
@@ -71,41 +74,41 @@ export function RevisaoIncidentePage() {
           </div>
         </section>
 
-        <Resumo>
-          <LinhaResumo
+        <Summary>
+          <SummaryRow
             icon={
-              categoria ? (
-                <CategoriaIcone category={categoria} pageSize="sm" className="bg-transparent" />
+              category ? (
+                <CategoryIcon category={category} pageSize="sm" className="bg-transparent" />
               ) : (
                 'category'
               )
             }
             label="Categoria"
-            value={categoria?.name ?? '—'}
-            aoEditar={() => navigate(caminhoDaCategoria('incident'))}
+            value={category?.name ?? '—'}
+            onEdit={() => navigate(categoryPath('incident'))}
           />
-          <LinhaResumo icon="blur_on" label="Tipo" value="Incidente — entra no mapa de calor" />
-          <LinhaResumo
+          <SummaryRow icon="blur_on" label="Tipo" value="Incidente — entra no mapa de calor" />
+          <SummaryRow
             icon="location_on"
             label="Área aproximada"
-            value={endereco ? (endereco.areaLabel ?? endereco.address) : 'Buscando endereço…'}
-            aoEditar={() => navigate('/registrar/incidente/local')}
+            value={address ? (address.areaLabel ?? address.address) : 'Buscando endereço…'}
+            onEdit={() => navigate('/registrar/incidente/local')}
           />
-          <LinhaResumo
+          <SummaryRow
             icon="schedule"
             label="Quando"
-            value={descreverHorario(horario)}
-            aoEditar={() => navigate('/registrar/incidente/local')}
+            value={describeTime(time)}
+            onEdit={() => navigate('/registrar/incidente/local')}
           />
-        </Resumo>
+        </Summary>
 
-        {envio.erroRegra && (
+        {submission.ruleError && (
           <p role="alert" className="text-sm text-destructive">
-            {envio.erroRegra}
+            {submission.ruleError}
           </p>
         )}
       </div>
-      <FalhaEnvioDialog {...envio.falha} />
-    </PassoRegistro>
+      <SubmissionFailedDialog {...submission.failure} />
+    </ReportStep>
   )
 }

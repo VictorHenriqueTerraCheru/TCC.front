@@ -2,118 +2,118 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
-import { Icone } from '@/common/components/icone'
-import { distanciaTexto, tempoRelativo } from '@/common/lib/formatacao'
+import { Icon } from '@/common/components/icone'
+import { distanceText, relativeTime } from '@/common/lib/formatacao'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { CategoriaIcone } from '@/features/categorias'
-import { detalheProblemaQuery, useVotar } from '@/features/problemas'
+import { CategoryIcon } from '@/features/categorias'
+import { issueDetailQuery, useVote } from '@/features/problemas'
 import type { Schema } from '@/infrastructure/api'
 
-import { duplicatasQuery } from '../api/use-registro'
-import { mensagemErroRegistro } from '../errors'
-import { MapaRegistro } from '../components/mapa-registro'
-import { PassoRegistro } from '../components/passo-registro'
-import { useExigirCategoria, useExigirPasso, useRascunho } from '../hooks/use-rascunho'
+import { duplicatesQuery } from '../api/use-registro'
+import { reportErrorMessage } from '../errors'
+import { ReportMap } from '../components/mapa-registro'
+import { ReportStep } from '../components/passo-registro'
+import { useRequireCategory, useRequireStep, useDraft } from '../hooks/use-rascunho'
 
-type Duplicata = Schema<'SearchDuplicatesResponse'>
+type Duplicate = Schema<'SearchDuplicatesResponse'>
 
-const rotuloFaixa = { high: 'Confiança alta', medium: 'Confiança média', low: 'Confiança baixa' }
+const bandLabel = { high: 'Confiança alta', medium: 'Confiança média', low: 'Confiança baixa' }
 
-function CartaoDuplicata({
-  duplicata,
-  selecionada,
-  aoEscolher,
+function DuplicateCard({
+  duplicate,
+  selected,
+  onChoose,
 }: {
-  duplicata: Duplicata
-  selecionada: boolean
-  aoEscolher?(): void
+  duplicate: Duplicate
+  selected: boolean
+  onChoose?(): void
 }) {
   return (
     <button
       type="button"
-      onClick={aoEscolher}
-      aria-pressed={aoEscolher ? selecionada : undefined}
-      disabled={!aoEscolher}
+      onClick={onChoose}
+      aria-pressed={onChoose ? selected : undefined}
+      disabled={!onChoose}
       className={cn(
         'flex w-full gap-3 rounded-2xl border bg-card p-3 text-left shadow-1 disabled:opacity-100',
-        selecionada ? 'border-primario' : 'border-border/60',
+        selected ? 'border-primario' : 'border-border/60',
       )}
     >
-      <CategoriaIcone category={duplicata.category} pageSize="sm" />
+      <CategoryIcon category={duplicate.category} pageSize="sm" />
       <div className="min-w-0 text-sm">
-        <p className="font-medium">{duplicata.category.name}</p>
+        <p className="font-medium">{duplicate.category.name}</p>
         <p className="text-xs text-muted-foreground">
-          {duplicata.address} · {tempoRelativo(duplicata.createdAt)}
+          {duplicate.address} · {relativeTime(duplicate.createdAt)}
         </p>
         <p className="mt-1 flex items-center gap-1 text-xs font-medium text-primario">
-          <Icone
-            name={duplicata.band ? 'check_circle' : 'hourglass_top'}
-            preenchido
+          <Icon
+            name={duplicate.band ? 'check_circle' : 'hourglass_top'}
+            filled
             className="text-[16px]"
           />
-          {duplicata.band ? rotuloFaixa[duplicata.band] : 'Em avaliação'} ·{' '}
-          {duplicata.confirmations} {duplicata.confirmations === 1 ? 'confirmação' : 'confirmações'}
+          {duplicate.band ? bandLabel[duplicate.band] : 'Em avaliação'} · {duplicate.confirmations}{' '}
+          {duplicate.confirmations === 1 ? 'confirmação' : 'confirmações'}
         </p>
       </div>
     </button>
   )
 }
 
-export function ConferenciaPage() {
+export function DuplicateCheckPage() {
   const navigate = useNavigate()
-  const { category: categoria, categoryId: categoriaId, local } = useRascunho()
-  useExigirCategoria('issue')
-  useExigirPasso(local !== null, '/registrar/local')
+  const { category, categoryId, location } = useDraft()
+  useRequireCategory('issue')
+  useRequireStep(location !== null, '/registrar/local')
 
-  const { data: duplicatas } = useQuery({
-    ...duplicatasQuery(categoriaId ?? 0, local ?? { lat: 0, lng: 0 }),
-    enabled: categoriaId !== null && local !== null,
+  const { data: duplicates } = useQuery({
+    ...duplicatesQuery(categoryId ?? 0, location ?? { lat: 0, lng: 0 }),
+    enabled: categoryId !== null && location !== null,
   })
-  const [escolhidaId, setEscolhidaId] = useState<string | null>(null)
-  const escolhida = duplicatas?.find((d) => d.id === escolhidaId) ?? duplicatas?.[0]
-  const confirmar = useVotar(escolhida?.id ?? '')
-  const { data: vizinho } = useQuery({
-    ...detalheProblemaQuery(escolhida?.id ?? ''),
-    enabled: escolhida !== undefined,
+  const [chosenId, setChosenId] = useState<string | null>(null)
+  const chosen = duplicates?.find((d) => d.id === chosenId) ?? duplicates?.[0]
+  const confirm = useVote(chosen?.id ?? '')
+  const { data: neighbor } = useQuery({
+    ...issueDetailQuery(chosen?.id ?? ''),
+    enabled: chosen !== undefined,
   })
 
-  useExigirPasso(duplicatas === undefined || duplicatas.length > 0, '/registrar/revisao')
+  useRequireStep(duplicates === undefined || duplicates.length > 0, '/registrar/revisao')
 
-  function confirmarExistente() {
-    if (!escolhida) return
-    confirmar.mutate('yes', {
-      onSuccess: (problema) => {
+  function confirmExisting() {
+    if (!chosen) return
+    confirm.mutate('yes', {
+      onSuccess: (issue) => {
         navigate('/registrar/sucesso', {
           replace: true,
-          state: { issue: problema, confirmacao: true },
+          state: { issue, confirmation: true },
         })
       },
     })
   }
 
-  const primeira = duplicatas?.[0]
+  const first = duplicates?.[0]
   return (
-    <PassoRegistro
-      titulo="Conferência"
-      passo={{ atual: 3, total: 4, label: 'Registros próximos' }}
-      acaoTopo="voltar"
-      aoTopo={() => navigate('/registrar/local')}
-      mapa={
-        local && escolhida && vizinho?.id === escolhida.id ? (
-          <MapaRegistro
-            modo="conferencia"
-            novo={local}
-            existente={{ ...escolhida, lat: vizinho.lat, lng: vizinho.lng }}
+    <ReportStep
+      title="Conferência"
+      step={{ current: 3, total: 4, label: 'Registros próximos' }}
+      topAction="back"
+      onTopAction={() => navigate('/registrar/local')}
+      map={
+        location && chosen && neighbor?.id === chosen.id ? (
+          <ReportMap
+            mode="duplicateCheck"
+            newPoint={location}
+            existing={{ ...chosen, lat: neighbor.lat, lng: neighbor.lng }}
           />
         ) : (
-          <MapaRegistro modo="estatico" />
+          <ReportMap mode="static" />
         )
       }
-      rodape={
+      footer={
         <div className="flex flex-col gap-2">
-          <Button disabled={!escolhida || confirmar.isPending} onClick={confirmarExistente}>
+          <Button disabled={!chosen || confirm.isPending} onClick={confirmExisting}>
             Sim, confirmar esse
           </Button>
           <Button variant="outline" onClick={() => navigate('/registrar/revisao')}>
@@ -122,37 +122,37 @@ export function ConferenciaPage() {
         </div>
       }
     >
-      {!primeira || !escolhida ? (
+      {!first || !chosen ? (
         <Skeleton className="h-40 rounded-2xl bg-muted" />
       ) : (
         <div className="space-y-3">
           <span className="flex size-10 items-center justify-center rounded-full bg-primario-suave text-primario">
-            <Icone name="content_copy" className="text-[20px]" />
+            <Icon name="content_copy" className="text-[20px]" />
           </span>
           <h2 className="text-[22px] leading-7">
-            Já existe um registro de {categoria?.name ?? primeira.category.name} a{' '}
-            {distanciaTexto(primeira.distanceMeters)}. É o mesmo?
+            Já existe um registro de {category?.name ?? first.category.name} a{' '}
+            {distanceText(first.distanceMeters)}. É o mesmo?
           </h2>
           <p className="text-sm text-muted-foreground">
             Se for, sua confirmação reforça o registro existente em vez de criar uma duplicata.
           </p>
           <div className="max-h-56 space-y-2 overflow-y-auto">
-            {duplicatas.map((d) => (
-              <CartaoDuplicata
+            {duplicates.map((d) => (
+              <DuplicateCard
                 key={d.id}
-                duplicata={d}
-                selecionada={d.id === escolhida.id}
-                aoEscolher={duplicatas.length > 1 ? () => setEscolhidaId(d.id) : undefined}
+                duplicate={d}
+                selected={d.id === chosen.id}
+                onChoose={duplicates.length > 1 ? () => setChosenId(d.id) : undefined}
               />
             ))}
           </div>
-          {confirmar.error && (
+          {confirm.error && (
             <p role="alert" className="text-sm text-destructive">
-              {mensagemErroRegistro(confirmar.error)}
+              {reportErrorMessage(confirm.error)}
             </p>
           )}
         </div>
       )}
-    </PassoRegistro>
+    </ReportStep>
   )
 }

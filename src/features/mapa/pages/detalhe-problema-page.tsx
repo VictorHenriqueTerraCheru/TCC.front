@@ -1,27 +1,27 @@
 import { useEffect } from 'react'
 import { useOutletContext, useParams } from 'react-router'
 
-import { PainelResponsivo } from '@/common/components/painel-responsivo'
-import { ALTURA_RESUMO, DetalheProblema, useDetalheProblema } from '@/features/problemas'
+import { ResponsivePanel } from '@/common/components/painel-responsivo'
+import { SUMMARY_HEIGHT, IssueDetail, useIssueDetail } from '@/features/problemas'
 
-import { useNavegacaoMapa } from '../hooks/use-navegacao-mapa'
-import type { ContextoMapa } from '../models/contexto'
+import { useMapNavigation } from '../hooks/use-navegacao-mapa'
+import type { MapContext } from '../models/contexto'
 
-export function DetalheProblemaPage() {
+export function IssueDetailPage() {
   const { id = '' } = useParams()
-  const { focar } = useOutletContext<ContextoMapa>()
-  const { fechar } = useNavegacaoMapa()
-  const { data } = useDetalheProblema(id)
+  const { focus } = useOutletContext<MapContext>()
+  const { close } = useMapNavigation()
+  const { data } = useIssueDetail(id)
 
   const lat = data?.lat
   const lng = data?.lng
   useEffect(() => {
-    if (lat !== undefined && lng !== undefined) focar({ lat, lng })
-  }, [id, lat, lng, focar])
+    if (lat !== undefined && lng !== undefined) focus({ lat, lng })
+  }, [id, lat, lng, focus])
 
   return (
-    <PainelResponsivo titulo="Detalhe do problema" aoFechar={fechar} alturaResumo={ALTURA_RESUMO}>
-      <DetalheProblema id={id} />
-    </PainelResponsivo>
+    <ResponsivePanel title="Detalhe do problema" onClose={close} summaryHeight={SUMMARY_HEIGHT}>
+      <IssueDetail id={id} />
+    </ResponsivePanel>
   )
 }

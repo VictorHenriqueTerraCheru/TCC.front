@@ -1,28 +1,27 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-const MAXIMO = 6
+const MAX = 6
 
-interface RecentesState {
+interface RecentState {
   ids: number[]
-  registrar(id: number): void
+  report(id: number): void
 }
 
-export const useRecentesStore = create<RecentesState>()(
+export const useRecentStore = create<RecentState>()(
   persist(
     (set) => ({
       ids: [],
-      registrar: (id) =>
-        set((s) => ({ ids: [id, ...s.ids.filter((i) => i !== id)].slice(0, MAXIMO) })),
+      report: (id) => set((s) => ({ ids: [id, ...s.ids.filter((i) => i !== id)].slice(0, MAX) })),
     }),
     {
       name: 'ocorrencias.categoriasRecentes',
       storage: createJSONStorage(() => localStorage),
-      merge: (salvo, atual) => {
-        const ids = (salvo as Partial<RecentesState> | undefined)?.ids
+      merge: (saved, current) => {
+        const ids = (saved as Partial<RecentState> | undefined)?.ids
         return {
-          ...atual,
-          ids: Array.isArray(ids) ? ids.filter((i) => Number.isInteger(i)).slice(0, MAXIMO) : [],
+          ...current,
+          ids: Array.isArray(ids) ? ids.filter((i) => Number.isInteger(i)).slice(0, MAX) : [],
         }
       },
     },

@@ -1,16 +1,16 @@
 import { authHandlers } from './auth'
-import { categoriasHandlers } from './categorias'
-import { geocodificacaoHandlers } from './geocodificacao'
-import { incidentesHandlers } from './incidentes'
-import { problemasHandlers } from './problemas'
-import { adminHandlers, usuariosHandlers } from './usuarios'
+import { categoryHandlers } from './categorias'
+import { geocodingHandlers } from './geocodificacao'
+import { incidentHandlers } from './incidentes'
+import { issueHandlers } from './problemas'
+import { adminHandlers, userHandlers } from './usuarios'
 
 export const handlers = [
   ...authHandlers,
-  ...categoriasHandlers,
-  ...problemasHandlers,
-  ...incidentesHandlers,
-  ...geocodificacaoHandlers,
-  ...usuariosHandlers,
+  ...categoryHandlers,
+  ...issueHandlers,
+  ...incidentHandlers,
+  ...geocodingHandlers,
+  ...userHandlers,
   ...adminHandlers,
 ]

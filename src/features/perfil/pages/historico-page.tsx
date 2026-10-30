@@ -1,86 +1,86 @@
 import { Navigate, useNavigate } from 'react-router'
 import { useState } from 'react'
 
-import { ListaInfinita } from '@/common/components/lista-infinita'
-import { Segmentado } from '@/common/components/segmentado'
-import { TelaComVoltar } from '@/common/components/tela-com-voltar'
+import { InfiniteList } from '@/common/components/lista-infinita'
+import { SegmentedControl } from '@/common/components/segmentado'
+import { ScreenWithBack } from '@/common/components/tela-com-voltar'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { ItemAnimado } from '@/common/components/item-animado'
-import { useAutenticado } from '@/features/auth'
+import { AnimatedItem } from '@/common/components/item-animado'
+import { useAuthenticated } from '@/features/auth'
 import {
-  agruparPorPeriodo,
-  ItemHistoricoLinha,
-  quandoItem,
-  useHistorico,
-  type FiltroHistorico,
+  groupByPeriod,
+  HistoryItemRow,
+  itemTime,
+  useHistory,
+  type HistoryFilter,
 } from '@/features/usuarios'
 
-const filtros: { value: FiltroHistorico; label: string }[] = [
+const filters: { value: HistoryFilter; label: string }[] = [
   { value: 'all', label: 'Tudo' },
   { value: 'reports', label: 'Registros' },
   { value: 'votes', label: 'Votos' },
 ]
 
-function Lista({ filtro }: { filtro: FiltroHistorico }) {
-  const historico = useHistorico(filtro)
-  if (historico.isPending) return <Skeleton className="h-60 rounded-2xl bg-muted" />
-  if (historico.isError) {
+function List({ filter }: { filter: HistoryFilter }) {
+  const history = useHistory(filter)
+  if (history.isPending) return <Skeleton className="h-60 rounded-2xl bg-muted" />
+  if (history.isError) {
     return (
       <div role="alert" className="space-y-3 py-6">
         <p>Não foi possível carregar o histórico.</p>
-        <Button variant="outline" size="sm" onClick={() => void historico.refetch()}>
+        <Button variant="outline" size="sm" onClick={() => void history.refetch()}>
           Tentar novamente
         </Button>
       </div>
     )
   }
-  const itens = historico.data.pages.flatMap((p) => p.items)
-  if (itens.length === 0) {
+  const items = history.data.pages.flatMap((p) => p.items)
+  if (items.length === 0) {
     return <p className="py-10 text-center text-sm text-muted-foreground">Nada por aqui ainda.</p>
   }
   return (
-    <ListaInfinita consulta={historico}>
-      {agruparPorPeriodo(itens).map((grupo) => (
-        <section key={grupo.titulo} aria-labelledby={`grupo-${grupo.titulo}`} className="mb-4">
+    <InfiniteList query={history}>
+      {groupByPeriod(items).map((group) => (
+        <section key={group.title} aria-labelledby={`grupo-${group.title}`} className="mb-4">
           <h2
-            id={`grupo-${grupo.titulo}`}
+            id={`grupo-${group.title}`}
             className="mb-1 text-sm font-medium text-muted-foreground"
           >
-            {grupo.titulo}
+            {group.title}
           </h2>
           <ul>
-            {grupo.items.map((item, i) => (
-              <ItemAnimado key={`${item.date}-${i}`} indice={i}>
-                <ItemHistoricoLinha item={item} quando={quandoItem(item.date)} />
-              </ItemAnimado>
+            {group.items.map((item, i) => (
+              <AnimatedItem key={`${item.date}-${i}`} index={i}>
+                <HistoryItemRow item={item} when={itemTime(item.date)} />
+              </AnimatedItem>
             ))}
           </ul>
         </section>
       ))}
-    </ListaInfinita>
+    </InfiniteList>
   )
 }
 
-export function HistoricoPage() {
+export function HistoryPage() {
   const navigate = useNavigate()
-  const autenticado = useAutenticado()
-  const [filtro, setFiltro] = useState<FiltroHistorico>('all')
+  const authenticated = useAuthenticated()
+  const [filter, setFilter] = useState<HistoryFilter>('all')
 
-  if (!autenticado) return <Navigate to="/login" replace state={{ de: '/perfil/historico' }} />
+  if (!authenticated) return <Navigate to="/login" replace state={{ de: '/perfil/historico' }} />
 
   return (
     <div className="mx-auto h-full w-full lg:max-w-3xl">
-      <TelaComVoltar titulo="Histórico" aoVoltar={() => navigate('/perfil')}>
-        <Segmentado<FiltroHistorico>
+      <ScreenWithBack title="Histórico" onBack={() => navigate('/perfil')}>
+        <SegmentedControl<HistoryFilter>
           label="Filtrar histórico"
-          opcoes={filtros}
-          value={filtro}
-          aoMudar={setFiltro}
+          options={filters}
+          value={filter}
+          onChange={setFilter}
           className="mb-4"
         />
-        <Lista filtro={filtro} />
-      </TelaComVoltar>
+        <List filter={filter} />
+      </ScreenWithBack>
     </div>
   )
 }

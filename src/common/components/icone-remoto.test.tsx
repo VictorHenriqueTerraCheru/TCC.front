@@ -1,23 +1,23 @@
 import { screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 
-import { carregarIcone, limparCacheDeIcones } from '@/common/lib/iconify'
+import { loadIcon, clearIconCache } from '@/common/lib/iconify'
 import { server } from '@/infrastructure/mocks/server'
-import { renderizar } from '@/test/render'
+import { renderWithProviders } from '@/test/render'
 
-import { IconeDinamico } from './icone-remoto'
+import { DynamicIcon } from './icone-remoto'
 
-beforeEach(() => limparCacheDeIcones())
+beforeEach(() => clearIconCache())
 
-describe('IconeDinamico', () => {
-  it('ícone do pacote embutido usa a fonte, sem rede', () => {
-    const { container } = renderizar(<IconeDinamico name="bolt" />)
+describe('DynamicIcon', () => {
+  it('bundled icon uses the font, without network', () => {
+    const { container } = renderWithProviders(<DynamicIcon name="bolt" />)
 
     expect(container.querySelector('.material-symbols-rounded')).toHaveTextContent('bolt')
     expect(container.querySelector('svg')).toBeNull()
   })
 
-  it('ícone fora do pacote mostra o alternativo e troca pelo SVG quando chega', async () => {
+  it('icon outside the bundle shows the fallback and swaps to the SVG when it arrives', async () => {
     server.use(
       http.get('https://api.iconify.design/material-symbols.json', () =>
         HttpResponse.json({
@@ -26,7 +26,7 @@ describe('IconeDinamico', () => {
         }),
       ),
     )
-    const { container } = renderizar(<IconeDinamico name="ico_a" alternativo="category" />)
+    const { container } = renderWithProviders(<DynamicIcon name="ico_a" alternative="category" />)
 
     expect(container.querySelector('.material-symbols-rounded')).toHaveTextContent('category')
     await waitFor(() =>
@@ -35,16 +35,16 @@ describe('IconeDinamico', () => {
     expect(screen.queryByText('category')).not.toBeInTheDocument()
   })
 
-  it('se o Iconify falhar, o alternativo fica', async () => {
+  it('if Iconify fails, the fallback stays', async () => {
     server.use(
       http.get(
         'https://api.iconify.design/material-symbols.json',
         () => new HttpResponse(null, { status: 500 }),
       ),
     )
-    const { container } = renderizar(<IconeDinamico name="ico_a" alternativo="category" />)
+    const { container } = renderWithProviders(<DynamicIcon name="ico_a" alternative="category" />)
 
-    expect(await carregarIcone('ico_a')).toBeNull()
+    expect(await loadIcon('ico_a')).toBeNull()
     expect(container.querySelector('.material-symbols-rounded')).toHaveTextContent('category')
     expect(container.querySelector('svg')).toBeNull()
   })

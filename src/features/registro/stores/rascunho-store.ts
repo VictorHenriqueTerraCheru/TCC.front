@@ -1,42 +1,44 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-import type { Horario } from '../models/horario'
+import type { OccurrenceTime } from '../models/horario'
 
-export interface Ponto {
+export interface Point {
   lat: number
   lng: number
 }
 
-interface RascunhoState {
+interface DraftState {
   categoryId: number | null
-  local: Ponto | null
+  location: Point | null
   description: string
-  horario: Horario
-  escolherCategoria(id: number): void
-  definirLocal(local: Ponto): void
-  definirDescricao(descricao: string): void
-  definirHorario(horario: Horario): void
-  limpar(): void
+  time: OccurrenceTime
+  chooseCategory(id: number): void
+  setLocation(location: Point): void
+  setDescription(description: string): void
+  setTime(time: OccurrenceTime): void
+  clear(): void
 }
 
-const vazio = {
+const empty = {
   categoryId: null,
-  local: null,
+  location: null,
   description: '',
-  horario: { modo: 'agora', outroEm: null } satisfies Horario,
+  time: { mode: 'now', otherAt: null } satisfies OccurrenceTime,
 }
 
-export const useRascunhoStore = create<RascunhoState>()(
+export const useDraftStore = create<DraftState>()(
   persist(
     (set) => ({
-      ...vazio,
-      escolherCategoria: (categoriaId) => set({ categoryId: categoriaId }),
-      definirLocal: (local) =>
-        set((s) => (s.local?.lat === local.lat && s.local.lng === local.lng ? s : { local })),
-      definirDescricao: (descricao) => set({ description: descricao }),
-      definirHorario: (horario) => set({ horario }),
-      limpar: () => set(vazio),
+      ...empty,
+      chooseCategory: (categoryId) => set({ categoryId }),
+      setLocation: (location) =>
+        set((s) =>
+          s.location?.lat === location.lat && s.location.lng === location.lng ? s : { location },
+        ),
+      setDescription: (description) => set({ description }),
+      setTime: (time) => set({ time }),
+      clear: () => set(empty),
     }),
     { name: 'ocorrencias.rascunhoRegistro', storage: createJSONStorage(() => sessionStorage) },
   ),

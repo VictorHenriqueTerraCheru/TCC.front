@@ -1,123 +1,123 @@
 import type { ReactNode } from 'react'
 
-import { Icone } from '@/common/components/icone'
-import { aparenciaDaCor } from '@/features/categorias'
-import { gradienteCalorCss } from '@/features/incidentes'
-import { dimensoesMarcador, MarcadorProblema } from '@/features/problemas'
+import { Icon } from '@/common/components/icone'
+import { colorAppearance } from '@/features/categorias'
+import { heatmapGradientCss } from '@/features/incidentes'
+import { markerSize, IssueMarker } from '@/features/problemas'
 
-import type { ModoMapa } from '../models/filtros'
+import type { MapMode } from '../models/filtros'
 
-function Balao({
+function Bubble({
   status = 'active',
-  band: faixa = 'high',
-  escala = 0.72,
+  band = 'high',
+  scale = 0.72,
 }: {
   status?: 'active' | 'possiblyResolved'
   band?: 'high' | 'low'
-  escala?: number
+  scale?: number
 }) {
-  const { largura, altura } = dimensoesMarcador(status, faixa)
+  const { width, height } = markerSize(status, band)
   return (
     <span
       className="pointer-events-none block"
-      style={{ width: largura * escala, height: altura * escala }}
+      style={{ width: width * scale, height: height * scale }}
     >
       <span
         className="block origin-top-left [&_.pulso-alerta]:hidden"
-        style={{ transform: `scale(${escala})` }}
+        style={{ transform: `scale(${scale})` }}
       >
-        <MarcadorProblema
-          color={aparenciaDaCor.orange.corForte}
+        <IssueMarker
+          color={colorAppearance.orange.strongColor}
           icon="edit_road"
           status={status}
-          band={faixa}
+          band={band}
         />
       </span>
     </span>
   )
 }
 
-function Item({ simbolo, titulo, texto }: { simbolo: ReactNode; titulo: string; texto?: string }) {
+function Item({ symbol, title, text }: { symbol: ReactNode; title: string; text?: string }) {
   return (
     <li className="flex gap-2.5">
-      <span className="flex w-7 shrink-0 items-start justify-center pt-0.5">{simbolo}</span>
+      <span className="flex w-7 shrink-0 items-start justify-center pt-0.5">{symbol}</span>
       <span>
-        <span className="block text-[13px] font-medium">{titulo}</span>
-        {texto && <span className="block text-xs text-muted-foreground">{texto}</span>}
+        <span className="block text-[13px] font-medium">{title}</span>
+        {text && <span className="block text-xs text-muted-foreground">{text}</span>}
       </span>
     </li>
   )
 }
 
-export function LegendaMapa({ modo, aoFechar }: { modo: ModoMapa; aoFechar(): void }) {
-  const comCalor = modo !== 'problemas'
-  const titulo = comCalor ? 'Como ler o mapa' : 'Estado do problema'
+export function MapLegend({ mode, onClose }: { mode: MapMode; onClose(): void }) {
+  const withHeatmap = mode !== 'issues'
+  const title = withHeatmap ? 'Como ler o mapa' : 'Estado do problema'
 
   return (
     <section
-      aria-label={titulo}
+      aria-label={title}
       className="pointer-events-auto w-60 rounded-[22px] p-4 shadow-3 vidro"
     >
       <header className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-medium">{titulo}</h2>
+        <h2 className="text-sm font-medium">{title}</h2>
         <button
           type="button"
-          onClick={aoFechar}
+          onClick={onClose}
           aria-label="Fechar legenda"
           className="-m-2.5 flex size-11 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
-          <Icone name="close" className="text-[18px]" />
+          <Icon name="close" className="text-[18px]" />
         </button>
       </header>
-      {comCalor ? (
+      {withHeatmap ? (
         <ul className="space-y-3">
-          {modo === 'ambos' && (
+          {mode === 'both' && (
             <Item
-              simbolo={<Balao />}
-              titulo="Problema · marcador"
-              texto="Fica no mapa até ser resolvido"
+              symbol={<Bubble />}
+              title="Problema · marcador"
+              text="Fica no mapa até ser resolvido"
             />
           )}
           <Item
-            simbolo={<span className="mt-0.5 size-4 rounded-full bg-calor blur-[1px]" />}
-            titulo="Incidente · calor"
-            texto="Concentração nos últimos 7 dias"
+            symbol={<span className="mt-0.5 size-4 rounded-full bg-calor blur-[1px]" />}
+            title="Incidente · calor"
+            text="Concentração nos últimos 7 dias"
           />
           <li>
-            <div className="h-2 rounded-full" style={{ backgroundImage: gradienteCalorCss }} />
+            <div className="h-2 rounded-full" style={{ backgroundImage: heatmapGradientCss }} />
             <div className="mt-1 flex justify-between text-[11px] text-muted-foreground">
               <span>Menos</span>
               <span>Mais</span>
             </div>
           </li>
-          {modo === 'ambos' && (
+          {mode === 'both' && (
             <Item
-              simbolo={
+              symbol={
                 <span className="flex items-end gap-0.5">
-                  <Balao band="low" escala={0.5} />
-                  <Balao band="high" escala={0.55} />
+                  <Bubble band="low" scale={0.5} />
+                  <Bubble band="high" scale={0.55} />
                 </span>
               }
-              titulo="Maior e mais cheio = mais confiável"
+              title="Maior e mais cheio = mais confiável"
             />
           )}
         </ul>
       ) : (
         <ul className="space-y-3">
-          <Item simbolo={<Balao />} titulo="Ativa" />
-          <Item simbolo={<Balao status="possiblyResolved" />} titulo="Possivelmente resolvida" />
+          <Item symbol={<Bubble />} title="Ativa" />
+          <Item symbol={<Bubble status="possiblyResolved" />} title="Possivelmente resolvida" />
           <Item
-            simbolo={<Icone name="history" className="text-[18px] text-muted-foreground" />}
-            titulo="Resolvidas saem do mapa e ficam só no histórico"
+            symbol={<Icon name="history" className="text-[18px] text-muted-foreground" />}
+            title="Resolvidas saem do mapa e ficam só no histórico"
           />
           <Item
-            simbolo={
+            symbol={
               <span className="rounded bg-nova px-1 text-[9px] leading-4 text-nova-foreground">
                 Nova
               </span>
             }
-            titulo="Em avaliação"
-            texto="Registro recente, com poucos votos"
+            title="Em avaliação"
+            text="Registro recente, com poucos votos"
           />
         </ul>
       )}

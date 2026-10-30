@@ -5,52 +5,52 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 
-import type { Perfil } from '@/features/usuarios'
-import { api, semConteudo, dados, type Schema } from '@/infrastructure/api'
+import type { Role } from '@/features/usuarios'
+import { api, unwrapEmpty, unwrapData, type Schema } from '@/infrastructure/api'
 
-const TAMANHO_PAGINA = 20
+const PAGE_SIZE = 20
 
-export type UsuarioAdmin = Schema<'ListUsersItem'>
+export type AdminUser = Schema<'ListUsersItem'>
 
-export interface FiltroUsuarios {
-  busca: string
-  role: Perfil | null
+export interface UserFilter {
+  search: string
+  role: Role | null
 }
 
-export function usuariosAdminQuery({ busca, role: perfil }: FiltroUsuarios) {
+export function adminUsersQuery({ search, role }: UserFilter) {
   return infiniteQueryOptions({
-    queryKey: ['admin', 'usuarios', { busca, role: perfil }],
+    queryKey: ['admin', 'users', { search, role }],
     queryFn: ({ pageParam, signal }) =>
       api
         .GET('/admin/users', {
           params: {
             query: {
-              search: busca || undefined,
-              role: perfil ?? undefined,
+              search: search || undefined,
+              role: role ?? undefined,
               page: pageParam,
-              pageSize: TAMANHO_PAGINA,
+              pageSize: PAGE_SIZE,
             },
           },
           signal,
         })
-        .then(dados),
+        .then(unwrapData),
     initialPageParam: 1,
-    getNextPageParam: ({ page: pagina, pageSize: tamanho, total }) =>
-      pagina * tamanho < total ? pagina + 1 : undefined,
+    getNextPageParam: ({ page, pageSize: size, total }) =>
+      page * size < total ? page + 1 : undefined,
   })
 }
 
-export function useUsuariosAdmin(filtro: FiltroUsuarios) {
-  return useInfiniteQuery(usuariosAdminQuery(filtro))
+export function useAdminUsers(filter: UserFilter) {
+  return useInfiniteQuery(adminUsersQuery(filter))
 }
 
-export function useAlterarPerfilUsuario() {
+export function useSetUserRole() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, role: perfil }: { id: string; role: Perfil }) =>
+    mutationFn: ({ id, role }: { id: string; role: Role }) =>
       api
-        .PATCH('/admin/users/{id}/role', { params: { path: { id } }, body: { role: perfil } })
-        .then(semConteudo),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'usuarios'] }),
+        .PATCH('/admin/users/{id}/role', { params: { path: { id } }, body: { role } })
+        .then(unwrapEmpty),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
   })
 }

@@ -11,35 +11,35 @@ import {
   type Ref,
 } from 'react'
 
-interface Limites {
-  sul: number
-  oeste: number
-  norte: number
-  leste: number
+interface MapEdges {
+  south: number
+  west: number
+  north: number
+  east: number
 }
-type Ouvinte = (evento: Record<string, unknown>) => void
-type CentroAlvo = [number, number] | { lng: number; lat: number }
-interface Destino {
-  center?: CentroAlvo
+type Listener = (event: Record<string, unknown>) => void
+type TargetCenter = [number, number] | { lng: number; lat: number }
+interface Destination {
+  center?: TargetCenter
   zoom?: number
   bearing?: number
   pitch?: number
 }
 
-export class InstanciaFalsa {
-  centro = { lat: 0, lng: 0 }
+export class FakeInstance {
+  center = { lat: 0, lng: 0 }
   zoom = 16
   bearing = 0
   pitch = 0
-  limites: Limites | null = null
-  elemento: HTMLDivElement | null = null
-  private ouvintes = new globalThis.Map<string, Set<Ouvinte>>()
+  bounds: MapEdges | null = null
+  element: HTMLDivElement | null = null
+  private listeners = new globalThis.Map<string, Set<Listener>>()
 
   getMap() {
     return this
   }
   getCenter() {
-    return { ...this.centro }
+    return { ...this.center }
   }
   getZoom() {
     return this.zoom
@@ -51,24 +51,24 @@ export class InstanciaFalsa {
     return this.pitch
   }
   getBounds() {
-    const l = this.limites ?? {
-      sul: this.centro.lat - 0.01,
-      oeste: this.centro.lng - 0.01,
-      norte: this.centro.lat + 0.01,
-      leste: this.centro.lng + 0.01,
+    const l = this.bounds ?? {
+      south: this.center.lat - 0.01,
+      west: this.center.lng - 0.01,
+      north: this.center.lat + 0.01,
+      east: this.center.lng + 0.01,
     }
     return {
-      getSouth: () => l.sul,
-      getWest: () => l.oeste,
-      getNorth: () => l.norte,
-      getEast: () => l.leste,
+      getSouth: () => l.south,
+      getWest: () => l.west,
+      getNorth: () => l.north,
+      getEast: () => l.east,
     }
   }
   getContainer() {
-    return this.elemento!
+    return this.element!
   }
   getCanvas() {
-    return this.elemento!
+    return this.element!
   }
   isStyleLoaded() {
     return true
@@ -78,95 +78,95 @@ export class InstanciaFalsa {
     return { x: 0, y: 0 }
   }
   unproject() {
-    return { lng: this.centro.lng, lat: this.centro.lat }
+    return { lng: this.center.lng, lat: this.center.lat }
   }
-  on(tipo: string, ouvinte: Ouvinte) {
-    if (!this.ouvintes.has(tipo)) this.ouvintes.set(tipo, new Set())
-    this.ouvintes.get(tipo)!.add(ouvinte)
+  on(type: string, listener: Listener) {
+    if (!this.listeners.has(type)) this.listeners.set(type, new Set())
+    this.listeners.get(type)!.add(listener)
     return this
   }
-  off(tipo: string, ouvinte: Ouvinte) {
-    this.ouvintes.get(tipo)?.delete(ouvinte)
+  off(type: string, listener: Listener) {
+    this.listeners.get(type)?.delete(listener)
     return this
   }
-  once(tipo: string, ouvinte: Ouvinte) {
-    const uma: Ouvinte = (e) => {
-      this.off(tipo, uma)
-      ouvinte(e)
+  once(type: string, listener: Listener) {
+    const one: Listener = (e) => {
+      this.off(type, one)
+      listener(e)
     }
-    return this.on(tipo, uma)
+    return this.on(type, one)
   }
-  emitir(tipo: string, evento: Record<string, unknown> = {}) {
-    for (const ouvinte of [...(this.ouvintes.get(tipo) ?? [])]) ouvinte({ type: tipo, ...evento })
+  emit(type: string, event: Record<string, unknown> = {}) {
+    for (const listener of [...(this.listeners.get(type) ?? [])]) listener({ type, ...event })
   }
-  private irPara({ center, zoom, bearing, pitch }: Destino) {
+  private goTo({ center, zoom, bearing, pitch }: Destination) {
     if (center) {
-      this.centro = Array.isArray(center)
+      this.center = Array.isArray(center)
         ? { lng: center[0], lat: center[1] }
         : { lng: center.lng, lat: center.lat }
     }
     if (zoom !== undefined) this.zoom = zoom
-    this.emitir('movestart')
+    this.emit('movestart')
     if (bearing !== undefined) {
       this.bearing = bearing
-      this.emitir('rotate')
+      this.emit('rotate')
     }
     if (pitch !== undefined) {
       this.pitch = pitch
-      this.emitir('pitch')
+      this.emit('pitch')
     }
-    this.emitir('move')
-    this.emitir('moveend')
+    this.emit('move')
+    this.emit('moveend')
   }
-  jumpTo(opcoes: Destino) {
-    this.irPara(opcoes)
+  jumpTo(options: Destination) {
+    this.goTo(options)
   }
-  easeTo(opcoes: Destino) {
-    this.irPara(opcoes)
+  easeTo(options: Destination) {
+    this.goTo(options)
   }
-  flyTo(opcoes: Destino) {
-    this.irPara(opcoes)
+  flyTo(options: Destination) {
+    this.goTo(options)
   }
   resetNorthPitch() {
-    this.irPara({ bearing: 0, pitch: 0 })
+    this.goTo({ bearing: 0, pitch: 0 })
   }
-  setCenter(center: CentroAlvo) {
-    this.irPara({ center })
+  setCenter(center: TargetCenter) {
+    this.goTo({ center })
   }
   fitBounds() {
-    this.irPara({})
+    this.goTo({})
   }
   zoomOut() {
-    this.irPara({ zoom: this.zoom - 1 })
+    this.goTo({ zoom: this.zoom - 1 })
   }
 }
 
-let atual: InstanciaFalsa | null = null
+let current: FakeInstance | null = null
 
-export const mapaFalso = {
-  atual: () => atual,
-  tocar(lat: number, lng: number) {
-    atual?.emitir('click', { lngLat: { lat, lng } })
+export const fakeMap = {
+  current: () => current,
+  tap(lat: number, lng: number) {
+    current?.emit('click', { lngLat: { lat, lng } })
   },
-  mover(centro: { lat: number; lng: number }, limites?: Limites) {
-    if (!atual) return
-    atual.limites = limites ?? null
-    atual.jumpTo({ center: centro })
+  move(center: { lat: number; lng: number }, bounds?: MapEdges) {
+    if (!current) return
+    current.bounds = bounds ?? null
+    current.jumpTo({ center })
   },
-  girar(bearing: number, pitch = 0) {
-    atual?.jumpTo({ bearing, pitch })
+  rotate(bearing: number, pitch = 0) {
+    current?.jumpTo({ bearing, pitch })
   },
 }
 
-const ContextoMapa = createContext<InstanciaFalsa | null>(null)
+const MapContext = createContext<FakeInstance | null>(null)
 
 export function useMap() {
-  const instancia = useContext(ContextoMapa)
-  return { current: instancia ?? undefined }
+  const instance = useContext(MapContext)
+  return { current: instance ?? undefined }
 }
 
 interface MapProps {
-  ref?: Ref<InstanciaFalsa>
+  ref?: Ref<FakeInstance>
   initialViewState?: { latitude?: number; longitude?: number; zoom?: number }
   style?: React.CSSProperties
   children?: ReactNode
@@ -187,14 +187,14 @@ export function Map({
   onLoad,
   mapStyle,
 }: MapProps) {
-  const [instancia] = useState(() => {
-    const nova = new InstanciaFalsa()
-    nova.centro = { lat: initialViewState?.latitude ?? 0, lng: initialViewState?.longitude ?? 0 }
-    nova.zoom = initialViewState?.zoom ?? 16
-    return nova
+  const [instance] = useState(() => {
+    const fresh = new FakeInstance()
+    fresh.center = { lat: initialViewState?.latitude ?? 0, lng: initialViewState?.longitude ?? 0 }
+    fresh.zoom = initialViewState?.zoom ?? 16
+    return fresh
   })
   const divRef = useRef<HTMLDivElement>(null)
-  useImperativeHandle(ref, () => instancia, [instancia])
+  useImperativeHandle(ref, () => instance, [instance])
 
   const callbacks = useRef({ onMove, onMoveEnd, onClick, onLoad })
   useEffect(() => {
@@ -202,32 +202,32 @@ export function Map({
   })
 
   useEffect(() => {
-    instancia.elemento = divRef.current
-    atual = instancia
-    const mover: Ouvinte = (e) => callbacks.current.onMove?.(e)
-    const parar: Ouvinte = (e) => callbacks.current.onMoveEnd?.(e)
-    const tocar: Ouvinte = (e) =>
+    instance.element = divRef.current
+    current = instance
+    const move: Listener = (e) => callbacks.current.onMove?.(e)
+    const stop: Listener = (e) => callbacks.current.onMoveEnd?.(e)
+    const tap: Listener = (e) =>
       callbacks.current.onClick?.(e as { lngLat: { lat: number; lng: number } })
-    instancia.on('move', mover).on('moveend', parar).on('click', tocar)
-    callbacks.current.onLoad?.({ target: instancia })
+    instance.on('move', move).on('moveend', stop).on('click', tap)
+    callbacks.current.onLoad?.({ target: instance })
     return () => {
-      instancia.off('move', mover).off('moveend', parar).off('click', tocar)
-      if (atual === instancia) atual = null
+      instance.off('move', move).off('moveend', stop).off('click', tap)
+      if (current === instance) current = null
     }
-  }, [instancia])
+  }, [instance])
 
   return (
-    <ContextoMapa.Provider value={instancia}>
+    <MapContext.Provider value={instance}>
       <div
         ref={divRef}
-        data-testid="mapa"
+        data-testid="map"
         data-estilo={(mapStyle as { name?: string } | undefined)?.name}
         className="maplibregl-map"
-        onClick={() => instancia.emitir('click', { lngLat: instancia.getCenter() })}
+        onClick={() => instance.emit('click', { lngLat: instance.getCenter() })}
       >
         {children}
       </div>
-    </ContextoMapa.Provider>
+    </MapContext.Provider>
   )
 }
 
@@ -243,7 +243,7 @@ interface MarkerProps {
 export function Marker({ latitude, longitude, style, onClick, children }: MarkerProps) {
   return (
     <div
-      data-testid="marcador"
+      data-testid="marker"
       data-lat={latitude}
       data-lng={longitude}
       style={style}
@@ -264,22 +264,22 @@ interface SourceProps {
 }
 
 export function Source({ id, data, children }: SourceProps) {
-  const dados = data as { features?: unknown[]; type?: string } | undefined
-  const pontos = dados?.features?.length ?? (dados?.type === 'Feature' ? 1 : 0)
+  const sourceData = data as { features?: unknown[]; type?: string } | undefined
+  const points = sourceData?.features?.length ?? (sourceData?.type === 'Feature' ? 1 : 0)
   return (
-    <div data-testid={`fonte-${id ?? 'sem-id'}`} data-pontos={pontos}>
+    <div data-testid={`source-${id ?? 'no-id'}`} data-pontos={points}>
       {children}
     </div>
   )
 }
 
 export function Layer({ id, type }: { id?: string; type?: string; [prop: string]: unknown }) {
-  return <div data-testid={`camada-${id ?? 'sem-id'}`} data-tipo={type} />
+  return <div data-testid={`layer-${id ?? 'no-id'}`} data-tipo={type} />
 }
 
 export function NavigationControl() {
   return null
 }
 
-export type MapRef = InstanciaFalsa
+export type MapRef = FakeInstance
 export type StyleSpecification = Record<string, unknown>

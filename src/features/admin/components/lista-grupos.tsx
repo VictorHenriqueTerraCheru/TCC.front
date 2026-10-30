@@ -1,36 +1,36 @@
 import { useState } from 'react'
 
-import { CampoBusca } from '@/common/components/campo-busca'
-import { FolhaResponsiva } from '@/common/components/folha-responsiva'
-import { semAcento } from '@/common/lib/texto'
+import { SearchField } from '@/common/components/campo-busca'
+import { ResponsiveSheet } from '@/common/components/folha-responsiva'
+import { withoutAccents } from '@/common/lib/texto'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { aparenciaDaCor, PontoGrupo, useGrupos, type Grupo } from '@/features/categorias'
+import { colorAppearance, GroupDot, useGroups, type Group } from '@/features/categorias'
 
-import { useCategoriasAdmin } from '../api/use-categorias-admin'
-import { useApagarGrupo } from '../api/use-grupos-admin'
-import { mensagemErroCategorias } from '../errors'
-import { EtiquetaTipo } from './etiqueta-tipo'
-import { ResumoDosFiltros, SegmentadoTipo, type FiltroTipo } from './filtros-lista'
-import { FormularioGrupo } from './formulario-grupo'
+import { useAdminCategories } from '../api/use-categorias-admin'
+import { useDeleteGroup } from '../api/use-grupos-admin'
+import { categoryErrorMessage } from '../errors'
+import { TypeLabel } from './etiqueta-tipo'
+import { FilterSummary, TypeSegmentedControl, type TypeFilter } from './filtros-lista'
+import { GroupForm } from './formulario-grupo'
 
-export function ListaGrupos() {
-  const grupos = useGrupos()
-  const categorias = useCategoriasAdmin()
-  const apagar = useApagarGrupo()
-  const [formulario, setFormulario] = useState<'novo' | Grupo | null>(null)
-  const [apagando, setApagando] = useState<Grupo | null>(null)
-  const [busca, setBusca] = useState('')
-  const [tipo, setTipo] = useState<FiltroTipo>('todos')
+export function GroupList() {
+  const groups = useGroups()
+  const categories = useAdminCategories()
+  const remove = useDeleteGroup()
+  const [form, setForm] = useState<'new' | Group | null>(null)
+  const [deleting, setDeleting] = useState<Group | null>(null)
+  const [search, setSearch] = useState('')
+  const [type, setType] = useState<TypeFilter>('all')
 
-  if (grupos.isPending || categorias.isPending) {
+  if (groups.isPending || categories.isPending) {
     return <Skeleton className="h-60 rounded-2xl bg-muted" />
   }
-  if (grupos.isError || categorias.isError) {
+  if (groups.isError || categories.isError) {
     return (
       <div role="alert" className="space-y-3 py-6">
         <p>
-          {grupos.isError
+          {groups.isError
             ? 'Não foi possível carregar os grupos.'
             : 'Não foi possível carregar as categorias.'}
         </p>
@@ -38,8 +38,8 @@ export function ListaGrupos() {
           variant="outline"
           size="sm"
           onClick={() => {
-            if (grupos.isError) void grupos.refetch()
-            if (categorias.isError) void categorias.refetch()
+            if (groups.isError) void groups.refetch()
+            if (categories.isError) void categories.refetch()
           }}
         >
           Tentar novamente
@@ -48,18 +48,19 @@ export function ListaGrupos() {
     )
   }
 
-  const total = (chave: string) => categorias.data.filter((c) => c.group === chave).length
+  const total = (key: string) => categories.data.filter((c) => c.group === key).length
 
-  const termo = semAcento(busca.trim())
-  const visiveis = grupos.data.filter(
+  const term = withoutAccents(search.trim())
+  const visible = groups.data.filter(
     (g) =>
-      (tipo === 'todos' || g.type === tipo) && (termo === '' || semAcento(g.label).includes(termo)),
+      (type === 'all' || g.type === type) &&
+      (term === '' || withoutAccents(g.label).includes(term)),
   )
-  const filtrando = termo !== '' || tipo !== 'todos'
+  const filtering = term !== '' || type !== 'all'
 
-  function confirmarApagar() {
-    if (!apagando) return
-    apagar.mutate(apagando.key, { onSuccess: () => setApagando(null) })
+  function confirmDelete() {
+    if (!deleting) return
+    remove.mutate(deleting.key, { onSuccess: () => setDeleting(null) })
   }
 
   return (
@@ -68,44 +69,44 @@ export function ListaGrupos() {
         <p className="text-sm text-muted-foreground">
           Os grupos organizam as categorias no mapa e na escolha de categoria.
         </p>
-        <Button size="sm" onClick={() => setFormulario('novo')}>
+        <Button size="sm" onClick={() => setForm('new')}>
           Novo grupo
         </Button>
       </div>
 
       <div className="mb-3 space-y-3">
-        <CampoBusca value={busca} aoMudar={setBusca} label="Buscar grupo" />
-        <SegmentadoTipo value={tipo} aoMudar={setTipo} />
-        <ResumoDosFiltros
-          mostradas={visiveis.length}
-          total={grupos.data.length}
-          substantivo="grupos"
-          filtrando={filtrando}
-          aoLimpar={() => {
-            setBusca('')
-            setTipo('todos')
+        <SearchField value={search} onChange={setSearch} label="Buscar grupo" />
+        <TypeSegmentedControl value={type} onChange={setType} />
+        <FilterSummary
+          shown={visible.length}
+          total={groups.data.length}
+          noun="grupos"
+          filtering={filtering}
+          onClear={() => {
+            setSearch('')
+            setType('all')
           }}
         />
       </div>
 
-      {visiveis.length === 0 ? (
+      {visible.length === 0 ? (
         <p className="rounded-[20px] bg-card py-10 text-center text-sm text-muted-foreground shadow-1">
           Nenhum grupo com esses filtros.
         </p>
       ) : (
         <ul className="divide-y divide-border rounded-[20px] bg-card shadow-1">
-          {visiveis.map((grupo) => {
-            const quantas = total(grupo.key)
+          {visible.map((group) => {
+            const howMany = total(group.key)
             return (
-              <li key={grupo.key} className="flex items-center gap-3 p-3">
-                <PontoGrupo color={aparenciaDaCor[grupo.color]} />
+              <li key={group.key} className="flex items-center gap-3 p-3">
+                <GroupDot color={colorAppearance[group.color]} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{grupo.label}</p>
+                  <p className="truncate font-medium">{group.label}</p>
                   <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-                    <EtiquetaTipo type={grupo.type} />
-                    {quantas !== undefined && (
+                    <TypeLabel type={group.type} />
+                    {howMany !== undefined && (
                       <span>
-                        {quantas} {quantas === 1 ? 'category' : 'categorias'}
+                        {howMany} {howMany === 1 ? 'category' : 'categories'}
                       </span>
                     )}
                   </p>
@@ -113,20 +114,20 @@ export function ListaGrupos() {
                 <Button
                   variant="outline"
                   size="sm"
-                  aria-label={`Editar ${grupo.label}`}
-                  onClick={() => setFormulario(grupo)}
+                  aria-label={`Editar ${group.label}`}
+                  onClick={() => setForm(group)}
                 >
                   Editar
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  aria-label={`Apagar ${grupo.label}`}
-                  disabled={quantas !== 0}
-                  title={quantas === 0 ? undefined : 'Só grupos sem categorias podem ser apagados'}
+                  aria-label={`Apagar ${group.label}`}
+                  disabled={howMany !== 0}
+                  title={howMany === 0 ? undefined : 'Só grupos sem categorias podem ser apagados'}
                   onClick={() => {
-                    apagar.reset()
-                    setApagando(grupo)
+                    remove.reset()
+                    setDeleting(group)
                   }}
                 >
                   Apagar
@@ -137,47 +138,47 @@ export function ListaGrupos() {
         </ul>
       )}
 
-      <FolhaResponsiva
-        aberto={formulario !== null}
-        aoMudarAberto={(aberto) => !aberto && setFormulario(null)}
-        titulo={formulario === 'novo' ? 'Novo grupo' : 'Editar grupo'}
+      <ResponsiveSheet
+        open={form !== null}
+        onOpenChange={(open) => !open && setForm(null)}
+        title={form === 'new' ? 'Novo grupo' : 'Editar grupo'}
       >
-        {formulario !== null && (
-          <FormularioGrupo
-            key={formulario === 'novo' ? 'novo' : formulario.key}
-            group={formulario === 'novo' ? undefined : formulario}
-            aoConcluir={() => setFormulario(null)}
+        {form !== null && (
+          <GroupForm
+            key={form === 'new' ? 'new' : form.key}
+            group={form === 'new' ? undefined : form}
+            onDone={() => setForm(null)}
           />
         )}
-      </FolhaResponsiva>
+      </ResponsiveSheet>
 
-      <FolhaResponsiva
-        aberto={apagando !== null}
-        aoMudarAberto={(aberto) => !aberto && setApagando(null)}
-        titulo={`Apagar o grupo ${apagando?.label ?? ''}?`}
+      <ResponsiveSheet
+        open={deleting !== null}
+        onOpenChange={(open) => !open && setDeleting(null)}
+        title={`Apagar o grupo ${deleting?.label ?? ''}?`}
       >
         <p className="mb-4 text-sm text-muted-foreground">
           Essa ação não pode ser desfeita. O grupo some dos filtros e da escolha de categoria.
         </p>
-        {apagar.isError && (
+        {remove.isError && (
           <p role="alert" className="mb-3 text-sm text-destructive">
-            {mensagemErroCategorias(apagar.error)}
+            {categoryErrorMessage(remove.error)}
           </p>
         )}
         <div className="flex gap-3">
-          <Button variant="outline" className="flex-1" onClick={() => setApagando(null)}>
+          <Button variant="outline" className="flex-1" onClick={() => setDeleting(null)}>
             Cancelar
           </Button>
           <Button
             variant="destructive"
             className="flex-1"
-            disabled={apagar.isPending}
-            onClick={confirmarApagar}
+            disabled={remove.isPending}
+            onClick={confirmDelete}
           >
-            {apagar.isPending ? 'Apagando…' : 'Apagar'}
+            {remove.isPending ? 'Apagando…' : 'Apagar'}
           </Button>
         </div>
-      </FolhaResponsiva>
+      </ResponsiveSheet>
     </>
   )
 }

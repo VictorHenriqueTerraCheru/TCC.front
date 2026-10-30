@@ -1,3 +1,3 @@
-export interface ContextoMapa {
-  focar(ponto: { lat: number; lng: number }): void
+export interface MapContext {
+  focus(point: { lat: number; lng: number }): void
 }

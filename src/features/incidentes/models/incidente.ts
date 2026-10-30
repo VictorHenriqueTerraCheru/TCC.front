@@ -1,9 +1,9 @@
 import type { Schema } from '@/infrastructure/api'
 
-export type CelulaCalor = Schema<'GetIncidentHeatmapResponse'>
-export type AreaIncidentes = Schema<'GetIncidentAreaResponse'>
-export type NivelConcentracao = Schema<'ConcentrationLevel'>
+export type HeatmapCell = Schema<'GetIncidentHeatmapResponse'>
+export type IncidentArea = Schema<'GetIncidentAreaResponse'>
+export type ConcentrationLevel = Schema<'ConcentrationLevel'>
 
-export function totalSeteDias(area: AreaIncidentes): number {
-  return area.counts.reduce((soma, c) => soma + c.days7, 0)
+export function sevenDayTotal(area: IncidentArea): number {
+  return area.counts.reduce((sum, c) => sum + c.days7, 0)
 }

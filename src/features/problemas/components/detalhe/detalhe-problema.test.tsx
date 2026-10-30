@@ -2,59 +2,59 @@ import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { delay, http, HttpResponse } from 'msw'
 
-import { EntreParaContinuar } from '@/features/auth'
-import { problemasNaArea } from '@/infrastructure/mocks/fixtures/problemas'
-import { criarDetalhes, ID_DO_AUTOR } from '@/infrastructure/mocks/fixtures/detalhes'
-import { erroDeRegra } from '@/infrastructure/mocks/handlers/comum'
-import { rota } from '@/infrastructure/mocks/rota'
+import { LoginToContinue } from '@/features/auth'
+import { issuesInArea } from '@/infrastructure/mocks/fixtures/problemas'
+import { createDetails, AUTHOR_ID } from '@/infrastructure/mocks/fixtures/detalhes'
+import { ruleError } from '@/infrastructure/mocks/handlers/comum'
+import { route } from '@/infrastructure/mocks/rota'
 import { server } from '@/infrastructure/mocks/server'
-import { definirLargura, renderizarRotas } from '@/test/render'
-import { entrarComoCidadao, sair } from '@/test/sessao'
+import { setWidth, renderRoutes } from '@/test/render'
+import { loginAsCitizen, logout } from '@/test/sessao'
 
-import { DetalheProblema } from './detalhe-problema'
+import { IssueDetail } from './detalhe-problema'
 
-const ATIVA = problemasNaArea[0]!.id
-const POSSIVELMENTE = problemasNaArea[4]!.id
-const NOVA = problemasNaArea[10]!.id
+const ACTIVE = issuesInArea[0]!.id
+const POSSIBLY = issuesInArea[4]!.id
+const NEW = issuesInArea[10]!.id
 
-function renderizar(id: string) {
-  definirLargura(390)
-  return renderizarRotas([
+function renderWithProviders(id: string) {
+  setWidth(390)
+  return renderRoutes([
     {
       path: '/',
       element: (
         <>
-          <DetalheProblema id={id} />
-          <EntreParaContinuar />
+          <IssueDetail id={id} />
+          <LoginToContinue />
         </>
       ),
     },
   ])
 }
 
-function espiarVotos() {
-  const votos: string[] = []
+function spyOnVotes() {
+  const votes: string[] = []
   server.events.on('request:start', ({ request }) => {
     if (request.method !== 'PUT' || !new URL(request.url).pathname.endsWith('/vote')) return
-    const posicao = votos.push('?') - 1
+    const position = votes.push('?') - 1
     void request
       .clone()
       .json()
-      .then(({ value: valor }: { value: string }) => (votos[posicao] = valor))
+      .then(({ value }: { value: string }) => (votes[position] = value))
   })
-  return votos
+  return votes
 }
 
-const cartao = () => screen.getByRole('heading', { name: /Ainda está lá\?/ }).closest('section')!
+const card = () => screen.getByRole('heading', { name: /Ainda está lá\?/ }).closest('section')!
 
-describe('DetalheProblema', () => {
+describe('IssueDetail', () => {
   afterEach(() => {
-    sair()
+    logout()
     server.events.removeAllListeners()
   })
 
-  it('Ativa: confiança e a pergunta única "Ainda está lá?" (tela 3)', async () => {
-    renderizar(ATIVA)
+  it('Active: trust and the single question "Ainda está lá?" (screen 3)', async () => {
+    renderWithProviders(ACTIVE)
 
     expect(await screen.findByRole('heading', { name: 'Buraco na via' })).toBeInTheDocument()
     expect(await screen.findByText('Via pública')).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('DetalheProblema', () => {
     expect(screen.getByText('82 / 100')).toBeInTheDocument()
     expect(screen.getByText(/Calculada com 16 votos/)).toBeInTheDocument()
     expect(screen.getByText('Ativa')).toBeInTheDocument()
-    expect(within(cartao()).getByText('15')).toBeInTheDocument()
+    expect(within(card()).getByText('15')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Sim, está lá' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Não está lá' })).toBeInTheDocument()
     expect(
@@ -70,8 +70,8 @@ describe('DetalheProblema', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('Nova: em avaliação com barra segmentada e a mesma pergunta (tela 22)', async () => {
-    renderizar(NOVA)
+  it('New: under evaluation with a segmented bar and the same question (screen 22)', async () => {
+    renderWithProviders(NEW)
 
     expect(await screen.findByRole('heading', { name: 'Fio caído' })).toBeInTheDocument()
     expect(screen.getByText('2 de 5 votos')).toBeInTheDocument()
@@ -80,8 +80,8 @@ describe('DetalheProblema', () => {
     expect(screen.queryByText('Confiança alta')).not.toBeInTheDocument()
   })
 
-  it('Possivelmente resolvida: "Ainda está lá?" em destaque (tela 23)', async () => {
-    renderizar(POSSIVELMENTE)
+  it('Possibly resolved: "Ainda está lá?" highlighted (screen 23)', async () => {
+    renderWithProviders(POSSIBLY)
 
     expect(await screen.findByRole('heading', { name: 'Ainda está lá?' })).toBeInTheDocument()
     expect(
@@ -92,96 +92,96 @@ describe('DetalheProblema', () => {
     expect(screen.getByText('58 / 100')).toBeInTheDocument()
   })
 
-  it('Resolvida (link salvo): só leitura, sem botões de voto', async () => {
-    const detalhe = criarDetalhes().get(ATIVA)!
+  it('Resolved (saved link): read only, without vote buttons', async () => {
+    const detail = createDetails().get(ACTIVE)!
     server.use(
-      http.get(rota('/issues/:id'), () =>
-        HttpResponse.json({ ...detalhe, status: 'resolved', trustScore: null, band: null }),
+      http.get(route('/issues/:id'), () =>
+        HttpResponse.json({ ...detail, status: 'resolved', trustScore: null, band: null }),
       ),
     )
-    renderizar(ATIVA)
+    renderWithProviders(ACTIVE)
 
     expect(await screen.findByText(/confirmou que este problema foi resolvido/)).toBeInTheDocument()
     expect(screen.getByText('Resolvida')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Sim, está lá' })).not.toBeInTheDocument()
   })
 
-  it('enquanto um voto está em andamento, os outros botões ficam desabilitados', async () => {
-    entrarComoCidadao()
+  it('while a vote is in progress, the other buttons are disabled', async () => {
+    loginAsCitizen()
     server.use(
-      http.put(rota('/issues/:id/vote'), async () => {
+      http.put(route('/issues/:id/vote'), async () => {
         await delay('infinite')
       }),
     )
-    renderizar(ATIVA)
+    renderWithProviders(ACTIVE)
 
     await userEvent.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
     expect(screen.getByRole('button', { name: 'Não está lá' })).toBeDisabled()
   })
 
-  it('aberto (folha expandida ou desktop), só o cartão completo pergunta "Ainda está lá?"', async () => {
-    entrarComoCidadao()
-    renderizar(ATIVA)
+  it('open (expanded sheet or desktop), only the full card asks "Ainda está lá?"', async () => {
+    loginAsCitizen()
+    renderWithProviders(ACTIVE)
 
     expect(await screen.findByRole('button', { name: 'Sim, está lá' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
 
-  it('souAutor: sem botões de voto, com a dica no cartão', async () => {
-    entrarComoCidadao()
-    renderizar(ID_DO_AUTOR)
+  it('isAuthor: no vote buttons, with the hint on the card', async () => {
+    loginAsCitizen()
+    renderWithProviders(AUTHOR_ID)
 
     expect(await screen.findByText('Você registrou este problema')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Sim, está lá' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
 
-  it('logado, o voto vai num PUT só, atualiza na hora e fica marcado', async () => {
-    entrarComoCidadao()
-    const votos = espiarVotos()
-    const usuario = userEvent.setup()
-    renderizar(ATIVA)
+  it('logged in, the vote goes in a single PUT, updates immediately and stays marked', async () => {
+    loginAsCitizen()
+    const votes = spyOnVotes()
+    const user = userEvent.setup()
+    renderWithProviders(ACTIVE)
 
-    await usuario.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
+    await user.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
 
     expect(screen.getByRole('button', { name: 'Sim, está lá' })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
-    expect(within(cartao()).getByText('16')).toBeInTheDocument()
-    await waitFor(() => expect(votos).toEqual(['yes']))
+    expect(within(card()).getByText('16')).toBeInTheDocument()
+    await waitFor(() => expect(votes).toEqual(['yes']))
     expect(screen.getByText(/Calculada com 17 votos/)).toBeInTheDocument()
   })
 
-  it('trocar a resposta substitui o voto', async () => {
-    entrarComoCidadao()
-    const votos = espiarVotos()
-    const usuario = userEvent.setup()
-    renderizar(ATIVA)
+  it('changing the answer replaces the vote', async () => {
+    loginAsCitizen()
+    const votes = spyOnVotes()
+    const user = userEvent.setup()
+    renderWithProviders(ACTIVE)
 
-    await usuario.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
+    await user.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
     await waitFor(() => expect(screen.getByRole('button', { name: 'Não está lá' })).toBeEnabled())
-    await usuario.click(screen.getByRole('button', { name: 'Não está lá' }))
+    await user.click(screen.getByRole('button', { name: 'Não está lá' }))
 
-    await waitFor(() => expect(votos).toEqual(['yes', 'no']))
+    await waitFor(() => expect(votes).toEqual(['yes', 'no']))
     expect(screen.getByRole('button', { name: 'Não está lá' })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
-    expect(within(cartao()).getByText('2')).toBeInTheDocument()
+    expect(within(card()).getByText('2')).toBeInTheDocument()
   })
 
-  it('erro de regra desfaz o voto otimista e mostra a mensagem', async () => {
-    entrarComoCidadao()
+  it('rule error undoes the optimistic vote and shows the message', async () => {
+    loginAsCitizen()
     server.use(
-      http.put(rota('/issues/:id/vote'), () =>
-        erroDeRegra(422, 'issue-resolved', 'Problema resolvido.'),
+      http.put(route('/issues/:id/vote'), () =>
+        ruleError(422, 'issue-resolved', 'Problema resolvido.'),
       ),
     )
-    const usuario = userEvent.setup()
-    renderizar(ATIVA)
+    const user = userEvent.setup()
+    renderWithProviders(ACTIVE)
 
-    await usuario.click(await screen.findByRole('button', { name: 'Não está lá' }))
+    await user.click(await screen.findByRole('button', { name: 'Não está lá' }))
 
     expect(await screen.findAllByRole('alert')).not.toHaveLength(0)
     expect(screen.getAllByRole('alert')[0]).toHaveTextContent('Este problema já foi resolvido.')
@@ -189,14 +189,14 @@ describe('DetalheProblema', () => {
       'aria-pressed',
       'false',
     )
-    expect(within(cartao()).getByText('1')).toBeInTheDocument()
+    expect(within(card()).getByText('1')).toBeInTheDocument()
   })
 
-  it('visitante que tenta votar vê "Entre para votar" (tela 27)', async () => {
-    const usuario = userEvent.setup()
-    renderizar(ATIVA)
+  it('guest who tries to vote sees "Entre para votar" (screen 27)', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(ACTIVE)
 
-    await usuario.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
+    await user.click(await screen.findByRole('button', { name: 'Sim, está lá' }))
 
     expect(await screen.findByRole('heading', { name: 'Entre para votar' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Criar conta' })).toBeInTheDocument()

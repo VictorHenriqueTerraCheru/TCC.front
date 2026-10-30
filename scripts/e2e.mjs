@@ -201,7 +201,7 @@ try {
     'Modo Incidentes: tocar no mapa abre a área com o relato (GET /incidentes/area)',
     p,
     async () => {
-      await p.goto(BASE + '/mapa?modo=incidentes')
+      await p.goto(BASE + '/mapa?mode=incidents')
       const mapa = p.locator('canvas.maplibregl-canvas')
       await mapa.waitFor()
       await p.waitForLoadState('networkidle')

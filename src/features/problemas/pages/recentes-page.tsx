@@ -2,46 +2,46 @@ import type { MaterialSymbol } from 'material-symbols'
 import { useState } from 'react'
 import { Link } from 'react-router'
 
-import { ChipFiltro } from '@/common/components/chip-filtro'
-import { Icone } from '@/common/components/icone'
-import { ListaInfinita } from '@/common/components/lista-infinita'
-import { Pagina } from '@/common/components/pagina'
-import { tempoRelativo } from '@/common/lib/formatacao'
-import { CENTRO_PADRAO } from '@/common/lib/mapa'
+import { FilterChip } from '@/common/components/chip-filtro'
+import { Icon } from '@/common/components/icone'
+import { InfiniteList } from '@/common/components/lista-infinita'
+import { Page } from '@/common/components/pagina'
+import { relativeTime } from '@/common/lib/formatacao'
+import { DEFAULT_CENTER } from '@/common/lib/mapa'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { ItemAnimado } from '@/common/components/item-animado'
+import { AnimatedItem } from '@/common/components/item-animado'
 import {
-  aparenciaDaCor,
-  CategoriaIcone,
-  gruposDoTipo,
-  PontoGrupo,
-  useAparencia,
-  useGrupos,
+  colorAppearance,
+  CategoryIcon,
+  groupsOfType,
+  GroupDot,
+  useAppearance,
+  useGroups,
 } from '@/features/categorias'
-import { useLocalizacao } from '@/features/localizacao'
+import { useGeolocation } from '@/features/localizacao'
 import type { Schema } from '@/infrastructure/api'
 
-import { RAIO_RECENTES_KM, useRecentes } from '../api/use-recentes'
-import type { FaixaConfianca } from '../models/problema'
+import { RECENT_RADIUS_KM, useRecent } from '../api/use-recentes'
+import type { TrustBand } from '../models/problema'
 
-type ItemRecente = Schema<'ListRecentIssuesItem'>
+type RecentItem = Schema<'ListRecentIssuesItem'>
 
-const faixa: Record<FaixaConfianca, { label: string; icon: MaterialSymbol }> = {
+const band: Record<TrustBand, { label: string; icon: MaterialSymbol }> = {
   high: { label: 'Alta', icon: 'signal_cellular_alt' },
   medium: { label: 'Média', icon: 'signal_cellular_alt_2_bar' },
   low: { label: 'Baixa', icon: 'signal_cellular_alt_1_bar' },
 }
 
-function Cartao({ item }: { item: ItemRecente }) {
-  const possivel = item.status === 'possiblyResolved'
+function RecentCard({ item }: { item: RecentItem }) {
+  const possible = item.status === 'possiblyResolved'
   return (
     <Link
       to={`/mapa/problema/${item.id}`}
       className="flex pressionavel gap-3 rounded-[20px] border border-border bg-card p-3 shadow-1 hover:bg-superficie-2 focus-visible:outline-2"
     >
-      <CategoriaIcone category={item.category} />
+      <CategoryIcon category={item.category} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <p className="font-medium">{item.category.name}</p>
@@ -52,31 +52,31 @@ function Cartao({ item }: { item: ItemRecente }) {
           )}
           {item.band && (
             <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-              <Icone name={faixa[item.band].icon} className="text-[16px] text-primario" />
-              {faixa[item.band].label}
+              <Icon name={band[item.band].icon} className="text-[16px] text-primario" />
+              {band[item.band].label}
             </span>
           )}
         </div>
         <p className="truncate text-xs text-muted-foreground">{item.address}</p>
         <p className="mt-1 flex flex-wrap items-center gap-2 text-xs">
           <span className="flex items-center gap-1 text-muted-foreground">
-            <Icone name="schedule" className="text-[16px]" />
-            {tempoRelativo(item.createdAt)}
+            <Icon name="schedule" className="text-[16px]" />
+            {relativeTime(item.createdAt)}
           </span>
           <span
             className={cn(
               'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-medium',
-              possivel ? 'bg-primario-suave text-primario' : 'bg-muted',
+              possible ? 'bg-primario-suave text-primario' : 'bg-muted',
             )}
           >
-            <Icone
+            <Icon
               name={
-                possivel ? 'help' : item.status === 'new' ? 'hourglass_top' : 'radio_button_checked'
+                possible ? 'help' : item.status === 'new' ? 'hourglass_top' : 'radio_button_checked'
               }
-              preenchido
+              filled
               className="text-[14px]"
             />
-            {possivel
+            {possible
               ? 'Possivelmente resolvida'
               : item.status === 'new'
                 ? 'Em avaliação'
@@ -88,93 +88,89 @@ function Cartao({ item }: { item: ItemRecente }) {
   )
 }
 
-export function RecentesPage() {
-  const { estado, posicao } = useLocalizacao()
-  const { grupos: todos, carregado } = useAparencia()
-  const gruposQuery = useGrupos()
-  const [escolhidos, setGrupos] = useState<string[]>([])
-  const grupos = carregado ? escolhidos.filter((g) => todos.some((t) => t.key === g)) : escolhidos
-  const centro =
-    estado === 'granted' && posicao ? posicao : { lat: CENTRO_PADRAO[0], lng: CENTRO_PADRAO[1] }
-  const recentes = useRecentes(centro, grupos)
-  const itens = recentes.data?.pages.flatMap((p) => p.items) ?? []
+export function RecentPage() {
+  const { state, position } = useGeolocation()
+  const { groups: all, loaded } = useAppearance()
+  const groupsQuery = useGroups()
+  const [chosenItems, setGroups] = useState<string[]>([])
+  const groups = loaded ? chosenItems.filter((g) => all.some((t) => t.key === g)) : chosenItems
+  const center =
+    state === 'granted' && position ? position : { lat: DEFAULT_CENTER[0], lng: DEFAULT_CENTER[1] }
+  const recent = useRecent(center, groups)
+  const items = recent.data?.pages.flatMap((p) => p.items) ?? []
 
-  const alternar = (grupo: string) =>
-    setGrupos(() =>
-      grupos.includes(grupo) ? grupos.filter((g) => g !== grupo) : [...grupos, grupo],
+  const toggle = (group: string) =>
+    setGroups(() =>
+      groups.includes(group) ? groups.filter((g) => g !== group) : [...groups, group],
     )
 
-  if (gruposQuery.isError) {
+  if (groupsQuery.isError) {
     return (
-      <Pagina titulo="Recentes">
+      <Page title="Recentes">
         <div role="alert" className="space-y-3 py-6">
           <p>Não foi possível carregar os filtros.</p>
-          <Button variant="outline" size="sm" onClick={() => void gruposQuery.refetch()}>
+          <Button variant="outline" size="sm" onClick={() => void groupsQuery.refetch()}>
             Tentar novamente
           </Button>
         </div>
-      </Pagina>
+      </Page>
     )
   }
 
   return (
-    <Pagina titulo="Recentes">
+    <Page title="Recentes">
       <p className="-mt-2 mb-3 text-xs text-muted-foreground">
-        {estado === 'granted' && posicao ? 'Perto de você' : 'Perto de Icaraí'} · até{' '}
-        {RAIO_RECENTES_KM} km
+        {state === 'granted' && position ? 'Perto de você' : 'Perto de Icaraí'} · até{' '}
+        {RECENT_RADIUS_KM} km
       </p>
       <div
         role="group"
         aria-label="Filtros"
         className="-mx-4 mb-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1"
       >
-        {gruposDoTipo(todos, 'issue').map((grupo) => {
-          const selecionado = grupos.includes(grupo.key)
+        {groupsOfType(all, 'issue').map((group) => {
+          const selected = groups.includes(group.key)
           return (
-            <ChipFiltro
-              key={grupo.key}
-              selecionado={selecionado}
-              aoClicar={() => alternar(grupo.key)}
-            >
-              {selecionado ? (
-                <Icone name="check" preenchido className="text-[18px]" />
+            <FilterChip key={group.key} selected={selected} onClick={() => toggle(group.key)}>
+              {selected ? (
+                <Icon name="check" filled className="text-[18px]" />
               ) : (
-                <PontoGrupo color={aparenciaDaCor[grupo.color]} />
+                <GroupDot color={colorAppearance[group.color]} />
               )}
-              {grupo.label}
-            </ChipFiltro>
+              {group.label}
+            </FilterChip>
           )
         })}
       </div>
 
-      {recentes.isPending ? (
+      {recent.isPending ? (
         <div className="space-y-2" aria-label="Carregando recentes">
           {Array.from({ length: 4 }, (_, i) => (
             <Skeleton key={i} className="h-24 rounded-2xl bg-muted" />
           ))}
         </div>
-      ) : recentes.isError ? (
+      ) : recent.isError ? (
         <div role="alert" className="space-y-3 py-6">
           <p>Não foi possível carregar os recentes.</p>
-          <Button variant="outline" size="sm" onClick={() => void recentes.refetch()}>
+          <Button variant="outline" size="sm" onClick={() => void recent.refetch()}>
             Tentar novamente
           </Button>
         </div>
-      ) : itens.length === 0 ? (
+      ) : items.length === 0 ? (
         <p className="py-10 text-center text-sm text-muted-foreground">
           Nenhum problema registrado nesta região.
         </p>
       ) : (
-        <ListaInfinita consulta={recentes}>
+        <InfiniteList query={recent}>
           <ul className="space-y-2">
-            {itens.map((item, i) => (
-              <ItemAnimado key={item.id} indice={i}>
-                <Cartao item={item} />
-              </ItemAnimado>
+            {items.map((item, i) => (
+              <AnimatedItem key={item.id} index={i}>
+                <RecentCard item={item} />
+              </AnimatedItem>
             ))}
           </ul>
-        </ListaInfinita>
+        </InfiniteList>
       )}
-    </Pagina>
+    </Page>
   )
 }

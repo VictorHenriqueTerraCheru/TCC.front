@@ -1,3 +1,3 @@
-export { CategoriasAdminPage } from './pages/categorias-admin-page'
-export { FilaVerificacaoPage } from './pages/fila-verificacao-page'
-export { UsuariosAdminPage } from './pages/usuarios-admin-page'
+export { AdminCategoriesPage } from './pages/categorias-admin-page'
+export { VerificationQueuePage } from './pages/fila-verificacao-page'
+export { AdminUsersPage } from './pages/usuarios-admin-page'

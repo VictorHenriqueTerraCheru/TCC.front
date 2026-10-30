@@ -1,4 +1,8 @@
-export { CartaoVerificacao } from './components/cartao-verificacao'
-export { mensagemErroVerificacao } from './errors'
-export { rotuloVinculo, type StatusVerificacao, type TipoVinculo } from './models/verificacao'
-export { SolicitarVerificacaoPage } from './pages/solicitar-verificacao-page'
+export { VerificationCard } from './components/cartao-verificacao'
+export { verificationErrorMessage } from './errors'
+export {
+  affiliationLabel,
+  type VerificationStatus,
+  type AffiliationType,
+} from './models/verificacao'
+export { RequestVerificationPage } from './pages/solicitar-verificacao-page'

@@ -2,124 +2,124 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 
-import { PainelResponsivo } from '@/common/components/painel-responsivo'
-import { ContextoPainel } from '@/common/hooks/use-painel-responsivo'
-import { EntreParaContinuar } from '@/features/auth'
-import { criarDetalhes } from '@/infrastructure/mocks/fixtures/detalhes'
-import { problemasNaArea } from '@/infrastructure/mocks/fixtures/problemas'
-import { rota } from '@/infrastructure/mocks/rota'
+import { ResponsivePanel } from '@/common/components/painel-responsivo'
+import { PanelContext } from '@/common/hooks/use-painel-responsivo'
+import { LoginToContinue } from '@/features/auth'
+import { createDetails } from '@/infrastructure/mocks/fixtures/detalhes'
+import { issuesInArea } from '@/infrastructure/mocks/fixtures/problemas'
+import { route } from '@/infrastructure/mocks/rota'
 import { server } from '@/infrastructure/mocks/server'
-import { definirLargura, renderizarRotas } from '@/test/render'
-import { entrarComoCidadao, sair } from '@/test/sessao'
+import { setWidth, renderRoutes } from '@/test/render'
+import { loginAsCitizen, logout } from '@/test/sessao'
 
-import type { DetalheProblema } from '../../models/problema'
-import { ALTURA_RESUMO, ResumoAlerta } from './resumo-alerta'
+import type { IssueDetail } from '../../models/problema'
+import { SUMMARY_HEIGHT, AlertSummary } from './resumo-alerta'
 
-const ATIVA = criarDetalhes().get(problemasNaArea[0]!.id)!
-const NOVA = criarDetalhes().get(problemasNaArea[10]!.id)!
+const ACTIVE = createDetails().get(issuesInArea[0]!.id)!
+const NEW = createDetails().get(issuesInArea[10]!.id)!
 
-function renderizar(problema: DetalheProblema, { recolhido = true } = {}) {
-  definirLargura(390)
-  return renderizarRotas([
+function renderWithProviders(issue: IssueDetail, { collapsed = true } = {}) {
+  setWidth(390)
+  return renderRoutes([
     {
       path: '/',
       element: (
-        <ContextoPainel.Provider value={{ recolhido, expandir: () => {}, medirResumo: () => {} }}>
-          <ResumoAlerta issue={problema} />
-          <EntreParaContinuar />
-        </ContextoPainel.Provider>
+        <PanelContext.Provider value={{ collapsed, expand: () => {}, measureSummary: () => {} }}>
+          <AlertSummary issue={issue} />
+          <LoginToContinue />
+        </PanelContext.Provider>
       ),
     },
   ])
 }
 
-function espiarVotos() {
-  const votos: unknown[] = []
+function spyOnVotes() {
+  const votes: unknown[] = []
   server.use(
-    http.put(rota('/issues/:id/vote'), async ({ request }) => {
-      votos.push(await request.json())
+    http.put(route('/issues/:id/vote'), async ({ request }) => {
+      votes.push(await request.json())
       return new HttpResponse(null, { status: 204 })
     }),
   )
-  return votos
+  return votes
 }
 
-describe('ResumoAlerta', () => {
-  afterEach(sair)
+describe('AlertSummary', () => {
+  afterEach(logout)
 
-  it('mostra categoria, endereço e confirmações', () => {
-    renderizar(ATIVA)
+  it('shows category, address and confirmations', () => {
+    renderWithProviders(ACTIVE)
 
-    expect(screen.getByRole('heading', { name: ATIVA.category.name })).toBeInTheDocument()
-    expect(screen.getByText(new RegExp(ATIVA.address))).toBeInTheDocument()
-    expect(screen.getByText(`${ATIVA.votes.yes} confirmaram`)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: ACTIVE.category.name })).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(ACTIVE.address))).toBeInTheDocument()
+    expect(screen.getByText(`${ACTIVE.votes.yes} confirmaram`)).toBeInTheDocument()
   })
 
   it.each([
-    ['new', NOVA],
-    ['active', ATIVA],
-  ])('%s: "Ainda está lá?" com um voto só', async (_status, problema) => {
-    entrarComoCidadao()
-    const votos = espiarVotos()
-    renderizar(problema)
+    ['new', NEW],
+    ['active', ACTIVE],
+  ])('%s: "Ainda está lá?" with a single vote', async (_status, issue) => {
+    loginAsCitizen()
+    const votes = spyOnVotes()
+    renderWithProviders(issue)
 
     expect(screen.getByText('Ainda está lá?')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Voto rápido: Não está lá' }))
 
-    expect(votos).toEqual([expect.objectContaining({ value: 'no' })])
+    expect(votes).toEqual([expect.objectContaining({ value: 'no' })])
   })
 
-  it('aberto (folha expandida ou desktop), sem polegares: o cartão completo já pergunta', () => {
-    entrarComoCidadao()
-    renderizar(ATIVA, { recolhido: false })
+  it('open (expanded sheet or desktop), without thumbs: the full card already asks', () => {
+    loginAsCitizen()
+    renderWithProviders(ACTIVE, { collapsed: false })
 
     expect(screen.queryByText('Ainda está lá?')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
 
-  it('autor não vê os polegares', () => {
-    renderizar({ ...ATIVA, isAuthor: true })
+  it('author does not see the thumbs', () => {
+    renderWithProviders({ ...ACTIVE, isAuthor: true })
 
     expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
 
-  it('resolvida não tem botões', () => {
-    renderizar({ ...ATIVA, status: 'resolved' })
+  it('resolved has no buttons', () => {
+    renderWithProviders({ ...ACTIVE, status: 'resolved' })
 
     expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
 
-  it('visitante tocando no polegar abre "Entre para votar"', async () => {
-    renderizar(ATIVA)
+  it('guest tapping the thumb opens "Entre para votar"', async () => {
+    renderWithProviders(ACTIVE)
 
     await userEvent.click(screen.getByRole('button', { name: 'Voto rápido: Sim, está lá' }))
 
     expect(await screen.findByRole('heading', { name: 'Entre para votar' })).toBeInTheDocument()
   })
 
-  it('no celular, tocar no card expande a folha; os polegares votam sem expandir', async () => {
-    entrarComoCidadao()
-    espiarVotos()
-    definirLargura(390)
-    renderizarRotas([
+  it('on mobile, tapping the card expands the sheet; the thumbs vote without expanding', async () => {
+    loginAsCitizen()
+    spyOnVotes()
+    setWidth(390)
+    renderRoutes([
       {
         path: '/',
         element: (
-          <PainelResponsivo titulo="Detalhe" aoFechar={() => {}} alturaResumo={ALTURA_RESUMO}>
-            <ResumoAlerta issue={ATIVA} />
-          </PainelResponsivo>
+          <ResponsivePanel title="Detalhe" onClose={() => {}} summaryHeight={SUMMARY_HEIGHT}>
+            <AlertSummary issue={ACTIVE} />
+          </ResponsivePanel>
         ),
       },
     ])
-    const estagio = () =>
-      screen.getByRole('heading', { name: ATIVA.category.name }).closest('[data-estagio]')
+    const stage = () =>
+      screen.getByRole('heading', { name: ACTIVE.category.name }).closest('[data-estagio]')
 
-    expect(estagio()).toHaveAttribute('data-estagio', 'resumo')
+    expect(stage()).toHaveAttribute('data-estagio', 'summary')
     await userEvent.click(screen.getByRole('button', { name: 'Voto rápido: Sim, está lá' }))
-    expect(estagio()).toHaveAttribute('data-estagio', 'resumo')
+    expect(stage()).toHaveAttribute('data-estagio', 'summary')
 
-    await userEvent.click(screen.getByRole('heading', { name: ATIVA.category.name }))
-    expect(estagio()).toHaveAttribute('data-estagio', 'aberto')
+    await userEvent.click(screen.getByRole('heading', { name: ACTIVE.category.name }))
+    expect(stage()).toHaveAttribute('data-estagio', 'open')
     expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
 })

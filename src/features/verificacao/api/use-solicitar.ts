@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { meQuery } from '@/features/usuarios'
-import { api, dados } from '@/infrastructure/api'
+import { api, unwrapData } from '@/infrastructure/api'
 
-import type { TipoVinculo } from '../models/verificacao'
+import type { AffiliationType } from '../models/verificacao'
 
-export function useSolicitarVerificacao() {
+export function useRequestVerification() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (corpo: { affiliationType: TipoVinculo; justification: string }) =>
-      api.POST('/verifications', { body: corpo }).then(dados),
+    mutationFn: (body: { affiliationType: AffiliationType; justification: string }) =>
+      api.POST('/verifications', { body }).then(unwrapData),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: meQuery.queryKey }),
   })
 }

@@ -1,11 +1,11 @@
 import { LazyMotion, MotionConfig } from 'motion/react'
 import type { ReactNode } from 'react'
 
-const carregarRecursos = () => import('@/common/lib/recursos-movimento').then((r) => r.default)
+const loadResources = () => import('@/common/lib/recursos-movimento').then((r) => r.default)
 
-export function ProvedorMovimento({ children }: { children: ReactNode }) {
+export function MotionProvider({ children }: { children: ReactNode }) {
   return (
-    <LazyMotion features={carregarRecursos} strict>
+    <LazyMotion features={loadResources} strict>
       <MotionConfig reducedMotion="user">{children}</MotionConfig>
     </LazyMotion>
   )

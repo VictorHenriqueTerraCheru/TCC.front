@@ -2,14 +2,14 @@ import { QueryClient } from '@tanstack/react-query'
 
 import { isApiError } from '../api/api-error'
 
-export function criarQueryClient() {
+export function createQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 30_000,
         refetchOnWindowFocus: false,
         networkMode: 'always',
-        retry: (falhas, erro) => !(isApiError(erro) && erro.status < 500) && falhas < 2,
+        retry: (failures, error) => !(isApiError(error) && error.status < 500) && failures < 2,
       },
       mutations: { retry: false, networkMode: 'always' },
     },

@@ -1,20 +1,19 @@
-import { grupos } from '@/infrastructure/mocks/fixtures/grupos'
+import { groups } from '@/infrastructure/mocks/fixtures/grupos'
 
-import { filtrosDasCamadas, gruposDoModo } from './filtros'
+import { layerFilters, modeGroups } from './filtros'
 
-const chaves = (modo: Parameters<typeof gruposDoModo>[1]) =>
-  gruposDoModo(grupos, modo).map((g) => g.key)
+const keys = (mode: Parameters<typeof modeGroups>[1]) => modeGroups(groups, mode).map((g) => g.key)
 
-describe('filtros do mapa', () => {
-  it('cada modo oferece os chips do seu tipo', () => {
-    expect(chaves('problemas')).toEqual(['viaPublica', 'eletrica', 'limpeza'])
-    expect(chaves('incidentes')).toEqual(['seguranca', 'transito'])
-    expect(chaves('ambos')).toHaveLength(5)
+describe('map filters', () => {
+  it('each mode offers the chips of its type', () => {
+    expect(keys('issues')).toEqual(['viaPublica', 'eletrica', 'limpeza'])
+    expect(keys('incidents')).toEqual(['seguranca', 'transito'])
+    expect(keys('both')).toHaveLength(5)
   })
 
-  it('um grupo criado pelo admin aparece no modo do seu tipo', () => {
-    const comNovo = [
-      ...grupos,
+  it('a group created by the admin appears in the mode of its type', () => {
+    const withNew = [
+      ...groups,
       {
         key: 'clima',
         label: 'Clima',
@@ -23,38 +22,40 @@ describe('filtros do mapa', () => {
         sortOrder: 6,
       },
     ]
-    expect(gruposDoModo(comNovo, 'incidentes').map((g) => g.key)).toEqual([
+    expect(modeGroups(withNew, 'incidents').map((g) => g.key)).toEqual([
       'seguranca',
       'transito',
       'clima',
     ])
   })
 
-  it('Ambos respeita a ordem configurada, misturando os tipos', () => {
-    const naOrdem = [grupos[3]!, grupos[0]!, grupos[4]!, grupos[1]!, grupos[2]!]
+  it('Ambos respects the configured order, mixing the types', () => {
+    const inOrder = [groups[3]!, groups[0]!, groups[4]!, groups[1]!, groups[2]!]
 
-    expect(gruposDoModo(naOrdem, 'ambos').map((g) => g.key)).toEqual(naOrdem.map((g) => g.key))
+    expect(modeGroups(inOrder, 'both').map((g) => g.key)).toEqual(inOrder.map((g) => g.key))
   })
 
-  it('Problemas liga só os marcadores; Incidentes só o calor', () => {
-    expect(
-      filtrosDasCamadas({ modo: 'problemas', grupos: [], somenteNovas: false }, grupos),
-    ).toEqual({ problemas: { grupos: [], status: [] }, calor: null })
-    expect(
-      filtrosDasCamadas({ modo: 'incidentes', grupos: [], somenteNovas: false }, grupos),
-    ).toEqual({ problemas: null, calor: { grupos: [] } })
+  it('Problemas turns on only the markers; Incidentes only the heatmap', () => {
+    expect(layerFilters({ mode: 'issues', groups: [], onlyNew: false }, groups)).toEqual({
+      issues: { groups: [], status: [] },
+      heatmap: null,
+    })
+    expect(layerFilters({ mode: 'incidents', groups: [], onlyNew: false }, groups)).toEqual({
+      issues: null,
+      heatmap: { groups: [] },
+    })
   })
 
-  it('o chip de ampulheta pede status=nova', () => {
+  it('the hourglass chip asks for status=new', () => {
     expect(
-      filtrosDasCamadas({ modo: 'problemas', grupos: ['eletrica'], somenteNovas: true }, grupos)
-        .problemas,
-    ).toEqual({ grupos: ['eletrica'], status: ['new'] })
+      layerFilters({ mode: 'issues', groups: ['eletrica'], onlyNew: true }, groups).issues,
+    ).toEqual({ groups: ['eletrica'], status: ['new'] })
   })
 
-  it('em Ambos, marcar só um grupo de incidente desliga os marcadores', () => {
-    expect(
-      filtrosDasCamadas({ modo: 'ambos', grupos: ['seguranca'], somenteNovas: false }, grupos),
-    ).toEqual({ problemas: null, calor: { grupos: ['seguranca'] } })
+  it('in Ambos, checking only an incident group turns the markers off', () => {
+    expect(layerFilters({ mode: 'both', groups: ['seguranca'], onlyNew: false }, groups)).toEqual({
+      issues: null,
+      heatmap: { groups: ['seguranca'] },
+    })
   })
 })

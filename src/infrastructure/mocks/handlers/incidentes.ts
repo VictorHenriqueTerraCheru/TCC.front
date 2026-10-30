@@ -1,62 +1,63 @@
 import { http, HttpResponse } from 'msw'
 
 import type { Schema } from '../../api'
-import { banco, metrosEntre } from '../banco'
-import { rota } from '../rota'
-import { erroDeRegra, lista, noRetangulo, retanguloDaUrl } from './comum'
+import { database, metersBetween } from '../banco'
+import { route } from '../rota'
+import { ruleError, list, inBounds, boundsFromUrl } from './comum'
 
-function resumoDaArea(ponto: { lat: number; lng: number }) {
-  const celulas = banco
-    .calor()
-    .filter((c) => metrosEntre(ponto, c) <= 400)
-    .reduce((soma, c) => soma + c.count, 0)
-  const novos = banco.incidentesNovos().filter((i) => metrosEntre(ponto, i) <= 400)
-  const ativos = novos.filter((i) => banco.categoriaPorId(i.categoryId)?.active)
-  const doNovo = (categoriaId: number) => ativos.filter((i) => i.categoryId === categoriaId).length
+function areaSummary(point: { lat: number; lng: number }) {
+  const cells = database
+    .heatmap()
+    .filter((c) => metersBetween(point, c) <= 400)
+    .reduce((sum, c) => sum + c.count, 0)
+  const newEntries = database.newIncidents().filter((i) => metersBetween(point, i) <= 400)
+  const activeItems = newEntries.filter((i) => database.categoryById(i.categoryId)?.active)
+  const newCount = (categoryId: number) =>
+    activeItems.filter((i) => i.categoryId === categoryId).length
 
-  const deExemplo = celulas - novos.length
-  const roubos = deExemplo + doNovo(7)
-  const acidentes = Math.floor(deExemplo / 4) + doNovo(8)
-  const contagens = banco
-    .categoriasAtivas()
+  const sampleCount = cells - newEntries.length
+  const robberies = sampleCount + newCount(7)
+  const accidents = Math.floor(sampleCount / 4) + newCount(8)
+  const counts = database
+    .activeCategories()
     .filter((c) => c.type === 'incident')
     .map((c) => {
-      const dias7 = c.id === 7 ? roubos : c.id === 8 ? acidentes : doNovo(c.id)
-      const dias30 = c.id === 7 ? roubos * 3 + 5 : c.id === 8 ? acidentes * 3 + 2 : dias7
-      return { categoryId: c.id, name: c.name, days7: dias7, days30: dias30 }
+      const sevenDays = c.id === 7 ? robberies : c.id === 8 ? accidents : newCount(c.id)
+      const thirtyDays = c.id === 7 ? robberies * 3 + 5 : c.id === 8 ? accidents * 3 + 2 : sevenDays
+      return { categoryId: c.id, name: c.name, days7: sevenDays, days30: thirtyDays }
     })
-  const total = contagens.reduce((soma, c) => soma + c.days7, 0)
+  const total = counts.reduce((sum, c) => sum + c.days7, 0)
   return {
     radiusMeters: 400,
     updatedAt: new Date().toISOString(),
     level: total >= 10 ? 'high' : total >= 4 ? 'medium' : 'low',
-    counts: contagens,
+    counts,
   }
 }
 
-export const incidentesHandlers = [
-  http.get(rota('/incidents/heatmap'), ({ request }) => {
+export const incidentHandlers = [
+  http.get(route('/incidents/heatmap'), ({ request }) => {
     const url = new URL(request.url)
-    const retangulo = retanguloDaUrl(url)
-    if (!retangulo) return HttpResponse.json({ title: 'Retângulo inválido.' }, { status: 400 })
+    const bounds = boundsFromUrl(url)
+    if (!bounds) return HttpResponse.json({ title: 'Retângulo inválido.' }, { status: 400 })
 
-    const grupos = lista(url, 'groups')
-    return HttpResponse.json(banco.calor(grupos).filter((c) => noRetangulo(c, retangulo)))
+    const groups = list(url, 'groups')
+    return HttpResponse.json(database.heatmap(groups).filter((c) => inBounds(c, bounds)))
   }),
-  http.get(rota('/incidents/area'), ({ request }) => {
+  http.get(route('/incidents/area'), ({ request }) => {
     const url = new URL(request.url)
     return HttpResponse.json(
-      resumoDaArea({
+      areaSummary({
         lat: Number(url.searchParams.get('lat')),
         lng: Number(url.searchParams.get('lng')),
       }),
     )
   }),
-  http.post<never, Schema<'CreateIncidentRequest'>>(rota('/incidents'), async ({ request }) => {
+  http.post<never, Schema<'CreateIncidentRequest'>>(route('/incidents'), async ({ request }) => {
     if (!request.headers.has('Authorization')) return new HttpResponse(null, { status: 401 })
-    const { categoryId: categoriaId, lat, lng, occurredAt: ocorridoEm } = await request.json()
-    const categoria = banco.categoriaPorId(categoriaId)
-    if (!categoria?.active) {
+    const { categoryId, lat, lng, occurredAt } = await request.json()
+    const category = database.categoryById(categoryId)
+    if (!category?.active) {
       return HttpResponse.json(
         {
           title: 'Erro de validação.',
@@ -66,15 +67,15 @@ export const incidentesHandlers = [
         { status: 400 },
       )
     }
-    if (categoria.type !== 'incident') {
-      return erroDeRegra(422, 'category-not-incident', 'A categoria não é de incidente.')
+    if (category.type !== 'incident') {
+      return ruleError(422, 'category-not-incident', 'A categoria não é de incidente.')
     }
-    const instante = Date.parse(ocorridoEm)
-    if (instante > Date.now() || instante < Date.now() - 24 * 3_600_000) {
-      return erroDeRegra(422, 'time-outside-window', 'Horário fora da janela de 24 h.')
+    const instant = Date.parse(occurredAt)
+    if (instant > Date.now() || instant < Date.now() - 24 * 3_600_000) {
+      return ruleError(422, 'time-outside-window', 'Horário fora da janela de 24 h.')
     }
-    const ponto = banco.registrarIncidente(categoriaId, lat, lng)
-    if (!ponto) return erroDeRegra(429, 'daily-incident-limit', 'Limite diário de incidentes.')
-    return HttpResponse.json(resumoDaArea(ponto), { status: 201 })
+    const point = database.reportIncident(categoryId, lat, lng)
+    if (!point) return ruleError(429, 'daily-incident-limit', 'Limite diário de incidentes.')
+    return HttpResponse.json(areaSummary(point), { status: 201 })
   }),
 ]

@@ -1,6 +1,6 @@
-import { isApiError, isErroDeRede } from '@/infrastructure/api'
+import { isApiError, isNetworkError } from '@/infrastructure/api'
 
-const mensagens: Record<string, string> = {
+const messages: Record<string, string> = {
   'duplicate-name': 'Já existe uma categoria com este nome.',
   'group-type-mismatch': 'O grupo escolhido é de outro tipo (Estado ou Evento).',
   'duplicate-group-label': 'Já existe um grupo com este nome.',
@@ -9,16 +9,16 @@ const mensagens: Record<string, string> = {
     'Este grupo ainda tem categorias (inclusive desativadas). Mova todas para outro grupo antes de apagar.',
 }
 
-function traduzir(erro: unknown): string {
-  if (isErroDeRede(erro)) return 'Sem conexão. Tente de novo.'
-  if (isApiError(erro)) {
-    if (erro.type && mensagens[erro.type]) return mensagens[erro.type]!
-    const campo = Object.values(erro.errors)[0]?.[0]
-    if (campo) return campo
-    if (erro.title) return erro.title
+function translate(error: unknown): string {
+  if (isNetworkError(error)) return 'Sem conexão. Tente de novo.'
+  if (isApiError(error)) {
+    if (error.type && messages[error.type]) return messages[error.type]!
+    const field = Object.values(error.errors)[0]?.[0]
+    if (field) return field
+    if (error.title) return error.title
   }
   return 'Não foi possível concluir. Tente de novo.'
 }
 
-export const mensagemErroCategorias = traduzir
-export const mensagemErroUsuarios = traduzir
+export const categoryErrorMessage = translate
+export const userErrorMessage = translate

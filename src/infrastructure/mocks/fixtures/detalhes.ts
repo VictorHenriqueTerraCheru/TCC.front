@@ -1,10 +1,10 @@
 import type { Schema } from '../../api'
-import { categorias } from './categorias'
-import { problemasNaArea } from './problemas'
+import { categories } from './categorias'
+import { issuesInArea } from './problemas'
 
-type Detalhe = Schema<'GetIssueDetailResponse'>
+type Detail = Schema<'GetIssueDetailResponse'>
 
-const enderecos = [
+const addresses = [
   'Rua Voluntários da Pátria, 190 — Botafogo',
   'Rua Sorocaba, 120 — Botafogo',
   'Rua Paulo Barreto, 45 — Botafogo',
@@ -19,45 +19,45 @@ const enderecos = [
   'Rua Paulino Fernandes, 15 — Botafogo',
 ]
 
-const horasAtras = (horas: number) => new Date(Date.now() - horas * 3_600_000).toISOString()
+const hoursAgo = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString()
 
-export const ID_DO_AUTOR = problemasNaArea[8]!.id
+export const AUTHOR_ID = issuesInArea[8]!.id
 
-export function criarDetalhes(): Map<string, Detalhe> {
+export function createDetails(): Map<string, Detail> {
   return new Map(
-    problemasNaArea.map((p, i) => {
-      const { type: _tipo, ...categoria } = categorias.find((c) => c.id === p.categoryId)!
+    issuesInArea.map((p, i) => {
+      const { type: _type, ...category } = categories.find((c) => c.id === p.categoryId)!
       const base = {
         id: p.id,
-        category: categoria,
+        category,
         description: null,
         lat: p.lat,
         lng: p.lng,
-        address: enderecos[i] ?? 'Rua Voluntários da Pátria, 170 — Botafogo',
+        address: addresses[i] ?? 'Rua Voluntários da Pátria, 170 — Botafogo',
         status: p.status,
         trustScore: p.trustScore,
         band: p.band,
         myVote: null,
         isAuthor: false,
       }
-      const porStatus: Record<string, Partial<Detalhe>> = {
+      const byStatus: Record<string, Partial<Detail>> = {
         new: {
-          createdAt: horasAtras(0.7),
-          evaluation: { voters: 2, required: 5, closesAt: horasAtras(-70) },
+          createdAt: hoursAgo(0.7),
+          evaluation: { voters: 2, required: 5, closesAt: hoursAgo(-70) },
           votes: { yes: 2, no: 0, noLast24h: 0 },
         },
         possiblyResolved: {
-          createdAt: horasAtras(5 * 24 + 3),
+          createdAt: hoursAgo(5 * 24 + 3),
           evaluation: null,
           votes: { yes: 12, no: 7, noLast24h: 7 },
         },
         active: {
-          createdAt: horasAtras(2 * 24 + 4),
+          createdAt: hoursAgo(2 * 24 + 4),
           evaluation: null,
           votes: { yes: 15, no: 1, noLast24h: 1 },
         },
       }
-      return [p.id, { ...base, ...porStatus[p.status] } as Detalhe]
+      return [p.id, { ...base, ...byStatus[p.status] } as Detail]
     }),
   )
 }

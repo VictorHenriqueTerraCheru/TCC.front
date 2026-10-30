@@ -2,35 +2,35 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { MotionGlobalConfig } from 'motion/react'
 
-import { useTemaStore } from '@/common/hooks/use-tema'
-import { provedorAutenticacao } from '@/features/auth'
-import { registrarAutenticacao } from '@/infrastructure/api'
-import { banco } from '@/infrastructure/mocks/banco'
+import { useThemeStore } from '@/common/hooks/use-tema'
+import { authProvider } from '@/features/auth'
+import { registerAuthProvider } from '@/infrastructure/api'
+import { database } from '@/infrastructure/mocks/banco'
 import { server } from '@/infrastructure/mocks/server'
 
 vi.mock('@vis.gl/react-maplibre', () => import('./maplibre-falso'))
 
 MotionGlobalConfig.skipAnimations = true
 
-registrarAutenticacao(provedorAutenticacao)
+registerAuthProvider(authProvider)
 
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }))
-beforeEach(() => useTemaStore.setState({ preferencia: 'automatico', escolhido: true }))
+beforeEach(() => useThemeStore.setState({ preference: 'system', chosen: true }))
 afterEach(() => {
   cleanup()
   server.resetHandlers()
-  banco.reiniciar()
+  database.reset()
   localStorage.clear()
 })
 afterAll(() => server.close())
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: (consulta: string) => {
-    const minimo = /min-width:\s*(\d+)px/.exec(consulta)?.[1]
+  value: (query: string) => {
+    const minimum = /min-width:\s*(\d+)px/.exec(query)?.[1]
     return {
-      matches: minimo !== undefined && window.innerWidth >= Number(minimo),
-      medium: consulta,
+      matches: minimum !== undefined && window.innerWidth >= Number(minimum),
+      medium: query,
       onchange: null,
       addEventListener: () => {},
       removeEventListener: () => {},

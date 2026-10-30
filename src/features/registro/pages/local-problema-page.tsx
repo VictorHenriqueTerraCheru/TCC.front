@@ -3,60 +3,64 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { Button } from '@/common/ui/button'
-import { useExigirConta } from '@/features/auth'
+import { useRequireAccount } from '@/features/auth'
 import { isApiError } from '@/infrastructure/api'
 
-import { duplicatasQuery } from '../api/use-registro'
-import { CartaoEndereco } from '../components/cartao-endereco'
-import { MapaRegistro } from '../components/mapa-registro'
-import { PassoRegistro } from '../components/passo-registro'
-import { useExigirCategoria, useRascunho } from '../hooks/use-rascunho'
-import { useRetomarRegistro } from '../hooks/use-retomar-registro'
-import { caminhoDaCategoria } from '../models/rotas'
+import { duplicatesQuery } from '../api/use-registro'
+import { AddressCard } from '../components/cartao-endereco'
+import { ReportMap } from '../components/mapa-registro'
+import { ReportStep } from '../components/passo-registro'
+import { useRequireCategory, useDraft } from '../hooks/use-rascunho'
+import { useResumeReport } from '../hooks/use-retomar-registro'
+import { categoryPath } from '../models/rotas'
 
-export function LocalProblemaPage() {
+export function IssueLocationPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const exigirConta = useExigirConta()
-  const { category: categoria, categoryId: categoriaId, local } = useRascunho()
-  const [conferindo, setConferindo] = useState(false)
-  useExigirCategoria('issue')
+  const requireAccount = useRequireAccount()
+  const { category, categoryId, location } = useDraft()
+  const [checkingDuplicates, setCheckingDuplicates] = useState(false)
+  useRequireCategory('issue')
 
-  async function confirmar() {
-    if (categoriaId === null || !local) return
-    setConferindo(true)
+  async function confirm() {
+    if (categoryId === null || !location) return
+    setCheckingDuplicates(true)
     try {
-      const duplicatas = await queryClient.fetchQuery(duplicatasQuery(categoriaId, local))
-      navigate(duplicatas.length > 0 ? '/registrar/conferencia' : '/registrar/revisao')
-    } catch (erro) {
-      if (isApiError(erro) && erro.status === 401) {
-        exigirConta('registrar', () => {}, {
-          retorno: '/registrar/local',
-          pending: { type: 'continuarRegistro', passo: 'conferir' },
+      const duplicates = await queryClient.fetchQuery(duplicatesQuery(categoryId, location))
+      navigate(duplicates.length > 0 ? '/registrar/conferencia' : '/registrar/revisao')
+    } catch (error) {
+      if (isApiError(error) && error.status === 401) {
+        requireAccount('report', () => {}, {
+          returnTo: '/registrar/local',
+          pending: { type: 'resumeReport', step: 'checkDuplicates' },
         })
         return
       }
       navigate('/registrar/revisao')
     } finally {
-      setConferindo(false)
+      setCheckingDuplicates(false)
     }
   }
-  useRetomarRegistro('conferir', () => void confirmar())
+  useResumeReport('checkDuplicates', () => void confirm())
 
   return (
-    <PassoRegistro
-      titulo="Onde fica?"
-      passo={{ atual: 2, total: 4, label: 'Local' }}
-      acaoTopo="voltar"
-      aoTopo={() => navigate(caminhoDaCategoria('issue'))}
-      mapa={<MapaRegistro modo="pino" category={categoria} />}
-      rodape={
-        <Button className="w-full" disabled={!local || conferindo} onClick={() => void confirmar()}>
-          {conferindo ? 'Conferindo…' : 'Confirmar local'}
+    <ReportStep
+      title="Onde fica?"
+      step={{ current: 2, total: 4, label: 'Local' }}
+      topAction="back"
+      onTopAction={() => navigate(categoryPath('issue'))}
+      map={<ReportMap mode="pin" category={category} />}
+      footer={
+        <Button
+          className="w-full"
+          disabled={!location || checkingDuplicates}
+          onClick={() => void confirm()}
+        >
+          {checkingDuplicates ? 'Conferindo…' : 'Confirmar local'}
         </Button>
       }
     >
-      <CartaoEndereco />
-    </PassoRegistro>
+      <AddressCard />
+    </ReportStep>
   )
 }

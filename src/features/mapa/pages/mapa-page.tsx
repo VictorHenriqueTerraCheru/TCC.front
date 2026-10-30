@@ -3,121 +3,119 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Outlet, useMatch, useNavigate, useSearchParams } from 'react-router'
 import { Layer, Source, type MapRef } from '@vis.gl/react-maplibre'
 
-import { BotaoBussola } from '@/common/components/botao-bussola'
-import { Icone } from '@/common/components/icone'
+import { CompassButton } from '@/common/components/botao-bussola'
+import { Icon } from '@/common/components/icone'
 import { useDesktop } from '@/common/hooks/use-media-query'
-import { useTema } from '@/common/hooks/use-tema'
-import { circuloGeoJson } from '@/common/lib/geo'
+import { useTheme } from '@/common/hooks/use-tema'
+import { circleGeoJson } from '@/common/lib/geo'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
-import { useExigirConta } from '@/features/auth'
-import { useAparencia, useCategorias, useGrupos } from '@/features/categorias'
+import { useRequireAccount } from '@/features/auth'
+import { useAppearance, useCategories, useGroups } from '@/features/categorias'
 import {
-  areaIncidentesQuery,
-  CamadaCalor,
-  totalSeteDias,
-  useCalorIncidentes,
+  incidentAreaQuery,
+  HeatmapLayer,
+  sevenDayTotal,
+  useIncidentHeatmap,
 } from '@/features/incidentes'
-import { useAtivarLocalizacao, useLocalizacao } from '@/features/localizacao'
-import { CamadaProblemas, useProblemasNaArea } from '@/features/problemas'
+import { useEnableLocation, useGeolocation } from '@/features/localizacao'
+import { IssueLayer, useIssuesInArea } from '@/features/problemas'
 
-import { BannerLocalizacao } from '../components/banner-localizacao'
-import { BotaoMapa } from '../components/botao-mapa'
-import { ChipsFiltro } from '../components/chips-filtro'
-import { EstadoVazio } from '../components/estado-vazio'
-import { LegendaMapa } from '../components/legenda-mapa'
-import { MapaBase } from '../components/mapa-base'
-import { MarcadorUsuario } from '../components/marcador-usuario'
-import { SeletorModo } from '../components/seletor-modo'
-import { useFiltrosMapa } from '../hooks/use-filtros-mapa'
-import { useNavegacaoMapa } from '../hooks/use-navegacao-mapa'
-import type { ContextoMapa } from '../models/contexto'
-import { filtrosDasCamadas, mostraCalor } from '../models/filtros'
-import { pontoDaUrl } from '../models/ponto'
-import { CENTRO_PADRAO, COR_TRACEJADO, ZOOM_PADRAO } from '@/common/lib/mapa'
-import type { Retangulo } from '../models/retangulo'
+import { LocationBanner } from '../components/banner-localizacao'
+import { MapButton } from '../components/botao-mapa'
+import { FilterChips } from '../components/chips-filtro'
+import { EmptyState } from '../components/estado-vazio'
+import { MapLegend } from '../components/legenda-mapa'
+import { BaseMap } from '../components/mapa-base'
+import { UserMarker } from '../components/marcador-usuario'
+import { ModePicker } from '../components/seletor-modo'
+import { useMapFilters } from '../hooks/use-filtros-mapa'
+import { useMapNavigation } from '../hooks/use-navegacao-mapa'
+import type { MapContext } from '../models/contexto'
+import { layerFilters, showsHeatmap } from '../models/filtros'
+import { pointFromUrl } from '../models/ponto'
+import { DEFAULT_CENTER, DASH_COLOR, DEFAULT_ZOOM } from '@/common/lib/mapa'
+import type { Bounds } from '../models/retangulo'
 
-const CHAVE_LEGENDA_VISTA = 'ocorrencias.legendaVista'
-const CHAVE_AVISO_VAZIO_FECHADO = 'ocorrencias.avisoVazioFechado'
-const LARGURA_PAINEL = 420
+const LEGEND_SEEN_KEY = 'ocorrencias.legendaVista'
+const EMPTY_NOTICE_DISMISSED_KEY = 'ocorrencias.avisoVazioFechado'
+const PANEL_WIDTH = 420
 
-function marcado(chave: string): boolean {
+function checked(key: string): boolean {
   try {
-    return localStorage.getItem(chave) === '1'
+    return localStorage.getItem(key) === '1'
   } catch {
     return true
   }
 }
 
-function marcar(chave: string) {
+function mark(key: string) {
   try {
-    localStorage.setItem(chave, '1')
+    localStorage.setItem(key, '1')
   } catch {
     void 0
   }
 }
 
-export function MapaPage() {
+export function MapPage() {
   const desktop = useDesktop()
-  const tema = useTema()
-  const filtros = useFiltrosMapa()
-  const { grupos: todosOsGrupos } = useAparencia()
-  const camadas = filtrosDasCamadas(filtros, todosOsGrupos)
-  const localizacao = useLocalizacao()
-  const ativarLocalizacao = useAtivarLocalizacao()
-  const navegacao = useNavegacaoMapa()
-  const exigirConta = useExigirConta()
+  const theme = useTheme()
+  const filters = useMapFilters()
+  const { groups: allGroups } = useAppearance()
+  const layers = layerFilters(filters, allGroups)
+  const geolocation = useGeolocation()
+  const enableLocation = useEnableLocation()
+  const navigation = useMapNavigation()
+  const requireAccount = useRequireAccount()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const rotaProblema = useMatch('/mapa/problema/:id')
-  const rotaArea = useMatch('/mapa/area')
+  const issueRoute = useMatch('/mapa/problema/:id')
+  const areaRoute = useMatch('/mapa/area')
   const [params] = useSearchParams()
-  const painelAberto = rotaProblema !== null || rotaArea !== null
+  const panelOpen = issueRoute !== null || areaRoute !== null
 
-  const [mapa, setMapa] = useState<MapRef | null>(null)
-  const [retangulo, setRetangulo] = useState<Retangulo | null>(null)
-  const [legendaAberta, setLegendaAberta] = useState(() => !marcado(CHAVE_LEGENDA_VISTA))
+  const [map, setMap] = useState<MapRef | null>(null)
+  const [bounds, setBounds] = useState<Bounds | null>(null)
+  const [legendOpen, setLegendOpen] = useState(() => !checked(LEGEND_SEEN_KEY))
   const [aviso, setAviso] = useState<string | null>(null)
-  const [vazioDispensado, setVazioDispensado] = useState(false)
-  const [vazioFechado, setVazioFechado] = useState(() => marcado(CHAVE_AVISO_VAZIO_FECHADO))
+  const [emptyDismissed, setEmptyDismissed] = useState(false)
+  const [emptyClosed, setEmptyClosed] = useState(() => checked(EMPTY_NOTICE_DISMISSED_KEY))
 
-  const categoriasQuery = useCategorias()
-  const categorias = categoriasQuery.data
-  const gruposQuery = useGrupos()
-  const categoriasPorId = useMemo(
-    () => new Map((categorias ?? []).map((c) => [c.id, c])),
-    [categorias],
-  )
-
-  const problemas = useProblemasNaArea(
-    retangulo && camadas.problemas ? { ...retangulo, ...camadas.problemas } : null,
-  )
-  const calor = useCalorIncidentes(
-    retangulo && camadas.calor ? { ...retangulo, ...camadas.calor, dias: 7 } : null,
+  const categoriesQuery = useCategories()
+  const categories = categoriesQuery.data
+  const groupsQuery = useGroups()
+  const categoriesById = useMemo(
+    () => new Map((categories ?? []).map((c) => [c.id, c])),
+    [categories],
   )
 
-  const [centroInicial] = useState<[number, number]>(() =>
-    localizacao.posicao ? [localizacao.posicao.lat, localizacao.posicao.lng] : CENTRO_PADRAO,
+  const issues = useIssuesInArea(bounds && layers.issues ? { ...bounds, ...layers.issues } : null)
+  const heatmap = useIncidentHeatmap(
+    bounds && layers.heatmap ? { ...bounds, ...layers.heatmap, days: 7 } : null,
   )
-  const centralizouRef = useRef(localizacao.posicao !== null)
+
+  const [initialCenter] = useState<[number, number]>(() =>
+    geolocation.position ? [geolocation.position.lat, geolocation.position.lng] : DEFAULT_CENTER,
+  )
+  const centeredRef = useRef(geolocation.position !== null)
   useEffect(() => {
-    if (!mapa || !localizacao.posicao || centralizouRef.current || painelAberto) return
-    centralizouRef.current = true
-    mapa.jumpTo({ center: [localizacao.posicao.lng, localizacao.posicao.lat], zoom: ZOOM_PADRAO })
-  }, [mapa, localizacao.posicao, painelAberto])
+    if (!map || !geolocation.position || centeredRef.current || panelOpen) return
+    centeredRef.current = true
+    map.jumpTo({ center: [geolocation.position.lng, geolocation.position.lat], zoom: DEFAULT_ZOOM })
+  }, [map, geolocation.position, panelOpen])
 
   useEffect(() => {
-    if (!mapa) return
-    const container = mapa.getContainer()
-    const dispensar = () => setVazioDispensado(true)
-    container.addEventListener('pointerdown', dispensar)
-    container.addEventListener('wheel', dispensar, { passive: true })
+    if (!map) return
+    const container = map.getContainer()
+    const dismiss = () => setEmptyDismissed(true)
+    container.addEventListener('pointerdown', dismiss)
+    container.addEventListener('wheel', dismiss, { passive: true })
     return () => {
-      container.removeEventListener('pointerdown', dispensar)
-      container.removeEventListener('wheel', dispensar)
+      container.removeEventListener('pointerdown', dismiss)
+      container.removeEventListener('wheel', dismiss)
     }
-  }, [mapa])
+  }, [map])
 
   useEffect(() => {
     if (!aviso) return
@@ -125,120 +123,115 @@ export function MapaPage() {
     return () => clearTimeout(timer)
   }, [aviso])
 
-  const focar = useCallback<ContextoMapa['focar']>(
+  const focus = useCallback<MapContext['focus']>(
     ({ lat, lng }) => {
-      if (!mapa) return
-      centralizouRef.current = true
+      if (!map) return
+      centeredRef.current = true
       const offset: [number, number] = desktop
-        ? [LARGURA_PAINEL / 2, 0]
-        : [0, -mapa.getContainer().clientHeight * 0.05]
-      mapa.easeTo({ center: [lng, lat], offset })
+        ? [PANEL_WIDTH / 2, 0]
+        : [0, -map.getContainer().clientHeight * 0.05]
+      map.easeTo({ center: [lng, lat], offset })
     },
-    [mapa, desktop],
+    [map, desktop],
   )
-  const contexto = useMemo<ContextoMapa>(() => ({ focar }), [focar])
+  const context = useMemo<MapContext>(() => ({ focus }), [focus])
 
-  async function aoTocarMapa(lat: number, lng: number) {
+  async function onMapTap(lat: number, lng: number) {
     try {
-      const area = await queryClient.fetchQuery(areaIncidentesQuery(lat, lng))
-      if (totalSeteDias(area) > 0) navegacao.abrirArea(lat, lng)
+      const area = await queryClient.fetchQuery(incidentAreaQuery(lat, lng))
+      if (sevenDayTotal(area) > 0) navigation.openArea(lat, lng)
       else setAviso('Sem incidentes por aqui nos últimos 7 dias')
     } catch {
       setAviso('Não foi possível consultar os incidentes desta área')
     }
   }
 
-  async function aoClicarGps() {
-    const posicao = localizacao.posicao ?? (await ativarLocalizacao.ativar())
-    centralizouRef.current = true
-    if (posicao) {
-      mapa?.flyTo({
-        center: [posicao.lng, posicao.lat],
-        zoom: Math.max(mapa.getZoom(), ZOOM_PADRAO),
+  async function onGpsClick() {
+    const position = geolocation.position ?? (await enableLocation.activate())
+    centeredRef.current = true
+    if (position) {
+      map?.flyTo({
+        center: [position.lng, position.lat],
+        zoom: Math.max(map.getZoom(), DEFAULT_ZOOM),
       })
     }
   }
 
-  function alternarLegenda() {
-    marcar(CHAVE_LEGENDA_VISTA)
-    setLegendaAberta((aberta) => !aberta)
+  function toggleLegend() {
+    mark(LEGEND_SEEN_KEY)
+    setLegendOpen((open) => !open)
   }
 
-  const consultas = [camadas.problemas && problemas, camadas.calor && calor].filter(
-    (consulta) => !!consulta,
-  )
-  const falhouCategorias = camadas.problemas !== null && categoriasQuery.isError
-  const falhouGrupos = gruposQuery.isError
-  const carregou =
-    consultas.length > 0 && consultas.every((c) => c.isSuccess && !c.isPlaceholderData)
-  const vazio = carregou && consultas.every((c) => c.data?.length === 0)
-  if (vazioDispensado && carregou && !vazio) setVazioDispensado(false)
-  const falhou = falhouCategorias || falhouGrupos || consultas.some((c) => c.isError)
-  const semLocalizacao = localizacao.estado === 'prompt' || localizacao.estado === 'denied'
-  const pontoArea = rotaArea ? pontoDaUrl(params) : null
-  const latArea = pontoArea?.lat
-  const lngArea = pontoArea?.lng
-  const circuloArea = useMemo(
+  const queries = [layers.issues && issues, layers.heatmap && heatmap].filter((query) => !!query)
+  const categoriesFailed = layers.issues !== null && categoriesQuery.isError
+  const groupsFailed = groupsQuery.isError
+  const didLoad = queries.length > 0 && queries.every((c) => c.isSuccess && !c.isPlaceholderData)
+  const empty = didLoad && queries.every((c) => c.data?.length === 0)
+  if (emptyDismissed && didLoad && !empty) setEmptyDismissed(false)
+  const failed = categoriesFailed || groupsFailed || queries.some((c) => c.isError)
+  const noLocation = geolocation.state === 'prompt' || geolocation.state === 'denied'
+  const areaPoint = areaRoute ? pointFromUrl(params) : null
+  const areaLat = areaPoint?.lat
+  const areaLng = areaPoint?.lng
+  const areaCircle = useMemo(
     () =>
-      latArea !== undefined && lngArea !== undefined
-        ? circuloGeoJson({ lat: latArea, lng: lngArea }, 400)
+      areaLat !== undefined && areaLng !== undefined
+        ? circleGeoJson({ lat: areaLat, lng: areaLng }, 400)
         : null,
-    [latArea, lngArea],
+    [areaLat, areaLng],
   )
 
   return (
     <div className="mapa-principal relative isolate size-full">
       <h1 className="sr-only">Mapa de ocorrências</h1>
-      <MapaBase
-        ref={setMapa}
-        centroInicial={centroInicial}
-        mostrarZoom={desktop}
-        aoMudarRetangulo={setRetangulo}
-        aoTocar={
-          mostraCalor(filtros.modo) ? ({ lat, lng }) => void aoTocarMapa(lat, lng) : undefined
-        }
+      <BaseMap
+        ref={setMap}
+        initialCenter={initialCenter}
+        showZoom={desktop}
+        onBoundsChange={setBounds}
+        onTap={showsHeatmap(filters.mode) ? ({ lat, lng }) => void onMapTap(lat, lng) : undefined}
       >
-        {camadas.calor && calor.data && <CamadaCalor celulas={calor.data} />}
-        {camadas.problemas && problemas.data && (
-          <CamadaProblemas
-            problemas={problemas.data}
-            categorias={categoriasPorId}
-            selecionadoId={rotaProblema?.params.id}
-            aoSelecionar={navegacao.abrirProblema}
+        {layers.heatmap && heatmap.data && <HeatmapLayer cells={heatmap.data} />}
+        {layers.issues && issues.data && (
+          <IssueLayer
+            issues={issues.data}
+            categories={categoriesById}
+            selectedId={issueRoute?.params.id}
+            onSelect={navigation.openIssue}
           />
         )}
-        {circuloArea && (
-          <Source id="area-incidentes" type="geojson" data={circuloArea}>
+        {areaCircle && (
+          <Source id="area-incidentes" type="geojson" data={areaCircle}>
             <Layer
               id="area-incidentes"
               type="line"
               paint={{
-                'line-color': COR_TRACEJADO[tema],
+                'line-color': DASH_COLOR[theme],
                 'line-width': 1.5,
                 'line-dasharray': [2, 2.5],
               }}
             />
           </Source>
         )}
-        {localizacao.posicao && <MarcadorUsuario posicao={localizacao.posicao} />}
+        {geolocation.position && <UserMarker position={geolocation.position} />}
 
-        <BotaoBussola className="right-3 bottom-[267px] lg:right-4 lg:bottom-[155px]" />
-      </MapaBase>
+        <CompassButton className="right-3 bottom-[267px] lg:right-4 lg:bottom-[155px]" />
+      </BaseMap>
 
       <div
         className={cn(
           'pointer-events-none absolute inset-x-0 top-0 z-[1000] space-y-2 p-3 lg:right-auto lg:w-[620px] lg:p-4',
-          painelAberto && 'lg:left-[420px]',
+          panelOpen && 'lg:left-[420px]',
         )}
       >
-        <SeletorModo modo={filtros.modo} aoMudar={filtros.alterarModo} />
-        <ChipsFiltro
-          {...filtros}
-          aoAlternarGrupo={filtros.alternarGrupo}
-          aoAlternarNovas={filtros.alternarNovas}
+        <ModePicker mode={filters.mode} onChange={filters.setMode} />
+        <FilterChips
+          {...filters}
+          onToggleGroup={filters.toggleGroup}
+          onToggleNew={filters.toggleNew}
         />
-        {semLocalizacao && <BannerLocalizacao aoAtivar={() => void ativarLocalizacao.ativar()} />}
-        {falhou && (
+        {noLocation && <LocationBanner onActivate={() => void enableLocation.activate()} />}
+        {failed && (
           <div
             role="alert"
             className="pointer-events-auto flex items-center gap-3 rounded-2xl bg-destructive/15 py-2 pr-2 pl-4 text-[13px] text-destructive shadow-2"
@@ -248,9 +241,9 @@ export function MapaPage() {
               variant="ghost"
               size="sm"
               onClick={() => {
-                if (falhouCategorias) void categoriasQuery.refetch()
-                if (falhouGrupos) void gruposQuery.refetch()
-                consultas.forEach((c) => void c.refetch())
+                if (categoriesFailed) void categoriesQuery.refetch()
+                if (groupsFailed) void groupsQuery.refetch()
+                queries.forEach((c) => void c.refetch())
               }}
             >
               Tentar novamente
@@ -259,26 +252,26 @@ export function MapaPage() {
         )}
       </div>
 
-      {vazio && !vazioFechado && !vazioDispensado && !falhou && !painelAberto && (
+      {empty && !emptyClosed && !emptyDismissed && !failed && !panelOpen && (
         <div className="pointer-events-none absolute inset-x-6 top-1/2 z-[1000] -translate-y-1/2">
-          <EstadoVazio
-            aoVerAreaMaior={() => mapa?.zoomTo(mapa.getZoom() - 2)}
-            aoFechar={() => {
-              marcar(CHAVE_AVISO_VAZIO_FECHADO)
-              setVazioFechado(true)
+          <EmptyState
+            onViewLargerArea={() => map?.zoomTo(map.getZoom() - 2)}
+            onClose={() => {
+              mark(EMPTY_NOTICE_DISMISSED_KEY)
+              setEmptyClosed(true)
             }}
           />
         </div>
       )}
 
-      {legendaAberta && (
+      {legendOpen && (
         <div
           className={cn(
             'pointer-events-none absolute bottom-[152px] left-3 z-[1000] lg:bottom-6 lg:left-4',
-            painelAberto && 'lg:left-[436px]',
+            panelOpen && 'lg:left-[436px]',
           )}
         >
-          <LegendaMapa modo={filtros.modo} aoFechar={alternarLegenda} />
+          <MapLegend mode={filters.mode} onClose={toggleLegend} />
         </div>
       )}
 
@@ -292,48 +285,48 @@ export function MapaPage() {
       )}
 
       <div className="pointer-events-auto absolute right-3 bottom-[168px] z-[1000] flex flex-col divide-y divide-vidro-borda overflow-hidden rounded-[14px] shadow-2 vidro lg:right-4 lg:bottom-14">
-        <BotaoMapa
-          aria-label={legendaAberta ? 'Fechar legenda' : 'Abrir legenda'}
-          aria-pressed={legendaAberta}
-          onClick={alternarLegenda}
+        <MapButton
+          aria-label={legendOpen ? 'Fechar legenda' : 'Abrir legenda'}
+          aria-pressed={legendOpen}
+          onClick={toggleLegend}
         >
-          <Icone name="info" />
-        </BotaoMapa>
-        <BotaoMapa
+          <Icon name="info" />
+        </MapButton>
+        <MapButton
           aria-label={
-            localizacao.estado === 'granted'
+            geolocation.state === 'granted'
               ? 'Centralizar na minha localização'
               : 'Ativar localização'
           }
-          onClick={() => void aoClicarGps()}
+          onClick={() => void onGpsClick()}
         >
-          <Icone
+          <Icon
             name={
-              localizacao.estado === 'denied' || localizacao.estado === 'indisponivel'
+              geolocation.state === 'denied' || geolocation.state === 'unavailable'
                 ? 'location_disabled'
                 : 'near_me'
             }
-            preenchido
+            filled
           />
-        </BotaoMapa>
+        </MapButton>
       </div>
 
       {!desktop && (
         <Link
           to="/registrar"
-          onClick={(evento) => {
-            evento.preventDefault()
-            exigirConta('registrar', () => navigate('/registrar'), { retorno: '/registrar' })
+          onClick={(event) => {
+            event.preventDefault()
+            requireAccount('report', () => navigate('/registrar'), { returnTo: '/registrar' })
           }}
           className="absolute bottom-[92px] left-1/2 z-[1000] flex h-12 -translate-x-1/2 pressionavel items-center gap-2 rounded-full bg-primary bg-linear-to-b from-black/0 to-black/12 px-5 font-semibold text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2"
         >
-          <Icone name="add_location_alt" />
+          <Icon name="add_location_alt" />
           Registrar
         </Link>
       )}
 
-      {ativarLocalizacao.dialogo}
-      <Outlet context={contexto} />
+      {enableLocation.dialog}
+      <Outlet context={context} />
     </div>
   )
 }

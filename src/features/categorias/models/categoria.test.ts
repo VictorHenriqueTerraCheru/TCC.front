@@ -1,37 +1,37 @@
-import { grupos } from '@/infrastructure/mocks/fixtures/grupos'
+import { groups } from '@/infrastructure/mocks/fixtures/grupos'
 
 import {
-  aparenciaDaCor,
-  aparenciaDe,
-  coresGrupo,
-  grupoDe,
-  gruposDoTipo,
-  iconeDe,
+  colorAppearance,
+  appearanceOf,
+  groupColors,
+  groupOf,
+  groupsOfType,
+  iconOf,
 } from './categoria'
 
-describe('modelo de categoria', () => {
-  it('cor e rótulo vêm do grupo cadastrado', () => {
-    expect(aparenciaDe(grupos, { group: 'eletrica' })).toEqual({
+describe('category model', () => {
+  it('color and label come from the registered group', () => {
+    expect(appearanceOf(groups, { group: 'eletrica' })).toEqual({
       label: 'Elétrica',
-      ...aparenciaDaCor.ochre,
+      ...colorAppearance.ochre,
     })
   })
 
-  it('grupo ainda não carregado ou removido: cinza neutro, com a chave no rótulo', () => {
-    expect(aparenciaDe([], { group: 'clima' })).toEqual({
+  it('group not loaded yet or removed: neutral gray, with the key in the label', () => {
+    expect(appearanceOf([], { group: 'clima' })).toEqual({
       label: 'clima',
-      ...aparenciaDaCor.gray,
+      ...colorAppearance.gray,
     })
-    expect(grupoDe(grupos, { group: 'clima' })).toBeUndefined()
+    expect(groupOf(groups, { group: 'clima' })).toBeUndefined()
   })
 
-  it('filtra grupos por tipo', () => {
-    expect(gruposDoTipo(grupos, 'incident').map((g) => g.key)).toEqual(['seguranca', 'transito'])
+  it('filters groups by type', () => {
+    expect(groupsOfType(groups, 'incident').map((g) => g.key)).toEqual(['seguranca', 'transito'])
   })
 
-  it('todo slot da API tem classes Tailwind literais e o token CSS do mesmo nome', () => {
-    for (const cor of coresGrupo) {
-      const { forte, claro, corForte } = aparenciaDaCor[cor]
+  it('every API slot has literal Tailwind classes and the CSS token of the same name', () => {
+    for (const color of groupColors) {
+      const { strong, light, strongColor } = colorAppearance[color]
       const token = {
         orange: 'laranja',
         ochre: 'ocre',
@@ -43,8 +43,8 @@ describe('modelo de categoria', () => {
         purple: 'roxo',
         pink: 'rosa',
         gray: 'cinza',
-      }[cor]
-      expect([forte, claro, corForte]).toEqual([
+      }[color]
+      expect([strong, light, strongColor]).toEqual([
         `text-cat-${token}`,
         `bg-cat-${token}-claro`,
         `var(--cat-${token})`,
@@ -52,8 +52,8 @@ describe('modelo de categoria', () => {
     }
   })
 
-  it('ícone: chaves do seed antigo viram Material Symbols; o resto já é o nome', () => {
-    expect(iconeDe({ icon: 'buraco' })).toBe('edit_road')
-    expect(iconeDe({ icon: 'flood' })).toBe('flood')
+  it('icon: old seed keys become Material Symbols; the rest is already the name', () => {
+    expect(iconOf({ icon: 'buraco' })).toBe('edit_road')
+    expect(iconOf({ icon: 'flood' })).toBe('flood')
   })
 })

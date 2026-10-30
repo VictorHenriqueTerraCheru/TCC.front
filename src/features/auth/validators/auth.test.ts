@@ -1,8 +1,8 @@
-import { cadastrarSchema, entrarSchema } from './auth'
+import { registerSchema, loginSchema } from './auth'
 
-describe('validadores de auth', () => {
-  it('login exige e-mail válido e senha', () => {
-    const r = entrarSchema.safeParse({ email: 'nao-e-email', password: '' })
+describe('auth validators', () => {
+  it('login requires a valid e-mail and password', () => {
+    const r = loginSchema.safeParse({ email: 'not-an-email', password: '' })
     expect(r.success).toBe(false)
     expect(r.error?.flatten().fieldErrors).toEqual({
       email: ['Informe um e-mail válido.'],
@@ -10,8 +10,8 @@ describe('validadores de auth', () => {
     })
   })
 
-  it('cadastro exige senha ≥ 8 e termos aceitos', () => {
-    const r = cadastrarSchema.safeParse({
+  it('sign up requires password ≥ 8 and accepted terms', () => {
+    const r = registerSchema.safeParse({
       name: ' Ana ',
       email: 'ana@x.com',
       password: '1234567',
@@ -23,8 +23,8 @@ describe('validadores de auth', () => {
     })
   })
 
-  it('cadastro válido remove espaços do nome', () => {
-    const r = cadastrarSchema.parse({
+  it('valid sign up trims the name', () => {
+    const r = registerSchema.parse({
       name: '  Mariana Souza ',
       email: 'mariana@email.com',
       password: '12345678',

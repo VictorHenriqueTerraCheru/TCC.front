@@ -1,15 +1,15 @@
 import { m } from 'motion/react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router'
 
-import { Icone } from '@/common/components/icone'
-import { MOLA_SUAVE } from '@/common/lib/movimento'
+import { Icon } from '@/common/components/icone'
+import { SOFT_SPRING } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
-import { useExigirConta } from '@/features/auth'
+import { useRequireAccount } from '@/features/auth'
 
-import { itensNavegacao } from './navegacao'
+import { navigationItems } from './navegacao'
 
 export function DesktopLayout() {
-  const exigirConta = useExigirConta()
+  const requireAccount = useRequireAccount()
   const navigate = useNavigate()
   return (
     <div className="flex h-dvh">
@@ -19,19 +19,19 @@ export function DesktopLayout() {
       >
         <Link
           to="/registrar"
-          onClick={(evento) => {
-            evento.preventDefault()
-            exigirConta('registrar', () => navigate('/registrar'), { retorno: '/registrar' })
+          onClick={(event) => {
+            event.preventDefault()
+            requireAccount('report', () => navigate('/registrar'), { returnTo: '/registrar' })
           }}
           aria-label="Registrar ocorrência"
           className="mb-4 flex size-14 pressionavel items-center justify-center rounded-2xl bg-primary bg-linear-to-b from-black/0 to-black/12 text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2"
         >
-          <Icone name="add_location_alt" />
+          <Icon name="add_location_alt" />
         </Link>
-        {itensNavegacao.map((item) => (
+        {navigationItems.map((item) => (
           <NavLink
-            key={item.rota}
-            to={item.rota}
+            key={item.route}
+            to={item.route}
             className="group flex w-full pressionavel flex-col items-center gap-1 text-xs font-medium focus-visible:outline-2"
           >
             {({ isActive }) => (
@@ -44,12 +44,12 @@ export function DesktopLayout() {
                 >
                   {isActive && (
                     <m.span
-                      layoutId="aba-ativa-trilho"
-                      transition={MOLA_SUAVE}
+                      layoutId="active-tab-rail"
+                      transition={SOFT_SPRING}
                       className="absolute inset-0 rounded-full bg-primario-suave"
                     />
                   )}
-                  <Icone name={item.icon} preenchido={isActive} className="relative" />
+                  <Icon name={item.icon} filled={isActive} className="relative" />
                 </span>
                 <span
                   className={cn(isActive ? 'font-semibold text-primario' : 'text-muted-foreground')}

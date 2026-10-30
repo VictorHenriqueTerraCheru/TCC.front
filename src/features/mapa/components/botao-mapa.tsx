@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react'
 
 import { cn } from '@/common/lib/utils'
 
-export function BotaoMapa({ className, ...props }: ComponentProps<'button'>) {
+export function MapButton({ className, ...props }: ComponentProps<'button'>) {
   return (
     <button
       type="button"

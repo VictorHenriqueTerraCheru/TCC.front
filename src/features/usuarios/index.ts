@@ -1,12 +1,12 @@
-export { historicoQuery, useHistorico, useHistoricoResumo } from './api/use-historico'
-export { meQuery, useAtualizarNome, useMe } from './api/use-me'
+export { historyQuery, useHistory, useHistorySummary } from './api/use-historico'
+export { meQuery, useUpdateName, useMe } from './api/use-me'
 export { Avatar } from './components/avatar'
-export { ItemHistoricoLinha } from './components/item-historico'
+export { HistoryItemRow } from './components/item-historico'
 export {
-  agruparPorPeriodo,
-  quandoItem,
-  quandoItemResumo,
-  type FiltroHistorico,
-  type ItemHistorico,
+  groupByPeriod,
+  itemTime,
+  itemTimeShort,
+  type HistoryFilter,
+  type HistoryItem,
 } from './models/historico'
-export { aparenciaPerfil, iniciais, type Me, type Perfil } from './models/usuario'
+export { roleAppearance, initials, type Me, type Role } from './models/usuario'

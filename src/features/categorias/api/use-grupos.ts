@@ -1,13 +1,13 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-import { api, dados } from '@/infrastructure/api'
+import { api, unwrapData } from '@/infrastructure/api'
 
-export const gruposQuery = queryOptions({
-  queryKey: ['grupos'],
-  queryFn: ({ signal }) => api.GET('/groups', { signal }).then(dados),
+export const groupsQuery = queryOptions({
+  queryKey: ['groups'],
+  queryFn: ({ signal }) => api.GET('/groups', { signal }).then(unwrapData),
   staleTime: 5 * 60_000,
 })
 
-export function useGrupos() {
-  return useQuery(gruposQuery)
+export function useGroups() {
+  return useQuery(groupsQuery)
 }

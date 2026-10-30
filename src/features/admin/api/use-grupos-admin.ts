@@ -1,40 +1,40 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { api, dados, semConteudo, type Schema } from '@/infrastructure/api'
+import { api, unwrapData, unwrapEmpty, type Schema } from '@/infrastructure/api'
 
-function useInvalidarGrupos() {
+function useInvalidateGroups() {
   const queryClient = useQueryClient()
   return () => {
-    void queryClient.invalidateQueries({ queryKey: ['grupos'] })
-    void queryClient.invalidateQueries({ queryKey: ['admin', 'categorias'] })
-    void queryClient.invalidateQueries({ queryKey: ['problemas'] })
-    void queryClient.invalidateQueries({ queryKey: ['incidentes'] })
+    void queryClient.invalidateQueries({ queryKey: ['groups'] })
+    void queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] })
+    void queryClient.invalidateQueries({ queryKey: ['issues'] })
+    void queryClient.invalidateQueries({ queryKey: ['incidents'] })
   }
 }
 
-export function useCriarGrupo() {
-  const invalidar = useInvalidarGrupos()
+export function useCreateGroup() {
+  const invalidate = useInvalidateGroups()
   return useMutation({
-    mutationFn: (corpo: Schema<'CreateGroupRequest'>) =>
-      api.POST('/admin/groups', { body: corpo }).then(dados),
-    onSuccess: invalidar,
+    mutationFn: (body: Schema<'CreateGroupRequest'>) =>
+      api.POST('/admin/groups', { body }).then(unwrapData),
+    onSuccess: invalidate,
   })
 }
 
-export function useEditarGrupo() {
-  const invalidar = useInvalidarGrupos()
+export function useEditGroup() {
+  const invalidate = useInvalidateGroups()
   return useMutation({
-    mutationFn: ({ key: chave, ...corpo }: Schema<'EditGroupRequest'> & { key: string }) =>
-      api.PUT('/admin/groups/{key}', { params: { path: { key: chave } }, body: corpo }).then(dados),
-    onSuccess: invalidar,
+    mutationFn: ({ key, ...body }: Schema<'EditGroupRequest'> & { key: string }) =>
+      api.PUT('/admin/groups/{key}', { params: { path: { key } }, body }).then(unwrapData),
+    onSuccess: invalidate,
   })
 }
 
-export function useApagarGrupo() {
-  const invalidar = useInvalidarGrupos()
+export function useDeleteGroup() {
+  const invalidate = useInvalidateGroups()
   return useMutation({
-    mutationFn: (chave: string) =>
-      api.DELETE('/admin/groups/{key}', { params: { path: { key: chave } } }).then(semConteudo),
-    onSuccess: invalidar,
+    mutationFn: (key: string) =>
+      api.DELETE('/admin/groups/{key}', { params: { path: { key } } }).then(unwrapEmpty),
+    onSuccess: invalidate,
   })
 }

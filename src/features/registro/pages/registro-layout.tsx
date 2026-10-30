@@ -1,11 +1,11 @@
 import { Navigate, Outlet, useLocation } from 'react-router'
 
-import { useAutenticado } from '@/features/auth'
+import { useAuthenticated } from '@/features/auth'
 
-export function RegistroLayout() {
-  const autenticado = useAutenticado()
+export function ReportLayout() {
+  const authenticated = useAuthenticated()
   const { pathname, search } = useLocation()
-  if (!autenticado) return <Navigate to="/login" replace state={{ de: pathname + search }} />
+  if (!authenticated) return <Navigate to="/login" replace state={{ de: pathname + search }} />
   return (
     <div className="h-full bg-background">
       <Outlet />

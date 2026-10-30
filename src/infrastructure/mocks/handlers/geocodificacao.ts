@@ -1,9 +1,9 @@
 import { http, HttpResponse } from 'msw'
 
-import { rota } from '../rota'
+import { route } from '../rota'
 
-export const geocodificacaoHandlers = [
-  http.get(rota('/geocoding/reverse'), () =>
+export const geocodingHandlers = [
+  http.get(route('/geocoding/reverse'), () =>
     HttpResponse.json({
       available: true,
       address: 'Praia de Botafogo, 300 — Botafogo',

@@ -1,33 +1,33 @@
 import { useLocation } from 'react-router'
 
-import { useGuardaStore, type AcaoPendente, type MotivoConta } from '../stores/guarda-store'
-import { sessaoAtual } from '../stores/sessao-store'
+import { useGuardStore, type PendingActionKind, type AccountReason } from '../stores/guarda-store'
+import { currentSession } from '../stores/sessao-store'
 
-interface OpcoesGuarda {
-  pending?: AcaoPendente
-  retorno?: string
+interface GuardOptions {
+  pending?: PendingActionKind
+  returnTo?: string
 }
 
-export function useExigirConta() {
+export function useRequireAccount() {
   const location = useLocation()
 
-  return (motivo: MotivoConta, acao: () => void, opcoes: OpcoesGuarda = {}) => {
-    if (sessaoAtual()) {
-      acao()
+  return (reason: AccountReason, action: () => void, options: GuardOptions = {}) => {
+    if (currentSession()) {
+      action()
       return
     }
-    const guarda = useGuardaStore.getState()
-    guarda.pedirConta(
-      motivo,
+    const guard = useGuardStore.getState()
+    guard.askForAccount(
+      reason,
       {
-        retorno: opcoes.retorno ?? `${location.pathname}${location.search}`,
-        acao: opcoes.pending ?? null,
+        returnTo: options.returnTo ?? `${location.pathname}${location.search}`,
+        action: options.pending ?? null,
       },
-      guarda.expirou,
+      guard.expired,
     )
   }
 }
 
-export function useConsumirAcaoPendente() {
-  return useGuardaStore((s) => s.consumirAcao)
+export function useConsumePendingAction() {
+  return useGuardStore((s) => s.consumeAction)
 }

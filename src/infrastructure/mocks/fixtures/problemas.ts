@@ -1,10 +1,10 @@
 import type { Schema } from '../../api'
 
-type ProblemaNaArea = Schema<'ListIssuesInAreaResponse'>
+type IssueInArea = Schema<'ListIssuesInAreaResponse'>
 
 const id = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
 
-export const problemasNaArea: ProblemaNaArea[] = [
+export const issuesInArea: IssueInArea[] = [
   {
     id: id(1),
     categoryId: 1,
@@ -115,7 +115,7 @@ export const problemasNaArea: ProblemaNaArea[] = [
   },
 ]
 
-export const calorIncidentes: Schema<'GetIncidentHeatmapResponse'>[] = [
+export const incidentHeatmap: Schema<'GetIncidentHeatmapResponse'>[] = [
   { lat: -22.903, lng: -43.115, count: 6 },
   { lat: -22.904, lng: -43.114, count: 4 },
   { lat: -22.908, lng: -43.107, count: 9 },
@@ -125,4 +125,4 @@ export const calorIncidentes: Schema<'GetIncidentHeatmapResponse'>[] = [
   { lat: -22.9, lng: -43.103, count: 2 },
 ]
 
-export const grupoDasCelulas = 'seguranca'
+export const cellGroup = 'seguranca'

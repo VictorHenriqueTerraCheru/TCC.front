@@ -1,24 +1,24 @@
-import type { FaixaConfianca, StatusProblema } from './problema'
+import type { TrustBand, IssueStatus } from './problema'
 
-interface Variante {
-  diametro: number
-  opacidade: number
+interface Variant {
+  diameter: number
+  opacity: number
 }
 
-const variantes: Record<FaixaConfianca, Variante> = {
-  high: { diametro: 38, opacidade: 1 },
-  medium: { diametro: 31, opacidade: 1 },
-  low: { diametro: 25, opacidade: 0.55 },
+const variants: Record<TrustBand, Variant> = {
+  high: { diameter: 38, opacity: 1 },
+  medium: { diameter: 31, opacity: 1 },
+  low: { diameter: 25, opacity: 0.55 },
 }
-const varianteNova: Variante = { diametro: 28, opacidade: 0.9 }
+const newVariant: Variant = { diameter: 28, opacity: 0.9 }
 
-export const PONTA = 7
+export const TIP = 7
 
-export function varianteDo(status: StatusProblema, faixa: FaixaConfianca | null): Variante {
-  return status === 'new' ? varianteNova : variantes[faixa ?? 'low']
+export function variantFor(status: IssueStatus, band: TrustBand | null): Variant {
+  return status === 'new' ? newVariant : variants[band ?? 'low']
 }
 
-export function dimensoesMarcador(status: StatusProblema, faixa: FaixaConfianca | null) {
-  const { diametro } = varianteDo(status, faixa)
-  return { largura: diametro, altura: diametro + PONTA }
+export function markerSize(status: IssueStatus, band: TrustBand | null) {
+  const { diameter } = variantFor(status, band)
+  return { width: diameter, height: diameter + TIP }
 }

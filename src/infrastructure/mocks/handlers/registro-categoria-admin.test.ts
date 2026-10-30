@@ -1,14 +1,14 @@
-import { banco } from '../banco'
-import { rota } from '../rota'
+import { database } from '../banco'
+import { route } from '../rota'
 
-const cabecalhos = { 'Content-Type': 'application/json', Authorization: 'Bearer teste' }
+const headers = { 'Content-Type': 'application/json', Authorization: 'Bearer teste' }
 
-function registrarIncidente(categoriaId: number) {
-  return fetch(rota('/incidents'), {
+function reportIncident(categoryId: number) {
+  return fetch(route('/incidents'), {
     method: 'POST',
-    headers: cabecalhos,
+    headers,
     body: JSON.stringify({
-      categoryId: categoriaId,
+      categoryId,
       lat: -22.95,
       lng: -43.18,
       occurredAt: new Date(Date.now() - 60_000).toISOString(),
@@ -16,117 +16,117 @@ function registrarIncidente(categoriaId: number) {
   })
 }
 
-interface Resumo {
+interface Summary {
   counts: { categoryId: number; name: string; days7: number }[]
 }
 
-async function resumo(): Promise<Resumo> {
-  return (await fetch(rota('/incidents/area?lat=-22.95&lng=-43.18'))).json()
+async function summary(): Promise<Summary> {
+  return (await fetch(route('/incidents/area?lat=-22.95&lng=-43.18'))).json()
 }
 
-describe('mocks de registro usam as categorias do admin', () => {
-  it('categoria criada em runtime pode ser registrada', async () => {
-    const criada = banco.criarCategoria({
+describe('report mocks use the admin categories', () => {
+  it('category created at runtime can be reported', async () => {
+    const created = database.createCategory({
       name: 'Rua inundada',
       group: 'seguranca',
       type: 'incident',
       icon: 'ico_a',
     })
-    if (typeof criada === 'string') throw new Error(criada)
+    if (typeof created === 'string') throw new Error(created)
 
-    expect((await registrarIncidente(criada.id)).status).toBe(201)
+    expect((await reportIncident(created.id)).status).toBe(201)
   })
 
-  it('o resumo da área conta o incidente na categoria escolhida, não em Roubo', async () => {
-    const criada = banco.criarCategoria({
+  it('the area summary counts the incident in the chosen category, not in Roubo', async () => {
+    const created = database.createCategory({
       name: 'Rua inundada',
       group: 'seguranca',
       type: 'incident',
       icon: 'ico_a',
     })
-    if (typeof criada === 'string') throw new Error(criada)
-    const antes = await resumo()
+    if (typeof created === 'string') throw new Error(created)
+    const before = await summary()
 
-    const resposta = await registrarIncidente(criada.id)
-    const depois = (await resposta.json()) as Resumo
+    const response = await reportIncident(created.id)
+    const after = (await response.json()) as Summary
 
-    expect(depois.counts.find((c) => c.categoryId === criada.id)).toMatchObject({
+    expect(after.counts.find((c) => c.categoryId === created.id)).toMatchObject({
       name: 'Rua inundada',
       days7: 1,
     })
-    expect(depois.counts.find((c) => c.categoryId === 7)?.days7).toBe(
-      antes.counts.find((c) => c.categoryId === 7)?.days7,
+    expect(after.counts.find((c) => c.categoryId === 7)?.days7).toBe(
+      before.counts.find((c) => c.categoryId === 7)?.days7,
     )
   })
 
-  it('o calor de um incidente novo aparece só no filtro do grupo da sua categoria', async () => {
-    const grupo = banco.criarGrupo('Clima', 'incident', 'blue')
-    if (typeof grupo === 'string') throw new Error(grupo)
-    const criada = banco.criarCategoria({
+  it("the heatmap of a new incident only shows in the filter of its category's group", async () => {
+    const group = database.createGroup('Clima', 'incident', 'blue')
+    if (typeof group === 'string') throw new Error(group)
+    const created = database.createCategory({
       name: 'Rua inundada',
-      group: grupo.key,
+      group: group.key,
       type: 'incident',
       icon: 'ico_a',
     })
-    if (typeof criada === 'string') throw new Error(criada)
-    await registrarIncidente(criada.id)
-    const calor = async (grupos: string) =>
+    if (typeof created === 'string') throw new Error(created)
+    await reportIncident(created.id)
+    const heatmap = async (groups: string) =>
       (await (
         await fetch(
-          rota(`/incidents/heatmap?minLat=-23&maxLat=-22&minLng=-44&maxLng=-43&groups=${grupos}`),
+          route(`/incidents/heatmap?minLat=-23&maxLat=-22&minLng=-44&maxLng=-43&groups=${groups}`),
         )
       ).json()) as { lat: number; lng: number; count: number }[]
 
-    const doClima = await calor(grupo.key)
-    const deSeguranca = await calor('seguranca')
+    const weatherCells = await heatmap(group.key)
+    const fallback = await heatmap('seguranca')
 
-    expect(doClima).toEqual([{ lat: -22.95, lng: -43.18, count: 1 }])
-    expect(deSeguranca.some((c) => c.lat === -22.95 && c.lng === -43.18)).toBe(false)
+    expect(weatherCells).toEqual([{ lat: -22.95, lng: -43.18, count: 1 }])
+    expect(fallback.some((c) => c.lat === -22.95 && c.lng === -43.18)).toBe(false)
   })
 
-  it('sem categoria nova, quatro incidentes de roubo não inventam acidente nem somem do total', async () => {
-    const antes = await resumo()
-    for (let i = 0; i < 4; i++) await registrarIncidente(7)
-    const depois = await resumo()
-    const acidentes = (r: Resumo) => r.counts.find((c) => c.categoryId === 8)?.days7
+  it('without a new category, four robbery incidents do not invent an accident nor vanish from the total', async () => {
+    const before = await summary()
+    for (let i = 0; i < 4; i++) await reportIncident(7)
+    const after = await summary()
+    const accidents = (r: Summary) => r.counts.find((c) => c.categoryId === 8)?.days7
 
-    expect(acidentes(depois)).toBe(acidentes(antes))
+    expect(accidents(after)).toBe(accidents(before))
   })
 
-  it('a área lista toda categoria de incidente ativa, mesmo com zero', async () => {
-    const criada = banco.criarCategoria({
+  it('the area lists every active incident category, even with zero', async () => {
+    const created = database.createCategory({
       name: 'Rua inundada',
       group: 'seguranca',
       type: 'incident',
       icon: 'ico_a',
     })
-    if (typeof criada === 'string') throw new Error(criada)
+    if (typeof created === 'string') throw new Error(created)
 
-    expect((await resumo()).counts.find((c) => c.categoryId === criada.id)).toMatchObject({
+    expect((await summary()).counts.find((c) => c.categoryId === created.id)).toMatchObject({
       name: 'Rua inundada',
       days7: 0,
     })
   })
 
-  it('mover a categoria de grupo move o calor já registrado junto', async () => {
-    const grupo = banco.criarGrupo('Clima', 'incident', 'blue')
-    if (typeof grupo === 'string') throw new Error(grupo)
-    await registrarIncidente(7)
-    banco.editarCategoria(7, { name: 'Roubo', group: grupo.key, icon: 'roubo' })
+  it('moving the category to another group moves the already reported heatmap along', async () => {
+    const group = database.createGroup('Clima', 'incident', 'blue')
+    if (typeof group === 'string') throw new Error(group)
+    await reportIncident(7)
+    database.editCategory(7, { name: 'Roubo', group: group.key, icon: 'roubo' })
 
-    const nasCelulas = (grupos: string[]) =>
-      banco.calor(grupos).some((c) => c.lat === -22.95 && c.lng === -43.18)
+    const inCells = (groups: string[]) =>
+      database.heatmap(groups).some((c) => c.lat === -22.95 && c.lng === -43.18)
 
-    expect(nasCelulas([grupo.key])).toBe(true)
-    expect(nasCelulas(['seguranca'])).toBe(false)
+    expect(inCells([group.key])).toBe(true)
+    expect(inCells(['seguranca'])).toBe(false)
   })
 
-  it('editar a categoria atualiza também o histórico do usuário', () => {
-    banco.editarCategoria(1, { name: 'Buraco grande', group: 'eletrica', icon: 'ico_a' })
+  it("editing the category also updates the user's history", () => {
+    database.editCategory(1, { name: 'Buraco grande', group: 'eletrica', icon: 'ico_a' })
 
-    const doBuraco = banco.historico('todos').filter((h) => h.category.id === 1)
-    expect(doBuraco.length).toBeGreaterThan(0)
-    for (const item of doBuraco) {
+    const potholeEntries = database.history('all').filter((h) => h.category.id === 1)
+    expect(potholeEntries.length).toBeGreaterThan(0)
+    for (const item of potholeEntries) {
       expect(item.category).toEqual({
         id: 1,
         name: 'Buraco grande',
@@ -136,28 +136,28 @@ describe('mocks de registro usam as categorias do admin', () => {
     }
   })
 
-  it('categoria desativada some da contagem da área', async () => {
-    const criada = banco.criarCategoria({
+  it('deactivated category disappears from the area count', async () => {
+    const created = database.createCategory({
       name: 'Rua inundada',
       group: 'seguranca',
       type: 'incident',
       icon: 'ico_a',
     })
-    if (typeof criada === 'string') throw new Error(criada)
-    await registrarIncidente(criada.id)
-    banco.alterarAtivaCategoria(criada.id, false)
+    if (typeof created === 'string') throw new Error(created)
+    await reportIncident(created.id)
+    database.setCategoryActive(created.id, false)
 
-    expect((await resumo()).counts.some((c) => c.categoryId === criada.id)).toBe(false)
+    expect((await summary()).counts.some((c) => c.categoryId === created.id)).toBe(false)
   })
 
-  it('editar a categoria atualiza os problemas já registrados', () => {
-    const antes = banco.problemas().find((p) => p.categoryId === 3)
-    expect(antes).toBeDefined()
+  it('editing the category updates the already reported issues', () => {
+    const before = database.issues().find((p) => p.categoryId === 3)
+    expect(before).toBeDefined()
 
-    banco.editarCategoria(3, { name: 'Poste sem luz', group: 'limpeza', icon: 'ico_a' })
+    database.editCategory(3, { name: 'Poste sem luz', group: 'limpeza', icon: 'ico_a' })
 
-    const detalhe = banco.detalhe(antes!.id, false)
-    expect(detalhe?.category).toEqual({
+    const detail = database.detail(before!.id, false)
+    expect(detail?.category).toEqual({
       id: 3,
       name: 'Poste sem luz',
       group: 'limpeza',
@@ -165,13 +165,13 @@ describe('mocks de registro usam as categorias do admin', () => {
     })
   })
 
-  it('categoria desativada não aceita novo registro', async () => {
-    banco.alterarAtivaCategoria(8, false)
+  it('deactivated category does not accept new reports', async () => {
+    database.setCategoryActive(8, false)
 
-    expect((await registrarIncidente(8)).status).toBe(400)
+    expect((await reportIncident(8)).status).toBe(400)
   })
 
-  it('categoria de outro tipo continua sendo 422', async () => {
-    expect((await registrarIncidente(1)).status).toBe(422)
+  it('category of another type is still 422', async () => {
+    expect((await reportIncident(1)).status).toBe(422)
   })
 })

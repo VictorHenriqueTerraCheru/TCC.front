@@ -1,9 +1,9 @@
-import type { TipoGrupo } from '@/features/categorias'
+import type { GroupType } from '@/features/categorias'
 
-export function caminhoDaCategoria(tipo: TipoGrupo) {
-  return `/registrar/categoria?tipo=${tipo}`
+export function categoryPath(type: GroupType) {
+  return `/registrar/categoria?type=${type}`
 }
 
-export function lerTipo(valor: string | null): TipoGrupo | null {
-  return valor === 'issue' || valor === 'incident' ? valor : null
+export function readType(value: string | null): GroupType | null {
+  return value === 'issue' || value === 'incident' ? value : null
 }

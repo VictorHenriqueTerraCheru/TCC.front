@@ -1,72 +1,71 @@
 import type { MaterialSymbol } from 'material-symbols'
 import { Link } from 'react-router'
 
-import { Icone } from '@/common/components/icone'
+import { Icon } from '@/common/components/icone'
 import { cn } from '@/common/lib/utils'
-import { CategoriaIcone, useAparencia } from '@/features/categorias'
+import { CategoryIcon, useAppearance } from '@/features/categorias'
 
-import { tituloItem, type ItemHistorico } from '../models/historico'
+import { itemTitle, type HistoryItem } from '../models/historico'
 
 const chips: Partial<
-  Record<NonNullable<ItemHistorico['issueStatus']>, { label: string; classe: string }>
+  Record<NonNullable<HistoryItem['issueStatus']>, { label: string; cssClass: string }>
 > = {
-  new: { label: 'Nova', classe: 'bg-primario-suave text-primario' },
-  active: { label: 'Ativa', classe: 'bg-muted text-foreground' },
+  new: { label: 'Nova', cssClass: 'bg-primario-suave text-primario' },
+  active: { label: 'Ativa', cssClass: 'bg-muted text-foreground' },
   possiblyResolved: {
     label: 'Possivelmente resolvida',
-    classe: 'bg-primario-suave text-primario',
+    cssClass: 'bg-primario-suave text-primario',
   },
-  resolved: { label: 'Resolvida', classe: 'bg-primario-suave text-primario' },
+  resolved: { label: 'Resolvida', cssClass: 'bg-primario-suave text-primario' },
 }
 
-const isReport = (type: ItemHistorico['type']) =>
-  type === 'issueReport' || type === 'incidentReport'
+const isReport = (type: HistoryItem['type']) => type === 'issueReport' || type === 'incidentReport'
 
-function IconeItem({ item }: { item: ItemHistorico }) {
-  const { aparenciaDe } = useAparencia()
-  if (isReport(item.type)) return <CategoriaIcone category={item.category} />
-  const aparencia = aparenciaDe(item.category)
-  const icone: MaterialSymbol = 'how_to_vote'
+function IconItem({ item }: { item: HistoryItem }) {
+  const { appearanceOf } = useAppearance()
+  if (isReport(item.type)) return <CategoryIcon category={item.category} />
+  const appearance = appearanceOf(item.category)
+  const icon: MaterialSymbol = 'how_to_vote'
   return (
     <span
       className={cn(
         'flex size-10 shrink-0 items-center justify-center rounded-full',
-        aparencia.claro,
-        aparencia.forte,
+        appearance.light,
+        appearance.strong,
       )}
     >
-      <Icone name={icone} className="text-[22px]" />
+      <Icon name={icon} className="text-[22px]" />
     </span>
   )
 }
 
-export function ItemHistoricoLinha({ item, quando }: { item: ItemHistorico; quando: string }) {
+export function HistoryItemRow({ item, when }: { item: HistoryItem; when: string }) {
   const chip = item.type === 'issueReport' && item.issueStatus ? chips[item.issueStatus] : undefined
-  const conteudo = (
+  const content = (
     <>
-      <IconeItem item={item} />
+      <IconItem item={item} />
       <div className="min-w-0 flex-1">
-        <p className="leading-5">{tituloItem(item)}</p>
+        <p className="leading-5">{itemTitle(item)}</p>
         <p className="text-sm text-muted-foreground">
-          {[item.address, quando].filter(Boolean).join(' · ')}
+          {[item.address, when].filter(Boolean).join(' · ')}
         </p>
       </div>
       {chip && (
-        <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-xs font-medium', chip.classe)}>
+        <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-xs font-medium', chip.cssClass)}>
           {chip.label}
         </span>
       )}
     </>
   )
-  const classe = 'flex items-center gap-3 py-2.5'
+  const cssClass = 'flex items-center gap-3 py-2.5'
   return item.reportId ? (
     <Link
       to={`/mapa/problema/${item.reportId}`}
-      className={cn(classe, '-mx-2 rounded-xl px-2 hover:bg-card focus-visible:outline-2')}
+      className={cn(cssClass, '-mx-2 rounded-xl px-2 hover:bg-card focus-visible:outline-2')}
     >
-      {conteudo}
+      {content}
     </Link>
   ) : (
-    <div className={classe}>{conteudo}</div>
+    <div className={cssClass}>{content}</div>
   )
 }

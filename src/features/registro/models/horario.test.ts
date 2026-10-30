@@ -1,39 +1,39 @@
-import { horarioInicialOutro, JANELA_MAXIMA, ocorridoEm, passoHorario } from './horario'
+import { initialOtherTime, MAX_WINDOW, occurredAt, timeStep } from './horario'
 
-const agora = new Date('2026-09-26T09:41:30Z')
-const minutos = (n: number) => n * 60_000
+const now = new Date('2026-09-26T09:41:30Z')
+const minutes = (n: number) => n * 60_000
 
-describe('horário do incidente (regra 16)', () => {
-  it('"Agora" envia agora − 1 min e "Há 1 hora" agora − 60 min', () => {
-    expect(ocorridoEm({ modo: 'agora', outroEm: null }, agora).getTime()).toBe(
-      agora.getTime() - minutos(1),
+describe('incident time (rule 16)', () => {
+  it('"Agora" sends now − 1 min and "Há 1 hora" now − 60 min', () => {
+    expect(occurredAt({ mode: 'now', otherAt: null }, now).getTime()).toBe(
+      now.getTime() - minutes(1),
     )
-    expect(ocorridoEm({ modo: 'umaHora', outroEm: null }, agora).getTime()).toBe(
-      agora.getTime() - minutos(60),
+    expect(occurredAt({ mode: 'oneHour', otherAt: null }, now).getTime()).toBe(
+      now.getTime() - minutes(60),
     )
   })
 
-  it('"Outro horário" começa no último quarto de hora e anda de 15 em 15', () => {
-    const inicial = horarioInicialOutro(agora)
-    expect(inicial.toISOString()).toBe('2026-09-26T09:30:00.000Z')
-    expect(passoHorario(inicial, -1, agora)?.toISOString()).toBe('2026-09-26T09:15:00.000Z')
-    expect(passoHorario(inicial, 1, agora)).toBeNull()
+  it('"Outro horário" starts at the last quarter hour and moves in steps of 15', () => {
+    const initial = initialOtherTime(now)
+    expect(initial.toISOString()).toBe('2026-09-26T09:30:00.000Z')
+    expect(timeStep(initial, -1, now)?.toISOString()).toBe('2026-09-26T09:15:00.000Z')
+    expect(timeStep(initial, 1, now)).toBeNull()
   })
 
-  it('não passa de 23 h 45 atrás', () => {
-    const limite = new Date(agora.getTime() - JANELA_MAXIMA)
-    const quaseNoLimite = new Date(Math.ceil(limite.getTime() / minutos(15)) * minutos(15))
-    expect(passoHorario(quaseNoLimite, -1, agora)).toBeNull()
+  it('does not go beyond 23 h 45 ago', () => {
+    const limit = new Date(now.getTime() - MAX_WINDOW)
+    const almostAtLimit = new Date(Math.ceil(limit.getTime() / minutes(15)) * minutes(15))
+    expect(timeStep(almostAtLimit, -1, now)).toBeNull()
   })
 
-  it('no envio, um horário que saiu da janela volta para dentro dela', () => {
-    const escolhidoHaMuito = new Date(agora.getTime() - minutos(24 * 60)).toISOString()
-    const futuro = new Date(agora.getTime() + minutos(5)).toISOString()
-    expect(ocorridoEm({ modo: 'other', outroEm: escolhidoHaMuito }, agora).getTime()).toBe(
-      agora.getTime() - JANELA_MAXIMA,
+  it('on submit, a time that left the window goes back inside it', () => {
+    const chosenLongAgo = new Date(now.getTime() - minutes(24 * 60)).toISOString()
+    const future = new Date(now.getTime() + minutes(5)).toISOString()
+    expect(occurredAt({ mode: 'other', otherAt: chosenLongAgo }, now).getTime()).toBe(
+      now.getTime() - MAX_WINDOW,
     )
-    expect(ocorridoEm({ modo: 'other', outroEm: futuro }, agora).getTime()).toBe(
-      agora.getTime() - minutos(1),
+    expect(occurredAt({ mode: 'other', otherAt: future }, now).getTime()).toBe(
+      now.getTime() - minutes(1),
     )
   })
 })

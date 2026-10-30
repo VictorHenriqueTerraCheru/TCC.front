@@ -1,23 +1,23 @@
-import { useSessaoStore } from '@/features/auth'
+import { useSessionStore } from '@/features/auth'
 
-type Perfil = 'citizen' | 'verifiedCitizen' | 'administrator'
+type Role = 'citizen' | 'verifiedCitizen' | 'administrator'
 
-export function entrarComo(id: string, nome: string, perfil: Perfil = 'citizen') {
-  useSessaoStore.getState().entrar({
+export function loginAs(id: string, name: string, role: Role = 'citizen') {
+  useSessionStore.getState().login({
     token: `mock-jwt-${id}`,
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
-    user: { id, name: nome, email: `${id}@tcc.local`, role: perfil },
+    user: { id, name, email: `${id}@tcc.local`, role },
   })
 }
 
-export function entrarComoCidadao() {
-  entrarComo('u-cidadao1', 'Ana Lima')
+export function loginAsCitizen() {
+  loginAs('u-citizen1', 'Ana Lima')
 }
 
-export function entrarComoAdmin() {
-  entrarComo('u-admin', 'Admin TCC', 'administrator')
+export function loginAsAdmin() {
+  loginAs('u-admin', 'Admin TCC', 'administrator')
 }
 
-export function sair() {
-  useSessaoStore.getState().sair()
+export function logout() {
+  useSessionStore.getState().logout()
 }

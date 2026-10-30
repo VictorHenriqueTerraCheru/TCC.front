@@ -1,15 +1,15 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-import { api, dados } from '@/infrastructure/api'
+import { api, unwrapData } from '@/infrastructure/api'
 
-export function detalheProblemaQuery(id: string) {
+export function issueDetailQuery(id: string) {
   return queryOptions({
-    queryKey: ['problemas', 'detalhe', id],
+    queryKey: ['issues', 'detail', id],
     queryFn: ({ signal }) =>
-      api.GET('/issues/{id}', { params: { path: { id } }, signal }).then(dados),
+      api.GET('/issues/{id}', { params: { path: { id } }, signal }).then(unwrapData),
   })
 }
 
-export function useDetalheProblema(id: string) {
-  return useQuery(detalheProblemaQuery(id))
+export function useIssueDetail(id: string) {
+  return useQuery(issueDetailQuery(id))
 }

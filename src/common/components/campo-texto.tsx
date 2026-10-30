@@ -1,117 +1,125 @@
 import { AnimatePresence, m } from 'motion/react'
 import { useId, useState, type ComponentProps, type ReactNode } from 'react'
 
-import { Icone } from '@/common/components/icone'
-import { SURGIR } from '@/common/lib/movimento'
+import { Icon } from '@/common/components/icone'
+import { APPEAR } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
 
-const caixa = cn(
+const box = cn(
   'peer w-full rounded-2xl border border-input bg-superficie-2 text-base outline-none',
   'transition-[border-color,box-shadow,background-color] duration-200 ease-out',
   'hover:border-muted-foreground/40 focus:border-ring focus:bg-card focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_18%,transparent)]',
   'aria-invalid:border-destructive aria-invalid:focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--destructive)_18%,transparent)]',
 )
 
-const rotuloFlutuante = cn(
+const floatingLabel = cn(
   'pointer-events-none absolute left-4 origin-left text-[11px] font-medium text-muted-foreground',
   'transition-[top,font-size,color] duration-200 ease-out',
   'peer-focus:text-primario peer-aria-invalid:text-destructive',
 )
 
-function Descricao({ id, erro, children }: { id: string; erro?: string; children?: ReactNode }) {
+function Description({
+  id,
+  error,
+  children,
+}: {
+  id: string
+  error?: string
+  children?: ReactNode
+}) {
   return (
     <p
       id={id}
       className={cn(
         'mt-1.5 flex items-start gap-1 px-4 text-xs',
-        erro ? 'text-destructive' : 'text-muted-foreground',
+        error ? 'text-destructive' : 'text-muted-foreground',
       )}
     >
-      {erro && <Icone name="error" preenchido className="mt-px text-[14px]" />}
+      {error && <Icon name="error" filled className="mt-px text-[14px]" />}
       {children}
     </p>
   )
 }
 
-interface CampoTextoProps extends ComponentProps<'input'> {
+interface TextFieldProps extends ComponentProps<'input'> {
   label: string
-  erro?: string
-  ajuda?: string
+  error?: string
+  help?: string
 }
 
-export function CampoTexto({
-  label: rotulo,
-  erro,
-  ajuda,
+export function TextField({
+  label,
+  error,
+  help,
   className,
   id,
   placeholder,
   ...props
-}: CampoTextoProps) {
-  const idGerado = useId()
-  const idCampo = id ?? idGerado
-  const idDescricao = `${idCampo}-descricao`
-  const descricao = erro ?? ajuda
+}: TextFieldProps) {
+  const generatedId = useId()
+  const fieldId = id ?? generatedId
+  const descriptionId = `${fieldId}-descricao`
+  const description = error ?? help
 
   return (
     <div className={className}>
       <div className="relative">
         <input
-          id={idCampo}
-          aria-invalid={erro ? true : undefined}
-          aria-describedby={descricao ? idDescricao : undefined}
+          id={fieldId}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={description ? descriptionId : undefined}
           placeholder={placeholder ?? ' '}
-          className={cn(caixa, 'h-14 px-4 pt-5 pb-1')}
+          className={cn(box, 'h-14 px-4 pt-5 pb-1')}
           {...props}
         />
         <label
-          htmlFor={idCampo}
+          htmlFor={fieldId}
           className={cn(
-            rotuloFlutuante,
+            floatingLabel,
             'top-2',
             !placeholder &&
               'peer-[:placeholder-shown:not(:focus)]:top-[17px] peer-[:placeholder-shown:not(:focus)]:text-base peer-[:placeholder-shown:not(:focus)]:font-normal',
           )}
         >
-          {rotulo}
+          {label}
         </label>
       </div>
-      {descricao && (
-        <Descricao id={idDescricao} erro={erro}>
-          {descricao}
-        </Descricao>
+      {description && (
+        <Description id={descriptionId} error={error}>
+          {description}
+        </Description>
       )}
     </div>
   )
 }
 
-export function CampoSenha(props: Omit<CampoTextoProps, 'type'>) {
-  const [visivel, setVisivel] = useState(false)
+export function PasswordField(props: Omit<TextFieldProps, 'type'>) {
+  const [visible, setVisible] = useState(false)
   return (
     <div className="relative">
-      <CampoTexto
+      <TextField
         {...props}
-        type={visivel ? 'text' : 'password'}
+        type={visible ? 'text' : 'password'}
         className={cn('[&_input]:pr-12', props.className)}
       />
       <button
         type="button"
-        onClick={() => setVisivel((v) => !v)}
-        aria-label={visivel ? 'Ocultar senha' : 'Mostrar senha'}
-        aria-pressed={visivel}
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? 'Ocultar senha' : 'Mostrar senha'}
+        aria-pressed={visible}
         className="absolute top-2 right-2 flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
       >
         <AnimatePresence mode="popLayout" initial={false}>
           <m.span
-            key={visivel ? 'visivel' : 'oculto'}
+            key={visible ? 'visible' : 'hidden'}
             initial={{ opacity: 0, scale: 0.7, rotate: -20 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
             exit={{ opacity: 0, scale: 0.7, rotate: 20 }}
-            transition={SURGIR}
+            transition={APPEAR}
             className="flex"
           >
-            <Icone
-              name={visivel ? 'visibility' : 'visibility_off'}
+            <Icon
+              name={visible ? 'visibility' : 'visibility_off'}
               className="text-muted-foreground"
             />
           </m.span>
@@ -121,111 +129,104 @@ export function CampoSenha(props: Omit<CampoTextoProps, 'type'>) {
   )
 }
 
-interface CampoAreaTextoProps extends ComponentProps<'textarea'> {
+interface TextAreaFieldProps extends ComponentProps<'textarea'> {
   label: string
-  erro?: string
-  ajuda?: string
-  maximo?: number
-  valorAtual?: string
+  error?: string
+  help?: string
+  maximum?: number
+  currentValue?: string
 }
 
-export function CampoAreaTexto({
-  label: rotulo,
-  erro,
-  ajuda,
-  maximo,
-  valorAtual = '',
+export function TextAreaField({
+  label,
+  error,
+  help,
+  maximum,
+  currentValue = '',
   className,
   id,
   placeholder,
   ...props
-}: CampoAreaTextoProps) {
-  const idGerado = useId()
-  const idCampo = id ?? idGerado
-  const idDescricao = `${idCampo}-descricao`
-  const pertoDoLimite = maximo !== undefined && valorAtual.length >= maximo * 0.9
+}: TextAreaFieldProps) {
+  const generatedId = useId()
+  const fieldId = id ?? generatedId
+  const descriptionId = `${fieldId}-descricao`
+  const nearLimit = maximum !== undefined && currentValue.length >= maximum * 0.9
   return (
     <div className={className}>
       <div className="relative">
         <textarea
-          id={idCampo}
+          id={fieldId}
           rows={4}
-          maxLength={maximo}
-          aria-invalid={erro ? true : undefined}
-          aria-describedby={idDescricao}
+          maxLength={maximum}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={descriptionId}
           placeholder={placeholder ?? ' '}
-          className={cn(caixa, 'resize-none px-4 pt-7 pb-3')}
+          className={cn(box, 'resize-none px-4 pt-7 pb-3')}
           {...props}
         />
         <label
-          htmlFor={idCampo}
+          htmlFor={fieldId}
           className={cn(
-            rotuloFlutuante,
+            floatingLabel,
             'top-2',
             !placeholder &&
               'peer-[:placeholder-shown:not(:focus)]:top-4 peer-[:placeholder-shown:not(:focus)]:text-base peer-[:placeholder-shown:not(:focus)]:font-normal',
           )}
         >
-          {rotulo}
+          {label}
         </label>
       </div>
-      <Descricao id={idDescricao} erro={erro}>
-        <span className="flex-1">{erro ?? ajuda}</span>
-        {maximo !== undefined && (
+      <Description id={descriptionId} error={error}>
+        <span className="flex-1">{error ?? help}</span>
+        {maximum !== undefined && (
           <span
             className={cn(
               'shrink-0 tabular-nums transition-colors',
-              pertoDoLimite ? 'font-semibold text-foreground' : 'text-muted-foreground',
+              nearLimit ? 'font-semibold text-foreground' : 'text-muted-foreground',
             )}
           >
-            {valorAtual.length}/{maximo}
+            {currentValue.length}/{maximum}
           </span>
         )}
-      </Descricao>
+      </Description>
     </div>
   )
 }
 
-interface CampoSelecaoProps extends ComponentProps<'select'> {
+interface SelectFieldProps extends ComponentProps<'select'> {
   label: string
-  erro?: string
+  error?: string
 }
 
-export function CampoSelecao({
-  label: rotulo,
-  erro,
-  className,
-  id,
-  children,
-  ...props
-}: CampoSelecaoProps) {
-  const idGerado = useId()
-  const idCampo = id ?? idGerado
-  const idDescricao = `${idCampo}-descricao`
+export function SelectField({ label, error, className, id, children, ...props }: SelectFieldProps) {
+  const generatedId = useId()
+  const fieldId = id ?? generatedId
+  const descriptionId = `${fieldId}-descricao`
   return (
     <div className={className}>
       <div className="relative">
         <select
-          id={idCampo}
-          aria-invalid={erro ? true : undefined}
-          aria-describedby={erro ? idDescricao : undefined}
-          className={cn(caixa, 'h-14 appearance-none pt-5 pr-12 pb-1 pl-4')}
+          id={fieldId}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? descriptionId : undefined}
+          className={cn(box, 'h-14 appearance-none pt-5 pr-12 pb-1 pl-4')}
           {...props}
         >
           {children}
         </select>
-        <label htmlFor={idCampo} className={cn(rotuloFlutuante, 'top-2')}>
-          {rotulo}
+        <label htmlFor={fieldId} className={cn(floatingLabel, 'top-2')}>
+          {label}
         </label>
-        <Icone
+        <Icon
           name="keyboard_arrow_down"
           className="pointer-events-none absolute top-4 right-4 text-muted-foreground transition-transform peer-focus:rotate-180"
         />
       </div>
-      {erro && (
-        <Descricao id={idDescricao} erro={erro}>
-          {erro}
-        </Descricao>
+      {error && (
+        <Description id={descriptionId} error={error}>
+          {error}
+        </Description>
       )}
     </div>
   )

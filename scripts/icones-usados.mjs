@@ -1,7 +1,16 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-const VALORES_DE_CONTRATO = new Set(['filter', 'groups', 'label', 'pending'])
+const VALORES_DE_CONTRATO = new Set([
+  'filter',
+  'groups',
+  'label',
+  'light',
+  'pending',
+  'pin',
+  'report',
+  'weight',
+])
 
 export async function iconesUsados(raiz = 'src') {
   const tipos = await readFile('node_modules/material-symbols/index.d.ts', 'utf8')

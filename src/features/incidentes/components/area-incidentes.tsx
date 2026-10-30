@@ -1,31 +1,31 @@
 import type { MaterialSymbol } from 'material-symbols'
 
-import { Icone } from '@/common/components/icone'
-import { horaCurta } from '@/common/lib/formatacao'
+import { Icon } from '@/common/components/icone'
+import { shortTime } from '@/common/lib/formatacao'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { useEnderecoReverso } from '@/features/geocodificacao'
+import { useReverseGeocode } from '@/features/geocodificacao'
 
-import { useAreaIncidentes } from '../api/use-area-incidentes'
-import { gradienteCalor } from '../models/calor'
-import type { NivelConcentracao } from '../models/incidente'
+import { useIncidentArea } from '../api/use-area-incidentes'
+import { heatmapGradient } from '../models/calor'
+import type { ConcentrationLevel } from '../models/incidente'
 
-const nivel: Record<NivelConcentracao, { label: string; color: string }> = {
-  low: { label: 'Concentração baixa', color: gradienteCalor[0.4]! },
-  medium: { label: 'Concentração média', color: gradienteCalor[0.6]! },
-  high: { label: 'Concentração alta', color: gradienteCalor[1]! },
+const level: Record<ConcentrationLevel, { label: string; color: string }> = {
+  low: { label: 'Concentração baixa', color: heatmapGradient[0.4]! },
+  medium: { label: 'Concentração média', color: heatmapGradient[0.6]! },
+  high: { label: 'Concentração alta', color: heatmapGradient[1]! },
 }
 
-const linhas: Record<number, { label: string; icon: MaterialSymbol }> = {
+const lines: Record<number, { label: string; icon: MaterialSymbol }> = {
   7: { label: 'Roubos', icon: 'error' },
   8: { label: 'Acidentes', icon: 'car_crash' },
 }
 
-export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
-  const area = useAreaIncidentes(lat, lng)
-  const endereco = useEnderecoReverso({ lat, lng })
+export function IncidentArea({ lat, lng }: { lat: number; lng: number }) {
+  const area = useIncidentArea(lat, lng)
+  const address = useReverseGeocode({ lat, lng })
 
-  const titulo = endereco.data?.areaLabel ?? (endereco.data ? 'Área selecionada' : null)
+  const title = address.data?.areaLabel ?? (address.data ? 'Área selecionada' : null)
 
   if (area.isError) {
     return (
@@ -45,13 +45,13 @@ export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
           aria-hidden="true"
           className="size-12 shrink-0 rounded-full blur-[1px]"
           style={{
-            backgroundImage: `radial-gradient(circle, ${gradienteCalor[1]}, ${gradienteCalor[0.6]} 45%, ${gradienteCalor[0.2]} 75%)`,
+            backgroundImage: `radial-gradient(circle, ${heatmapGradient[1]}, ${heatmapGradient[0.6]} 45%, ${heatmapGradient[0.2]} 75%)`,
           }}
         />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium text-muted-foreground">Área de incidentes</p>
-          {titulo ? (
-            <h2 className="text-[22px] leading-7">{titulo}</h2>
+          {title ? (
+            <h2 className="text-[22px] leading-7">{title}</h2>
           ) : (
             <Skeleton className="mt-1 h-7 w-48 bg-muted" />
           )}
@@ -65,14 +65,14 @@ export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
               Raio aprox. {area.data.radiusMeters} m · atualizado às{' '}
-              {horaCurta(area.data.updatedAt)}
+              {shortTime(area.data.updatedAt)}
             </p>
             <span className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-input px-2.5 py-1 text-xs font-medium">
               <span
                 className="size-2.5 rounded-full"
-                style={{ background: nivel[area.data.level].color }}
+                style={{ background: level[area.data.level].color }}
               />
-              {nivel[area.data.level].label}
+              {level[area.data.level].label}
             </span>
           </div>
 
@@ -89,11 +89,11 @@ export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
                 <tr key={c.categoryId} className="border-t border-border/60">
                   <td className="px-4 py-3">
                     <span className="flex items-center gap-3">
-                      <Icone
-                        name={linhas[c.categoryId]?.icon ?? 'error'}
+                      <Icon
+                        name={lines[c.categoryId]?.icon ?? 'error'}
                         className="text-[20px] text-muted-foreground"
                       />
-                      {linhas[c.categoryId]?.label ?? c.name}
+                      {lines[c.categoryId]?.label ?? c.name}
                     </span>
                   </td>
                   <td className="px-2 py-3 text-right text-2xl">{c.days7}</td>
@@ -106,7 +106,7 @@ export function AreaIncidentes({ lat, lng }: { lat: number; lng: number }) {
       )}
 
       <p className="flex gap-3 rounded-2xl bg-superficie-2 p-3 text-xs text-muted-foreground">
-        <Icone name="info" className="text-[18px]" />
+        <Icon name="info" className="text-[18px]" />
         Eventos são pontuais: aparecem apenas agregados, sem local exato, e não recebem votos de
         "Ainda está lá?".
       </p>

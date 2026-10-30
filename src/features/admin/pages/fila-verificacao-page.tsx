@@ -1,65 +1,65 @@
 import { useState } from 'react'
-import { ListaInfinita } from '@/common/components/lista-infinita'
+import { InfiniteList } from '@/common/components/lista-infinita'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import type { StatusVerificacao } from '@/features/verificacao'
+import type { VerificationStatus } from '@/features/verificacao'
 
-import { useFila } from '../api/use-fila'
-import { CartaoSolicitacao } from '../components/cartao-solicitacao'
-import { GuardaAdmin } from '../components/guarda-admin'
+import { useQueue } from '../api/use-fila'
+import { RequestCard } from '../components/cartao-solicitacao'
+import { AdminGuard } from '../components/guarda-admin'
 
-const abas: { status: StatusVerificacao; label: string }[] = [
+const tabs: { status: VerificationStatus; label: string }[] = [
   { status: 'pending', label: 'Pendentes' },
   { status: 'approved', label: 'Aprovadas' },
   { status: 'rejected', label: 'Recusadas' },
 ]
 
-function Fila({ status }: { status: StatusVerificacao }) {
-  const fila = useFila(status)
-  if (fila.isPending) return <Skeleton className="h-40 rounded-2xl bg-muted" />
-  if (fila.isError) {
+function Queue({ status }: { status: VerificationStatus }) {
+  const queue = useQueue(status)
+  if (queue.isPending) return <Skeleton className="h-40 rounded-2xl bg-muted" />
+  if (queue.isError) {
     return (
       <div role="alert" className="space-y-3 py-6">
         <p>Não foi possível carregar a fila.</p>
-        <Button variant="outline" size="sm" onClick={() => void fila.refetch()}>
+        <Button variant="outline" size="sm" onClick={() => void queue.refetch()}>
           Tentar novamente
         </Button>
       </div>
     )
   }
-  const itens = fila.data.pages.flatMap((p) => p.items)
-  if (itens.length === 0) {
+  const items = queue.data.pages.flatMap((p) => p.items)
+  if (items.length === 0) {
     return <p className="py-10 text-center text-sm text-muted-foreground">Nenhum pedido aqui.</p>
   }
   return (
-    <ListaInfinita consulta={fila}>
+    <InfiniteList query={queue}>
       <div className="space-y-3">
-        {itens.map((s) => (
-          <CartaoSolicitacao key={s.id} solicitacao={s} />
+        {items.map((s) => (
+          <RequestCard key={s.id} request={s} />
         ))}
       </div>
-    </ListaInfinita>
+    </InfiniteList>
   )
 }
 
-function TotalPendentes() {
-  const { data } = useFila('pending')
+function PendingTotal() {
+  const { data } = useQueue('pending')
   const total = data?.pages[0]?.total
   return total !== undefined ? <> · {total}</> : null
 }
 
-export function FilaVerificacaoPage() {
-  const [aba, setAba] = useState<StatusVerificacao>('pending')
+export function VerificationQueuePage() {
+  const [aba, setAba] = useState<VerificationStatus>('pending')
 
   return (
-    <GuardaAdmin titulo="Fila de verificação" caminho="/admin/verificacoes">
+    <AdminGuard title="Fila de verificação" path="/admin/verificacoes">
       <div
         role="tablist"
         aria-label="Situação dos pedidos"
         className="mb-4 flex border-b border-border"
       >
-        {abas.map(({ status, label: rotulo }) => (
+        {tabs.map(({ status, label }) => (
           <button
             key={status}
             type="button"
@@ -75,14 +75,14 @@ export function FilaVerificacaoPage() {
                 : 'border-transparent text-muted-foreground',
             )}
           >
-            {rotulo}
-            {status === 'pending' && <TotalPendentes />}
+            {label}
+            {status === 'pending' && <PendingTotal />}
           </button>
         ))}
       </div>
       <div role="tabpanel" id={`painel-${aba}`} aria-labelledby={`aba-${aba}`}>
-        <Fila status={aba} />
+        <Queue status={aba} />
       </div>
-    </GuardaAdmin>
+    </AdminGuard>
   )
 }

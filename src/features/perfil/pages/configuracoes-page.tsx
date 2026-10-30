@@ -2,8 +2,8 @@ import type { MaterialSymbol } from 'material-symbols'
 import { useState, type ReactNode } from 'react'
 import { Navigate, useNavigate } from 'react-router'
 
-import { Icone } from '@/common/components/icone'
-import { TelaComVoltar } from '@/common/components/tela-com-voltar'
+import { Icon } from '@/common/components/icone'
+import { ScreenWithBack } from '@/common/components/tela-com-voltar'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import {
@@ -14,30 +14,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/common/ui/dialog'
-import { SeletorTema } from '@/features/aparencia'
-import { useAutenticado, useSessaoStore } from '@/features/auth'
-import {
-  useAtivarLocalizacao,
-  useLocalizacao,
-  type EstadoLocalizacao,
-} from '@/features/localizacao'
+import { ThemePicker } from '@/features/aparencia'
+import { useAuthenticated, useSessionStore } from '@/features/auth'
+import { useEnableLocation, useGeolocation, type LocationStatus } from '@/features/localizacao'
 import { useMe } from '@/features/usuarios'
 
-import { EditarNomeDialog } from '../components/editar-nome-dialog'
+import { EditNameDialog } from '../components/editar-nome-dialog'
 
-const permissao: Record<EstadoLocalizacao, { label: string; classe: string }> = {
-  granted: { label: 'Permitida', classe: 'bg-primario-suave text-primario' },
-  denied: { label: 'Negada', classe: 'bg-destructive/15 text-destructive' },
-  prompt: { label: 'Não definida', classe: 'bg-muted text-foreground' },
-  verificando: { label: 'Verificando', classe: 'bg-muted text-foreground' },
-  indisponivel: { label: 'Indisponível', classe: 'bg-muted text-foreground' },
+const permission: Record<LocationStatus, { label: string; cssClass: string }> = {
+  granted: { label: 'Permitida', cssClass: 'bg-primario-suave text-primario' },
+  denied: { label: 'Negada', cssClass: 'bg-destructive/15 text-destructive' },
+  prompt: { label: 'Não definida', cssClass: 'bg-muted text-foreground' },
+  checking: { label: 'Verificando', cssClass: 'bg-muted text-foreground' },
+  unavailable: { label: 'Indisponível', cssClass: 'bg-muted text-foreground' },
 }
 
-function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="py-2">
       <h2 className="px-4 pb-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-        {titulo}
+        {title}
       </h2>
       <div className="divide-y divide-border overflow-hidden rounded-[20px] bg-card shadow-1">
         {children}
@@ -46,133 +42,129 @@ function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
   )
 }
 
-function Linha({
-  icon: icone,
-  titulo,
-  subtitulo,
-  aoClicar,
-  seta = true,
+function Row({
+  icon,
+  title,
+  subtitle,
+  onClick,
+  arrow = true,
 }: {
   icon: MaterialSymbol
-  titulo: string
-  subtitulo?: string
-  aoClicar?(): void
-  seta?: boolean
+  title: string
+  subtitle?: string
+  onClick?(): void
+  arrow?: boolean
 }) {
-  const conteudo = (
+  const content = (
     <>
-      <Icone name={icone} className="text-primario" />
+      <Icon name={icon} className="text-primario" />
       <span className="min-w-0 flex-1 text-left">
-        <span className="block">{titulo}</span>
-        {subtitulo && (
-          <span className="block truncate text-sm text-muted-foreground">{subtitulo}</span>
+        <span className="block">{title}</span>
+        {subtitle && (
+          <span className="block truncate text-sm text-muted-foreground">{subtitle}</span>
         )}
       </span>
-      {aoClicar && seta && <Icone name="chevron_right" className="text-muted-foreground" />}
+      {onClick && arrow && <Icon name="chevron_right" className="text-muted-foreground" />}
     </>
   )
-  const classe = 'flex w-full items-center gap-4 px-4 py-3'
-  return aoClicar ? (
+  const cssClass = 'flex w-full items-center gap-4 px-4 py-3'
+  return onClick ? (
     <button
       type="button"
-      onClick={aoClicar}
+      onClick={onClick}
       className={cn(
-        classe,
+        cssClass,
         'transition-colors hover:bg-foreground/5 focus-visible:outline-2 active:bg-foreground/8',
       )}
     >
-      {conteudo}
+      {content}
     </button>
   ) : (
-    <div className={classe}>{conteudo}</div>
+    <div className={cssClass}>{content}</div>
   )
 }
 
-export function ConfiguracoesPage() {
+export function SettingsPage() {
   const navigate = useNavigate()
-  const autenticado = useAutenticado()
+  const authenticated = useAuthenticated()
   const { data: me } = useMe()
-  const { estado } = useLocalizacao()
-  const { ativar, dialogo } = useAtivarLocalizacao()
-  const sair = useSessaoStore((s) => s.sair)
-  const [editandoNome, setEditandoNome] = useState(false)
-  const [sobreAberto, setSobreAberto] = useState(false)
-  const [saindo, setSaindo] = useState(false)
+  const { state } = useGeolocation()
+  const { activate, dialog } = useEnableLocation()
+  const logout = useSessionStore((s) => s.logout)
+  const [editingName, setEditingName] = useState(false)
+  const [aboutOpen, setAboutOpen] = useState(false)
+  const [leaving, setLeaving] = useState(false)
 
-  if (!autenticado) {
-    return saindo ? null : <Navigate to="/login" replace state={{ de: '/perfil/configuracoes' }} />
+  if (!authenticated) {
+    return leaving ? null : <Navigate to="/login" replace state={{ de: '/perfil/configuracoes' }} />
   }
 
-  function sairDaConta() {
-    setSaindo(true)
+  function signOut() {
+    setLeaving(true)
     navigate('/mapa', { replace: true })
-    sair()
+    logout()
   }
 
   return (
     <div className="mx-auto h-full w-full lg:max-w-3xl">
-      <TelaComVoltar titulo="Configurações" aoVoltar={() => navigate('/perfil')}>
-        <Secao titulo="Conta">
-          <Linha
+      <ScreenWithBack title="Configurações" onBack={() => navigate('/perfil')}>
+        <Section title="Conta">
+          <Row
             icon="person"
-            titulo="Nome"
-            subtitulo={me?.name ?? '…'}
-            aoClicar={me ? () => setEditandoNome(true) : undefined}
+            title="Nome"
+            subtitle={me?.name ?? '…'}
+            onClick={me ? () => setEditingName(true) : undefined}
           />
-          <Linha icon="mail" titulo="E-mail" subtitulo={me?.email ?? '…'} />
-        </Secao>
+          <Row icon="mail" title="E-mail" subtitle={me?.email ?? '…'} />
+        </Section>
 
-        <Secao titulo="Aparência">
-          <SeletorTema className="px-2 py-1" />
-        </Secao>
+        <Section title="Aparência">
+          <ThemePicker className="px-2 py-1" />
+        </Section>
 
-        <Secao titulo="Localização">
+        <Section title="Localização">
           <div className="flex gap-4 px-4 py-3">
-            <Icone name="my_location" className="text-primario" />
+            <Icon name="my_location" className="text-primario" />
             <div className="flex-1">
               <div className="flex items-center justify-between gap-2">
                 <span>Permissão de localização</span>
                 <span
                   className={cn(
                     'rounded-md px-2 py-0.5 text-xs font-medium',
-                    permissao[estado].classe,
+                    permission[state].cssClass,
                   )}
                 >
-                  {permissao[estado].label}
+                  {permission[state].label}
                 </span>
               </div>
               <p className="mb-3 text-sm text-muted-foreground">
                 Seus votos pesam mais quando você está perto da ocorrência.
               </p>
-              {estado !== 'granted' && (
-                <Button variant="outline" size="sm" onClick={() => void ativar()}>
-                  {estado === 'prompt' ? 'Permitir localização' : 'Como liberar a localização'}
+              {state !== 'granted' && (
+                <Button variant="outline" size="sm" onClick={() => void activate()}>
+                  {state === 'prompt' ? 'Permitir localização' : 'Como liberar a localização'}
                 </Button>
               )}
             </div>
           </div>
-        </Secao>
+        </Section>
 
-        <Secao titulo="Geral">
-          <Linha
+        <Section title="Geral">
+          <Row
             icon="info"
-            titulo="Sobre o app"
-            subtitulo={`Versão ${__VERSAO_APP__} · termos e privacidade`}
-            aoClicar={() => setSobreAberto(true)}
+            title="Sobre o app"
+            subtitle={`Versão ${__VERSAO_APP__} · termos e privacidade`}
+            onClick={() => setAboutOpen(true)}
           />
-          <Linha icon="logout" titulo="Sair da conta" aoClicar={sairDaConta} seta={false} />
-        </Secao>
-      </TelaComVoltar>
+          <Row icon="logout" title="Sair da conta" onClick={signOut} arrow={false} />
+        </Section>
+      </ScreenWithBack>
 
       {me && (
-        <EditarNomeDialog
-          nomeAtual={me.name}
-          aberto={editandoNome}
-          aoMudarAberto={setEditandoNome}
-        />
+        <EditNameDialog currentName={me.name} open={editingName} onOpenChange={setEditingName} />
       )}
-      {dialogo}
-      <Dialog open={sobreAberto} onOpenChange={setSobreAberto}>
+      {dialog}
+      <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
         <DialogContent showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>Ocorrências urbanas</DialogTitle>
@@ -191,7 +183,7 @@ export function ConfiguracoesPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setSobreAberto(false)}>
+            <Button variant="ghost" onClick={() => setAboutOpen(false)}>
               Fechar
             </Button>
           </DialogFooter>

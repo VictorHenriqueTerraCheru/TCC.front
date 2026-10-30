@@ -1,146 +1,153 @@
 import { useState } from 'react'
 
-import { CampoBusca } from '@/common/components/campo-busca'
-import { ChipFiltro } from '@/common/components/chip-filtro'
-import { semAcento } from '@/common/lib/texto'
+import { SearchField } from '@/common/components/campo-busca'
+import { FilterChip } from '@/common/components/chip-filtro'
+import { withoutAccents } from '@/common/lib/texto'
 import { cn } from '@/common/lib/utils'
 import {
-  aparenciaDaCor,
-  CategoriaIcone,
-  PontoGrupo,
-  type Categoria,
-  type Grupo,
+  colorAppearance,
+  CategoryIcon,
+  GroupDot,
+  type Category,
+  type Group,
 } from '@/features/categorias'
 
-interface SeletorCategoriaProps {
-  categorias: Categoria[]
-  grupos: Grupo[]
-  selecionadaId: number | null
-  recentesIds: number[]
-  aoEscolher(id: number): void
+interface CategoryPickerProps {
+  categories: Category[]
+  groups: Group[]
+  selectedId: number | null
+  recentIds: number[]
+  onChoose(id: number): void
 }
 
-export function SeletorCategoria({
-  categorias,
-  grupos,
-  selecionadaId,
-  recentesIds,
-  aoEscolher,
-}: SeletorCategoriaProps) {
-  const [busca, setBusca] = useState('')
-  const [grupoFiltro, setGrupoFiltro] = useState<string | null>(null)
+export function CategoryPicker({
+  categories,
+  groups,
+  selectedId,
+  recentIds,
+  onChoose,
+}: CategoryPickerProps) {
+  const [search, setSearch] = useState('')
+  const [groupFilter, setGroupFilter] = useState<string | null>(null)
 
-  const termo = semAcento(busca.trim())
-  const secoes = grupos
-    .filter((g) => grupoFiltro === null || g.key === grupoFiltro)
-    .map((grupo) => ({
-      group: grupo,
-      items: categorias.filter(
+  const term = withoutAccents(search.trim())
+  const sections = groups
+    .filter((g) => groupFilter === null || g.key === groupFilter)
+    .map((group) => ({
+      group,
+      items: categories.filter(
         (c) =>
-          c.group === grupo.key &&
-          (termo === '' ||
-            semAcento(c.name).includes(termo) ||
-            semAcento(grupo.label).includes(termo)),
+          c.group === group.key &&
+          (term === '' ||
+            withoutAccents(c.name).includes(term) ||
+            withoutAccents(group.label).includes(term)),
       ),
     }))
     .filter((s) => s.items.length > 0)
 
-  const orfas = categorias.filter(
+  const orphans = categories.filter(
     (c) =>
-      !grupos.some((g) => g.key === c.group) && (termo === '' || semAcento(c.name).includes(termo)),
+      !groups.some((g) => g.key === c.group) &&
+      (term === '' || withoutAccents(c.name).includes(term)),
   )
-  if (orfas.length > 0 && grupoFiltro === null) {
-    secoes.push({
-      group: { key: 'outras', label: 'Outras', type: orfas[0]!.type, color: 'gray', sortOrder: 0 },
-      items: orfas,
+  if (orphans.length > 0 && groupFilter === null) {
+    sections.push({
+      group: {
+        key: 'others',
+        label: 'Outras',
+        type: orphans[0]!.type,
+        color: 'gray',
+        sortOrder: 0,
+      },
+      items: orphans,
     })
   }
 
-  const recentes = recentesIds
-    .map((id) => categorias.find((c) => c.id === id))
-    .filter((c): c is Categoria => c !== undefined)
+  const recent = recentIds
+    .map((id) => categories.find((c) => c.id === id))
+    .filter((c): c is Category => c !== undefined)
     .slice(0, 3)
-  const mostrarRecentes = termo === '' && grupoFiltro === null && recentes.length > 0
+  const showRecent = term === '' && groupFilter === null && recent.length > 0
 
   return (
     <div className="space-y-4">
-      <CampoBusca value={busca} aoMudar={setBusca} label="Buscar categoria" />
+      <SearchField value={search} onChange={setSearch} label="Buscar categoria" />
 
-      {grupos.length > 1 && (
+      {groups.length > 1 && (
         <div
           role="group"
           aria-label="Grupos"
           className="-mx-4 flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 pb-1"
         >
-          <ChipFiltro selecionado={grupoFiltro === null} aoClicar={() => setGrupoFiltro(null)}>
+          <FilterChip selected={groupFilter === null} onClick={() => setGroupFilter(null)}>
             Todas
-          </ChipFiltro>
-          {grupos.map((grupo) => (
-            <ChipFiltro
-              key={grupo.key}
-              selecionado={grupoFiltro === grupo.key}
-              aoClicar={() => setGrupoFiltro(grupoFiltro === grupo.key ? null : grupo.key)}
+          </FilterChip>
+          {groups.map((group) => (
+            <FilterChip
+              key={group.key}
+              selected={groupFilter === group.key}
+              onClick={() => setGroupFilter(groupFilter === group.key ? null : group.key)}
             >
-              <PontoGrupo color={aparenciaDaCor[grupo.color]} />
-              {grupo.label}
-            </ChipFiltro>
+              <GroupDot color={colorAppearance[group.color]} />
+              {group.label}
+            </FilterChip>
           ))}
         </div>
       )}
 
-      {mostrarRecentes && (
+      {showRecent && (
         <section aria-label="Recentes">
           <h3 className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
             Recentes
           </h3>
           <div className="flex flex-wrap gap-2">
-            {recentes.map((categoria) => (
+            {recent.map((category) => (
               <button
-                key={categoria.id}
+                key={category.id}
                 type="button"
-                aria-label={`Recente: ${categoria.name}`}
-                aria-pressed={categoria.id === selecionadaId}
-                onClick={() => aoEscolher(categoria.id)}
+                aria-label={`Recente: ${category.name}`}
+                aria-pressed={category.id === selectedId}
+                onClick={() => onChoose(category.id)}
                 className={cn(
                   'flex min-h-11 pressionavel items-center gap-2 rounded-full border py-1 pr-3 pl-1.5 text-sm font-medium focus-visible:outline-2',
-                  categoria.id === selecionadaId
+                  category.id === selectedId
                     ? 'border-primario bg-primario-suave'
                     : 'border-border bg-card hover:bg-superficie-2',
                 )}
               >
-                <CategoriaIcone category={categoria} pageSize="sm" />
-                {categoria.name}
+                <CategoryIcon category={category} pageSize="sm" />
+                {category.name}
               </button>
             ))}
           </div>
         </section>
       )}
 
-      {secoes.map(({ group: grupo, items: itens }) => {
-        const cor = aparenciaDaCor[grupo.color]
+      {sections.map(({ group, items }) => {
+        const color = colorAppearance[group.color]
         return (
-          <section key={grupo.key} aria-label={grupo.label}>
+          <section key={group.key} aria-label={group.label}>
             <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
-              <PontoGrupo color={cor} />
-              {grupo.label}
+              <GroupDot color={color} />
+              {group.label}
             </h3>
             <div className="grid grid-cols-3 gap-2">
-              {itens.map((categoria) => {
-                const ativa = categoria.id === selecionadaId
+              {items.map((category) => {
+                const active = category.id === selectedId
                 return (
                   <button
-                    key={categoria.id}
+                    key={category.id}
                     type="button"
-                    aria-pressed={ativa}
-                    onClick={() => aoEscolher(categoria.id)}
+                    aria-pressed={active}
+                    onClick={() => onChoose(category.id)}
                     className={cn(
                       'flex min-h-24 pressionavel flex-col items-center gap-1.5 rounded-2xl border-2 p-2 text-center text-[13px] leading-tight font-medium focus-visible:outline-2',
-                      ativa ? cor.claro : 'border-border bg-card shadow-1 hover:bg-superficie-2',
+                      active ? color.light : 'border-border bg-card shadow-1 hover:bg-superficie-2',
                     )}
-                    style={ativa ? { borderColor: cor.corForte } : undefined}
+                    style={active ? { borderColor: color.strongColor } : undefined}
                   >
-                    <CategoriaIcone category={categoria} />
-                    {categoria.name}
+                    <CategoryIcon category={category} />
+                    {category.name}
                   </button>
                 )
               })}
@@ -149,7 +156,7 @@ export function SeletorCategoria({
         )
       })}
 
-      {secoes.length === 0 && (
+      {sections.length === 0 && (
         <p className="py-8 text-center text-sm text-muted-foreground">
           Nenhuma categoria com esse nome.
           <br />

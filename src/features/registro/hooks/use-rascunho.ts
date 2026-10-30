@@ -2,39 +2,36 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router'
 
 import { useDebouncedValue } from '@/common/hooks/use-debounced-value'
-import { useCategorias, type TipoGrupo } from '@/features/categorias'
-import { useEnderecoReverso } from '@/features/geocodificacao'
+import { useCategories, type GroupType } from '@/features/categorias'
+import { useReverseGeocode } from '@/features/geocodificacao'
 
-import { caminhoDaCategoria } from '../models/rotas'
-import { useRascunhoStore } from '../stores/rascunho-store'
+import { categoryPath } from '../models/rotas'
+import { useDraftStore } from '../stores/rascunho-store'
 
-export function useRascunho() {
-  const rascunho = useRascunhoStore()
-  const { data: categorias } = useCategorias()
-  const categoria = categorias?.find((c) => c.id === rascunho.categoryId) ?? null
-  return { ...rascunho, category: categoria }
+export function useDraft() {
+  const draft = useDraftStore()
+  const { data: categories } = useCategories()
+  const category = categories?.find((c) => c.id === draft.categoryId) ?? null
+  return { ...draft, category }
 }
 
-export function useEnderecoDoRascunho() {
-  const local = useRascunhoStore((s) => s.local)
-  const parado = useDebouncedValue(local, 600)
-  const consulta = useEnderecoReverso(parado)
-  const atualizando = local !== parado || consulta.isPending
-  return { ...consulta, atualizando }
+export function useDraftAddress() {
+  const location = useDraftStore((s) => s.location)
+  const stopped = useDebouncedValue(location, 600)
+  const query = useReverseGeocode(stopped)
+  const updating = location !== stopped || query.isPending
+  return { ...query, updating }
 }
 
-export function useExigirCategoria(tipo: TipoGrupo) {
-  const { category: categoria, categoryId: categoriaId } = useRascunho()
-  const { isSuccess } = useCategorias()
-  useExigirPasso(
-    categoriaId !== null && (!isSuccess || categoria?.type === tipo),
-    caminhoDaCategoria(tipo),
-  )
+export function useRequireCategory(type: GroupType) {
+  const { category, categoryId } = useDraft()
+  const { isSuccess } = useCategories()
+  useRequireStep(categoryId !== null && (!isSuccess || category?.type === type), categoryPath(type))
 }
 
-export function useExigirPasso(ok: boolean, rota: string) {
+export function useRequireStep(ok: boolean, route: string) {
   const navigate = useNavigate()
   useEffect(() => {
-    if (!ok) navigate(rota, { replace: true })
-  }, [ok, rota, navigate])
+    if (!ok) navigate(route, { replace: true })
+  }, [ok, route, navigate])
 }

@@ -1,37 +1,37 @@
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query'
 
-import { api, dados } from '@/infrastructure/api'
+import { api, unwrapData } from '@/infrastructure/api'
 
-export interface FiltroCalorIncidentes {
+export interface IncidentHeatmapFilter {
   minLat: number
   minLng: number
   maxLat: number
   maxLng: number
-  grupos: string[]
-  dias: number
+  groups: string[]
+  days: number
 }
 
-export function calorIncidentesQuery({ grupos, dias, ...retangulo }: FiltroCalorIncidentes) {
+export function incidentHeatmapQuery({ groups, days, ...bounds }: IncidentHeatmapFilter) {
   return queryOptions({
-    queryKey: ['incidentes', 'calor', retangulo, { grupos, dias }],
+    queryKey: ['incidents', 'calor', bounds, { groups, days }],
     queryFn: ({ signal }) =>
       api
         .GET('/incidents/heatmap', {
           params: {
-            query: { ...retangulo, dias, groups: grupos.length ? grupos.join(',') : undefined },
+            query: { ...bounds, days, groups: groups.length ? groups.join(',') : undefined },
           },
           signal,
         })
-        .then(dados),
+        .then(unwrapData),
   })
 }
 
-export function useCalorIncidentes(filtro: FiltroCalorIncidentes | null) {
+export function useIncidentHeatmap(filter: IncidentHeatmapFilter | null) {
   return useQuery({
-    ...calorIncidentesQuery(
-      filtro ?? { minLat: 0, minLng: 0, maxLat: 0, maxLng: 0, grupos: [], dias: 7 },
+    ...incidentHeatmapQuery(
+      filter ?? { minLat: 0, minLng: 0, maxLat: 0, maxLng: 0, groups: [], days: 7 },
     ),
-    enabled: filtro !== null,
+    enabled: filter !== null,
     placeholderData: keepPreviousData,
   })
 }

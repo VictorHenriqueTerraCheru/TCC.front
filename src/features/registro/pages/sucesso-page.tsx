@@ -2,32 +2,32 @@ import { m } from 'motion/react'
 import { useEffect, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
-import { MOLA_RAPIDA } from '@/common/lib/movimento'
+import { FAST_SPRING } from '@/common/lib/movimento'
 import { Button } from '@/common/ui/button'
-import { iconeDe, useAparencia } from '@/features/categorias'
-import { MarcadorProblema, type DetalheProblemaDados } from '@/features/problemas'
+import { iconOf, useAppearance } from '@/features/categorias'
+import { IssueMarker, type IssueDetailData } from '@/features/problemas'
 
-import { useRascunhoStore } from '../stores/rascunho-store'
+import { useDraftStore } from '../stores/rascunho-store'
 
-interface TelaSucessoProps {
-  titulo: string
-  texto: string
-  cartao?: ReactNode
-  verNoMapa: string
+interface SuccessScreenProps {
+  title: string
+  text: string
+  card?: ReactNode
+  viewOnMap: string
 }
 
-export function TelaSucesso({ titulo, texto, cartao, verNoMapa }: TelaSucessoProps) {
+export function SuccessScreen({ title, text, card, viewOnMap }: SuccessScreenProps) {
   const navigate = useNavigate()
-  const limpar = useRascunhoStore((s) => s.limpar)
+  const clear = useDraftStore((s) => s.clear)
 
-  useEffect(() => limpar(), [limpar])
+  useEffect(() => clear(), [clear])
 
   return (
     <div className="mx-auto flex h-full max-w-md flex-col px-6 pt-20 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:pt-16">
       <m.span
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={MOLA_RAPIDA}
+        transition={FAST_SPRING}
         className="mb-8 flex size-16 items-center justify-center rounded-full bg-primario-suave text-primario"
       >
         <svg viewBox="0 0 24 24" aria-hidden className="size-9">
@@ -45,15 +45,15 @@ export function TelaSucesso({ titulo, texto, cartao, verNoMapa }: TelaSucessoPro
           />
         </svg>
       </m.span>
-      <h1 className="mb-4 text-[28px] leading-9">{titulo}</h1>
-      <p className="mb-6">{texto}</p>
-      {cartao}
+      <h1 className="mb-4 text-[28px] leading-9">{title}</h1>
+      <p className="mb-6">{text}</p>
+      {card}
       <div className="mt-auto flex flex-col gap-2 pt-8">
-        <Button onClick={() => navigate(verNoMapa, { replace: true })}>Ver no mapa</Button>
+        <Button onClick={() => navigate(viewOnMap, { replace: true })}>Ver no mapa</Button>
         <Button
           variant="outline"
           onClick={() => {
-            limpar()
+            clear()
             navigate('/registrar', { replace: true })
           }}
         >
@@ -64,48 +64,48 @@ export function TelaSucesso({ titulo, texto, cartao, verNoMapa }: TelaSucessoPro
   )
 }
 
-export function SucessoProblemaPage() {
+export function IssueSuccessPage() {
   const { state } = useLocation()
-  const { aparenciaDe } = useAparencia()
-  const { issue: problema, confirmacao } = (state ?? {}) as {
-    issue?: DetalheProblemaDados
-    confirmacao?: boolean
+  const { appearanceOf } = useAppearance()
+  const { issue, confirmation } = (state ?? {}) as {
+    issue?: IssueDetailData
+    confirmation?: boolean
   }
 
-  const cartao = problema && (
+  const card = issue && (
     <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-1">
       <span className="shrink-0 pr-6">
-        <MarcadorProblema
-          color={aparenciaDe(problema.category).corForte}
-          icon={iconeDe(problema.category)}
-          status={problema.status}
-          band={problema.band}
+        <IssueMarker
+          color={appearanceOf(issue.category).strongColor}
+          icon={iconOf(issue.category)}
+          status={issue.status}
+          band={issue.band}
         />
       </span>
       <div className="min-w-0">
-        <p className="font-medium">{problema.category.name}</p>
-        <p className="text-xs text-muted-foreground">{problema.address}</p>
+        <p className="font-medium">{issue.category.name}</p>
+        <p className="text-xs text-muted-foreground">{issue.address}</p>
       </div>
     </div>
   )
 
-  if (confirmacao) {
+  if (confirmation) {
     return (
-      <TelaSucesso
-        titulo="Confirmação registrada"
-        texto="Sua confirmação foi registrada e reforça o registro que já estava no mapa, em vez de criar uma duplicata."
-        cartao={cartao}
-        verNoMapa={problema ? `/mapa/problema/${problema.id}` : '/mapa'}
+      <SuccessScreen
+        title="Confirmação registrada"
+        text="Sua confirmação foi registrada e reforça o registro que já estava no mapa, em vez de criar uma duplicata."
+        card={card}
+        viewOnMap={issue ? `/mapa/problema/${issue.id}` : '/mapa'}
       />
     )
   }
 
   return (
-    <TelaSucesso
-      titulo="Registro enviado"
-      texto='Sua ocorrência já aparece no mapa com o selo "Nova". Ela fica em período de avaliação até que pessoas por perto confirmem.'
-      cartao={cartao}
-      verNoMapa={problema ? `/mapa/problema/${problema.id}` : '/mapa'}
+    <SuccessScreen
+      title="Registro enviado"
+      text='Sua ocorrência já aparece no mapa com o selo "Nova". Ela fica em período de avaliação até que pessoas por perto confirmem.'
+      card={card}
+      viewOnMap={issue ? `/mapa/problema/${issue.id}` : '/mapa'}
     />
   )
 }

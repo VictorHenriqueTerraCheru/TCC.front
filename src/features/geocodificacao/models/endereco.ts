@@ -1,8 +1,8 @@
 import type { Schema } from '@/infrastructure/api'
 
-export type EnderecoReverso = Schema<'ReverseResponse'>
+export type ReverseGeocode = Schema<'ReverseResponse'>
 
-export function enderecoIndisponivel(lat: number, lng: number): EnderecoReverso {
+export function addressUnavailable(lat: number, lng: number): ReverseGeocode {
   return {
     available: false,
     address: `Próximo a ${lat.toFixed(5)}, ${lng.toFixed(5)}`,

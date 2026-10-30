@@ -1,13 +1,13 @@
 import type { MaterialSymbol } from 'material-symbols'
 
-export interface ItemNavegacao {
-  rota: string
+export interface NavigationItem {
+  route: string
   label: string
   icon: MaterialSymbol
 }
 
-export const itensNavegacao: ItemNavegacao[] = [
-  { rota: '/mapa', label: 'Mapa', icon: 'map' },
-  { rota: '/recentes', label: 'Recentes', icon: 'history' },
-  { rota: '/perfil', label: 'Perfil', icon: 'person' },
+export const navigationItems: NavigationItem[] = [
+  { route: '/mapa', label: 'Mapa', icon: 'map' },
+  { route: '/recentes', label: 'Recentes', icon: 'history' },
+  { route: '/perfil', label: 'Perfil', icon: 'person' },
 ]

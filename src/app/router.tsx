@@ -1,35 +1,35 @@
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router'
 
-import { EscolherTemaPage } from '@/features/aparencia'
-import { CadastroPage, EntrarPage } from '@/features/auth'
-import { PermissaoLocalizacaoPage } from '@/features/localizacao'
-import { AreaIncidentesPage, DetalheProblemaPage, MapaPage } from '@/features/mapa'
-import { RecentesPage } from '@/features/problemas'
+import { ChooseThemePage } from '@/features/aparencia'
+import { RegisterPage, LoginPage } from '@/features/auth'
+import { LocationPermissionPage } from '@/features/localizacao'
+import { IncidentAreaPage, IssueDetailPage, MapPage } from '@/features/mapa'
+import { RecentPage } from '@/features/problemas'
 import {
-  CategoriaPage,
-  ConferenciaPage,
-  LocalIncidentePage,
-  LocalProblemaPage,
-  RegistroLayout,
-  TipoPage,
-  RevisaoIncidentePage,
-  RevisaoProblemaPage,
-  SucessoIncidentePage,
-  SucessoProblemaPage,
+  CategoryPage,
+  DuplicateCheckPage,
+  IncidentLocationPage,
+  IssueLocationPage,
+  ReportLayout,
+  TypePage,
+  IncidentReviewPage,
+  IssueReviewPage,
+  IncidentSuccessPage,
+  IssueSuccessPage,
 } from '@/features/registro'
-import { CategoriasAdminPage, FilaVerificacaoPage, UsuariosAdminPage } from '@/features/admin'
-import { ConfiguracoesPage, HistoricoPage, PerfilPage } from '@/features/perfil'
-import { SolicitarVerificacaoPage } from '@/features/verificacao'
+import { AdminCategoriesPage, VerificationQueuePage, AdminUsersPage } from '@/features/admin'
+import { SettingsPage, HistoryPage, ProfilePage } from '@/features/perfil'
+import { RequestVerificationPage } from '@/features/verificacao'
 
 import { AppLayout } from './layouts/app-layout'
-import { RaizLayout } from './layouts/raiz-layout'
-import { TelaCheiaLayout } from './layouts/tela-cheia-layout'
-import { PaginaNaoEncontrada } from './pagina-nao-encontrada'
+import { RootLayout } from './layouts/raiz-layout'
+import { FullScreenLayout } from './layouts/tela-cheia-layout'
+import { NotFoundPage } from './pagina-nao-encontrada'
 
-export const rotas: RouteObject[] = [
+export const routes: RouteObject[] = [
   {
-    element: <RaizLayout />,
-    errorElement: <PaginaNaoEncontrada />,
+    element: <RootLayout />,
+    errorElement: <NotFoundPage />,
     children: [
       {
         element: <AppLayout />,
@@ -37,50 +37,50 @@ export const rotas: RouteObject[] = [
           { index: true, element: <Navigate to="/mapa" replace /> },
           {
             path: 'mapa',
-            element: <MapaPage />,
+            element: <MapPage />,
             children: [
-              { path: 'problema/:id', element: <DetalheProblemaPage /> },
-              { path: 'area', element: <AreaIncidentesPage /> },
+              { path: 'problema/:id', element: <IssueDetailPage /> },
+              { path: 'area', element: <IncidentAreaPage /> },
             ],
           },
-          { path: 'recentes', element: <RecentesPage /> },
-          { path: 'perfil', element: <PerfilPage /> },
-          { path: 'perfil/verificacao', element: <SolicitarVerificacaoPage /> },
-          { path: 'perfil/historico', element: <HistoricoPage /> },
-          { path: 'perfil/configuracoes', element: <ConfiguracoesPage /> },
-          { path: 'admin/verificacoes', element: <FilaVerificacaoPage /> },
-          { path: 'admin/categorias', element: <CategoriasAdminPage /> },
-          { path: 'admin/usuarios', element: <UsuariosAdminPage /> },
+          { path: 'recentes', element: <RecentPage /> },
+          { path: 'perfil', element: <ProfilePage /> },
+          { path: 'perfil/verificacao', element: <RequestVerificationPage /> },
+          { path: 'perfil/historico', element: <HistoryPage /> },
+          { path: 'perfil/configuracoes', element: <SettingsPage /> },
+          { path: 'admin/verificacoes', element: <VerificationQueuePage /> },
+          { path: 'admin/categorias', element: <AdminCategoriesPage /> },
+          { path: 'admin/usuarios', element: <AdminUsersPage /> },
           {
             path: 'registrar',
-            element: <RegistroLayout />,
+            element: <ReportLayout />,
             children: [
-              { index: true, element: <TipoPage /> },
-              { path: 'categoria', element: <CategoriaPage /> },
-              { path: 'local', element: <LocalProblemaPage /> },
-              { path: 'conferencia', element: <ConferenciaPage /> },
-              { path: 'revisao', element: <RevisaoProblemaPage /> },
-              { path: 'sucesso', element: <SucessoProblemaPage /> },
-              { path: 'incidente/local', element: <LocalIncidentePage /> },
-              { path: 'incidente/revisao', element: <RevisaoIncidentePage /> },
-              { path: 'incidente/sucesso', element: <SucessoIncidentePage /> },
+              { index: true, element: <TypePage /> },
+              { path: 'categoria', element: <CategoryPage /> },
+              { path: 'local', element: <IssueLocationPage /> },
+              { path: 'conferencia', element: <DuplicateCheckPage /> },
+              { path: 'revisao', element: <IssueReviewPage /> },
+              { path: 'sucesso', element: <IssueSuccessPage /> },
+              { path: 'incidente/local', element: <IncidentLocationPage /> },
+              { path: 'incidente/revisao', element: <IncidentReviewPage /> },
+              { path: 'incidente/sucesso', element: <IncidentSuccessPage /> },
             ],
           },
         ],
       },
       {
-        element: <TelaCheiaLayout />,
+        element: <FullScreenLayout />,
         children: [
-          { path: 'login', element: <EntrarPage /> },
-          { path: 'cadastro', element: <CadastroPage /> },
-          { path: 'aparencia', element: <EscolherTemaPage /> },
-          { path: 'permissao-localizacao', element: <PermissaoLocalizacaoPage /> },
+          { path: 'login', element: <LoginPage /> },
+          { path: 'cadastro', element: <RegisterPage /> },
+          { path: 'aparencia', element: <ChooseThemePage /> },
+          { path: 'permissao-localizacao', element: <LocationPermissionPage /> },
         ],
       },
     ],
   },
 ]
 
-export function criarRouter() {
-  return createBrowserRouter(rotas)
+export function createAppRouter() {
+  return createBrowserRouter(routes)
 }

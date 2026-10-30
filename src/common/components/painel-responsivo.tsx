@@ -1,93 +1,89 @@
 import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
 
-import { Icone } from '@/common/components/icone'
+import { Icon } from '@/common/components/icone'
 import { useDesktop } from '@/common/hooks/use-media-query'
-import { ContextoPainel } from '@/common/hooks/use-painel-responsivo'
+import { PanelContext } from '@/common/hooks/use-painel-responsivo'
 import { cn } from '@/common/lib/utils'
 import { Drawer, DrawerContent, DrawerTitle } from '@/common/ui/drawer'
 
-interface PainelResponsivoProps {
-  titulo: string
-  aoFechar(): void
-  alturaResumo?: number
+interface ResponsivePanelProps {
+  title: string
+  onClose(): void
+  summaryHeight?: number
   children: ReactNode
 }
 
-export function PainelResponsivo({
-  titulo,
-  aoFechar,
-  alturaResumo,
-  children,
-}: PainelResponsivoProps) {
+export function ResponsivePanel({ title, onClose, summaryHeight, children }: ResponsivePanelProps) {
   const desktop = useDesktop()
-  const [alturaMedida, setAlturaMedida] = useState<number | null>(null)
-  const altura = alturaResumo ? (alturaMedida ?? alturaResumo) : null
-  const snaps = useMemo(() => (altura ? [`${altura}px`, 0.85] : undefined), [altura])
-  const [aberto, setAberto] = useState(false)
-  const snap = snaps ? snaps[aberto ? 1 : 0]! : null
+  const [measuredHeight, setMeasuredHeight] = useState<number | null>(null)
+  const height = summaryHeight ? (measuredHeight ?? summaryHeight) : null
+  const snaps = useMemo(() => (height ? [`${height}px`, 0.85] : undefined), [height])
+  const [open, setOpen] = useState(false)
+  const snap = snaps ? snaps[open ? 1 : 0]! : null
 
-  const observador = useRef<ResizeObserver | null>(null)
-  const abertoRef = useRef(aberto)
-  const mudarAberto = useCallback((valor: boolean) => {
-    abertoRef.current = valor
-    setAberto(valor)
+  const observer = useRef<ResizeObserver | null>(null)
+  const openRef = useRef(open)
+  const handleOpenChange = useCallback((value: boolean) => {
+    openRef.current = value
+    setOpen(value)
   }, [])
-  const medirResumo = useCallback((elemento: HTMLElement | null) => {
-    observador.current?.disconnect()
-    observador.current = null
-    if (!elemento) return
-    const medir = () => {
-      if (abertoRef.current || elemento.offsetHeight === 0) return
-      const rolagem = elemento.closest<HTMLElement>('[data-rolagem-painel]')
-      const respiro = rolagem ? parseFloat(getComputedStyle(rolagem).paddingBottom) || 0 : 0
-      setAlturaMedida(Math.ceil(elemento.offsetTop + elemento.offsetHeight + respiro))
+  const measureSummary = useCallback((element: HTMLElement | null) => {
+    observer.current?.disconnect()
+    observer.current = null
+    if (!element) return
+    const measure = () => {
+      if (openRef.current || element.offsetHeight === 0) return
+      const scroll = element.closest<HTMLElement>('[data-rolagem-painel]')
+      const margin = scroll ? parseFloat(getComputedStyle(scroll).paddingBottom) || 0 : 0
+      setMeasuredHeight(Math.ceil(element.offsetTop + element.offsetHeight + margin))
     }
-    medir()
+    measure()
     if (typeof ResizeObserver !== 'undefined') {
-      observador.current = new ResizeObserver(medir)
-      observador.current.observe(elemento)
+      observer.current = new ResizeObserver(measure)
+      observer.current.observe(element)
     }
   }, [])
 
   if (desktop) {
     return (
       <aside
-        aria-label={titulo}
+        aria-label={title}
         className="absolute inset-y-0 left-0 z-[1001] flex w-[420px] animate-in flex-col border-y-0 border-l-0 shadow-3 vidro duration-300 ease-[cubic-bezier(0.2,0.9,0.25,1)] fade-in-0 slide-in-from-left-6 motion-reduce:animate-none"
       >
         <div className="flex-1 overflow-y-auto p-4 pt-5">{children}</div>
-        <BotaoFechar aoFechar={aoFechar} className="absolute top-4 right-4" />
+        <CloseButton onClose={onClose} className="absolute top-4 right-4" />
       </aside>
     )
   }
 
-  const recolhido = !!snaps && !aberto
-  const expandir = () => mudarAberto(true)
+  const collapsed = !!snaps && !open
+  const expand = () => handleOpenChange(true)
 
   return (
-    <ContextoPainel.Provider value={{ recolhido, expandir, medirResumo }}>
+    <PanelContext.Provider value={{ collapsed, expand, measureSummary }}>
       <Drawer
         open
         modal={false}
-        onOpenChange={(visivel) => !visivel && aoFechar()}
+        onOpenChange={(visible) => !visible && onClose()}
         {...(snaps && {
           snapPoints: snaps,
           activeSnapPoint: snap,
-          setActiveSnapPoint: (ponto: number | string | null) => mudarAberto(ponto === snaps[1]),
+          setActiveSnapPoint: (point: number | string | null) =>
+            handleOpenChange(point === snaps[1]),
         })}
       >
         <DrawerContent
-          semFundo
+          transparent
           aria-describedby={undefined}
-          data-estagio={snaps ? (recolhido ? 'resumo' : 'aberto') : undefined}
+          data-estagio={snaps ? (collapsed ? 'summary' : 'open') : undefined}
           className={snaps ? 'mt-0! h-dvh max-h-none!' : undefined}
         >
-          <DrawerTitle className="sr-only">{titulo}</DrawerTitle>
+          <DrawerTitle className="sr-only">{title}</DrawerTitle>
           <div
             data-rolagem-painel
-            onFocusCapture={(evento) => {
-              if (!recolhido) return
-              if (evento.target.getBoundingClientRect().bottom > window.innerHeight) expandir()
+            onFocusCapture={(event) => {
+              if (!collapsed) return
+              if (event.target.getBoundingClientRect().bottom > window.innerHeight) expand()
             }}
             className={cn(
               'overflow-y-auto overscroll-contain px-4 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]',
@@ -96,22 +92,22 @@ export function PainelResponsivo({
           >
             {children}
           </div>
-          <BotaoFechar aoFechar={aoFechar} className="absolute top-5 right-4" />
+          <CloseButton onClose={onClose} className="absolute top-5 right-4" />
         </DrawerContent>
       </Drawer>
-    </ContextoPainel.Provider>
+    </PanelContext.Provider>
   )
 }
 
-function BotaoFechar({ aoFechar, className }: { aoFechar(): void; className: string }) {
+function CloseButton({ onClose, className }: { onClose(): void; className: string }) {
   return (
     <button
       type="button"
-      onClick={aoFechar}
+      onClick={onClose}
       aria-label="Fechar"
       className={`flex size-9 pressionavel items-center justify-center rounded-full bg-foreground/6 text-muted-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:outline-2 ${className}`}
     >
-      <Icone name="close" className="text-[20px]" />
+      <Icon name="close" className="text-[20px]" />
     </button>
   )
 }

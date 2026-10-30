@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 
-import { Icone } from '@/common/components/icone'
+import { Icon } from '@/common/components/icone'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 
@@ -64,7 +64,7 @@ function DialogContent({
             data-slot="dialog-close"
             className="absolute top-4 right-4 flex size-9 pressionavel items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-superficie-2 hover:text-foreground focus-visible:outline-2 disabled:pointer-events-none"
           >
-            <Icone name="close" className="text-[20px]" />
+            <Icon name="close" className="text-[20px]" />
             <span className="sr-only">Fechar</span>
           </DialogPrimitive.Close>
         )}

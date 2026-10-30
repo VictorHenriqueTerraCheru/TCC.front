@@ -61,7 +61,7 @@
   --cat-cinza-claro: rgba(86, 98, 112, 0.14);
 }
 
-:root[data-tema='escuro'] {
+:root[data-tema='dark'] {
   color-scheme: dark;
 
   --background: #121a24;
@@ -220,8 +220,8 @@
 .maplibregl-ctrl-group button + button {
   border-top-color: var(--vidro-borda) !important;
 }
-[data-tema='escuro'] .maplibregl-ctrl-icon,
-[data-tema='escuro'] .maplibregl-ctrl-attrib-button {
+[data-tema='dark'] .maplibregl-ctrl-icon,
+[data-tema='dark'] .maplibregl-ctrl-attrib-button {
   filter: invert(1) brightness(1.4);
 }
 .maplibregl-ctrl-attrib-inner,

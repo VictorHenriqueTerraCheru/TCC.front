@@ -1,87 +1,87 @@
 import { m } from 'motion/react'
 
-import { Icone } from '@/common/components/icone'
-import { NumeroAnimado } from '@/common/components/numero-animado'
-import { MOLA_SUAVE } from '@/common/lib/movimento'
+import { Icon } from '@/common/components/icone'
+import { AnimatedNumber } from '@/common/components/numero-animado'
+import { SOFT_SPRING } from '@/common/lib/movimento'
 import { cn } from '@/common/lib/utils'
 
-import type { DetalheProblema, FaixaConfianca } from '../../models/problema'
+import type { IssueDetail, TrustBand } from '../../models/problema'
 
-const rotuloFaixa: Record<FaixaConfianca, string> = {
+const bandLabel: Record<TrustBand, string> = {
   high: 'Confiança alta',
   medium: 'Confiança média',
   low: 'Confiança baixa',
 }
 
-export function BarraConfianca({
-  trustScore: confianca,
-  band: faixa,
-  legenda,
+export function TrustBar({
+  trustScore: trust,
+  band,
+  legend,
 }: {
   trustScore: number
-  band: FaixaConfianca
-  legenda: string
+  band: TrustBand
+  legend: string
 }) {
-  const valor = Math.round(confianca)
+  const value = Math.round(trust)
   return (
     <section aria-label="Confiança">
       <div className="mb-2 flex items-center gap-2">
-        {faixa === 'high' && (
-          <Icone name="check_circle" preenchido className="text-[20px] text-primario" />
+        {band === 'high' && (
+          <Icon name="check_circle" filled className="text-[20px] text-primario" />
         )}
-        <span className={cn('font-medium', faixa === 'high' && 'text-primario')}>
-          {rotuloFaixa[faixa]}
+        <span className={cn('font-medium', band === 'high' && 'text-primario')}>
+          {bandLabel[band]}
         </span>
-        <NumeroAnimado value={valor} formatar={(n) => `${n} / 100`} className="ml-auto text-sm" />
+        <AnimatedNumber value={value} format={(n) => `${n} / 100`} className="ml-auto text-sm" />
       </div>
       <div
         role="meter"
-        aria-label={rotuloFaixa[faixa]}
+        aria-label={bandLabel[band]}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-valuenow={valor}
+        aria-valuenow={value}
         className="h-1.5 overflow-hidden rounded-full bg-muted"
       >
         <m.div
           className="h-full rounded-full bg-primario"
           initial={{ width: 0 }}
-          animate={{ width: `${valor}%` }}
-          transition={MOLA_SUAVE}
+          animate={{ width: `${value}%` }}
+          transition={SOFT_SPRING}
         />
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">{legenda}</p>
+      <p className="mt-2 text-xs text-muted-foreground">{legend}</p>
     </section>
   )
 }
 
-export function BarraAvaliacao({
-  evaluation: avaliacao,
+export function EvaluationBar({
+  evaluation,
 }: {
-  evaluation: NonNullable<DetalheProblema['evaluation']>
+  evaluation: NonNullable<IssueDetail['evaluation']>
 }) {
-  const { voters: votantes, required: necessarios } = avaliacao
+  const { voters, required } = evaluation
   return (
     <section aria-label="Em avaliação">
       <div className="mb-2 flex items-center gap-2 text-nova">
-        <Icone name="hourglass_top" className="text-[20px]" />
+        <Icon name="hourglass_top" className="text-[20px]" />
         <span className="font-medium">Em avaliação</span>
         <span className="ml-auto text-sm text-foreground">
-          {Math.min(votantes, necessarios)} de {necessarios} votos
+          {Math.min(voters, required)} de {required} votos
         </span>
       </div>
       <div className="flex gap-1.5" aria-hidden="true">
-        {Array.from({ length: necessarios }, (_, i) => (
+        {Array.from({ length: required }, (_, i) => (
           <span
             key={i}
             className={cn(
               'h-1.5 flex-1 rounded-full transition-colors duration-500',
-              i < votantes ? 'bg-nova' : 'bg-muted',
+              i < voters ? 'bg-nova' : 'bg-muted',
             )}
           />
         ))}
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Registro recente, com poucos votos. A confiança aparece depois de {necessarios} votos.
+        Registro recente, com poucos votos. A confiança aparece depois de {required} votos.
       </p>
     </section>
   )

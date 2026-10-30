@@ -1,26 +1,26 @@
 import { Outlet } from 'react-router'
 
-import { useAplicarTema } from '@/common/hooks/use-tema'
-import { useRedirecionarEscolhaTema } from '@/features/aparencia'
+import { useApplyTheme } from '@/common/hooks/use-tema'
+import { useRedirectToThemeChoice } from '@/features/aparencia'
 
 import {
-  EntreParaContinuar,
-  useDescartarPendenciaAoSairDoLogin,
-  useSincronizarCacheComSessao,
+  LoginToContinue,
+  useDiscardPendingActionOnLeavingLogin,
+  useSyncCacheWithSession,
 } from '@/features/auth'
-import { useMonitorarLocalizacao, useRedirecionarPrePermissao } from '@/features/localizacao'
+import { useWatchLocation, useRedirectToPrePermission } from '@/features/localizacao'
 
-export function RaizLayout() {
-  useAplicarTema()
-  useMonitorarLocalizacao()
-  const temaEscolhido = useRedirecionarEscolhaTema()
-  useRedirecionarPrePermissao(temaEscolhido)
-  useSincronizarCacheComSessao()
-  useDescartarPendenciaAoSairDoLogin()
+export function RootLayout() {
+  useApplyTheme()
+  useWatchLocation()
+  const chosenTheme = useRedirectToThemeChoice()
+  useRedirectToPrePermission(chosenTheme)
+  useSyncCacheWithSession()
+  useDiscardPendingActionOnLeavingLogin()
   return (
     <>
       <Outlet />
-      <EntreParaContinuar />
+      <LoginToContinue />
     </>
   )
 }

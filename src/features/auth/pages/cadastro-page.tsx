@@ -3,89 +3,89 @@ import { useState, type ReactNode } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router'
 
-import { CampoSenha, CampoTexto } from '@/common/components/campo-texto'
-import { TelaComVoltar } from '@/common/components/tela-com-voltar'
+import { PasswordField, TextField } from '@/common/components/campo-texto'
+import { ScreenWithBack } from '@/common/components/tela-com-voltar'
 import { Button } from '@/common/ui/button'
 import { Checkbox } from '@/common/ui/checkbox'
 
-import { useCadastrar } from '../api/use-entrar'
-import { AvisoDialog } from '../components/aviso-dialog'
-import { aplicarErroAuth } from '../errors'
-import { useAposEntrar } from '../hooks/use-apos-entrar'
-import { useGuardaStore } from '../stores/guarda-store'
-import { cadastrarSchema, type CadastrarForm } from '../validators/auth'
+import { useRegister } from '../api/use-entrar'
+import { NoticeDialog } from '../components/aviso-dialog'
+import { applyAuthError } from '../errors'
+import { useAfterLogin } from '../hooks/use-apos-entrar'
+import { useGuardStore } from '../stores/guarda-store'
+import { registerSchema, type RegisterFormValues } from '../validators/auth'
 
-function LinkDocumento({ titulo, children }: { titulo: string; children: ReactNode }) {
+function DocumentLink({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <AvisoDialog
-      titulo={titulo}
-      gatilho={
+    <NoticeDialog
+      title={title}
+      trigger={
         <button type="button" className="text-primario underline underline-offset-2">
-          {titulo}
+          {title}
         </button>
       }
     >
       {children}
-    </AvisoDialog>
+    </NoticeDialog>
   )
 }
 
-export function CadastroPage() {
+export function RegisterPage() {
   const navigate = useNavigate()
-  const aposEntrar = useAposEntrar()
-  const cadastrar = useCadastrar()
-  const [erroGeral, setErroGeral] = useState<string | null>(null)
-  const { register, control, handleSubmit, setError, formState } = useForm<CadastrarForm>({
-    resolver: zodResolver(cadastrarSchema),
+  const afterLogin = useAfterLogin()
+  const registration = useRegister()
+  const [generalError, setGeneralError] = useState<string | null>(null)
+  const { register, control, handleSubmit, setError, formState } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
     defaultValues: { name: '', email: '', password: '', acceptedTerms: false },
   })
 
-  const enviar = handleSubmit((form) => {
-    setErroGeral(null)
-    cadastrar.mutate(form, {
-      onSuccess: aposEntrar,
-      onError: (erro) =>
-        setErroGeral(
-          aplicarErroAuth(erro, setError, ['name', 'email', 'password', 'acceptedTerms']),
+  const send = handleSubmit((form) => {
+    setGeneralError(null)
+    registration.mutate(form, {
+      onSuccess: afterLogin,
+      onError: (error) =>
+        setGeneralError(
+          applyAuthError(error, setError, ['name', 'email', 'password', 'acceptedTerms']),
         ),
     })
   })
 
-  function voltar() {
-    useGuardaStore.getState().descartar()
+  function goBack() {
+    useGuardStore.getState().discard()
     navigate(-1)
   }
 
-  const erroTermos = formState.errors.acceptedTerms?.message
+  const termsError = formState.errors.acceptedTerms?.message
 
   return (
-    <TelaComVoltar titulo="Criar conta" aoVoltar={voltar}>
-      <form onSubmit={enviar} noValidate className="flex flex-1 flex-col">
+    <ScreenWithBack title="Criar conta" onBack={goBack}>
+      <form onSubmit={send} noValidate className="flex flex-1 flex-col">
         <h2 className="mt-4 text-[28px] leading-9">Crie sua conta</h2>
         <p className="mb-6 text-sm text-muted-foreground">
           Com uma conta você registra ocorrências e avalia as que já estão no mapa.
         </p>
 
         <div className="space-y-6">
-          <CampoTexto
+          <TextField
             label="Nome"
             autoComplete="name"
-            erro={formState.errors.name?.message}
+            error={formState.errors.name?.message}
             {...register('name')}
           />
-          <CampoTexto
+          <TextField
             label="E-mail"
             type="email"
             autoComplete="email"
             inputMode="email"
-            erro={formState.errors.email?.message}
+            error={formState.errors.email?.message}
             {...register('email')}
           />
-          <CampoSenha
+          <PasswordField
             label="Senha"
             autoComplete="new-password"
-            ajuda="Mínimo de 8 caracteres"
-            erro={formState.errors.password?.message}
+            help="Mínimo de 8 caracteres"
+            error={formState.errors.password?.message}
             {...register('password')}
           />
         </div>
@@ -96,51 +96,51 @@ export function CadastroPage() {
             name="acceptedTerms"
             render={({ field }) => (
               <Checkbox
-                id="aceitou-termos"
+                id="accepted-terms"
                 ref={field.ref}
                 name={field.name}
                 checked={field.value}
-                onCheckedChange={(valor) => field.onChange(valor === true)}
+                onCheckedChange={(value) => field.onChange(value === true)}
                 onBlur={field.onBlur}
-                aria-invalid={erroTermos ? true : undefined}
-                aria-describedby={erroTermos ? 'aceitou-termos-erro' : undefined}
+                aria-invalid={termsError ? true : undefined}
+                aria-describedby={termsError ? 'accepted-terms-error' : undefined}
                 className="mt-0.5"
               />
             )}
           />
           <div>
-            <label htmlFor="aceitou-termos">Li e aceito os </label>
-            <LinkDocumento titulo="Termos de uso">
+            <label htmlFor="accepted-terms">Li e aceito os </label>
+            <DocumentLink title="Termos de uso">
               <p>
                 O sistema é um protótipo acadêmico (TCC). Registre apenas ocorrências reais e evite
                 dados pessoais nas descrições.
               </p>
               <p>Registros e votos podem ser usados de forma agregada na pesquisa.</p>
-            </LinkDocumento>{' '}
+            </DocumentLink>{' '}
             e a{' '}
-            <LinkDocumento titulo="Política de privacidade">
+            <DocumentLink title="Política de privacidade">
               <p>
                 Guardamos seu nome, e-mail e seus registros e votos. Sua localização serve só para
                 calcular a distância do voto e é descartada; incidentes são anônimos e agregados.
               </p>
-            </LinkDocumento>
-            {erroTermos && (
-              <p id="aceitou-termos-erro" className="mt-1 text-xs text-destructive">
-                {erroTermos}
+            </DocumentLink>
+            {termsError && (
+              <p id="accepted-terms-error" className="mt-1 text-xs text-destructive">
+                {termsError}
               </p>
             )}
           </div>
         </div>
 
-        {erroGeral && (
+        {generalError && (
           <p role="alert" className="mt-4 text-sm text-destructive">
-            {erroGeral}
+            {generalError}
           </p>
         )}
 
         <div className="mt-auto pt-10">
-          <Button type="submit" className="w-full" carregando={cadastrar.isPending}>
-            {cadastrar.isPending ? 'Criando conta…' : 'Criar conta'}
+          <Button type="submit" className="w-full" loading={registration.isPending}>
+            {registration.isPending ? 'Criando conta…' : 'Criar conta'}
           </Button>
           <p className="mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground">
             Já tem conta?
@@ -154,6 +154,6 @@ export function CadastroPage() {
           </p>
         </div>
       </form>
-    </TelaComVoltar>
+    </ScreenWithBack>
   )
 }

@@ -1,28 +1,28 @@
-import type { ItemHistorico } from './historico'
-import { agruparPorPeriodo, tituloItem } from './historico'
+import type { HistoryItem } from './historico'
+import { groupByPeriod, itemTitle } from './historico'
 
-const agora = new Date('2026-10-06T12:00:00')
-const item = (data: string, extra: Partial<ItemHistorico> = {}) =>
+const now = new Date('2026-10-06T12:00:00')
+const item = (data: string, extra: Partial<HistoryItem> = {}) =>
   ({
     type: 'vote',
     value: 'yes',
     category: { id: 1, name: 'Buraco na via', group: 'viaPublica', icon: 'buraco' },
     date: data,
     ...extra,
-  }) as ItemHistorico
+  }) as HistoryItem
 
-describe('histórico', () => {
-  it('agrupa em Hoje, Ontem, Esta semana e Anteriores', () => {
-    const grupos = agruparPorPeriodo(
+describe('history', () => {
+  it('groups into Hoje, Ontem, Esta semana and Anteriores', () => {
+    const groups = groupByPeriod(
       [
         item('2026-10-06T09:41:00'),
         item('2026-10-05T19:40:00'),
         item('2026-10-02T10:00:00'),
         item('2026-09-20T10:00:00'),
       ],
-      agora,
+      now,
     )
-    expect(grupos.map((g) => [g.titulo, g.items.length])).toEqual([
+    expect(groups.map((g) => [g.title, g.items.length])).toEqual([
       ['Hoje', 1],
       ['Ontem', 1],
       ['Esta semana', 1],
@@ -30,11 +30,11 @@ describe('histórico', () => {
     ])
   })
 
-  it('descreve cada tipo como no protótipo', () => {
-    expect(tituloItem(item('x'))).toBe('Disse que está lá · Buraco na via')
-    expect(tituloItem(item('x', { value: 'no' }))).toBe('Disse que não está lá · Buraco na via')
+  it('describes each type as in the prototype', () => {
+    expect(itemTitle(item('x'))).toBe('Disse que está lá · Buraco na via')
+    expect(itemTitle(item('x', { value: 'no' }))).toBe('Disse que não está lá · Buraco na via')
     expect(
-      tituloItem(
+      itemTitle(
         item('x', {
           type: 'incidentReport',
           value: null,

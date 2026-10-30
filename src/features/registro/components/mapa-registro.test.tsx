@@ -1,57 +1,57 @@
 import { act, screen } from '@testing-library/react'
 
-import { distanciaTexto } from '@/common/lib/formatacao'
-import type { CategoriaResumo } from '@/features/categorias'
-import { mapaFalso } from '@/test/maplibre-falso'
-import { renderizar } from '@/test/render'
+import { distanceText } from '@/common/lib/formatacao'
+import type { CategorySummary } from '@/features/categorias'
+import { fakeMap } from '@/test/maplibre-falso'
+import { renderWithProviders } from '@/test/render'
 
-import { useRascunhoStore } from '../stores/rascunho-store'
-import { MapaRegistro } from './mapa-registro'
+import { useDraftStore } from '../stores/rascunho-store'
+import { ReportMap } from './mapa-registro'
 
-const buraco: CategoriaResumo = {
+const buraco: CategorySummary = {
   id: 1,
   name: 'Buraco na via',
   group: 'viaPublica',
   icon: 'buraco',
 }
 
-afterEach(() => useRascunhoStore.getState().limpar())
+afterEach(() => useDraftStore.getState().clear())
 
-describe('MapaRegistro', () => {
-  it('modo pino grava o centro do mapa como local ao parar de mover', () => {
-    renderizar(<MapaRegistro modo="pino" category={buraco} />)
+describe('ReportMap', () => {
+  it('pin mode saves the map center as the location when it stops moving', () => {
+    renderWithProviders(<ReportMap mode="pin" category={buraco} />)
 
-    act(() => mapaFalso.mover({ lat: -22.95, lng: -43.18 }))
+    act(() => fakeMap.move({ lat: -22.95, lng: -43.18 }))
 
-    expect(useRascunhoStore.getState().local).toEqual({ lat: -22.95, lng: -43.18 })
+    expect(useDraftStore.getState().location).toEqual({ lat: -22.95, lng: -43.18 })
   })
 
-  it('moveend com o mesmo centro (redimensionar) não troca o local', () => {
-    renderizar(<MapaRegistro modo="pino" category={buraco} />)
-    act(() => mapaFalso.mover({ lat: -22.95, lng: -43.18 }))
-    const antes = useRascunhoStore.getState().local
+  it('moveend with the same center (resize) does not change the location', () => {
+    renderWithProviders(<ReportMap mode="pin" category={buraco} />)
+    act(() => fakeMap.move({ lat: -22.95, lng: -43.18 }))
+    const before = useDraftStore.getState().location
 
-    act(() => mapaFalso.mover({ lat: -22.95, lng: -43.18 }))
+    act(() => fakeMap.move({ lat: -22.95, lng: -43.18 }))
 
-    expect(useRascunhoStore.getState().local).toBe(antes)
+    expect(useDraftStore.getState().location).toBe(before)
   })
 
-  it('modo área desenha o raio de 150 m', () => {
-    renderizar(<MapaRegistro modo="area" />)
+  it('area mode draws the 150 m radius', () => {
+    renderWithProviders(<ReportMap mode="area" />)
 
-    expect(screen.getByTestId('fonte-registro-area')).toHaveAttribute('data-pontos', '1')
+    expect(screen.getByTestId('source-report-area')).toHaveAttribute('data-pontos', '1')
   })
 
-  it('conferência mostra a distância entre os pinos', () => {
-    renderizar(
-      <MapaRegistro
-        modo="conferencia"
-        novo={{ lat: -22.9519, lng: -43.1866 }}
-        existente={{ lat: -22.9521, lng: -43.1867, category: buraco, distanceMeters: 30 }}
+  it('duplicate check shows the distance between the pins', () => {
+    renderWithProviders(
+      <ReportMap
+        mode="duplicateCheck"
+        newPoint={{ lat: -22.9519, lng: -43.1866 }}
+        existing={{ lat: -22.9521, lng: -43.1867, category: buraco, distanceMeters: 30 }}
       />,
     )
 
-    expect(screen.getByText(distanciaTexto(30))).toBeInTheDocument()
-    expect(screen.getAllByTestId('marcador').length).toBeGreaterThanOrEqual(2)
+    expect(screen.getByText(distanceText(30))).toBeInTheDocument()
+    expect(screen.getAllByTestId('marker').length).toBeGreaterThanOrEqual(2)
   })
 })

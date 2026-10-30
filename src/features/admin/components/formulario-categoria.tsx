@@ -1,107 +1,96 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 
-import { CampoTexto } from '@/common/components/campo-texto'
-import { ChipFiltro } from '@/common/components/chip-filtro'
-import { Segmentado } from '@/common/components/segmentado'
+import { TextField } from '@/common/components/campo-texto'
+import { FilterChip } from '@/common/components/chip-filtro'
+import { SegmentedControl } from '@/common/components/segmentado'
 import { Button } from '@/common/ui/button'
-import { aparenciaDaCor, gruposDoTipo, PontoGrupo, type Grupo } from '@/features/categorias'
+import { colorAppearance, groupsOfType, GroupDot, type Group } from '@/features/categorias'
 
-import {
-  useCriarCategoria,
-  useEditarCategoria,
-  type CategoriaAdmin,
-} from '../api/use-categorias-admin'
-import { mensagemErroCategorias } from '../errors'
-import { ajudaDoTipo, opcoesDeTipo } from '../models/tipo'
-import { EtiquetaTipo } from './etiqueta-tipo'
-import { categoriaSchema, type CategoriaForm } from '../validators/categoria'
-import { SeletorIcone } from './seletor-icone'
+import { useCreateCategory, useEditCategory, type AdminCategory } from '../api/use-categorias-admin'
+import { categoryErrorMessage } from '../errors'
+import { typeHelp, typeOptions } from '../models/tipo'
+import { TypeLabel } from './etiqueta-tipo'
+import { categorySchema, type CategoryFormValues } from '../validators/categoria'
+import { IconPicker } from './seletor-icone'
 
-interface FormularioCategoriaProps {
-  category?: CategoriaAdmin
-  grupos: Grupo[]
-  aoConcluir(): void
+interface CategoryFormProps {
+  category?: AdminCategory
+  groups: Group[]
+  onDone(): void
 }
 
-export function FormularioCategoria({
-  category: categoria,
-  grupos,
-  aoConcluir,
-}: FormularioCategoriaProps) {
-  const criar = useCriarCategoria()
-  const editar = useEditarCategoria()
-  const mutacao = categoria ? editar : criar
-  const { register, handleSubmit, control, setValue, formState } = useForm<CategoriaForm>({
-    resolver: zodResolver(categoriaSchema),
+export function CategoryForm({ category, groups, onDone }: CategoryFormProps) {
+  const create = useCreateCategory()
+  const edit = useEditCategory()
+  const mutation = category ? edit : create
+  const { register, handleSubmit, control, setValue, formState } = useForm<CategoryFormValues>({
+    resolver: zodResolver(categorySchema),
     defaultValues: {
-      name: categoria?.name ?? '',
-      type: categoria?.type ?? 'issue',
-      group: categoria?.group ?? '',
-      icon: categoria?.icon ?? '',
+      name: category?.name ?? '',
+      type: category?.type ?? 'issue',
+      group: category?.group ?? '',
+      icon: category?.icon ?? '',
     },
   })
-  const [tipo, grupo, icone] = useWatch({ control, name: ['type', 'group', 'icon'] })
-  const doTipo = gruposDoTipo(grupos, tipo)
+  const [type, group, icon] = useWatch({ control, name: ['type', 'group', 'icon'] })
+  const ofType = groupsOfType(groups, type)
 
-  const enviar = handleSubmit((form) => {
-    const opcoes = { onSuccess: aoConcluir }
-    if (categoria) {
-      editar.mutate(
-        { id: categoria.id, name: form.name, group: form.group, icon: form.icon },
-        opcoes,
-      )
+  const send = handleSubmit((form) => {
+    const options = { onSuccess: onDone }
+    if (category) {
+      edit.mutate({ id: category.id, name: form.name, group: form.group, icon: form.icon }, options)
     } else {
-      criar.mutate(form, opcoes)
+      create.mutate(form, options)
     }
   })
 
   return (
-    <form onSubmit={enviar} noValidate className="mt-2 space-y-5">
-      <CampoTexto
+    <form onSubmit={send} noValidate className="mt-2 space-y-5">
+      <TextField
         label="Nome"
         maxLength={60}
-        erro={formState.errors.name?.message}
+        error={formState.errors.name?.message}
         {...register('name')}
       />
 
       <div className="space-y-2">
         <p className="text-sm font-medium">Tipo</p>
-        {categoria ? (
+        {category ? (
           <p className="text-sm text-muted-foreground">
-            <EtiquetaTipo type={categoria.type} className="mr-2" />O tipo não muda depois de criada.
+            <TypeLabel type={category.type} className="mr-2" />O tipo não muda depois de criada.
           </p>
         ) : (
-          <Segmentado
+          <SegmentedControl
             label="Tipo"
-            opcoes={opcoesDeTipo}
-            value={tipo}
-            aoMudar={(valor) => {
-              setValue('type', valor)
+            options={typeOptions}
+            value={type}
+            onChange={(value) => {
+              setValue('type', value)
               setValue('group', '')
             }}
           />
         )}
-        <p className="text-xs text-muted-foreground">{ajudaDoTipo[categoria?.type ?? tipo]}</p>
+        <p className="text-xs text-muted-foreground">{typeHelp[category?.type ?? type]}</p>
       </div>
 
       <div className="space-y-2">
         <p className="text-sm font-medium">Grupo</p>
-        {doTipo.length === 0 ? (
+        {ofType.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             Ainda não há grupo desse tipo. Crie um na aba Grupos.
           </p>
         ) : (
           <div role="group" aria-label="Grupo" className="flex flex-wrap gap-2">
-            {doTipo.map((g) => (
-              <ChipFiltro
+            {ofType.map((g) => (
+              <FilterChip
                 key={g.key}
-                selecionado={g.key === grupo}
-                aoClicar={() => setValue('group', g.key, { shouldValidate: true })}
+                selected={g.key === group}
+                onClick={() => setValue('group', g.key, { shouldValidate: true })}
               >
-                <PontoGrupo color={aparenciaDaCor[g.color]} />
+                <GroupDot color={colorAppearance[g.color]} />
                 {g.label}
-              </ChipFiltro>
+              </FilterChip>
             ))}
           </div>
         )}
@@ -114,24 +103,24 @@ export function FormularioCategoria({
 
       <div className="space-y-2">
         <p className="text-sm font-medium">Ícone</p>
-        <SeletorIcone
-          value={icone}
-          aoMudar={(nome) => setValue('icon', nome, { shouldValidate: true })}
-          erro={formState.errors.icon?.message}
+        <IconPicker
+          value={icon}
+          onChange={(name) => setValue('icon', name, { shouldValidate: true })}
+          error={formState.errors.icon?.message}
         />
       </div>
 
-      {mutacao.isError && (
+      {mutation.isError && (
         <p role="alert" className="text-sm text-destructive">
-          {mensagemErroCategorias(mutacao.error)}
+          {categoryErrorMessage(mutation.error)}
         </p>
       )}
       <div className="flex gap-3">
-        <Button type="button" variant="outline" className="flex-1" onClick={aoConcluir}>
+        <Button type="button" variant="outline" className="flex-1" onClick={onDone}>
           Cancelar
         </Button>
-        <Button type="submit" className="flex-1" carregando={mutacao.isPending}>
-          {mutacao.isPending ? 'Salvando…' : 'Salvar'}
+        <Button type="submit" className="flex-1" loading={mutation.isPending}>
+          {mutation.isPending ? 'Salvando…' : 'Salvar'}
         </Button>
       </div>
     </form>

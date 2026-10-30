@@ -6,50 +6,50 @@ import {
 } from '@tanstack/react-query'
 
 import { meQuery } from '@/features/usuarios'
-import type { StatusVerificacao } from '@/features/verificacao'
-import { api, dados, semConteudo } from '@/infrastructure/api'
+import type { VerificationStatus } from '@/features/verificacao'
+import { api, unwrapData, unwrapEmpty } from '@/infrastructure/api'
 
-const TAMANHO_PAGINA = 20
+const PAGE_SIZE = 20
 
-export function filaQuery(status: StatusVerificacao) {
+export function queueQuery(status: VerificationStatus) {
   return infiniteQueryOptions({
-    queryKey: ['admin', 'verificacoes', status],
+    queryKey: ['admin', 'verifications', status],
     queryFn: ({ pageParam, signal }) =>
       api
         .GET('/admin/verifications', {
-          params: { query: { status, page: pageParam, pageSize: TAMANHO_PAGINA } },
+          params: { query: { status, page: pageParam, pageSize: PAGE_SIZE } },
           signal,
         })
-        .then(dados),
+        .then(unwrapData),
     initialPageParam: 1,
-    getNextPageParam: ({ page: pagina, pageSize: tamanho, total }) =>
-      pagina * tamanho < total ? pagina + 1 : undefined,
+    getNextPageParam: ({ page, pageSize: size, total }) =>
+      page * size < total ? page + 1 : undefined,
   })
 }
 
-export function useFila(status: StatusVerificacao) {
-  return useInfiniteQuery(filaQuery(status))
+export function useQueue(status: VerificationStatus) {
+  return useInfiniteQuery(queueQuery(status))
 }
 
-type Analise =
-  { id: string; decisao: 'aprovar' } | { id: string; decisao: 'recusar'; reason: string }
+type Review =
+  { id: string; decision: 'approve' } | { id: string; decision: 'reject'; reason: string }
 
-export function useAnalisarVerificacao() {
+export function useReviewVerification() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (analise: Analise) =>
-      analise.decisao === 'aprovar'
+    mutationFn: (review: Review) =>
+      review.decision === 'approve'
         ? api
-            .POST('/admin/verifications/{id}/approve', { params: { path: { id: analise.id } } })
-            .then(semConteudo)
+            .POST('/admin/verifications/{id}/approve', { params: { path: { id: review.id } } })
+            .then(unwrapEmpty)
         : api
             .POST('/admin/verifications/{id}/reject', {
-              params: { path: { id: analise.id } },
-              body: { reason: analise.reason },
+              params: { path: { id: review.id } },
+              body: { reason: review.reason },
             })
-            .then(semConteudo),
+            .then(unwrapEmpty),
     onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: ['admin', 'verificacoes'] })
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'verifications'] })
       void queryClient.invalidateQueries({ queryKey: meQuery.queryKey })
     },
   })

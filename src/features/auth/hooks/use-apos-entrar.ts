@@ -1,13 +1,13 @@
 import { useLocation, useNavigate } from 'react-router'
 
-import { useGuardaStore } from '../stores/guarda-store'
+import { useGuardStore } from '../stores/guarda-store'
 
-export function useAposEntrar() {
+export function useAfterLogin() {
   const navigate = useNavigate()
   const location = useLocation()
   return () => {
-    const retorno = useGuardaStore.getState().concluirLogin()
+    const returnTo = useGuardStore.getState().completeLogin()
     const de = (location.state as { de?: string } | null)?.de
-    navigate(retorno ?? de ?? '/mapa', { replace: true })
+    navigate(returnTo ?? de ?? '/mapa', { replace: true })
   }
 }

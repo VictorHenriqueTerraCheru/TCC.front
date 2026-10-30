@@ -1,3 +1,3 @@
-export { ConfiguracoesPage } from './pages/configuracoes-page'
-export { HistoricoPage } from './pages/historico-page'
-export { PerfilPage } from './pages/perfil-page'
+export { SettingsPage } from './pages/configuracoes-page'
+export { HistoryPage } from './pages/historico-page'
+export { ProfilePage } from './pages/perfil-page'

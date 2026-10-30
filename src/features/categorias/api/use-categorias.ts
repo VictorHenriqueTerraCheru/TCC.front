@@ -1,13 +1,13 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-import { api, dados } from '@/infrastructure/api'
+import { api, unwrapData } from '@/infrastructure/api'
 
-export const categoriasQuery = queryOptions({
-  queryKey: ['categorias'],
-  queryFn: ({ signal }) => api.GET('/categories', { signal }).then(dados),
+export const categoriesQuery = queryOptions({
+  queryKey: ['categories'],
+  queryFn: ({ signal }) => api.GET('/categories', { signal }).then(unwrapData),
   staleTime: 5 * 60_000,
 })
 
-export function useCategorias() {
-  return useQuery(categoriasQuery)
+export function useCategories() {
+  return useQuery(categoriesQuery)
 }

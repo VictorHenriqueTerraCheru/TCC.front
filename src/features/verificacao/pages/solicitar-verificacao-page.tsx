@@ -2,61 +2,61 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { Navigate, useNavigate } from 'react-router'
 
-import { CampoAreaTexto, CampoSelecao } from '@/common/components/campo-texto'
-import { Icone } from '@/common/components/icone'
-import { TelaComVoltar } from '@/common/components/tela-com-voltar'
+import { TextAreaField, SelectField } from '@/common/components/campo-texto'
+import { Icon } from '@/common/components/icone'
+import { ScreenWithBack } from '@/common/components/tela-com-voltar'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { useAutenticado } from '@/features/auth'
+import { useAuthenticated } from '@/features/auth'
 import { useMe } from '@/features/usuarios'
 
-import { useSolicitarVerificacao } from '../api/use-solicitar'
-import { mensagemErroVerificacao } from '../errors'
-import { rotuloVinculo, tiposVinculo } from '../models/verificacao'
-import { solicitarSchema, type SolicitarForm } from '../validators/solicitar'
+import { useRequestVerification } from '../api/use-solicitar'
+import { verificationErrorMessage } from '../errors'
+import { affiliationLabel, affiliationTypes } from '../models/verificacao'
+import { requestSchema, type RequestFormValues } from '../validators/solicitar'
 
-const LIMITE = 500
+const LIMIT = 500
 
-export function SolicitarVerificacaoPage() {
+export function RequestVerificationPage() {
   const navigate = useNavigate()
-  const autenticado = useAutenticado()
+  const authenticated = useAuthenticated()
   const { data: me, isPending } = useMe()
-  const solicitar = useSolicitarVerificacao()
-  const { register, handleSubmit, control, formState } = useForm<SolicitarForm>({
-    resolver: zodResolver(solicitarSchema),
+  const request = useRequestVerification()
+  const { register, handleSubmit, control, formState } = useForm<RequestFormValues>({
+    resolver: zodResolver(requestSchema),
     defaultValues: { affiliationType: 'livesInArea', justification: '' },
   })
-  const justificativa = useWatch({ control, name: 'justification' })
+  const justification = useWatch({ control, name: 'justification' })
 
-  if (!autenticado) return <Navigate to="/login" replace state={{ de: '/perfil/verificacao' }} />
+  if (!authenticated) return <Navigate to="/login" replace state={{ de: '/perfil/verificacao' }} />
   if (me && me.role !== 'citizen') return <Navigate to="/perfil" replace />
 
-  const enviar = handleSubmit((form) =>
-    solicitar.mutate(
+  const send = handleSubmit((form) =>
+    request.mutate(
       { affiliationType: form.affiliationType, justification: form.justification },
       { onSuccess: () => navigate('/perfil', { replace: true }) },
     ),
   )
-  const recusa = me?.verification?.status === 'rejected' ? me.verification : null
-  const pendente = me?.verification?.status === 'pending'
+  const rejection = me?.verification?.status === 'rejected' ? me.verification : null
+  const pending = me?.verification?.status === 'pending'
 
   return (
     <div className="mx-auto h-full w-full lg:max-w-3xl">
-      <TelaComVoltar titulo="Solicitar verificação" aoVoltar={() => navigate('/perfil')}>
+      <ScreenWithBack title="Solicitar verificação" onBack={() => navigate('/perfil')}>
         {isPending ? (
           <Skeleton className="h-60 rounded-2xl bg-muted" />
         ) : (
-          <form onSubmit={enviar} noValidate className="flex flex-1 flex-col">
-            {recusa && (
+          <form onSubmit={send} noValidate className="flex flex-1 flex-col">
+            {rejection && (
               <div
                 role="status"
                 className="mb-4 flex gap-3 rounded-2xl bg-destructive/15 p-4 text-destructive"
               >
-                <Icone name="cancel" preenchido className="text-[22px] text-destructive" />
+                <Icon name="cancel" filled className="text-[22px] text-destructive" />
                 <div className="text-sm">
                   <p className="text-xs">Último pedido</p>
                   <p className="text-base font-medium">Recusada</p>
-                  {recusa.rejectionReason && <p>Motivo: {recusa.rejectionReason}</p>}
+                  {rejection.rejectionReason && <p>Motivo: {rejection.rejectionReason}</p>}
                   <p>Você pode enviar um novo pedido.</p>
                 </div>
               </div>
@@ -66,7 +66,7 @@ export function SolicitarVerificacaoPage() {
               pedido é analisado pela equipe de moderação.
             </p>
 
-            {pendente ? (
+            {pending ? (
               <p className="rounded-2xl bg-card p-4 text-sm shadow-1">
                 Você já tem um pedido em análise. Assim que a moderação responder, o resultado
                 aparece no seu perfil.
@@ -74,36 +74,36 @@ export function SolicitarVerificacaoPage() {
             ) : (
               <>
                 <div className="space-y-6">
-                  <CampoSelecao label="Tipo de vínculo" {...register('affiliationType')}>
-                    {tiposVinculo.map((tipo) => (
-                      <option key={tipo} value={tipo}>
-                        {rotuloVinculo[tipo]}
+                  <SelectField label="Tipo de vínculo" {...register('affiliationType')}>
+                    {affiliationTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {affiliationLabel[type]}
                       </option>
                     ))}
-                  </CampoSelecao>
-                  <CampoAreaTexto
+                  </SelectField>
+                  <TextAreaField
                     label="Justificativa *"
                     placeholder="Ex.: moro na Rua São Clemente há 8 anos e passo pelo trecho todos os dias."
-                    maximo={LIMITE}
-                    valorAtual={justificativa}
-                    erro={formState.errors.justification?.message}
-                    ajuda="Conte seu vínculo com a região (mínimo de 30 caracteres)."
+                    maximum={LIMIT}
+                    currentValue={justification}
+                    error={formState.errors.justification?.message}
+                    help="Conte seu vínculo com a região (mínimo de 30 caracteres)."
                     {...register('justification')}
                   />
                 </div>
-                {solicitar.error && (
+                {request.error && (
                   <p role="alert" className="mt-4 text-sm text-destructive">
-                    {mensagemErroVerificacao(solicitar.error)}
+                    {verificationErrorMessage(request.error)}
                   </p>
                 )}
-                <Button type="submit" className="mt-auto w-full" carregando={solicitar.isPending}>
-                  {solicitar.isPending ? 'Enviando…' : 'Enviar pedido'}
+                <Button type="submit" className="mt-auto w-full" loading={request.isPending}>
+                  {request.isPending ? 'Enviando…' : 'Enviar pedido'}
                 </Button>
               </>
             )}
           </form>
         )}
-      </TelaComVoltar>
+      </ScreenWithBack>
     </div>
   )
 }

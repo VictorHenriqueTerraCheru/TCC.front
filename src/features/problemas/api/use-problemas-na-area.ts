@@ -1,43 +1,43 @@
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query'
 
-import { api, dados } from '@/infrastructure/api'
+import { api, unwrapData } from '@/infrastructure/api'
 
-import type { StatusProblema } from '../models/problema'
+import type { IssueStatus } from '../models/problema'
 
-export interface FiltroProblemasNaArea {
+export interface IssuesInAreaFilter {
   minLat: number
   minLng: number
   maxLat: number
   maxLng: number
-  grupos: string[]
-  status: StatusProblema[]
+  groups: string[]
+  status: IssueStatus[]
 }
 
-export function problemasNaAreaQuery({ grupos, status, ...retangulo }: FiltroProblemasNaArea) {
+export function issuesInAreaQuery({ groups, status, ...bounds }: IssuesInAreaFilter) {
   return queryOptions({
-    queryKey: ['problemas', 'area', retangulo, { grupos, status }],
+    queryKey: ['issues', 'area', bounds, { groups, status }],
     queryFn: ({ signal }) =>
       api
         .GET('/issues', {
           params: {
             query: {
-              ...retangulo,
-              groups: grupos.length ? grupos.join(',') : undefined,
+              ...bounds,
+              groups: groups.length ? groups.join(',') : undefined,
               status: status.length ? status.join(',') : undefined,
             },
           },
           signal,
         })
-        .then(dados),
+        .then(unwrapData),
   })
 }
 
-export function useProblemasNaArea(filtro: FiltroProblemasNaArea | null) {
+export function useIssuesInArea(filter: IssuesInAreaFilter | null) {
   return useQuery({
-    ...problemasNaAreaQuery(
-      filtro ?? { minLat: 0, minLng: 0, maxLat: 0, maxLng: 0, grupos: [], status: [] },
+    ...issuesInAreaQuery(
+      filter ?? { minLat: 0, minLng: 0, maxLat: 0, maxLng: 0, groups: [], status: [] },
     ),
-    enabled: filtro !== null,
+    enabled: filter !== null,
     placeholderData: keepPreviousData,
   })
 }

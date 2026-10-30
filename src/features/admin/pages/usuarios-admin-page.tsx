@@ -1,53 +1,53 @@
 import { useState } from 'react'
 
-import { CampoBusca } from '@/common/components/campo-busca'
-import { ListaInfinita } from '@/common/components/lista-infinita'
-import { Segmentado } from '@/common/components/segmentado'
+import { SearchField } from '@/common/components/campo-busca'
+import { InfiniteList } from '@/common/components/lista-infinita'
+import { SegmentedControl } from '@/common/components/segmentado'
 import { useDebouncedValue } from '@/common/hooks/use-debounced-value'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { useMe, type Perfil } from '@/features/usuarios'
+import { useMe, type Role } from '@/features/usuarios'
 
-import { useUsuariosAdmin } from '../api/use-usuarios-admin'
-import { CartaoUsuario } from '../components/cartao-usuario'
-import { GuardaAdmin } from '../components/guarda-admin'
+import { useAdminUsers } from '../api/use-usuarios-admin'
+import { UserCard } from '../components/cartao-usuario'
+import { AdminGuard } from '../components/guarda-admin'
 
-type FiltroPerfil = Perfil | 'todos'
+type RoleFilter = Role | 'all'
 
-const filtros: { value: FiltroPerfil; label: string }[] = [
-  { value: 'todos', label: 'Todos' },
+const filters: { value: RoleFilter; label: string }[] = [
+  { value: 'all', label: 'Todos' },
   { value: 'citizen', label: 'Cidadão' },
   { value: 'verifiedCitizen', label: 'Verificado' },
   { value: 'administrator', label: 'Admin' },
 ]
 
-function ListaUsuarios() {
-  const [busca, setBusca] = useState('')
-  const [perfil, setPerfil] = useState<FiltroPerfil>('todos')
-  const buscaAtrasada = useDebouncedValue(busca.trim(), 300)
-  const usuarios = useUsuariosAdmin({
-    busca: buscaAtrasada,
-    role: perfil === 'todos' ? null : perfil,
+function UserList() {
+  const [search, setSearch] = useState('')
+  const [role, setRole] = useState<RoleFilter>('all')
+  const debouncedSearch = useDebouncedValue(search.trim(), 300)
+  const users = useAdminUsers({
+    search: debouncedSearch,
+    role: role === 'all' ? null : role,
   })
   const { data: me } = useMe()
 
-  const total = usuarios.data?.pages[0]?.total
-  const itens = usuarios.data?.pages.flatMap((p) => p.items) ?? []
+  const total = users.data?.pages[0]?.total
+  const items = users.data?.pages.flatMap((p) => p.items) ?? []
 
   return (
     <>
       <div className="mb-4 space-y-3">
-        <CampoBusca
-          value={busca}
-          aoMudar={setBusca}
+        <SearchField
+          value={search}
+          onChange={setSearch}
           label="Buscar usuário"
           placeholder="Buscar por nome ou e-mail"
         />
-        <Segmentado<FiltroPerfil>
+        <SegmentedControl<RoleFilter>
           label="Perfil"
-          opcoes={filtros}
-          value={perfil}
-          aoMudar={setPerfil}
+          options={filters}
+          value={role}
+          onChange={setRole}
         />
         {total !== undefined && (
           <p className="text-sm text-muted-foreground">
@@ -56,36 +56,36 @@ function ListaUsuarios() {
         )}
       </div>
 
-      {usuarios.isPending ? (
+      {users.isPending ? (
         <Skeleton className="h-40 rounded-2xl bg-muted" />
-      ) : usuarios.isError ? (
+      ) : users.isError ? (
         <div role="alert" className="space-y-3 py-6">
           <p>Não foi possível carregar os usuários.</p>
-          <Button variant="outline" size="sm" onClick={() => void usuarios.refetch()}>
+          <Button variant="outline" size="sm" onClick={() => void users.refetch()}>
             Tentar novamente
           </Button>
         </div>
-      ) : itens.length === 0 ? (
+      ) : items.length === 0 ? (
         <p className="py-10 text-center text-sm text-muted-foreground">
           Nenhum usuário encontrado.
         </p>
       ) : (
-        <ListaInfinita consulta={usuarios}>
+        <InfiniteList query={users}>
           <div className="space-y-3">
-            {itens.map((u) => (
-              <CartaoUsuario key={u.id} user={u} ehVoce={u.id === me?.id} />
+            {items.map((u) => (
+              <UserCard key={u.id} user={u} isSelf={u.id === me?.id} />
             ))}
           </div>
-        </ListaInfinita>
+        </InfiniteList>
       )}
     </>
   )
 }
 
-export function UsuariosAdminPage() {
+export function AdminUsersPage() {
   return (
-    <GuardaAdmin titulo="Usuários" caminho="/admin/usuarios">
-      <ListaUsuarios />
-    </GuardaAdmin>
+    <AdminGuard title="Usuários" path="/admin/usuarios">
+      <UserList />
+    </AdminGuard>
   )
 }

@@ -1,63 +1,62 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-import type { ProvedorAutenticacao } from '@/infrastructure/api'
+import type { AuthProvider } from '@/infrastructure/api'
 
-import type { RespostaAuth, Sessao } from '../models/sessao'
-import { useGuardaStore } from './guarda-store'
+import type { AuthResponse, Session } from '../models/sessao'
+import { useGuardStore } from './guarda-store'
 
-interface SessaoState {
-  sessao: Sessao | null
-  entrar(resposta: RespostaAuth): void
-  sair(): void
+interface SessionState {
+  session: Session | null
+  login(response: AuthResponse): void
+  logout(): void
 }
 
-export const useSessaoStore = create<SessaoState>()(
+export const useSessionStore = create<SessionState>()(
   persist(
     (set) => ({
-      sessao: null,
-      entrar: ({ token, expiresAt: expiraEm, user: usuario }) =>
-        set({ sessao: { token, expiresAt: expiraEm, user: usuario } }),
-      sair: () => set({ sessao: null }),
+      session: null,
+      login: ({ token, expiresAt, user }) => set({ session: { token, expiresAt, user } }),
+      logout: () => set({ session: null }),
     }),
     {
       name: 'ocorrencias.sessao',
       storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (estado) => {
-        if (estado?.sessao && expirou(estado.sessao)) {
-          estado.sair()
-          useGuardaStore.setState({ expirou: true })
+      onRehydrateStorage: () => (state) => {
+        if (state?.session && expired(state.session)) {
+          state.logout()
+          useGuardStore.setState({ expired: true })
         }
       },
     },
   ),
 )
 
-function expirou(sessao: Sessao): boolean {
-  return Date.parse(sessao.expiresAt) <= Date.now()
+function expired(session: Session): boolean {
+  return Date.parse(session.expiresAt) <= Date.now()
 }
 
-export function sessaoAtual(): Sessao | null {
-  const { sessao, sair } = useSessaoStore.getState()
-  if (!sessao) return null
-  if (expirou(sessao)) {
-    sair()
-    useGuardaStore.setState({ expirou: true })
+export function currentSession(): Session | null {
+  const { session, logout } = useSessionStore.getState()
+  if (!session) return null
+  if (expired(session)) {
+    logout()
+    useGuardStore.setState({ expired: true })
     return null
   }
-  return sessao
+  return session
 }
 
-export const provedorAutenticacao: ProvedorAutenticacao = {
-  obterToken() {
-    return sessaoAtual()?.token ?? null
+export const authProvider: AuthProvider = {
+  getToken() {
+    return currentSession()?.token ?? null
   },
-  aoExpirarSessao() {
-    useSessaoStore.getState().sair()
-    useGuardaStore.setState({ expirou: true })
+  onSessionExpired() {
+    useSessionStore.getState().logout()
+    useGuardStore.setState({ expired: true })
   },
 }
 
-export function useAutenticado(): boolean {
-  return useSessaoStore((s) => s.sessao !== null)
+export function useAuthenticated(): boolean {
+  return useSessionStore((s) => s.session !== null)
 }

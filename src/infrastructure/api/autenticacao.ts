@@ -1,17 +1,17 @@
-export interface ProvedorAutenticacao {
-  obterToken(): string | null
-  aoExpirarSessao(): void
+export interface AuthProvider {
+  getToken(): string | null
+  onSessionExpired(): void
 }
 
-let provedor: ProvedorAutenticacao = {
-  obterToken: () => null,
-  aoExpirarSessao: () => {},
+let provider: AuthProvider = {
+  getToken: () => null,
+  onSessionExpired: () => {},
 }
 
-export function registrarAutenticacao(novo: ProvedorAutenticacao) {
-  provedor = novo
+export function registerAuthProvider(newPoint: AuthProvider) {
+  provider = newPoint
 }
 
-export function obterProvedorAutenticacao(): ProvedorAutenticacao {
-  return provedor
+export function getAuthProvider(): AuthProvider {
+  return provider
 }

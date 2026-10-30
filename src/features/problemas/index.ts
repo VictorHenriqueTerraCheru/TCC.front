@@ -1,17 +1,17 @@
-export { detalheProblemaQuery, useDetalheProblema } from './api/use-detalhe-problema'
-export { problemasNaAreaQuery, useProblemasNaArea } from './api/use-problemas-na-area'
-export { recentesQuery, useRecentes } from './api/use-recentes'
-export { useVotar } from './api/use-votar'
-export type { FiltroProblemasNaArea } from './api/use-problemas-na-area'
-export { CamadaProblemas } from './components/camada-problemas'
-export { DetalheProblema } from './components/detalhe/detalhe-problema'
-export { ALTURA_RESUMO } from './components/detalhe/resumo-alerta'
-export { MarcadorProblema } from './components/marcador-problema'
-export { dimensoesMarcador } from './models/marcador'
+export { issueDetailQuery, useIssueDetail } from './api/use-detalhe-problema'
+export { issuesInAreaQuery, useIssuesInArea } from './api/use-problemas-na-area'
+export { recentQuery, useRecent } from './api/use-recentes'
+export { useVote } from './api/use-votar'
+export type { IssuesInAreaFilter } from './api/use-problemas-na-area'
+export { IssueLayer } from './components/camada-problemas'
+export { IssueDetail } from './components/detalhe/detalhe-problema'
+export { SUMMARY_HEIGHT } from './components/detalhe/resumo-alerta'
+export { IssueMarker } from './components/marcador-problema'
+export { markerSize } from './models/marcador'
 export type {
-  DetalheProblema as DetalheProblemaDados,
-  FaixaConfianca,
-  ProblemaNaArea,
-  StatusProblema,
+  IssueDetail as IssueDetailData,
+  TrustBand,
+  IssueInArea,
+  IssueStatus,
 } from './models/problema'
-export { RecentesPage } from './pages/recentes-page'
+export { RecentPage } from './pages/recentes-page'

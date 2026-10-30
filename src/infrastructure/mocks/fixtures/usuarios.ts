@@ -1,8 +1,8 @@
 import type { Schema } from '../../api'
 
-type Usuario = Schema<'AuthResponseUserSummary'> & { password: string }
+type User = Schema<'AuthResponseUserSummary'> & { password: string }
 
-export const usuariosIniciais: Usuario[] = [
+export const initialUsers: User[] = [
   {
     id: 'u-admin',
     name: 'Admin TCC',
@@ -11,21 +11,21 @@ export const usuariosIniciais: Usuario[] = [
     password: 'tcc12345',
   },
   {
-    id: 'u-verificado',
+    id: 'u-verified',
     name: 'Mariana Souza',
     email: 'verificado@tcc.local',
     role: 'verifiedCitizen',
     password: 'tcc12345',
   },
   {
-    id: 'u-cidadao1',
+    id: 'u-citizen1',
     name: 'Ana Lima',
     email: 'cidadao1@tcc.local',
     role: 'citizen',
     password: 'tcc12345',
   },
   {
-    id: 'u-cidadao2',
+    id: 'u-citizen2',
     name: 'João Pereira',
     email: 'cidadao2@tcc.local',
     role: 'citizen',

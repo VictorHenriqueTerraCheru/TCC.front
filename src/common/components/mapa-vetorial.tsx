@@ -8,60 +8,60 @@ import {
 } from '@vis.gl/react-maplibre'
 import type { ReactNode, Ref } from 'react'
 
-import estiloClaro from '@/assets/mapa/estilo-claro.json'
-import estiloEscuro from '@/assets/mapa/estilo-escuro.json'
-import { useTema, type Tema } from '@/common/hooks/use-tema'
-import { ZOOM_PADRAO } from '@/common/lib/mapa'
+import lightStyle from '@/assets/mapa/estilo-claro.json'
+import darkStyle from '@/assets/mapa/estilo-escuro.json'
+import { useTheme, type Theme } from '@/common/hooks/use-tema'
+import { DEFAULT_ZOOM } from '@/common/lib/mapa'
 
-const ESTILOS: Record<Tema, StyleSpecification> = {
-  claro: estiloClaro as StyleSpecification,
-  escuro: estiloEscuro as StyleSpecification,
+const STYLES: Record<Theme, StyleSpecification> = {
+  light: lightStyle as StyleSpecification,
+  dark: darkStyle as StyleSpecification,
 }
 
-interface MapaVetorialProps {
-  centro: [number, number]
+interface VectorMapProps {
+  center: [number, number]
   zoom?: number
-  interativo?: boolean
-  mostrarZoom?: boolean
+  interactive?: boolean
+  showZoom?: boolean
   ref?: Ref<MapRef>
-  aoMover?(): void
-  aoParar?(): void
-  aoTocar?(ponto: { lat: number; lng: number }): void
-  aoCarregar?(): void
+  onMove?(): void
+  onStop?(): void
+  onTap?(point: { lat: number; lng: number }): void
+  onLoaded?(): void
   className?: string
   children?: ReactNode
 }
 
-export function MapaVetorial({
-  centro,
-  zoom = ZOOM_PADRAO,
-  interativo = true,
-  mostrarZoom = false,
+export function VectorMap({
+  center,
+  zoom = DEFAULT_ZOOM,
+  interactive = true,
+  showZoom = false,
   ref,
-  aoMover,
-  aoParar,
-  aoTocar,
-  aoCarregar,
+  onMove,
+  onStop,
+  onTap,
+  onLoaded,
   className = 'size-full',
   children,
-}: MapaVetorialProps) {
-  const tema = useTema()
+}: VectorMapProps) {
+  const theme = useTheme()
   return (
     <div className={className}>
       <Map
         ref={ref}
-        initialViewState={{ latitude: centro[0], longitude: centro[1], zoom }}
-        mapStyle={ESTILOS[tema]}
+        initialViewState={{ latitude: center[0], longitude: center[1], zoom }}
+        mapStyle={STYLES[theme]}
         minZoom={3}
         maxZoom={18}
-        interactive={interativo}
-        dragRotate={interativo}
-        pitchWithRotate={interativo}
+        interactive={interactive}
+        dragRotate={interactive}
+        pitchWithRotate={interactive}
         attributionControl={{ compact: true }}
         style={{ width: '100%', height: '100%' }}
-        onMove={aoMover && (() => aoMover())}
-        onMoveEnd={aoParar && (() => aoParar())}
-        onClick={aoTocar && ((e) => aoTocar({ lat: e.lngLat.lat, lng: e.lngLat.lng }))}
+        onMove={onMove && (() => onMove())}
+        onMoveEnd={onStop && (() => onStop())}
+        onClick={onTap && ((e) => onTap({ lat: e.lngLat.lat, lng: e.lngLat.lng }))}
         onLoad={(e) => {
           if (window.innerWidth < 1024) {
             e.target
@@ -69,10 +69,10 @@ export function MapaVetorial({
               .querySelector('.maplibregl-compact-show')
               ?.classList.remove('maplibregl-compact-show')
           }
-          aoCarregar?.()
+          onLoaded?.()
         }}
       >
-        {mostrarZoom && <NavigationControl position="top-right" showCompass={false} />}
+        {showZoom && <NavigationControl position="top-right" showCompass={false} />}
         {children}
       </Map>
     </div>

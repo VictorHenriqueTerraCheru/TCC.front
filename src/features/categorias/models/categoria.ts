@@ -1,55 +1,59 @@
 import type { Schema } from '@/infrastructure/api'
 
-export type Categoria = Schema<'ListCategoriesResponse'>
-export type CategoriaResumo = Schema<'CategorySummary'>
-export type Grupo = Schema<'GroupResponse'>
+export type Category = Schema<'ListCategoriesResponse'>
+export type CategorySummary = Schema<'CategorySummary'>
+export type Group = Schema<'GroupResponse'>
 
-export type CorGrupo = Grupo['color']
+export type GroupColor = Group['color']
 
-export type TipoGrupo = Categoria['type']
+export type GroupType = Category['type']
 
-export interface AparenciaDaCor {
-  forte: string
-  claro: string
-  corForte: string
+export interface ColorAppearance {
+  strong: string
+  light: string
+  strongColor: string
 }
 
-export interface AparenciaCategoria extends AparenciaDaCor {
+export interface CategoryAppearance extends ColorAppearance {
   label: string
 }
 
-export const aparenciaDaCor: Record<CorGrupo, AparenciaDaCor> = {
+export const colorAppearance: Record<GroupColor, ColorAppearance> = {
   orange: {
-    forte: 'text-cat-laranja',
-    claro: 'bg-cat-laranja-claro',
-    corForte: 'var(--cat-laranja)',
+    strong: 'text-cat-laranja',
+    light: 'bg-cat-laranja-claro',
+    strongColor: 'var(--cat-laranja)',
   },
-  ochre: { forte: 'text-cat-ocre', claro: 'bg-cat-ocre-claro', corForte: 'var(--cat-ocre)' },
-  brown: { forte: 'text-cat-marrom', claro: 'bg-cat-marrom-claro', corForte: 'var(--cat-marrom)' },
+  ochre: { strong: 'text-cat-ocre', light: 'bg-cat-ocre-claro', strongColor: 'var(--cat-ocre)' },
+  brown: {
+    strong: 'text-cat-marrom',
+    light: 'bg-cat-marrom-claro',
+    strongColor: 'var(--cat-marrom)',
+  },
   red: {
-    forte: 'text-cat-vermelho',
-    claro: 'bg-cat-vermelho-claro',
-    corForte: 'var(--cat-vermelho)',
+    strong: 'text-cat-vermelho',
+    light: 'bg-cat-vermelho-claro',
+    strongColor: 'var(--cat-vermelho)',
   },
   terracotta: {
-    forte: 'text-cat-terracota',
-    claro: 'bg-cat-terracota-claro',
-    corForte: 'var(--cat-terracota)',
+    strong: 'text-cat-terracota',
+    light: 'bg-cat-terracota-claro',
+    strongColor: 'var(--cat-terracota)',
   },
-  blue: { forte: 'text-cat-azul', claro: 'bg-cat-azul-claro', corForte: 'var(--cat-azul)' },
+  blue: { strong: 'text-cat-azul', light: 'bg-cat-azul-claro', strongColor: 'var(--cat-azul)' },
   teal: {
-    forte: 'text-cat-verde-agua',
-    claro: 'bg-cat-verde-agua-claro',
-    corForte: 'var(--cat-verde-agua)',
+    strong: 'text-cat-verde-agua',
+    light: 'bg-cat-verde-agua-claro',
+    strongColor: 'var(--cat-verde-agua)',
   },
-  purple: { forte: 'text-cat-roxo', claro: 'bg-cat-roxo-claro', corForte: 'var(--cat-roxo)' },
-  pink: { forte: 'text-cat-rosa', claro: 'bg-cat-rosa-claro', corForte: 'var(--cat-rosa)' },
-  gray: { forte: 'text-cat-cinza', claro: 'bg-cat-cinza-claro', corForte: 'var(--cat-cinza)' },
+  purple: { strong: 'text-cat-roxo', light: 'bg-cat-roxo-claro', strongColor: 'var(--cat-roxo)' },
+  pink: { strong: 'text-cat-rosa', light: 'bg-cat-rosa-claro', strongColor: 'var(--cat-rosa)' },
+  gray: { strong: 'text-cat-cinza', light: 'bg-cat-cinza-claro', strongColor: 'var(--cat-cinza)' },
 }
 
-export const coresGrupo = Object.keys(aparenciaDaCor) as CorGrupo[]
+export const groupColors = Object.keys(colorAppearance) as GroupColor[]
 
-export const nomeDaCor: Record<CorGrupo, string> = {
+export const colorName: Record<GroupColor, string> = {
   orange: 'Laranja',
   ochre: 'Ocre',
   brown: 'Marrom',
@@ -62,7 +66,7 @@ export const nomeDaCor: Record<CorGrupo, string> = {
   gray: 'Cinza',
 }
 
-const iconeLegado: Record<string, string> = {
+const legacyIcon: Record<string, string> = {
   buraco: 'edit_road',
   calcada: 'directions_walk',
   poste: 'light_off',
@@ -73,27 +77,27 @@ const iconeLegado: Record<string, string> = {
   acidente: 'car_crash',
 }
 
-export const ICONE_PADRAO = 'category'
+export const DEFAULT_ICON = 'category'
 
-export function gruposDoTipo(grupos: Grupo[], tipo: TipoGrupo): Grupo[] {
-  return grupos.filter((g) => g.type === tipo)
+export function groupsOfType(groups: Group[], type: GroupType): Group[] {
+  return groups.filter((g) => g.type === type)
 }
 
-export function grupoDe(
-  grupos: Grupo[],
-  categoria: Pick<CategoriaResumo, 'group'>,
-): Grupo | undefined {
-  return grupos.find((g) => g.key === categoria.group)
+export function groupOf(
+  groups: Group[],
+  category: Pick<CategorySummary, 'group'>,
+): Group | undefined {
+  return groups.find((g) => g.key === category.group)
 }
 
-export function aparenciaDe(
-  grupos: Grupo[],
-  categoria: Pick<CategoriaResumo, 'group'>,
-): AparenciaCategoria {
-  const grupo = grupoDe(grupos, categoria)
-  return { label: grupo?.label ?? categoria.group, ...aparenciaDaCor[grupo?.color ?? 'gray'] }
+export function appearanceOf(
+  groups: Group[],
+  category: Pick<CategorySummary, 'group'>,
+): CategoryAppearance {
+  const group = groupOf(groups, category)
+  return { label: group?.label ?? category.group, ...colorAppearance[group?.color ?? 'gray'] }
 }
 
-export function iconeDe(categoria: Pick<CategoriaResumo, 'icon'>): string {
-  return iconeLegado[categoria.icon] ?? categoria.icon
+export function iconOf(category: Pick<CategorySummary, 'icon'>): string {
+  return legacyIcon[category.icon] ?? category.icon
 }

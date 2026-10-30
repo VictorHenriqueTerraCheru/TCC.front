@@ -1,23 +1,23 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { useAutenticado } from '@/features/auth'
-import { api, dados } from '@/infrastructure/api'
+import { useAuthenticated } from '@/features/auth'
+import { api, unwrapData } from '@/infrastructure/api'
 
 export const meQuery = queryOptions({
   queryKey: ['me'],
-  queryFn: ({ signal }) => api.GET('/me', { signal }).then(dados),
+  queryFn: ({ signal }) => api.GET('/me', { signal }).then(unwrapData),
   staleTime: 0,
 })
 
 export function useMe() {
-  const autenticado = useAutenticado()
-  return useQuery({ ...meQuery, enabled: autenticado })
+  const authenticated = useAuthenticated()
+  return useQuery({ ...meQuery, enabled: authenticated })
 }
 
-export function useAtualizarNome() {
+export function useUpdateName() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (nome: string) => api.PATCH('/me', { body: { name: nome } }).then(dados),
+    mutationFn: (name: string) => api.PATCH('/me', { body: { name } }).then(unwrapData),
     onSuccess: (me) => queryClient.setQueryData(meQuery.queryKey, me),
   })
 }

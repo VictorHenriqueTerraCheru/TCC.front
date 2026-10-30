@@ -1,19 +1,19 @@
-import { Segmentado } from '@/common/components/segmentado'
+import { SegmentedControl } from '@/common/components/segmentado'
 
-import { modosMapa, type ModoMapa } from '../models/filtros'
+import { mapModes, type MapMode } from '../models/filtros'
 
-interface SeletorModoProps {
-  modo: ModoMapa
-  aoMudar(modo: ModoMapa): void
+interface ModePickerProps {
+  mode: MapMode
+  onChange(mode: MapMode): void
 }
 
-export function SeletorModo({ modo, aoMudar }: SeletorModoProps) {
+export function ModePicker({ mode, onChange }: ModePickerProps) {
   return (
-    <Segmentado
+    <SegmentedControl
       label="O que mostrar no mapa"
-      opcoes={modosMapa}
-      value={modo}
-      aoMudar={aoMudar}
+      options={mapModes}
+      value={mode}
+      onChange={onChange}
       className="pointer-events-auto shadow-1 lg:max-w-[440px]"
     />
   )

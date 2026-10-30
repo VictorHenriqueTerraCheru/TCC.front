@@ -1,17 +1,13 @@
 import { useEffect } from 'react'
 
-import {
-  iniciarMonitoramento,
-  solicitarLocalizacao,
-  useLocalizacaoStore,
-} from '../stores/localizacao-store'
+import { startWatching, requestLocation, useGeolocationStore } from '../stores/localizacao-store'
 
-export function useLocalizacao() {
-  const estado = useLocalizacaoStore((s) => s.estado)
-  const posicao = useLocalizacaoStore((s) => s.posicao)
-  return { estado, posicao, solicitar: solicitarLocalizacao }
+export function useGeolocation() {
+  const state = useGeolocationStore((s) => s.state)
+  const position = useGeolocationStore((s) => s.position)
+  return { state, position, request: requestLocation }
 }
 
-export function useMonitorarLocalizacao() {
-  useEffect(() => iniciarMonitoramento(), [])
+export function useWatchLocation() {
+  useEffect(() => startWatching(), [])
 }

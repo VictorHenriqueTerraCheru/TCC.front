@@ -1,34 +1,34 @@
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { mapaFalso } from '@/test/maplibre-falso'
+import { fakeMap } from '@/test/maplibre-falso'
 
-import { BotaoBussola } from './botao-bussola'
-import { MapaVetorial } from './mapa-vetorial'
+import { CompassButton } from './botao-bussola'
+import { VectorMap } from './mapa-vetorial'
 
-function renderizar() {
+function renderWithProviders() {
   return render(
-    <MapaVetorial centro={[-22.95, -43.18]}>
-      <BotaoBussola />
-    </MapaVetorial>,
+    <VectorMap center={[-22.95, -43.18]}>
+      <CompassButton />
+    </VectorMap>,
   )
 }
 
-describe('BotaoBussola', () => {
-  it('fica escondida com o mapa apontando para o norte', () => {
-    renderizar()
+describe('CompassButton', () => {
+  it('stays hidden while the map points north', () => {
+    renderWithProviders()
     expect(screen.queryByRole('button', { name: /norte/i })).not.toBeInTheDocument()
   })
 
-  it('aparece ao girar e o mostrador acompanha o giro', () => {
-    renderizar()
-    act(() => mapaFalso.girar(45))
+  it('appears when rotated and the dial follows the rotation', () => {
+    renderWithProviders()
+    act(() => fakeMap.rotate(45))
 
-    const botao = screen.getByRole('button', { name: 'Apontar para o norte' })
-    expect(botao.querySelector('[data-mostrador]')).toHaveStyle({ transform: 'rotate(-45deg)' })
+    const button = screen.getByRole('button', { name: 'Apontar para o norte' })
+    expect(button.querySelector('[data-mostrador]')).toHaveStyle({ transform: 'rotate(-45deg)' })
 
-    act(() => mapaFalso.girar(90))
-    expect(botao.querySelector('[data-mostrador]')).toHaveStyle({ transform: 'rotate(-90deg)' })
+    act(() => fakeMap.rotate(90))
+    expect(button.querySelector('[data-mostrador]')).toHaveStyle({ transform: 'rotate(-90deg)' })
   })
 
   it.each([
@@ -39,26 +39,26 @@ describe('BotaoBussola', () => {
     [-170, 'S'],
     [-90, 'O'],
     [300, 'O'],
-  ])('com o topo da tela a %s° mostra a letra %s', (giro, letra) => {
-    renderizar()
-    act(() => mapaFalso.girar(giro))
-    expect(screen.getByRole('button', { name: 'Apontar para o norte' })).toHaveTextContent(letra)
+  ])('with the top of the screen at %s° shows the letter %s', (rotation, letter) => {
+    renderWithProviders()
+    act(() => fakeMap.rotate(rotation))
+    expect(screen.getByRole('button', { name: 'Apontar para o norte' })).toHaveTextContent(letter)
   })
 
-  it('aparece com o mapa inclinado mesmo sem giro', () => {
-    renderizar()
-    act(() => mapaFalso.girar(0, 40))
+  it('appears when the map is tilted even without rotation', () => {
+    renderWithProviders()
+    act(() => fakeMap.rotate(0, 40))
     expect(screen.getByRole('button', { name: 'Apontar para o norte' })).toBeInTheDocument()
   })
 
-  it('ao tocar, endireita para o norte e some', async () => {
-    renderizar()
-    act(() => mapaFalso.girar(-120, 30))
+  it('on tap, turns back north and disappears', async () => {
+    renderWithProviders()
+    act(() => fakeMap.rotate(-120, 30))
 
     await userEvent.click(screen.getByRole('button', { name: 'Apontar para o norte' }))
 
-    expect(mapaFalso.atual()!.getBearing()).toBe(0)
-    expect(mapaFalso.atual()!.getPitch()).toBe(0)
+    expect(fakeMap.current()!.getBearing()).toBe(0)
+    expect(fakeMap.current()!.getPitch()).toBe(0)
     expect(screen.queryByRole('button', { name: /norte/i })).not.toBeInTheDocument()
   })
 })

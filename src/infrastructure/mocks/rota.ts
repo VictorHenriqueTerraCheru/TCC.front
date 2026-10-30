@@ -1,5 +1,5 @@
 import { env } from '../env'
 
-export function rota(caminho: string): string {
-  return new URL(env.apiUrl + caminho, globalThis.location?.origin ?? 'http://localhost').href
+export function route(path: string): string {
+  return new URL(env.apiUrl + path, globalThis.location?.origin ?? 'http://localhost').href
 }

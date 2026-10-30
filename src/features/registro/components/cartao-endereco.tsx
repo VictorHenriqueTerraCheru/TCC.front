@@ -1,34 +1,34 @@
-import { Icone } from '@/common/components/icone'
+import { Icon } from '@/common/components/icone'
 import { Skeleton } from '@/common/ui/skeleton'
-import { distanciaMetros, useLocalizacao } from '@/features/localizacao'
+import { distanceMeters, useGeolocation } from '@/features/localizacao'
 
-import { useEnderecoDoRascunho } from '../hooks/use-rascunho'
-import { useRascunhoStore } from '../stores/rascunho-store'
+import { useDraftAddress } from '../hooks/use-rascunho'
+import { useDraftStore } from '../stores/rascunho-store'
 
-function usePrecisao(): number | null {
-  const local = useRascunhoStore((s) => s.local)
-  const { estado, posicao } = useLocalizacao()
-  if (estado !== 'granted' || !posicao || !local) return null
-  const perto = distanciaMetros(local, posicao) <= Math.max(posicao.precisao, 30)
-  return perto && posicao.precisao >= 1 ? posicao.precisao : null
+function useAccuracy(): number | null {
+  const location = useDraftStore((s) => s.location)
+  const { state, position } = useGeolocation()
+  if (state !== 'granted' || !position || !location) return null
+  const near = distanceMeters(location, position) <= Math.max(position.accuracy, 30)
+  return near && position.accuracy >= 1 ? position.accuracy : null
 }
 
-export function CartaoEndereco() {
-  const { data, atualizando } = useEnderecoDoRascunho()
-  const precisao = usePrecisao()
-  const detalhes = [data?.city, precisao !== null && `precisão de ±${Math.round(precisao)} m`]
+export function AddressCard() {
+  const { data, updating } = useDraftAddress()
+  const accuracy = useAccuracy()
+  const details = [data?.city, accuracy !== null && `precisão de ±${Math.round(accuracy)} m`]
     .filter(Boolean)
     .join(' · ')
 
   return (
     <div className="flex gap-3" aria-live="polite">
       <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-        <Icone name="location_on" preenchido className="text-[22px]" />
+        <Icon name="location_on" filled className="text-[22px]" />
       </span>
 
       <div className="min-h-[84px] min-w-0 flex-1">
         <p className="text-xs text-muted-foreground">Endereço aproximado</p>
-        {atualizando || !data ? (
+        {updating || !data ? (
           <div aria-label="Buscando endereço" className="mt-1 space-y-1.5">
             <Skeleton className="h-5 w-4/5 bg-muted" />
             <Skeleton className="h-3 w-1/2 bg-muted" />
@@ -41,7 +41,7 @@ export function CartaoEndereco() {
                 Endereço indisponível agora; o registro segue com o ponto do mapa.
               </p>
             )}
-            {detalhes && <p className="text-xs text-muted-foreground">{detalhes}</p>}
+            {details && <p className="text-xs text-muted-foreground">{details}</p>}
           </>
         )}
       </div>

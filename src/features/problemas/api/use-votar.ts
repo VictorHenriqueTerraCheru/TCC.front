@@ -1,47 +1,47 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { useLocalizacao } from '@/features/localizacao'
-import { api, dados } from '@/infrastructure/api'
+import { useGeolocation } from '@/features/localizacao'
+import { api, unwrapData } from '@/infrastructure/api'
 
-import type { ValorVoto } from '../models/problema'
-import { aplicarVoto } from '../models/votos'
-import { detalheProblemaQuery } from './use-detalhe-problema'
+import type { VoteValue } from '../models/problema'
+import { applyVote } from '../models/votos'
+import { issueDetailQuery } from './use-detalhe-problema'
 
-function useCoordenadasDoVoto() {
-  const { estado, posicao } = useLocalizacao()
+function useVoteCoordinates() {
+  const { state, position } = useGeolocation()
   return () =>
-    estado === 'granted' && posicao
-      ? { lat: posicao.lat, lng: posicao.lng }
+    state === 'granted' && position
+      ? { lat: position.lat, lng: position.lng }
       : { lat: null, lng: null }
 }
 
-export const chaveVotos = (id: string) => ['votes', id] as const
+export const votesKey = (id: string) => ['votes', id] as const
 
-export function useVotar(id: string) {
+export function useVote(id: string) {
   const queryClient = useQueryClient()
-  const coordenadas = useCoordenadasDoVoto()
-  const { queryKey } = detalheProblemaQuery(id)
+  const coordinates = useVoteCoordinates()
+  const { queryKey } = issueDetailQuery(id)
 
   return useMutation({
-    mutationKey: chaveVotos(id),
-    mutationFn: (valor: ValorVoto) =>
+    mutationKey: votesKey(id),
+    mutationFn: (value: VoteValue) =>
       api
         .PUT('/issues/{id}/vote', {
           params: { path: { id } },
-          body: { value: valor, ...coordenadas() },
+          body: { value, ...coordinates() },
         })
-        .then(dados),
-    onMutate: async (valor) => {
+        .then(unwrapData),
+    onMutate: async (value) => {
       await queryClient.cancelQueries({ queryKey })
-      const anterior = queryClient.getQueryData(queryKey)
-      if (anterior) queryClient.setQueryData(queryKey, aplicarVoto(anterior, valor))
-      return { anterior }
+      const previous = queryClient.getQueryData(queryKey)
+      if (previous) queryClient.setQueryData(queryKey, applyVote(previous, value))
+      return { previous }
     },
-    onError: (_erro, _valor, contexto) => {
-      if (contexto?.anterior) queryClient.setQueryData(queryKey, contexto.anterior)
+    onError: (_error, _value, context) => {
+      if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
       void queryClient.invalidateQueries({ queryKey })
     },
-    onSuccess: (detalhe) => queryClient.setQueryData(queryKey, detalhe),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['problemas', 'area'] }),
+    onSuccess: (detail) => queryClient.setQueryData(queryKey, detail),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['issues', 'area'] }),
   })
 }

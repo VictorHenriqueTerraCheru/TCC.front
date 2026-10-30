@@ -1,58 +1,58 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { MapaVetorial } from '@/common/components/mapa-vetorial'
-import type { Categoria } from '@/features/categorias'
-import { categorias } from '@/infrastructure/mocks/fixtures/categorias'
-import { problemasNaArea } from '@/infrastructure/mocks/fixtures/problemas'
-import { renderizar } from '@/test/render'
+import { VectorMap } from '@/common/components/mapa-vetorial'
+import type { Category } from '@/features/categorias'
+import { categories } from '@/infrastructure/mocks/fixtures/categorias'
+import { issuesInArea } from '@/infrastructure/mocks/fixtures/problemas'
+import { renderWithProviders } from '@/test/render'
 
-import { CamadaProblemas } from './camada-problemas'
+import { IssueLayer } from './camada-problemas'
 
-const porId = new Map(categorias.map((c) => [c.id, c as Categoria]))
+const byId = new Map(categories.map((c) => [c.id, c as Category]))
 
-function montar(selecionadoId?: string, mapa = porId) {
-  const aoSelecionar = vi.fn()
-  const aoTocar = vi.fn()
-  renderizar(
-    <MapaVetorial centro={[-22.9519, -43.1866]} aoTocar={aoTocar}>
-      <CamadaProblemas
-        problemas={problemasNaArea}
-        categorias={mapa}
-        selecionadoId={selecionadoId}
-        aoSelecionar={aoSelecionar}
+function mount(selectedId?: string, map = byId) {
+  const onSelect = vi.fn()
+  const onTap = vi.fn()
+  renderWithProviders(
+    <VectorMap center={[-22.9519, -43.1866]} onTap={onTap}>
+      <IssueLayer
+        issues={issuesInArea}
+        categories={map}
+        selectedId={selectedId}
+        onSelect={onSelect}
       />
-    </MapaVetorial>,
+    </VectorMap>,
   )
-  return { aoSelecionar, aoTocar }
+  return { onSelect, onTap }
 }
 
-describe('CamadaProblemas', () => {
-  it('clicar no marcador seleciona o problema e não chega ao toque do mapa (regra 7)', async () => {
-    const { aoSelecionar, aoTocar } = montar()
+describe('IssueLayer', () => {
+  it('clicking the marker selects the issue and does not reach the map tap (rule 7)', async () => {
+    const { onSelect, onTap } = mount()
 
-    await userEvent.click(screen.getAllByTestId('marcador')[0]!)
+    await userEvent.click(screen.getAllByTestId('marker')[0]!)
 
-    expect(aoSelecionar).toHaveBeenCalledWith(problemasNaArea[0]!.id)
-    expect(aoTocar).not.toHaveBeenCalled()
+    expect(onSelect).toHaveBeenCalledWith(issuesInArea[0]!.id)
+    expect(onTap).not.toHaveBeenCalled()
   })
 
-  it('marcador selecionado fica por cima; alta acima de baixa', () => {
-    const alta = problemasNaArea.find((p) => p.band === 'high' && p.status !== 'new')!
-    const baixa = problemasNaArea.find((p) => p.band === 'low' && p.status !== 'new')!
-    montar(baixa.id)
+  it('selected marker stays on top; high above low', () => {
+    const high = issuesInArea.find((p) => p.band === 'high' && p.status !== 'new')!
+    const low = issuesInArea.find((p) => p.band === 'low' && p.status !== 'new')!
+    mount(low.id)
 
-    const zDe = (id: string) =>
-      screen.getAllByTestId('marcador').find((m) => m.querySelector(`[data-problema="${id}"]`))!
-        .style.zIndex
-    expect(zDe(baixa.id)).toBe('1000')
-    expect(zDe(alta.id)).toBe('300')
+    const zIndexOf = (id: string) =>
+      screen.getAllByTestId('marker').find((m) => m.querySelector(`[data-problema="${id}"]`))!.style
+        .zIndex
+    expect(zIndexOf(low.id)).toBe('1000')
+    expect(zIndexOf(high.id)).toBe('300')
   })
 
-  it('problema de categoria desativada continua no mapa, em cinza', () => {
-    montar(undefined, new Map())
+  it('issue of a deactivated category stays on the map, in gray', () => {
+    mount(undefined, new Map())
 
-    expect(screen.getAllByTestId('marcador')).toHaveLength(problemasNaArea.length)
-    expect(screen.getAllByRole('button', { name: 'Problema' })).toHaveLength(problemasNaArea.length)
+    expect(screen.getAllByTestId('marker')).toHaveLength(issuesInArea.length)
+    expect(screen.getAllByRole('button', { name: 'Problema' })).toHaveLength(issuesInArea.length)
   })
 })

@@ -3,61 +3,55 @@ import { ptBR } from 'date-fns/locale'
 import { useId } from 'react'
 import { useNavigate } from 'react-router'
 
-import { Icone } from '@/common/components/icone'
+import { Icon } from '@/common/components/icone'
 import { Button } from '@/common/ui/button'
-import { CategoriaIcone } from '@/features/categorias'
+import { CategoryIcon } from '@/features/categorias'
 
-import { useRegistrarProblema } from '../api/use-registro'
-import { FalhaEnvioDialog } from '../components/falha-envio-dialog'
-import { PassoRegistro } from '../components/passo-registro'
-import { LinhaResumo, Resumo } from '../components/resumo'
-import { useEnvio } from '../hooks/use-envio'
-import { useRetomarRegistro } from '../hooks/use-retomar-registro'
+import { useReportIssue } from '../api/use-registro'
+import { SubmissionFailedDialog } from '../components/falha-envio-dialog'
+import { ReportStep } from '../components/passo-registro'
+import { SummaryRow, Summary } from '../components/resumo'
+import { useSubmission } from '../hooks/use-envio'
+import { useResumeReport } from '../hooks/use-retomar-registro'
 import {
-  useEnderecoDoRascunho,
-  useExigirCategoria,
-  useExigirPasso,
-  useRascunho,
+  useDraftAddress,
+  useRequireCategory,
+  useRequireStep,
+  useDraft,
 } from '../hooks/use-rascunho'
-import { caminhoDaCategoria } from '../models/rotas'
+import { categoryPath } from '../models/rotas'
 
-const LIMITE_DESCRICAO = 280
+const DESCRIPTION_LIMIT = 280
 
-export function RevisaoProblemaPage() {
+export function IssueReviewPage() {
   const navigate = useNavigate()
-  const idDescricao = useId()
-  const {
-    category: categoria,
-    categoryId: categoriaId,
-    local,
-    description: descricao,
-    definirDescricao,
-  } = useRascunho()
-  const { data: endereco } = useEnderecoDoRascunho()
-  const registrar = useRegistrarProblema()
-  useExigirCategoria('issue')
-  useExigirPasso(local !== null, '/registrar/local')
+  const descriptionId = useId()
+  const { category, categoryId, location, description, setDescription } = useDraft()
+  const { data: address } = useDraftAddress()
+  const report = useReportIssue()
+  useRequireCategory('issue')
+  useRequireStep(location !== null, '/registrar/local')
 
-  const envio = useEnvio(registrar.mutateAsync, (problema) => {
-    navigate('/registrar/sucesso', { replace: true, state: { issue: problema } })
+  const submission = useSubmission(report.mutateAsync, (issue) => {
+    navigate('/registrar/sucesso', { replace: true, state: { issue } })
   })
 
-  function enviar() {
-    if (categoriaId === null || !local) return
-    envio.enviar({ categoryId: categoriaId, ...local, description: descricao })
+  function send() {
+    if (categoryId === null || !location) return
+    submission.send({ categoryId, ...location, description })
   }
-  useRetomarRegistro('enviar', enviar)
+  useResumeReport('submit', send)
 
   return (
-    <PassoRegistro
-      titulo="Revisão"
-      passo={{ atual: 4, total: 4, label: 'Revisão' }}
-      acaoTopo="voltar"
-      aoTopo={() => navigate('/registrar/local')}
-      rodape={
-        <Button className="w-full" carregando={registrar.isPending} onClick={enviar}>
-          <Icone name="send" className="text-[18px]" />
-          {registrar.isPending ? 'Enviando…' : 'Enviar registro'}
+    <ReportStep
+      title="Revisão"
+      step={{ current: 4, total: 4, label: 'Revisão' }}
+      topAction="back"
+      onTopAction={() => navigate('/registrar/local')}
+      footer={
+        <Button className="w-full" loading={report.isPending} onClick={send}>
+          <Icon name="send" className="text-[18px]" />
+          {report.isPending ? 'Enviando…' : 'Enviar registro'}
         </Button>
       }
     >
@@ -65,71 +59,71 @@ export function RevisaoProblemaPage() {
         <div>
           <div className="relative">
             <textarea
-              id={idDescricao}
-              value={descricao}
-              maxLength={LIMITE_DESCRICAO}
-              onChange={(e) => definirDescricao(e.target.value)}
+              id={descriptionId}
+              value={description}
+              maxLength={DESCRIPTION_LIMIT}
+              onChange={(e) => setDescription(e.target.value)}
               rows={4}
-              aria-describedby={`${idDescricao}-ajuda`}
+              aria-describedby={`${descriptionId}-ajuda`}
               className="w-full resize-none rounded-md border border-input bg-background px-4 py-4 text-base outline-none focus:border-2 focus:border-primario focus:px-[15px]"
             />
             <label
-              htmlFor={idDescricao}
+              htmlFor={descriptionId}
               className="absolute -top-2 left-3 bg-background px-1 text-xs text-muted-foreground"
             >
               Descrição (opcional)
             </label>
           </div>
           <p
-            id={`${idDescricao}-ajuda`}
+            id={`${descriptionId}-ajuda`}
             className="mt-1 flex justify-between px-4 text-xs text-muted-foreground"
           >
             <span>O que ajuda a identificar o problema</span>
-            <span aria-label={`${descricao.length} de ${LIMITE_DESCRICAO} caracteres`}>
-              {descricao.length}/{LIMITE_DESCRICAO}
+            <span aria-label={`${description.length} de ${DESCRIPTION_LIMIT} caracteres`}>
+              {description.length}/{DESCRIPTION_LIMIT}
             </span>
           </p>
         </div>
 
-        <Resumo>
-          <LinhaResumo
+        <Summary>
+          <SummaryRow
             icon={
-              categoria ? (
-                <CategoriaIcone category={categoria} pageSize="sm" className="bg-transparent" />
+              category ? (
+                <CategoryIcon category={category} pageSize="sm" className="bg-transparent" />
               ) : (
                 'category'
               )
             }
             label="Categoria"
-            value={categoria?.name ?? '—'}
-            aoEditar={() => navigate(caminhoDaCategoria('issue'))}
+            value={category?.name ?? '—'}
+            onEdit={() => navigate(categoryPath('issue'))}
           />
-          <LinhaResumo icon="keep" label="Tipo" value="Problema — fica no mapa até ser resolvido" />
-          <LinhaResumo
+          <SummaryRow icon="keep" label="Tipo" value="Problema — fica no mapa até ser resolvido" />
+          <SummaryRow
             icon="location_on"
             label="Local aproximado"
-            value={endereco?.address ?? 'Buscando endereço…'}
-            aoEditar={() => navigate('/registrar/local')}
+            value={address?.address ?? 'Buscando endereço…'}
+            onEdit={() => navigate('/registrar/local')}
           />
-          <LinhaResumo
+          <SummaryRow
             icon="schedule"
             label="Data e hora"
             value={format(new Date(), "'Hoje', d MMM. · HH:mm", { locale: ptBR })}
           />
-        </Resumo>
+        </Summary>
 
         <p className="flex gap-2 text-xs text-muted-foreground">
-          <Icone name="info" className="text-[18px]" />
+          <Icon name="info" className="text-[18px]" />
           Seu registro entra com o selo "Nova" até receber avaliações de quem está por perto.
         </p>
 
-        {envio.erroRegra && (
+        {submission.ruleError && (
           <p role="alert" className="text-sm text-destructive">
-            {envio.erroRegra}
+            {submission.ruleError}
           </p>
         )}
       </div>
-      <FalhaEnvioDialog {...envio.falha} />
-    </PassoRegistro>
+      <SubmissionFailedDialog {...submission.failure} />
+    </ReportStep>
   )
 }

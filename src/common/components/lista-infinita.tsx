@@ -2,36 +2,30 @@ import { useEffect, useRef, type ReactNode } from 'react'
 
 import { Button } from '@/common/ui/button'
 
-interface ConsultaPaginada {
+interface PagedQuery {
   hasNextPage: boolean
   isFetchingNextPage: boolean
   fetchNextPage(): Promise<unknown>
 }
 
-export function ListaInfinita({
-  consulta,
-  children,
-}: {
-  consulta: ConsultaPaginada
-  children: ReactNode
-}) {
-  const fimRef = useRef<HTMLDivElement>(null)
-  const { hasNextPage, isFetchingNextPage, fetchNextPage } = consulta
+export function InfiniteList({ query, children }: { query: PagedQuery; children: ReactNode }) {
+  const endRef = useRef<HTMLDivElement>(null)
+  const { hasNextPage, isFetchingNextPage, fetchNextPage } = query
 
   useEffect(() => {
-    const fim = fimRef.current
-    if (!fim || !hasNextPage || typeof IntersectionObserver === 'undefined') return
-    const observador = new IntersectionObserver(([entrada]) => {
-      if (entrada?.isIntersecting && !isFetchingNextPage) void fetchNextPage()
+    const end = endRef.current
+    if (!end || !hasNextPage || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting && !isFetchingNextPage) void fetchNextPage()
     })
-    observador.observe(fim)
-    return () => observador.disconnect()
+    observer.observe(end)
+    return () => observer.disconnect()
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   return (
     <>
       {children}
-      <div ref={fimRef} className="flex justify-center py-4">
+      <div ref={endRef} className="flex justify-center py-4">
         {hasNextPage && (
           <Button
             variant="ghost"

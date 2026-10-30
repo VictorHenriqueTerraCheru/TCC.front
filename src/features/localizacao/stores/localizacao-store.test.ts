@@ -1,140 +1,136 @@
-import {
-  iniciarMonitoramento,
-  solicitarLocalizacao,
-  useLocalizacaoStore,
-} from './localizacao-store'
+import { startWatching, requestLocation, useGeolocationStore } from './localizacao-store'
 
-type Sucesso = (p: GeolocationPosition) => void
-type Falha = (e: GeolocationPositionError) => void
+type Success = (p: GeolocationPosition) => void
+type Failure = (e: GeolocationPositionError) => void
 
-const posicao = {
+const position = {
   coords: { latitude: -22.95, longitude: -43.18, accuracy: 15 },
 } as GeolocationPosition
-const negado = { code: 1, PERMISSION_DENIED: 1 } as GeolocationPositionError
+const denied = { code: 1, PERMISSION_DENIED: 1 } as GeolocationPositionError
 
-function instalarNavegador(estadoPermissao: PermissionState | null) {
+function installBrowser(permissionState: PermissionState | null) {
   const geolocation = {
-    getCurrentPosition: vi.fn<(s: Sucesso, f: Falha) => void>(),
-    watchPosition: vi.fn<(s: Sucesso, f: Falha) => number>(() => 1),
+    getCurrentPosition: vi.fn<(s: Success, f: Failure) => void>(),
+    watchPosition: vi.fn<(s: Success, f: Failure) => number>(() => 1),
     clearWatch: vi.fn(),
   }
   const status = {
-    state: estadoPermissao,
-    addEventListener: vi.fn<(tipo: string, ouvinte: () => void) => void>(),
+    state: permissionState,
+    addEventListener: vi.fn<(type: string, listener: () => void) => void>(),
     removeEventListener: vi.fn(),
   }
-  const permissions = estadoPermissao && { query: vi.fn(() => Promise.resolve(status)) }
+  const permissions = permissionState && { query: vi.fn(() => Promise.resolve(status)) }
   vi.stubGlobal('isSecureContext', true)
   vi.stubGlobal('navigator', { ...navigator, geolocation, permissions })
   return Object.assign(geolocation, {
-    mudarPermissao(estado: PermissionState) {
-      status.state = estado
-      for (const [, ouvinte] of status.addEventListener.mock.calls) ouvinte()
+    setPermission(state: PermissionState) {
+      status.state = state
+      for (const [, listener] of status.addEventListener.mock.calls) listener()
     },
   })
 }
 
-describe('localizacao-store', () => {
-  let limpar: () => void = () => {}
+describe('geolocation-store', () => {
+  let clear: () => void = () => {}
 
-  beforeEach(() => useLocalizacaoStore.setState({ estado: 'verificando', posicao: null }))
+  beforeEach(() => useGeolocationStore.setState({ state: 'checking', position: null }))
   afterEach(() => {
-    limpar()
+    clear()
     vi.unstubAllGlobals()
   })
 
-  it('fica indisponível fora de contexto seguro', () => {
+  it('is unavailable outside a secure context', () => {
     vi.stubGlobal('isSecureContext', false)
-    limpar = iniciarMonitoramento()
-    expect(useLocalizacaoStore.getState().estado).toBe('indisponivel')
+    clear = startWatching()
+    expect(useGeolocationStore.getState().state).toBe('unavailable')
   })
 
-  it('com permissão já concedida, acompanha a posição sem pedir', async () => {
-    const geo = instalarNavegador('granted')
-    limpar = iniciarMonitoramento()
+  it('with permission already granted, tracks the position without asking', async () => {
+    const geo = installBrowser('granted')
+    clear = startWatching()
 
-    await vi.waitFor(() => expect(useLocalizacaoStore.getState().estado).toBe('granted'))
+    await vi.waitFor(() => expect(useGeolocationStore.getState().state).toBe('granted'))
     expect(geo.watchPosition).toHaveBeenCalledOnce()
     expect(geo.getCurrentPosition).not.toHaveBeenCalled()
 
-    geo.watchPosition.mock.calls[0]![0](posicao)
-    expect(useLocalizacaoStore.getState().posicao).toEqual({
+    geo.watchPosition.mock.calls[0]![0](position)
+    expect(useGeolocationStore.getState().position).toEqual({
       lat: -22.95,
       lng: -43.18,
-      precisao: 15,
+      accuracy: 15,
     })
   })
 
-  it('em prompt, não acompanha até o usuário pedir', async () => {
-    const geo = instalarNavegador('prompt')
-    limpar = iniciarMonitoramento()
+  it('in prompt, does not track until the user asks', async () => {
+    const geo = installBrowser('prompt')
+    clear = startWatching()
 
-    await vi.waitFor(() => expect(useLocalizacaoStore.getState().estado).toBe('prompt'))
+    await vi.waitFor(() => expect(useGeolocationStore.getState().state).toBe('prompt'))
     expect(geo.watchPosition).not.toHaveBeenCalled()
 
-    const pedido = solicitarLocalizacao()
-    geo.getCurrentPosition.mock.calls[0]![0](posicao)
+    const request = requestLocation()
+    geo.getCurrentPosition.mock.calls[0]![0](position)
 
-    await expect(pedido).resolves.toEqual({ lat: -22.95, lng: -43.18, precisao: 15 })
-    expect(useLocalizacaoStore.getState().estado).toBe('granted')
+    await expect(request).resolves.toEqual({ lat: -22.95, lng: -43.18, accuracy: 15 })
+    expect(useGeolocationStore.getState().state).toBe('granted')
     expect(geo.watchPosition).toHaveBeenCalledOnce()
   })
 
-  it('guarda que a permissão foi concedida', async () => {
-    instalarNavegador('granted')
-    limpar = iniciarMonitoramento()
+  it('remembers that permission was granted', async () => {
+    installBrowser('granted')
+    clear = startWatching()
 
-    await vi.waitFor(() => expect(useLocalizacaoStore.getState().estado).toBe('granted'))
+    await vi.waitFor(() => expect(useGeolocationStore.getState().state).toBe('granted'))
     expect(localStorage.getItem('ocorrencias.localizacaoConcedida')).toBe('1')
   })
 
-  it('em prompt, se já concedeu antes (iOS esquece), pede de novo sem esperar o Ativar', async () => {
+  it('in prompt, if it was granted before (iOS forgets), asks again without waiting for Ativar', async () => {
     localStorage.setItem('ocorrencias.localizacaoConcedida', '1')
-    const geo = instalarNavegador('prompt')
-    limpar = iniciarMonitoramento()
+    const geo = installBrowser('prompt')
+    clear = startWatching()
 
     await vi.waitFor(() => expect(geo.getCurrentPosition).toHaveBeenCalledOnce())
-    expect(useLocalizacaoStore.getState().estado).toBe('verificando')
+    expect(useGeolocationStore.getState().state).toBe('checking')
 
-    geo.getCurrentPosition.mock.calls[0]![0](posicao)
-    expect(useLocalizacaoStore.getState()).toMatchObject({
-      estado: 'granted',
-      posicao: { lat: -22.95, lng: -43.18, precisao: 15 },
+    geo.getCurrentPosition.mock.calls[0]![0](position)
+    expect(useGeolocationStore.getState()).toMatchObject({
+      state: 'granted',
+      position: { lat: -22.95, lng: -43.18, accuracy: 15 },
     })
     expect(geo.watchPosition).toHaveBeenCalledOnce()
   })
 
-  it('app aberto: se o iOS volta a permissão para prompt, pede de novo em vez do banner', async () => {
-    const geo = instalarNavegador('granted')
-    limpar = iniciarMonitoramento()
-    await vi.waitFor(() => expect(useLocalizacaoStore.getState().estado).toBe('granted'))
+  it('app open: if iOS moves the permission back to prompt, asks again instead of the banner', async () => {
+    const geo = installBrowser('granted')
+    clear = startWatching()
+    await vi.waitFor(() => expect(useGeolocationStore.getState().state).toBe('granted'))
 
-    geo.mudarPermissao('prompt')
+    geo.setPermission('prompt')
 
     expect(geo.getCurrentPosition).toHaveBeenCalledOnce()
-    expect(useLocalizacaoStore.getState().estado).not.toBe('prompt')
+    expect(useGeolocationStore.getState().state).not.toBe('prompt')
     expect(geo.clearWatch).toHaveBeenCalledWith(1)
     expect(geo.clearWatch.mock.invocationCallOrder[0]).toBeLessThan(
       geo.getCurrentPosition.mock.invocationCallOrder[0]!,
     )
   })
 
-  it('se o pedido automático for negado, esquece a concessão e fica denied', async () => {
+  it('if the automatic request is denied, forgets the grant and stays denied', async () => {
     localStorage.setItem('ocorrencias.localizacaoConcedida', '1')
-    const geo = instalarNavegador('prompt')
-    limpar = iniciarMonitoramento()
+    const geo = installBrowser('prompt')
+    clear = startWatching()
 
     await vi.waitFor(() => expect(geo.getCurrentPosition).toHaveBeenCalledOnce())
-    geo.getCurrentPosition.mock.calls[0]![1](negado)
+    geo.getCurrentPosition.mock.calls[0]![1](denied)
 
-    expect(useLocalizacaoStore.getState()).toMatchObject({ estado: 'denied', posicao: null })
+    expect(useGeolocationStore.getState()).toMatchObject({ state: 'denied', position: null })
     expect(localStorage.getItem('ocorrencias.localizacaoConcedida')).toBeNull()
   })
 
-  it('se o pedido automático falhar por outro motivo, volta a prompt', async () => {
+  it('if the automatic request fails for another reason, goes back to prompt', async () => {
     localStorage.setItem('ocorrencias.localizacaoConcedida', '1')
-    const geo = instalarNavegador('prompt')
-    limpar = iniciarMonitoramento()
+    const geo = installBrowser('prompt')
+    clear = startWatching()
 
     await vi.waitFor(() => expect(geo.getCurrentPosition).toHaveBeenCalledOnce())
     geo.getCurrentPosition.mock.calls[0]![1]({
@@ -142,18 +138,18 @@ describe('localizacao-store', () => {
       PERMISSION_DENIED: 1,
     } as GeolocationPositionError)
 
-    await vi.waitFor(() => expect(useLocalizacaoStore.getState().estado).toBe('prompt'))
+    await vi.waitFor(() => expect(useGeolocationStore.getState().state).toBe('prompt'))
   })
 
-  it('pedido negado vira denied e resolve null', async () => {
-    const geo = instalarNavegador(null)
-    limpar = iniciarMonitoramento()
-    expect(useLocalizacaoStore.getState().estado).toBe('prompt')
+  it('denied request becomes denied and resolves null', async () => {
+    const geo = installBrowser(null)
+    clear = startWatching()
+    expect(useGeolocationStore.getState().state).toBe('prompt')
 
-    const pedido = solicitarLocalizacao()
-    geo.getCurrentPosition.mock.calls[0]![1](negado)
+    const request = requestLocation()
+    geo.getCurrentPosition.mock.calls[0]![1](denied)
 
-    await expect(pedido).resolves.toBeNull()
-    expect(useLocalizacaoStore.getState()).toMatchObject({ estado: 'denied', posicao: null })
+    await expect(request).resolves.toBeNull()
+    expect(useGeolocationStore.getState()).toMatchObject({ state: 'denied', position: null })
   })
 })

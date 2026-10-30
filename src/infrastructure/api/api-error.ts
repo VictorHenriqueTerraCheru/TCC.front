@@ -8,27 +8,28 @@ export class ApiError extends Error {
   readonly title: string | null
   readonly errors: Record<string, string[]>
 
-  constructor(status: number, problema?: ProblemDetails | null) {
-    super(problema?.title ?? `Erro HTTP ${status}`)
+  constructor(status: number, issue?: ProblemDetails | null) {
+    super(issue?.title ?? `Erro HTTP ${status}`)
     this.name = 'ApiError'
     this.status = status
-    this.type = problema?.type ?? null
-    this.title = problema?.title ?? null
-    this.errors = problema?.errors ?? {}
+    this.type = issue?.type ?? null
+    this.title = issue?.title ?? null
+    this.errors = issue?.errors ?? {}
   }
 
-  erroDoCampo(campo: string): string | undefined {
-    return this.errors[campo]?.[0]
+  fieldError(field: string): string | undefined {
+    return this.errors[field]?.[0]
   }
 }
 
-export function isApiError(erro: unknown): erro is ApiError {
-  return erro instanceof ApiError
+export function isApiError(error: unknown): error is ApiError {
+  return error instanceof ApiError
 }
 
-export function isErroDeRede(erro: unknown): boolean {
+export function isNetworkError(error: unknown): boolean {
   return (
-    erro instanceof TypeError ||
-    (erro instanceof DOMException && (erro.name === 'AbortError' || erro.name === 'TimeoutError'))
+    error instanceof TypeError ||
+    (error instanceof DOMException &&
+      (error.name === 'AbortError' || error.name === 'TimeoutError'))
   )
 }

@@ -1,31 +1,31 @@
-import { Icone } from '@/common/components/icone'
-import { NumeroComPulso } from '@/common/components/numero-animado'
-import { distanciaTexto } from '@/common/lib/formatacao'
+import { Icon } from '@/common/components/icone'
+import { PulsingNumber } from '@/common/components/numero-animado'
+import { distanceText } from '@/common/lib/formatacao'
 import { cn } from '@/common/lib/utils'
 
-import { mensagemErroVoto } from '../../errors'
-import { useDistanciaAte } from '../../hooks/use-distancia-ate'
-import { useVotos } from '../../hooks/use-votos'
-import type { DetalheProblema } from '../../models/problema'
-import { BotaoVoto } from './botao-voto'
+import { voteErrorMessage } from '../../errors'
+import { useDistanceTo } from '../../hooks/use-distancia-ate'
+import { useVotes } from '../../hooks/use-votos'
+import type { IssueDetail } from '../../models/problema'
+import { VoteButton } from './botao-voto'
 
-const DICA_AUTOR = 'Você registrou este problema'
+const AUTHOR_HINT = 'Você registrou este problema'
 
-function pessoas(n: number) {
+function people(n: number) {
   return n === 1 ? '1 pessoa disse' : `${n} pessoas disseram`
 }
 
-function Convite({ issue: problema }: { issue: DetalheProblema }) {
-  const distancia = useDistanciaAte(problema)
+function Invite({ issue }: { issue: IssueDetail }) {
+  const distance = useDistanceTo(issue)
 
-  if (problema.status === 'new') {
+  if (issue.status === 'new') {
     return (
       <div className="mb-1 flex items-start gap-3">
-        <Icone name="near_me" preenchido className="mt-0.5 text-[20px]" />
+        <Icon name="near_me" filled className="mt-0.5 text-[20px]" />
         <div>
           <h3 className="font-medium">
-            {distancia !== null
-              ? `Você está a ${distanciaTexto(distancia)}. Ainda está lá?`
+            {distance !== null
+              ? `Você está a ${distanceText(distance)}. Ainda está lá?`
               : 'Ainda está lá?'}
           </h3>
           <p className="text-sm">Quem está perto ajuda mais a avaliar registros novos.</p>
@@ -34,13 +34,13 @@ function Convite({ issue: problema }: { issue: DetalheProblema }) {
     )
   }
 
-  if (problema.status === 'possiblyResolved') {
+  if (issue.status === 'possiblyResolved') {
     return (
       <>
         <h3 className="mb-2 text-2xl">Ainda está lá?</h3>
         <p className="text-sm">
-          {pessoas(problema.votes.noLast24h)} que não está mais lá nas últimas 24 h. Se você passou
-          por lá, ajude a confirmar.
+          {people(issue.votes.noLast24h)} que não está mais lá nas últimas 24 h. Se você passou por
+          lá, ajude a confirmar.
         </p>
       </>
     )
@@ -49,57 +49,57 @@ function Convite({ issue: problema }: { issue: DetalheProblema }) {
   return <h3 className="font-medium">Ainda está lá?</h3>
 }
 
-export function CartaoVoto({ issue: problema }: { issue: DetalheProblema }) {
-  const { erro, votar, myVote: meuVoto, votando, podeVotar } = useVotos(problema)
-  const destaque = problema.status !== 'active'
-  const { yes: sim, no: nao } = problema.votes
+export function VoteCard({ issue }: { issue: IssueDetail }) {
+  const { error, vote, myVote, voting, canVote } = useVotes(issue)
+  const highlight = issue.status !== 'active'
+  const { yes, no } = issue.votes
 
   return (
     <section
       className={cn(
         'rounded-2xl p-4',
-        destaque ? 'bg-primario-suave text-primario' : 'border border-border/60 bg-card',
+        highlight ? 'bg-primario-suave text-primario' : 'border border-border/60 bg-card',
       )}
     >
-      <Convite issue={problema} />
-      <p className={cn('mt-2 text-xs', destaque ? 'font-medium' : 'text-muted-foreground')}>
-        <NumeroComPulso value={sim} className={cn('text-2xl', !destaque && 'text-foreground')} />{' '}
+      <Invite issue={issue} />
+      <p className={cn('mt-2 text-xs', highlight ? 'font-medium' : 'text-muted-foreground')}>
+        <PulsingNumber value={yes} className={cn('text-2xl', !highlight && 'text-foreground')} />{' '}
         sim{' '}
-        <NumeroComPulso
-          value={nao}
-          className={cn('ml-2 text-2xl', !destaque && 'text-foreground')}
+        <PulsingNumber
+          value={no}
+          className={cn('ml-2 text-2xl', !highlight && 'text-foreground')}
         />{' '}
         não
       </p>
-      {podeVotar ? (
+      {canVote ? (
         <div className="mt-3 flex gap-2">
-          <BotaoVoto
+          <VoteButton
             className="flex-1"
-            variante={destaque ? 'default' : 'tonal'}
-            selecionado={meuVoto === 'yes'}
-            disabled={votando}
-            onClick={() => votar('yes')}
+            variant={highlight ? 'default' : 'tonal'}
+            selected={myVote === 'yes'}
+            disabled={voting}
+            onClick={() => vote('yes')}
           >
             Sim, está lá
-          </BotaoVoto>
-          <BotaoVoto
-            className={cn('flex-1', destaque && 'border-primario/40 text-primario')}
-            variante="outline"
-            selecionado={meuVoto === 'no'}
-            disabled={votando}
-            onClick={() => votar('no')}
+          </VoteButton>
+          <VoteButton
+            className={cn('flex-1', highlight && 'border-primario/40 text-primario')}
+            variant="outline"
+            selected={myVote === 'no'}
+            disabled={voting}
+            onClick={() => vote('no')}
           >
             Não está lá
-          </BotaoVoto>
+          </VoteButton>
         </div>
       ) : (
-        problema.isAuthor && (
-          <p className={cn('mt-2 text-xs', !destaque && 'text-muted-foreground')}>{DICA_AUTOR}</p>
+        issue.isAuthor && (
+          <p className={cn('mt-2 text-xs', !highlight && 'text-muted-foreground')}>{AUTHOR_HINT}</p>
         )
       )}
-      {erro && (
+      {error && (
         <p role="alert" className="mt-2 text-xs text-destructive">
-          {mensagemErroVoto(erro)}
+          {voteErrorMessage(error)}
         </p>
       )}
     </section>

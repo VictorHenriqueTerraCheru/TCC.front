@@ -1,138 +1,139 @@
 import { create } from 'zustand'
 
-export type EstadoLocalizacao = 'verificando' | 'prompt' | 'granted' | 'denied' | 'indisponivel'
+export type LocationStatus = 'checking' | 'prompt' | 'granted' | 'denied' | 'unavailable'
 
-export interface Posicao {
+export interface Position {
   lat: number
   lng: number
-  precisao: number
+  accuracy: number
 }
 
-interface LocalizacaoState {
-  estado: EstadoLocalizacao
-  posicao: Posicao | null
+interface GeolocationState {
+  state: LocationStatus
+  position: Position | null
 }
 
-export const useLocalizacaoStore = create<LocalizacaoState>()(() => ({
-  estado: 'verificando',
-  posicao: null,
+export const useGeolocationStore = create<GeolocationState>()(() => ({
+  state: 'checking',
+  position: null,
 }))
 
-const OPCOES: PositionOptions = { enableHighAccuracy: true, timeout: 15_000, maximumAge: 30_000 }
+const OPTIONS: PositionOptions = { enableHighAccuracy: true, timeout: 15_000, maximumAge: 30_000 }
 
-let idMonitoramento: number | null = null
+let watchId: number | null = null
 
-function paraPosicao({ coords }: GeolocationPosition): Posicao {
-  return { lat: coords.latitude, lng: coords.longitude, precisao: coords.accuracy }
+function toPosition({ coords }: GeolocationPosition): Position {
+  return { lat: coords.latitude, lng: coords.longitude, accuracy: coords.accuracy }
 }
 
-function disponivel(): boolean {
+function available(): boolean {
   return globalThis.isSecureContext === true && 'geolocation' in navigator
 }
 
-function acompanharPosicao() {
-  if (idMonitoramento !== null) return
-  idMonitoramento = navigator.geolocation.watchPosition(
-    (posicao) => useLocalizacaoStore.setState({ estado: 'granted', posicao: paraPosicao(posicao) }),
-    (erro) => {
-      if (erro.code === erro.PERMISSION_DENIED) aplicarEstado('denied')
+function trackPosition() {
+  if (watchId !== null) return
+  watchId = navigator.geolocation.watchPosition(
+    (position) =>
+      useGeolocationStore.setState({ state: 'granted', position: toPosition(position) }),
+    (error) => {
+      if (error.code === error.PERMISSION_DENIED) applyState('denied')
     },
-    OPCOES,
+    OPTIONS,
   )
 }
 
-function pararDeAcompanhar() {
-  if (idMonitoramento === null) return
-  navigator.geolocation.clearWatch(idMonitoramento)
-  idMonitoramento = null
+function stopTracking() {
+  if (watchId === null) return
+  navigator.geolocation.clearWatch(watchId)
+  watchId = null
 }
 
-const CHAVE_CONCEDIDA = 'ocorrencias.localizacaoConcedida'
+const GRANTED_KEY = 'ocorrencias.localizacaoConcedida'
 
-function concedeuAntes(): boolean {
+function grantedBefore(): boolean {
   try {
-    return localStorage.getItem(CHAVE_CONCEDIDA) === '1'
+    return localStorage.getItem(GRANTED_KEY) === '1'
   } catch {
     return false
   }
 }
 
-function lembrarConcessao(concedida: boolean) {
+function rememberGrant(granted: boolean) {
   try {
-    if (concedida) localStorage.setItem(CHAVE_CONCEDIDA, '1')
-    else localStorage.removeItem(CHAVE_CONCEDIDA)
+    if (granted) localStorage.setItem(GRANTED_KEY, '1')
+    else localStorage.removeItem(GRANTED_KEY)
   } catch {
     void 0
   }
 }
 
-function aplicarEstado(estado: EstadoLocalizacao) {
-  if (estado === 'granted') {
-    lembrarConcessao(true)
-    useLocalizacaoStore.setState({ estado })
-    acompanharPosicao()
+function applyState(state: LocationStatus) {
+  if (state === 'granted') {
+    rememberGrant(true)
+    useGeolocationStore.setState({ state })
+    trackPosition()
   } else {
-    if (estado === 'denied') lembrarConcessao(false)
-    pararDeAcompanhar()
-    useLocalizacaoStore.setState({ estado, posicao: null })
+    if (state === 'denied') rememberGrant(false)
+    stopTracking()
+    useGeolocationStore.setState({ state, position: null })
   }
 }
 
-export function iniciarMonitoramento(): () => void {
-  if (!disponivel()) {
-    aplicarEstado('indisponivel')
+export function startWatching(): () => void {
+  if (!available()) {
+    applyState('unavailable')
     return () => {}
   }
 
   let status: PermissionStatus | null = null
-  let cancelado = false
-  const aplicarPermissao = (estado: PermissionState) => {
-    if (estado !== 'prompt' || !concedeuAntes()) return aplicarEstado(estado)
-    pararDeAcompanhar()
-    useLocalizacaoStore.setState({ estado: 'verificando' })
-    void solicitarLocalizacao().then((posicao) => {
-      if (!posicao && !cancelado && useLocalizacaoStore.getState().estado === 'verificando')
-        aplicarEstado('prompt')
+  let cancelled = false
+  const applyPermission = (state: PermissionState) => {
+    if (state !== 'prompt' || !grantedBefore()) return applyState(state)
+    stopTracking()
+    useGeolocationStore.setState({ state: 'checking' })
+    void requestLocation().then((position) => {
+      if (!position && !cancelled && useGeolocationStore.getState().state === 'checking')
+        applyState('prompt')
     })
   }
-  const aoMudar = () => status && aplicarPermissao(status.state)
+  const onChange = () => status && applyPermission(status.state)
 
   if (navigator.permissions?.query) {
     navigator.permissions
       .query({ name: 'geolocation' })
-      .then((resultado) => {
-        if (cancelado) return
-        status = resultado
-        status.addEventListener('change', aoMudar)
-        aplicarPermissao(status.state)
+      .then((result) => {
+        if (cancelled) return
+        status = result
+        status.addEventListener('change', onChange)
+        applyPermission(status.state)
       })
-      .catch(() => !cancelado && aplicarPermissao('prompt'))
+      .catch(() => !cancelled && applyPermission('prompt'))
   } else {
-    aplicarPermissao('prompt')
+    applyPermission('prompt')
   }
 
   return () => {
-    cancelado = true
-    status?.removeEventListener('change', aoMudar)
-    pararDeAcompanhar()
+    cancelled = true
+    status?.removeEventListener('change', onChange)
+    stopTracking()
   }
 }
 
-export function solicitarLocalizacao(): Promise<Posicao | null> {
-  if (!disponivel()) return Promise.resolve(null)
+export function requestLocation(): Promise<Position | null> {
+  if (!available()) return Promise.resolve(null)
   return new Promise((resolve) => {
     navigator.geolocation.getCurrentPosition(
-      (resultado) => {
-        const posicao = paraPosicao(resultado)
-        useLocalizacaoStore.setState({ posicao })
-        aplicarEstado('granted')
-        resolve(posicao)
+      (result) => {
+        const position = toPosition(result)
+        useGeolocationStore.setState({ position })
+        applyState('granted')
+        resolve(position)
       },
-      (erro) => {
-        if (erro.code === erro.PERMISSION_DENIED) aplicarEstado('denied')
+      (error) => {
+        if (error.code === error.PERMISSION_DENIED) applyState('denied')
         resolve(null)
       },
-      OPCOES,
+      OPTIONS,
     )
   })
 }

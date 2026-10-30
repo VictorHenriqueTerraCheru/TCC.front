@@ -1,76 +1,74 @@
-import { useRascunhoStore } from './rascunho-store'
+import { useDraftStore } from './rascunho-store'
 
 beforeEach(() => {
-  useRascunhoStore.getState().limpar()
+  useDraftStore.getState().clear()
   sessionStorage.clear()
 })
 
-describe('rascunho do registro (regra 5)', () => {
-  it('começa vazio, com horário "agora"', () => {
-    expect(useRascunhoStore.getState()).toMatchObject({
+describe('report draft (rule 5)', () => {
+  it('starts empty, with time "now"', () => {
+    expect(useDraftStore.getState()).toMatchObject({
       categoryId: null,
-      local: null,
+      location: null,
       description: '',
-      horario: { modo: 'agora', outroEm: null },
+      time: { mode: 'now', otherAt: null },
     })
   })
 
-  it('guarda categoria, local, descrição e horário', () => {
-    const { escolherCategoria, definirLocal, definirDescricao, definirHorario } =
-      useRascunhoStore.getState()
-    escolherCategoria(3)
-    definirLocal({ lat: -22.95, lng: -43.18 })
-    definirDescricao('Buraco fundo na calçada')
-    definirHorario({ modo: 'other', outroEm: '2026-10-20T10:00:00.000Z' })
+  it('stores category, location, description and time', () => {
+    const { chooseCategory, setLocation, setDescription, setTime } = useDraftStore.getState()
+    chooseCategory(3)
+    setLocation({ lat: -22.95, lng: -43.18 })
+    setDescription('Buraco fundo na calçada')
+    setTime({ mode: 'other', otherAt: '2026-10-20T10:00:00.000Z' })
 
-    expect(useRascunhoStore.getState()).toMatchObject({
+    expect(useDraftStore.getState()).toMatchObject({
       categoryId: 3,
-      local: { lat: -22.95, lng: -43.18 },
+      location: { lat: -22.95, lng: -43.18 },
       description: 'Buraco fundo na calçada',
-      horario: { modo: 'other', outroEm: '2026-10-20T10:00:00.000Z' },
+      time: { mode: 'other', otherAt: '2026-10-20T10:00:00.000Z' },
     })
   })
 
-  it('definirLocal com o mesmo centro mantém o objeto (não reinicia o debounce do endereço)', () => {
-    useRascunhoStore.getState().definirLocal({ lat: -22.95, lng: -43.18 })
-    const antes = useRascunhoStore.getState().local
+  it('setLocation with the same center keeps the object (does not restart the address debounce)', () => {
+    useDraftStore.getState().setLocation({ lat: -22.95, lng: -43.18 })
+    const before = useDraftStore.getState().location
 
-    useRascunhoStore.getState().definirLocal({ lat: -22.95, lng: -43.18 })
+    useDraftStore.getState().setLocation({ lat: -22.95, lng: -43.18 })
 
-    expect(useRascunhoStore.getState().local).toBe(antes)
+    expect(useDraftStore.getState().location).toBe(before)
   })
 
-  it('definirLocal com outro centro troca o objeto', () => {
-    useRascunhoStore.getState().definirLocal({ lat: -22.95, lng: -43.18 })
-    const antes = useRascunhoStore.getState().local
+  it('setLocation with another center replaces the object', () => {
+    useDraftStore.getState().setLocation({ lat: -22.95, lng: -43.18 })
+    const before = useDraftStore.getState().location
 
-    useRascunhoStore.getState().definirLocal({ lat: -22.95, lng: -43.19 })
+    useDraftStore.getState().setLocation({ lat: -22.95, lng: -43.19 })
 
-    expect(useRascunhoStore.getState().local).not.toBe(antes)
-    expect(useRascunhoStore.getState().local).toEqual({ lat: -22.95, lng: -43.19 })
+    expect(useDraftStore.getState().location).not.toBe(before)
+    expect(useDraftStore.getState().location).toEqual({ lat: -22.95, lng: -43.19 })
   })
 
-  it('limpar volta ao estado inicial', () => {
-    const { escolherCategoria, definirLocal, definirDescricao, limpar } =
-      useRascunhoStore.getState()
-    escolherCategoria(3)
-    definirLocal({ lat: -22.95, lng: -43.18 })
-    definirDescricao('x')
+  it('clear goes back to the initial state', () => {
+    const { chooseCategory, setLocation, setDescription, clear } = useDraftStore.getState()
+    chooseCategory(3)
+    setLocation({ lat: -22.95, lng: -43.18 })
+    setDescription('x')
 
-    limpar()
+    clear()
 
-    expect(useRascunhoStore.getState()).toMatchObject({
+    expect(useDraftStore.getState()).toMatchObject({
       categoryId: null,
-      local: null,
+      location: null,
       description: '',
-      horario: { modo: 'agora', outroEm: null },
+      time: { mode: 'now', otherAt: null },
     })
   })
 
-  it('persiste no sessionStorage, para sobreviver a recarregar e à falha de envio', () => {
-    useRascunhoStore.getState().definirDescricao('Poste apagado')
+  it('persists in sessionStorage, to survive a reload and a submit failure', () => {
+    useDraftStore.getState().setDescription('Poste apagado')
 
-    const guardado = JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro') ?? '{}')
-    expect(guardado.state.description).toBe('Poste apagado')
+    const stored = JSON.parse(sessionStorage.getItem('ocorrencias.rascunhoRegistro') ?? '{}')
+    expect(stored.state.description).toBe('Poste apagado')
   })
 })

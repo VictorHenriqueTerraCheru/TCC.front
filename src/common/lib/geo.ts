@@ -1,49 +1,49 @@
 import type { Feature, LineString, Polygon } from 'geojson'
 
-const RAIO_TERRA_M = 6_371_000
+const EARTH_RADIUS_M = 6_371_000
 
-export function distanciaMetros(
+export function distanceMeters(
   a: { lat: number; lng: number },
   b: { lat: number; lng: number },
 ): number {
-  const rad = (graus: number) => (graus * Math.PI) / 180
+  const rad = (degrees: number) => (degrees * Math.PI) / 180
   const dLat = rad(b.lat - a.lat)
   const dLng = rad(b.lng - a.lng)
   const h =
     Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2
-  return 2 * RAIO_TERRA_M * Math.asin(Math.sqrt(h))
+  return 2 * EARTH_RADIUS_M * Math.asin(Math.sqrt(h))
 }
 
-export interface Ponto {
+export interface Point {
   lat: number
   lng: number
 }
 
-export function circuloGeoJson(centro: Ponto, raioMetros: number, passos = 64): Feature<Polygon> {
-  const rad = (graus: number) => (graus * Math.PI) / 180
-  const graus = (radianos: number) => (radianos * 180) / Math.PI
-  const angular = raioMetros / RAIO_TERRA_M
-  const lat1 = rad(centro.lat)
-  const lng1 = rad(centro.lng)
-  const anel: [number, number][] = []
+export function circleGeoJson(center: Point, radiusMeters: number, passos = 64): Feature<Polygon> {
+  const rad = (degrees: number) => (degrees * Math.PI) / 180
+  const degrees = (radians: number) => (radians * 180) / Math.PI
+  const angular = radiusMeters / EARTH_RADIUS_M
+  const lat1 = rad(center.lat)
+  const lng1 = rad(center.lng)
+  const ring: [number, number][] = []
   for (let i = 0; i < passos; i++) {
-    const rumo = (2 * Math.PI * i) / passos
+    const heading = (2 * Math.PI * i) / passos
     const lat2 = Math.asin(
-      Math.sin(lat1) * Math.cos(angular) + Math.cos(lat1) * Math.sin(angular) * Math.cos(rumo),
+      Math.sin(lat1) * Math.cos(angular) + Math.cos(lat1) * Math.sin(angular) * Math.cos(heading),
     )
     const lng2 =
       lng1 +
       Math.atan2(
-        Math.sin(rumo) * Math.sin(angular) * Math.cos(lat1),
+        Math.sin(heading) * Math.sin(angular) * Math.cos(lat1),
         Math.cos(angular) - Math.sin(lat1) * Math.sin(lat2),
       )
-    anel.push([graus(lng2), graus(lat2)])
+    ring.push([degrees(lng2), degrees(lat2)])
   }
-  anel.push(anel[0]!)
-  return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [anel] } }
+  ring.push(ring[0]!)
+  return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } }
 }
 
-export function linhaGeoJson(a: Ponto, b: Ponto): Feature<LineString> {
+export function lineGeoJson(a: Point, b: Point): Feature<LineString> {
   return {
     type: 'Feature',
     properties: {},

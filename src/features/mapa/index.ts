@@ -1,3 +1,3 @@
-export { AreaIncidentesPage } from './pages/area-incidentes-page'
-export { DetalheProblemaPage } from './pages/detalhe-problema-page'
-export { MapaPage } from './pages/mapa-page'
+export { IncidentAreaPage } from './pages/area-incidentes-page'
+export { IssueDetailPage } from './pages/detalhe-problema-page'
+export { MapPage } from './pages/mapa-page'

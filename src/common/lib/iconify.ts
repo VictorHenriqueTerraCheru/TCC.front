@@ -1,161 +1,155 @@
 const HOST = 'https://api.iconify.design'
-const PREFIXO = 'material-symbols'
-const CHAVE_CACHE = 'ocorrencias.iconesRemotos'
-const D_VALIDO = /^[MmLlHhVvCcSsQqTtAaZz0-9eE+\-.,\s]+$/
-const TAMANHO_MAXIMO_D = 4000
-const TAMANHO_MAXIMO_VIEWBOX = 512
-const TEMPO_LIMITE_MS = 8000
-const NOME_VALIDO = /^[a-z0-9_-]+$/
+const PREFIX = 'material-symbols'
+const CACHE_KEY = 'ocorrencias.iconesRemotos'
+const VALID_D = /^[MmLlHhVvCcSsQqTtAaZz0-9eE+\-.,\s]+$/
+const MAX_D_LENGTH = 4000
+const MAX_VIEWBOX_LENGTH = 512
+const TIMEOUT_MS = 8000
+const VALID_NAME = /^[a-z0-9_-]+$/
 
-export interface IconeRemotoDados {
-  caminhos: string[]
+export interface RemoteIconData {
+  paths: string[]
   pageSize: number
 }
 
-export function nomeNoIconify(nome: string) {
-  return `${nome.replaceAll('_', '-')}-rounded`
+export function iconifyName(name: string) {
+  return `${name.replaceAll('_', '-')}-rounded`
 }
 
-export function nomeDoResultado(id: string): string | null {
-  const [prefixo, nome] = id.split(':')
-  if (prefixo !== PREFIXO || !nome?.endsWith('-rounded') || nome.endsWith('-outline-rounded')) {
+export function resultName(id: string): string | null {
+  const [prefix, name] = id.split(':')
+  if (prefix !== PREFIX || !name?.endsWith('-rounded') || name.endsWith('-outline-rounded')) {
     return null
   }
-  return nome.slice(0, -'-rounded'.length).replaceAll('-', '_')
+  return name.slice(0, -'-rounded'.length).replaceAll('-', '_')
 }
 
-export function caminhosDoCorpo(corpo: string): string[] | null {
-  const caminhos: string[] = []
-  const resto = corpo.replace(/<path\b([^>]*?)\/?>/g, (_, atributos: string) => {
-    const d = /(?:^|\s)d="([^"]*)"/.exec(atributos)?.[1]
-    if (d && d.length <= TAMANHO_MAXIMO_D && D_VALIDO.test(d)) caminhos.push(d)
+export function bodyPaths(body: string): string[] | null {
+  const paths: string[] = []
+  const rest = body.replace(/<path\b([^>]*?)\/?>/g, (_, attributes: string) => {
+    const d = /(?:^|\s)d="([^"]*)"/.exec(attributes)?.[1]
+    if (d && d.length <= MAX_D_LENGTH && VALID_D.test(d)) paths.push(d)
     return ''
   })
-  return resto.trim() === '' && caminhos.length > 0 ? caminhos : null
+  return rest.trim() === '' && paths.length > 0 ? paths : null
 }
 
-function dadosValidos(valor: unknown): valor is IconeRemotoDados {
-  if (typeof valor !== 'object' || valor === null) return false
-  const { caminhos, pageSize: tamanho } = valor as Partial<IconeRemotoDados>
+function validData(value: unknown): value is RemoteIconData {
+  if (typeof value !== 'object' || value === null) return false
+  const { paths, pageSize: size } = value as Partial<RemoteIconData>
   return (
-    Array.isArray(caminhos) &&
-    caminhos.length > 0 &&
-    caminhos.every(
-      (d) => typeof d === 'string' && d.length <= TAMANHO_MAXIMO_D && D_VALIDO.test(d),
-    ) &&
-    typeof tamanho === 'number' &&
-    Number.isFinite(tamanho) &&
-    tamanho > 0 &&
-    tamanho <= TAMANHO_MAXIMO_VIEWBOX
+    Array.isArray(paths) &&
+    paths.length > 0 &&
+    paths.every((d) => typeof d === 'string' && d.length <= MAX_D_LENGTH && VALID_D.test(d)) &&
+    typeof size === 'number' &&
+    Number.isFinite(size) &&
+    size > 0 &&
+    size <= MAX_VIEWBOX_LENGTH
   )
 }
 
-function lerCache(): Record<string, unknown> {
+function readCache(): Record<string, unknown> {
   try {
-    const salvo: unknown = JSON.parse(localStorage.getItem(CHAVE_CACHE) ?? '{}')
-    return typeof salvo === 'object' && salvo !== null && !Array.isArray(salvo)
-      ? (salvo as Record<string, unknown>)
+    const saved: unknown = JSON.parse(localStorage.getItem(CACHE_KEY) ?? '{}')
+    return typeof saved === 'object' && saved !== null && !Array.isArray(saved)
+      ? (saved as Record<string, unknown>)
       : {}
   } catch {
     return {}
   }
 }
 
-function gravarCache(novos: Record<string, IconeRemotoDados>) {
+function saveCache(newEntries: Record<string, RemoteIconData>) {
   try {
-    localStorage.setItem(CHAVE_CACHE, JSON.stringify({ ...lerCache(), ...novos }))
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ ...readCache(), ...newEntries }))
   } catch {
     void 0
   }
 }
 
-function comTempoLimite(sinal?: AbortSignal) {
-  const controle = new AbortController()
-  const timer = setTimeout(() => controle.abort(), TEMPO_LIMITE_MS)
-  sinal?.addEventListener('abort', () => controle.abort(), { once: true })
-  return { sinal: controle.signal, limpar: () => clearTimeout(timer) }
+function withTimeout(signal?: AbortSignal) {
+  const control = new AbortController()
+  const timer = setTimeout(() => control.abort(), TIMEOUT_MS)
+  signal?.addEventListener('abort', () => control.abort(), { once: true })
+  return { signal: control.signal, clear: () => clearTimeout(timer) }
 }
 
-async function buscarJson(url: string, sinal?: AbortSignal): Promise<unknown> {
-  const limite = comTempoLimite(sinal)
+async function fetchJson(url: string, signal?: AbortSignal): Promise<unknown> {
+  const limit = withTimeout(signal)
   try {
-    const resposta = await fetch(url, { signal: limite.sinal })
-    if (!resposta.ok) throw new Error(`Iconify respondeu ${resposta.status}`)
-    return await resposta.json()
+    const response = await fetch(url, { signal: limit.signal })
+    if (!response.ok) throw new Error(`Iconify respondeu ${response.status}`)
+    return await response.json()
   } finally {
-    limite.limpar()
+    limit.clear()
   }
 }
 
-const emMemoria = new Map<string, Promise<IconeRemotoDados | null>>()
-let fila: { name: string; resolver(dados: IconeRemotoDados | null): void }[] = []
+const inMemory = new Map<string, Promise<RemoteIconData | null>>()
+let queue: { name: string; resolve(unwrapData: RemoteIconData | null): void }[] = []
 
-async function buscarLote(nomes: string[]): Promise<Map<string, IconeRemotoDados>> {
-  const consulta = nomes.map(nomeNoIconify).join(',')
-  const json = (await buscarJson(
-    `${HOST}/${PREFIXO}.json?icons=${encodeURIComponent(consulta)}`,
-  )) as {
+async function fetchBatch(names: string[]): Promise<Map<string, RemoteIconData>> {
+  const query = names.map(iconifyName).join(',')
+  const json = (await fetchJson(`${HOST}/${PREFIX}.json?icons=${encodeURIComponent(query)}`)) as {
     width?: number
     icons?: Record<string, { body?: string; width?: number }>
   }
-  const resultado = new Map<string, IconeRemotoDados>()
-  for (const nome of nomes) {
-    const chave = nomeNoIconify(nome)
-    const icone = json.icons && Object.hasOwn(json.icons, chave) ? json.icons[chave] : undefined
-    const caminhos = icone?.body ? caminhosDoCorpo(icone.body) : null
-    const dados = { caminhos: caminhos ?? [], pageSize: icone?.width ?? json.width ?? 24 }
-    if (dadosValidos(dados)) resultado.set(nome, dados)
+  const result = new Map<string, RemoteIconData>()
+  for (const name of names) {
+    const key = iconifyName(name)
+    const icon = json.icons && Object.hasOwn(json.icons, key) ? json.icons[key] : undefined
+    const paths = icon?.body ? bodyPaths(icon.body) : null
+    const unwrapData = { paths: paths ?? [], pageSize: icon?.width ?? json.width ?? 24 }
+    if (validData(unwrapData)) result.set(name, unwrapData)
   }
-  return resultado
+  return result
 }
 
-function descarregarFila() {
-  const lote = fila
-  fila = []
-  if (lote.length === 0) return
-  const nomes = lote.map((item) => item.name)
-  buscarLote(nomes)
-    .then((resultado) => {
-      gravarCache(Object.fromEntries(resultado))
-      for (const { name: nome, resolver } of lote) resolver(resultado.get(nome) ?? null)
+function flushQueue() {
+  const batch = queue
+  queue = []
+  if (batch.length === 0) return
+  const names = batch.map((item) => item.name)
+  fetchBatch(names)
+    .then((result) => {
+      saveCache(Object.fromEntries(result))
+      for (const { name, resolve } of batch) resolve(result.get(name) ?? null)
     })
     .catch(() => {
-      for (const { resolver } of lote) resolver(null)
+      for (const { resolve } of batch) resolve(null)
     })
 }
 
-export function carregarIcone(nome: string): Promise<IconeRemotoDados | null> {
-  if (!NOME_VALIDO.test(nome)) return Promise.resolve(null)
-  const existente = emMemoria.get(nome)
-  if (existente) return existente
+export function loadIcon(name: string): Promise<RemoteIconData | null> {
+  if (!VALID_NAME.test(name)) return Promise.resolve(null)
+  const existing = inMemory.get(name)
+  if (existing) return existing
 
-  const cache = lerCache()
-  const salvo = Object.hasOwn(cache, nome) && dadosValidos(cache[nome]) ? cache[nome] : null
-  const promessa = salvo
-    ? Promise.resolve(salvo)
-    : new Promise<IconeRemotoDados | null>((resolver) => {
-        fila.push({ name: nome, resolver })
-        if (fila.length === 1) queueMicrotask(descarregarFila)
+  const cache = readCache()
+  const saved = Object.hasOwn(cache, name) && validData(cache[name]) ? cache[name] : null
+  const promise = saved
+    ? Promise.resolve(saved)
+    : new Promise<RemoteIconData | null>((resolve) => {
+        queue.push({ name, resolve })
+        if (queue.length === 1) queueMicrotask(flushQueue)
       })
-  emMemoria.set(nome, promessa)
-  return promessa
+  inMemory.set(name, promise)
+  return promise
 }
 
-export async function buscarIcones(consulta: string, sinal?: AbortSignal): Promise<string[]> {
-  const url = `${HOST}/search?query=${encodeURIComponent(consulta)}&prefix=${PREFIXO}&limit=96`
-  const resposta = await fetch(url, { signal: sinal })
-  if (!resposta.ok) throw new Error(`Iconify respondeu ${resposta.status}`)
-  const json = (await resposta.json()) as { icons?: string[] }
-  return [
-    ...new Set((json.icons ?? []).map(nomeDoResultado).filter((n): n is string => n !== null)),
-  ]
+export async function fetchIcons(query: string, signal?: AbortSignal): Promise<string[]> {
+  const url = `${HOST}/search?query=${encodeURIComponent(query)}&prefix=${PREFIX}&limit=96`
+  const response = await fetch(url, { signal })
+  if (!response.ok) throw new Error(`Iconify respondeu ${response.status}`)
+  const json = (await response.json()) as { icons?: string[] }
+  return [...new Set((json.icons ?? []).map(resultName).filter((n): n is string => n !== null))]
 }
 
-export function limparCacheDeIcones() {
-  emMemoria.clear()
-  fila = []
+export function clearIconCache() {
+  inMemory.clear()
+  queue = []
   try {
-    localStorage.removeItem(CHAVE_CACHE)
+    localStorage.removeItem(CACHE_KEY)
   } catch {
     void 0
   }

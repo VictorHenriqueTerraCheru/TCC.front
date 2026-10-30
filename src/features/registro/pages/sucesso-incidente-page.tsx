@@ -2,37 +2,31 @@ import { useLocation } from 'react-router'
 
 import type { AreaIncidentesDados } from '@/features/incidentes'
 
-import { TelaSucesso } from './sucesso-page'
+import { SuccessScreen } from './sucesso-page'
 
 const plural: Record<number, string> = { 7: 'Roubos', 8: 'Acidentes' }
 
-export function SucessoIncidentePage() {
+export function IncidentSuccessPage() {
   const { state } = useLocation()
-  const {
-    area,
-    categoryId: categoriaId,
-    areaLabel: rotuloArea,
-    neighborhood: bairro,
-    ponto,
-  } = (state ?? {}) as {
+  const { area, categoryId, areaLabel, neighborhood, point } = (state ?? {}) as {
     area?: AreaIncidentesDados
     categoryId?: number
     areaLabel?: string | null
     neighborhood?: string | null
-    ponto?: { lat: number; lng: number }
+    point?: { lat: number; lng: number }
   }
-  const contagem = area?.counts.find((c) => c.categoryId === categoriaId)
-  const verNoMapa = ponto
-    ? `/mapa/area?modo=incidentes&lat=${ponto.lat.toFixed(5)}&lng=${ponto.lng.toFixed(5)}`
-    : '/mapa?modo=incidentes'
+  const count = area?.counts.find((c) => c.categoryId === categoryId)
+  const viewOnMap = point
+    ? `/mapa/area?mode=incidents&lat=${point.lat.toFixed(5)}&lng=${point.lng.toFixed(5)}`
+    : '/mapa?mode=incidents'
 
   return (
-    <TelaSucesso
-      titulo="Relato enviado"
-      texto={`Obrigado. Seu relato já faz parte do mapa de calor${bairro ? ` de ${bairro}` : ''}, de forma anônima. Ele não aparece como marcador e não recebe votos.`}
-      verNoMapa={verNoMapa}
-      cartao={
-        contagem && (
+    <SuccessScreen
+      title="Relato enviado"
+      text={`Obrigado. Seu relato já faz parte do mapa de calor${neighborhood ? ` de ${neighborhood}` : ''}, de forma anônima. Ele não aparece como marcador e não recebe votos.`}
+      viewOnMap={viewOnMap}
+      card={
+        count && (
           <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-1">
             <span
               aria-hidden="true"
@@ -43,10 +37,10 @@ export function SucessoIncidentePage() {
               }}
             />
             <div className="min-w-0">
-              <p className="font-medium">{rotuloArea ?? 'Área do relato'}</p>
+              <p className="font-medium">{areaLabel ?? 'Área do relato'}</p>
               <p className="text-xs text-muted-foreground">
-                {plural[contagem.categoryId] ?? contagem.name} · {contagem.days7}{' '}
-                {contagem.days7 === 1 ? 'relato' : 'relatos'} nos últimos 7 dias
+                {plural[count.categoryId] ?? count.name} · {count.days7}{' '}
+                {count.days7 === 1 ? 'relato' : 'relatos'} nos últimos 7 dias
               </p>
             </div>
           </div>

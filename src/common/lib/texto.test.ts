@@ -1,8 +1,8 @@
-import { semAcento } from './texto'
+import { withoutAccents } from './texto'
 
-describe('semAcento', () => {
-  it('tira acento e põe em minúsculas', () => {
-    expect(semAcento('Calçada Danificada')).toBe('calcada danificada')
-    expect(semAcento('Água e esgoto')).toBe('agua e esgoto')
+describe('withoutAccents', () => {
+  it('removes accents and lowercases', () => {
+    expect(withoutAccents('Calçada Danificada')).toBe('calcada danificada')
+    expect(withoutAccents('Água e esgoto')).toBe('agua e esgoto')
   })
 })

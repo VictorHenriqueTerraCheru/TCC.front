@@ -1,49 +1,56 @@
 import type { ReactNode } from 'react'
 
-import { Segmentado } from '@/common/components/segmentado'
+import { SegmentedControl } from '@/common/components/segmentado'
 import { Button } from '@/common/ui/button'
-import type { TipoGrupo } from '@/features/categorias'
+import type { GroupType } from '@/features/categorias'
 
-import { rotuloDoTipo } from '../models/tipo'
+import { typeLabel } from '../models/tipo'
 
-export type FiltroTipo = 'todos' | TipoGrupo
+export type TypeFilter = 'all' | GroupType
 
-const opcoesTipo: { value: FiltroTipo; label: string }[] = [
-  { value: 'todos', label: 'Todos' },
-  { value: 'issue', label: rotuloDoTipo.issue },
-  { value: 'incident', label: rotuloDoTipo.incident },
+const typeOptions: { value: TypeFilter; label: string }[] = [
+  { value: 'all', label: 'Todos' },
+  { value: 'issue', label: typeLabel.issue },
+  { value: 'incident', label: typeLabel.incident },
 ]
 
-export function SegmentadoTipo({
-  value: valor,
-  aoMudar,
+export function TypeSegmentedControl({
+  value,
+  onChange,
 }: {
-  value: FiltroTipo
-  aoMudar(valor: FiltroTipo): void
+  value: TypeFilter
+  onChange(value: TypeFilter): void
 }) {
-  return <Segmentado<FiltroTipo> label="Tipo" opcoes={opcoesTipo} value={valor} aoMudar={aoMudar} />
+  return (
+    <SegmentedControl<TypeFilter>
+      label="Tipo"
+      options={typeOptions}
+      value={value}
+      onChange={onChange}
+    />
+  )
 }
 
-export function ResumoDosFiltros({
-  mostradas,
+export function FilterSummary({
+  shown,
   total,
-  substantivo,
-  filtrando,
-  aoLimpar,
+  noun,
+  filtering,
+  onClear,
 }: {
-  mostradas: number
+  shown: number
   total: number
-  substantivo: string
-  filtrando: boolean
-  aoLimpar(): void
+  noun: string
+  filtering: boolean
+  onClear(): void
 }): ReactNode {
   return (
     <div className="flex items-center justify-between gap-3">
       <p className="text-sm text-muted-foreground" aria-live="polite">
-        {filtrando ? `${mostradas} de ${total} ${substantivo}` : `${total} ${substantivo}`}
+        {filtering ? `${shown} de ${total} ${noun}` : `${total} ${noun}`}
       </p>
-      {filtrando && (
-        <Button variant="ghost" size="sm" onClick={aoLimpar}>
+      {filtering && (
+        <Button variant="ghost" size="sm" onClick={onClear}>
           Limpar filtros
         </Button>
       )}

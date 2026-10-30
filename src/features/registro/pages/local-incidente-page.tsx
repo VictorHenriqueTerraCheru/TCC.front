@@ -2,31 +2,31 @@ import { useNavigate } from 'react-router'
 
 import { Skeleton } from '@/common/ui/skeleton'
 import { Button } from '@/common/ui/button'
-import { CategoriaIcone } from '@/features/categorias'
+import { CategoryIcon } from '@/features/categorias'
 
-import { MapaRegistro } from '../components/mapa-registro'
-import { PassoRegistro } from '../components/passo-registro'
-import { SeletorHorario } from '../components/seletor-horario'
-import { useEnderecoDoRascunho, useExigirCategoria, useRascunho } from '../hooks/use-rascunho'
-import { caminhoDaCategoria } from '../models/rotas'
+import { ReportMap } from '../components/mapa-registro'
+import { ReportStep } from '../components/passo-registro'
+import { TimePicker } from '../components/seletor-horario'
+import { useDraftAddress, useRequireCategory, useDraft } from '../hooks/use-rascunho'
+import { categoryPath } from '../models/rotas'
 
-export function LocalIncidentePage() {
+export function IncidentLocationPage() {
   const navigate = useNavigate()
-  const { category: categoria, local, horario, definirHorario } = useRascunho()
-  const { data: endereco, atualizando } = useEnderecoDoRascunho()
-  useExigirCategoria('incident')
+  const { category, location, time, setTime } = useDraft()
+  const { data: address, updating } = useDraftAddress()
+  useRequireCategory('incident')
 
   return (
-    <PassoRegistro
-      titulo="Onde aconteceu?"
-      passo={{ atual: 2, total: 3, label: `Local · ${categoria?.name ?? ''}` }}
-      acaoTopo="voltar"
-      aoTopo={() => navigate(caminhoDaCategoria('incident'))}
-      mapa={<MapaRegistro modo="area" />}
-      rodape={
+    <ReportStep
+      title="Onde aconteceu?"
+      step={{ current: 2, total: 3, label: `Local · ${category?.name ?? ''}` }}
+      topAction="back"
+      onTopAction={() => navigate(categoryPath('incident'))}
+      map={<ReportMap mode="area" />}
+      footer={
         <Button
           className="w-full"
-          disabled={!local}
+          disabled={!location}
           onClick={() => navigate('/registrar/incidente/revisao')}
         >
           Continuar
@@ -35,19 +35,19 @@ export function LocalIncidentePage() {
     >
       <div className="space-y-5">
         <div className="flex gap-3" aria-live="polite">
-          {categoria && <CategoriaIcone category={categoria} />}
+          {category && <CategoryIcon category={category} />}
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground">Área aproximada · raio de 150 m</p>
-            {atualizando || !endereco ? (
+            {updating || !address ? (
               <Skeleton className="mt-1 h-5 w-4/5 bg-muted" />
             ) : (
-              <p className="font-medium">{endereco.areaLabel ?? endereco.address}</p>
+              <p className="font-medium">{address.areaLabel ?? address.address}</p>
             )}
             <p className="text-xs text-muted-foreground">O ponto exato não é salvo nem exibido.</p>
           </div>
         </div>
-        <SeletorHorario horario={horario} aoMudar={definirHorario} />
+        <TimePicker time={time} onChange={setTime} />
       </div>
-    </PassoRegistro>
+    </ReportStep>
   )
 }

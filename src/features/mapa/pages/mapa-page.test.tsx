@@ -2,43 +2,43 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 
-import { useMonitorarLocalizacao } from '@/features/localizacao'
-import { banco } from '@/infrastructure/mocks/banco'
-import { rota } from '@/infrastructure/mocks/rota'
+import { useWatchLocation } from '@/features/localizacao'
+import { database } from '@/infrastructure/mocks/banco'
+import { route } from '@/infrastructure/mocks/rota'
 import { server } from '@/infrastructure/mocks/server'
-import { mapaFalso } from '@/test/maplibre-falso'
-import { definirLargura, renderizarRotas } from '@/test/render'
+import { fakeMap } from '@/test/maplibre-falso'
+import { setWidth, renderRoutes } from '@/test/render'
 
-import { MapaPage } from './mapa-page'
+import { MapPage } from './mapa-page'
 
-function MapaComLocalizacao() {
-  useMonitorarLocalizacao()
-  return <MapaPage />
+function MapWithLocation() {
+  useWatchLocation()
+  return <MapPage />
 }
 
-function renderizarMapa(caminho = '/mapa') {
-  definirLargura(390)
-  return renderizarRotas([{ path: '/mapa', element: <MapaComLocalizacao /> }], caminho)
+function renderMap(path = '/mapa') {
+  setWidth(390)
+  return renderRoutes([{ path: '/mapa', element: <MapWithLocation /> }], path)
 }
 
-describe('MapaPage', () => {
-  it('troca de modo e mostra os chips do modo escolhido', async () => {
-    const usuario = userEvent.setup()
-    const { router } = renderizarMapa()
+describe('MapPage', () => {
+  it('switches mode and shows the chips of the chosen mode', async () => {
+    const user = userEvent.setup()
+    const { router } = renderMap()
 
     expect(screen.getByRole('radio', { name: /Problemas/ })).toHaveAttribute('aria-checked', 'true')
     expect(screen.queryByRole('button', { name: /Segurança/ })).not.toBeInTheDocument()
 
-    await usuario.click(screen.getByRole('radio', { name: /Incidentes/ }))
+    await user.click(screen.getByRole('radio', { name: /Incidentes/ }))
 
-    expect(router.state.location.search).toBe('?modo=incidentes')
+    expect(router.state.location.search).toBe('?mode=incidents')
     expect(await screen.findByRole('button', { name: /Segurança/ })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Via pública/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Em avaliação/ })).not.toBeInTheDocument()
   })
 
-  it('link com chip de outro modo é ignorado (não apaga as camadas)', async () => {
-    renderizarMapa('/mapa?grupos=seguranca')
+  it('link with a chip from another mode is ignored (does not clear the layers)', async () => {
+    renderMap('/mapa?groups=seguranca')
 
     expect(screen.getByRole('radio', { name: /Problemas/ })).toHaveAttribute('aria-checked', 'true')
     for (const chip of [/Via pública/, /Elétrica/, /Limpeza/]) {
@@ -50,86 +50,86 @@ describe('MapaPage', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
-  it('trocar de modo antes de os grupos chegarem não apaga os chips do link', async () => {
-    let liberar = () => {}
-    const espera = new Promise<void>((resolver) => {
-      liberar = resolver
+  it('switching mode before the groups arrive does not clear the link chips', async () => {
+    let release = () => {}
+    const wait = new Promise<void>((resolve) => {
+      release = resolve
     })
     server.use(
-      http.get(rota('/groups'), async () => {
-        await espera
-        return HttpResponse.json(banco.grupos())
+      http.get(route('/groups'), async () => {
+        await wait
+        return HttpResponse.json(database.groups())
       }),
     )
-    const usuario = userEvent.setup()
-    const { router } = renderizarMapa('/mapa?modo=incidentes&grupos=seguranca')
+    const user = userEvent.setup()
+    const { router } = renderMap('/mapa?mode=incidents&groups=seguranca')
 
-    await usuario.click(screen.getByRole('radio', { name: /Ambos/ }))
-    expect(router.state.location.search).toContain('grupos=seguranca')
-    liberar()
+    await user.click(screen.getByRole('radio', { name: /Ambos/ }))
+    expect(router.state.location.search).toContain('groups=seguranca')
+    release()
     expect(await screen.findByRole('button', { name: /Segurança/ })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
   })
 
-  it('falha em GET /grupos mostra o erro do mapa em vez de sumir com as camadas', async () => {
-    server.use(http.get(rota('/groups'), () => new HttpResponse(null, { status: 500 })))
-    renderizarMapa()
+  it('failure on GET /grupos shows the map error instead of hiding the layers', async () => {
+    server.use(http.get(route('/groups'), () => new HttpResponse(null, { status: 500 })))
+    renderMap()
 
     expect(await screen.findByText('Não foi possível carregar o mapa.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
   })
 
-  it('falha em GET /categorias mostra o erro do mapa com "Tentar novamente"', async () => {
-    server.use(http.get(rota('/categories'), () => new HttpResponse(null, { status: 500 })))
-    renderizarMapa()
+  it('failure on GET /categorias shows the map error with "Tentar novamente"', async () => {
+    server.use(http.get(route('/categories'), () => new HttpResponse(null, { status: 500 })))
+    renderMap()
 
     expect(await screen.findByText('Não foi possível carregar o mapa.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tentar novamente' })).toBeInTheDocument()
   })
 
-  it('aviso de área vazia some ao mexer no mapa e não volta a cada área vazia', async () => {
-    server.use(http.get(rota('/issues'), () => HttpResponse.json([])))
-    renderizarMapa()
+  it('empty area notice disappears when moving the map and does not come back on every empty area', async () => {
+    server.use(http.get(route('/issues'), () => HttpResponse.json([])))
+    renderMap()
 
     expect(await screen.findByText('Nenhuma ocorrência nesta área')).toBeInTheDocument()
 
-    fireEvent.pointerDown(screen.getByTestId('mapa'))
+    fireEvent.pointerDown(screen.getByTestId('map'))
 
     expect(screen.queryByText('Nenhuma ocorrência nesta área')).not.toBeInTheDocument()
   })
 
-  it('X do aviso de área vazia fecha de vez', async () => {
-    const usuario = userEvent.setup()
-    let consultas = 0
+  it('the empty area notice X closes it for good', async () => {
+    const user = userEvent.setup()
+    let queries = 0
     server.use(
-      http.get(rota('/issues'), () => {
-        consultas++
+      http.get(route('/issues'), () => {
+        queries++
         return HttpResponse.json([])
       }),
     )
-    const { unmount } = renderizarMapa()
+    const { unmount } = renderMap()
 
-    await usuario.click(await screen.findByRole('button', { name: 'Fechar aviso' }))
+    await user.click(await screen.findByRole('button', { name: 'Fechar aviso' }))
 
     expect(screen.queryByText('Nenhuma ocorrência nesta área')).not.toBeInTheDocument()
     expect(localStorage.getItem('ocorrencias.avisoVazioFechado')).toBe('1')
 
     unmount()
-    const antes = consultas
-    renderizarMapa()
-    await waitFor(() => expect(consultas).toBeGreaterThan(antes))
-    await new Promise((resolver) => setTimeout(resolver, 50))
+    const before = queries
+    renderMap()
+    await waitFor(() => expect(queries).toBeGreaterThan(before))
+    await new Promise((resolve) => setTimeout(resolve, 50))
     expect(screen.queryByText('Nenhuma ocorrência nesta área')).not.toBeInTheDocument()
   })
 
-  it('toque no mapa no modo Ambos sem incidentes mostra o aviso e não abre a área', async () => {
-    server.use(http.get(rota('/incidents/area'), () => HttpResponse.json({ counts: [] })))
-    const { router } = renderizarMapa('/mapa?modo=ambos')
-    await screen.findByTestId('mapa')
+  it('tapping the map in Ambos mode without incidents shows the notice and does not open the area', async () => {
+    server.use(http.get(route('/incidents/area'), () => HttpResponse.json({ counts: [] })))
+    const { router } = renderMap('/mapa?mode=both')
+    await screen.findByTestId('map')
 
-    act(() => mapaFalso.tocar(-22.95, -43.18))
+    act(() => fakeMap.tap(-22.95, -43.18))
 
     expect(
       await screen.findByText('Sem incidentes por aqui nos últimos 7 dias'),
@@ -137,51 +137,51 @@ describe('MapaPage', () => {
     expect(router.state.location.pathname).toBe('/mapa')
   })
 
-  it('retângulo enviado à API fica dentro de ±180 mesmo com o mapa afastado (regra 15)', async () => {
-    const pedidos: URL[] = []
+  it('bounds sent to the API stay within ±180 even with the map zoomed out (rule 15)', async () => {
+    const requests: URL[] = []
     server.use(
-      http.get(rota('/issues'), ({ request }) => {
-        pedidos.push(new URL(request.url))
+      http.get(route('/issues'), ({ request }) => {
+        requests.push(new URL(request.url))
         return HttpResponse.json([])
       }),
     )
-    renderizarMapa()
-    await screen.findByTestId('mapa')
+    renderMap()
+    await screen.findByTestId('map')
 
-    act(() => mapaFalso.mover({ lat: 0, lng: 0 }, { sul: -80, oeste: -200, norte: 80, leste: 200 }))
+    act(() => fakeMap.move({ lat: 0, lng: 0 }, { south: -80, west: -200, north: 80, east: 200 }))
 
-    await waitFor(() => expect(pedidos.at(-1)?.searchParams.get('minLng')).toBe('-180'), {
+    await waitFor(() => expect(requests.at(-1)?.searchParams.get('minLng')).toBe('-180'), {
       timeout: 2000,
     })
-    expect(pedidos.at(-1)!.searchParams.get('maxLng')).toBe('180')
+    expect(requests.at(-1)!.searchParams.get('maxLng')).toBe('180')
   })
 
-  it('marca chips de filtro na URL e limpa os que não existem no novo modo', async () => {
-    const usuario = userEvent.setup()
-    const { router } = renderizarMapa('/mapa?modo=ambos')
+  it('marks filter chips in the URL and clears those that do not exist in the new mode', async () => {
+    const user = userEvent.setup()
+    const { router } = renderMap('/mapa?mode=both')
 
-    await usuario.click(await screen.findByRole('button', { name: /Elétrica/ }))
-    await usuario.click(await screen.findByRole('button', { name: /Segurança/ }))
-    await usuario.click(screen.getByRole('button', { name: /Em avaliação/ }))
+    await user.click(await screen.findByRole('button', { name: /Elétrica/ }))
+    await user.click(await screen.findByRole('button', { name: /Segurança/ }))
+    await user.click(screen.getByRole('button', { name: /Em avaliação/ }))
 
     expect(screen.getByRole('button', { name: /Elétrica/ })).toHaveAttribute('aria-pressed', 'true')
-    expect(new URLSearchParams(router.state.location.search).get('grupos')).toBe(
+    expect(new URLSearchParams(router.state.location.search).get('groups')).toBe(
       'eletrica,seguranca',
     )
 
-    await usuario.click(screen.getByRole('radio', { name: /Problemas/ }))
+    await user.click(screen.getByRole('radio', { name: /Problemas/ }))
 
     const params = new URLSearchParams(router.state.location.search)
-    expect(params.get('grupos')).toBe('eletrica')
-    expect(params.get('nova')).toBe('1')
+    expect(params.get('groups')).toBe('eletrica')
+    expect(params.get('new')).toBe('1')
   })
 
-  it('sem Geolocation (jsdom) não mostra o banner e o GPS abre a ajuda', async () => {
-    const usuario = userEvent.setup()
-    renderizarMapa()
+  it('without Geolocation (jsdom) does not show the banner and the GPS opens the help', async () => {
+    const user = userEvent.setup()
+    renderMap()
 
     expect(screen.queryByText(/Localização desativada/)).not.toBeInTheDocument()
-    await usuario.click(screen.getByRole('button', { name: 'Ativar localização' }))
+    await user.click(screen.getByRole('button', { name: 'Ativar localização' }))
     expect(await screen.findByRole('dialog', { name: 'Como liberar a localização' })).toBeVisible()
   })
 })

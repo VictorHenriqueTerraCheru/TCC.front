@@ -1,17 +1,17 @@
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 
-import { prePermissaoVista } from '../lib/pre-permissao'
-import { useLocalizacaoStore } from '../stores/localizacao-store'
+import { prePermissionSeen } from '../lib/pre-permissao'
+import { useGeolocationStore } from '../stores/localizacao-store'
 
-export function useRedirecionarPrePermissao(ativo = true) {
-  const estado = useLocalizacaoStore((s) => s.estado)
+export function useRedirectToPrePermission(active = true) {
+  const state = useGeolocationStore((s) => s.state)
   const navigate = useNavigate()
   const { pathname, search } = useLocation()
 
   useEffect(() => {
-    if (!ativo || estado !== 'prompt' || !pathname.startsWith('/mapa') || prePermissaoVista())
+    if (!active || state !== 'prompt' || !pathname.startsWith('/mapa') || prePermissionSeen())
       return
     navigate('/permissao-localizacao', { replace: true, state: { de: `${pathname}${search}` } })
-  }, [ativo, estado, pathname, search, navigate])
+  }, [active, state, pathname, search, navigate])
 }

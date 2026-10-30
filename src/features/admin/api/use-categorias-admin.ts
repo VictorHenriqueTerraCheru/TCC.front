@@ -1,57 +1,57 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { api, dados, semConteudo, type Schema } from '@/infrastructure/api'
+import { api, unwrapData, unwrapEmpty, type Schema } from '@/infrastructure/api'
 
-export type CategoriaAdmin = Schema<'CategoryAdminResponse'>
+export type AdminCategory = Schema<'CategoryAdminResponse'>
 
-export const categoriasAdminQuery = queryOptions({
-  queryKey: ['admin', 'categorias'],
-  queryFn: ({ signal }) => api.GET('/admin/categories', { signal }).then(dados),
+export const adminCategoriesQuery = queryOptions({
+  queryKey: ['admin', 'categories'],
+  queryFn: ({ signal }) => api.GET('/admin/categories', { signal }).then(unwrapData),
 })
 
-export function useCategoriasAdmin() {
-  return useQuery(categoriasAdminQuery)
+export function useAdminCategories() {
+  return useQuery(adminCategoriesQuery)
 }
 
-function useInvalidarCategorias() {
+function useInvalidateCategories() {
   const queryClient = useQueryClient()
   return () => {
-    void queryClient.invalidateQueries({ queryKey: ['admin', 'categorias'] })
-    void queryClient.invalidateQueries({ queryKey: ['categorias'] })
-    void queryClient.invalidateQueries({ queryKey: ['problemas'] })
-    void queryClient.invalidateQueries({ queryKey: ['incidentes'] })
-    void queryClient.invalidateQueries({ queryKey: ['me', 'historico'] })
+    void queryClient.invalidateQueries({ queryKey: ['admin', 'categories'] })
+    void queryClient.invalidateQueries({ queryKey: ['categories'] })
+    void queryClient.invalidateQueries({ queryKey: ['issues'] })
+    void queryClient.invalidateQueries({ queryKey: ['incidents'] })
+    void queryClient.invalidateQueries({ queryKey: ['me', 'history'] })
   }
 }
 
-export function useCriarCategoria() {
-  const invalidar = useInvalidarCategorias()
+export function useCreateCategory() {
+  const invalidate = useInvalidateCategories()
   return useMutation({
-    mutationFn: (corpo: Schema<'CreateCategoryRequest'>) =>
-      api.POST('/admin/categories', { body: corpo }).then(dados),
-    onSuccess: invalidar,
+    mutationFn: (body: Schema<'CreateCategoryRequest'>) =>
+      api.POST('/admin/categories', { body }).then(unwrapData),
+    onSuccess: invalidate,
   })
 }
 
-export function useEditarCategoria() {
-  const invalidar = useInvalidarCategorias()
+export function useEditCategory() {
+  const invalidate = useInvalidateCategories()
   return useMutation({
-    mutationFn: ({ id, ...corpo }: Schema<'EditCategoryRequest'> & { id: number }) =>
-      api.PUT('/admin/categories/{id}', { params: { path: { id } }, body: corpo }).then(dados),
-    onSuccess: invalidar,
+    mutationFn: ({ id, ...body }: Schema<'EditCategoryRequest'> & { id: number }) =>
+      api.PUT('/admin/categories/{id}', { params: { path: { id } }, body }).then(unwrapData),
+    onSuccess: invalidate,
   })
 }
 
-export function useAlterarAtivaCategoria() {
-  const invalidar = useInvalidarCategorias()
+export function useSetCategoryActive() {
+  const invalidate = useInvalidateCategories()
   return useMutation({
-    mutationFn: ({ id, active: ativa }: { id: number; active: boolean }) =>
+    mutationFn: ({ id, active }: { id: number; active: boolean }) =>
       api
         .PATCH('/admin/categories/{id}/active', {
           params: { path: { id } },
-          body: { active: ativa },
+          body: { active },
         })
-        .then(semConteudo),
-    onSuccess: invalidar,
+        .then(unwrapEmpty),
+    onSuccess: invalidate,
   })
 }

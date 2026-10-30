@@ -4,48 +4,48 @@ import { useDesktop } from '@/common/hooks/use-media-query'
 import { Dialog, DialogContent, DialogTitle } from '@/common/ui/dialog'
 import { Drawer, DrawerContent, DrawerTitle } from '@/common/ui/drawer'
 
-interface FolhaResponsivaProps {
-  aberto: boolean
-  aoMudarAberto(aberto: boolean): void
-  titulo: string
+interface ResponsiveSheetProps {
+  open: boolean
+  onOpenChange(open: boolean): void
+  title: string
   icon?: ReactNode
   children: ReactNode
 }
 
-export function FolhaResponsiva({
-  aberto,
-  aoMudarAberto,
-  titulo,
-  icon: icone,
+export function ResponsiveSheet({
+  open,
+  onOpenChange,
+  title,
+  icon,
   children,
-}: FolhaResponsivaProps) {
+}: ResponsiveSheetProps) {
   const desktop = useDesktop()
-  const Titulo = desktop ? DialogTitle : DrawerTitle
-  const conteudo = (
+  const Title = desktop ? DialogTitle : DrawerTitle
+  const content = (
     <>
-      {icone}
-      <Titulo className="mb-2 text-left text-2xl leading-8 font-semibold tracking-tight">
-        {titulo}
-      </Titulo>
+      {icon}
+      <Title className="mb-2 text-left text-2xl leading-8 font-semibold tracking-tight">
+        {title}
+      </Title>
       {children}
     </>
   )
 
   if (desktop) {
     return (
-      <Dialog open={aberto} onOpenChange={aoMudarAberto}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent aria-describedby={undefined} className="max-w-md">
-          <div>{conteudo}</div>
+          <div>{content}</div>
         </DialogContent>
       </Dialog>
     )
   }
 
   return (
-    <Drawer open={aberto} onOpenChange={aoMudarAberto}>
+    <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent aria-describedby={undefined}>
         <div className="overflow-y-auto px-6 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-          {conteudo}
+          {content}
         </div>
       </DrawerContent>
     </Drawer>

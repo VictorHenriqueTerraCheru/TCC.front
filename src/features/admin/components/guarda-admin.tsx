@@ -1,28 +1,28 @@
 import type { ReactNode } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router'
 
-import { TelaComVoltar } from '@/common/components/tela-com-voltar'
+import { ScreenWithBack } from '@/common/components/tela-com-voltar'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
-import { useAutenticado } from '@/features/auth'
+import { useAuthenticated } from '@/features/auth'
 import { useMe } from '@/features/usuarios'
 
-interface GuardaAdminProps {
-  titulo: string
-  caminho: string
+interface AdminGuardProps {
+  title: string
+  path: string
   children: ReactNode
 }
 
-export function GuardaAdmin({ titulo, caminho, children }: GuardaAdminProps) {
+export function AdminGuard({ title, path, children }: AdminGuardProps) {
   const navigate = useNavigate()
-  const autenticado = useAutenticado()
+  const authenticated = useAuthenticated()
   const { data: me, isPending, isError, refetch } = useMe()
 
-  if (!autenticado) return <Navigate to="/login" replace state={{ de: caminho }} />
+  if (!authenticated) return <Navigate to="/login" replace state={{ de: path }} />
 
   return (
     <div className="mx-auto h-full w-full lg:max-w-3xl">
-      <TelaComVoltar titulo={titulo} aoVoltar={() => navigate('/perfil')}>
+      <ScreenWithBack title={title} onBack={() => navigate('/perfil')}>
         {isPending ? (
           <Skeleton className="h-60 rounded-2xl bg-muted" />
         ) : isError ? (
@@ -42,7 +42,7 @@ export function GuardaAdmin({ titulo, caminho, children }: GuardaAdminProps) {
         ) : (
           children
         )}
-      </TelaComVoltar>
+      </ScreenWithBack>
     </div>
   )
 }

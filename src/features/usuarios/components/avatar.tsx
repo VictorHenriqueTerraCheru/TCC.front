@@ -1,15 +1,15 @@
-import { Icone } from '@/common/components/icone'
+import { Icon } from '@/common/components/icone'
 import { cn } from '@/common/lib/utils'
 
-import { iniciais } from '../models/usuario'
+import { initials } from '../models/usuario'
 
 export function Avatar({
-  name: nome,
-  verificado = false,
-  pageSize: tamanho,
+  name,
+  verified = false,
+  pageSize: size,
 }: {
   name: string
-  verificado?: boolean
+  verified?: boolean
   pageSize?: 'md' | 'lg'
 }) {
   return (
@@ -17,13 +17,13 @@ export function Avatar({
       aria-hidden="true"
       className={cn(
         'relative flex shrink-0 items-center justify-center rounded-full bg-primario-suave font-medium text-primario',
-        tamanho === 'lg' ? 'size-16 text-xl' : 'size-10 text-sm',
+        size === 'lg' ? 'size-16 text-xl' : 'size-10 text-sm',
       )}
     >
-      {iniciais(nome)}
-      {verificado && (
+      {initials(name)}
+      {verified && (
         <span className="absolute -right-0.5 -bottom-0.5 flex size-6 items-center justify-center rounded-full border-2 border-white bg-primary text-primary-foreground">
-          <Icone name="check" className="text-[14px] font-bold" />
+          <Icon name="check" className="text-[14px] font-bold" />
         </span>
       )}
     </span>

@@ -1,18 +1,18 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-import { api, dados } from '@/infrastructure/api'
+import { api, unwrapData } from '@/infrastructure/api'
 
-const arredondar = (valor: number) => Math.round(valor * 100_000) / 100_000
+const round = (value: number) => Math.round(value * 100_000) / 100_000
 
-export function areaIncidentesQuery(lat: number, lng: number) {
-  const ponto = { lat: arredondar(lat), lng: arredondar(lng) }
+export function incidentAreaQuery(lat: number, lng: number) {
+  const point = { lat: round(lat), lng: round(lng) }
   return queryOptions({
-    queryKey: ['incidentes', 'area', ponto],
+    queryKey: ['incidents', 'area', point],
     queryFn: ({ signal }) =>
-      api.GET('/incidents/area', { params: { query: ponto }, signal }).then(dados),
+      api.GET('/incidents/area', { params: { query: point }, signal }).then(unwrapData),
   })
 }
 
-export function useAreaIncidentes(lat: number, lng: number) {
-  return useQuery(areaIncidentesQuery(lat, lng))
+export function useIncidentArea(lat: number, lng: number) {
+  return useQuery(incidentAreaQuery(lat, lng))
 }

@@ -1,22 +1,23 @@
 import { useMutation } from '@tanstack/react-query'
 
-import { api, dados } from '@/infrastructure/api'
+import { api, unwrapData } from '@/infrastructure/api'
 
-import { useSessaoStore } from '../stores/sessao-store'
-import type { CadastrarForm, EntrarForm } from '../validators/auth'
+import { useSessionStore } from '../stores/sessao-store'
+import type { RegisterFormValues, LoginFormValues } from '../validators/auth'
 
-export function useEntrar() {
-  const entrar = useSessaoStore((s) => s.entrar)
+export function useLogin() {
+  const login = useSessionStore((s) => s.login)
   return useMutation({
-    mutationFn: (form: EntrarForm) => api.POST('/auth/login', { body: form }).then(dados),
-    onSuccess: entrar,
+    mutationFn: (form: LoginFormValues) => api.POST('/auth/login', { body: form }).then(unwrapData),
+    onSuccess: login,
   })
 }
 
-export function useCadastrar() {
-  const entrar = useSessaoStore((s) => s.entrar)
+export function useRegister() {
+  const login = useSessionStore((s) => s.login)
   return useMutation({
-    mutationFn: (form: CadastrarForm) => api.POST('/auth/register', { body: form }).then(dados),
-    onSuccess: entrar,
+    mutationFn: (form: RegisterFormValues) =>
+      api.POST('/auth/register', { body: form }).then(unwrapData),
+    onSuccess: login,
   })
 }

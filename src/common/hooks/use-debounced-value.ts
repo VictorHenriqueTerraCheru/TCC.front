@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 
-export function useDebouncedValue<T>(valor: T, atrasoMs: number): T {
-  const [atrasado, setAtrasado] = useState(valor)
+export function useDebouncedValue<T>(value: T, delayMs: number): T {
+  const [delayed, setDelayed] = useState(value)
   useEffect(() => {
-    const timer = setTimeout(() => setAtrasado(valor), atrasoMs)
+    const timer = setTimeout(() => setDelayed(value), delayMs)
     return () => clearTimeout(timer)
-  }, [valor, atrasoMs])
-  return atrasado
+  }, [value, delayMs])
+  return delayed
 }

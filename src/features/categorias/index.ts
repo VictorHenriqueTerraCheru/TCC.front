@@ -1,22 +1,22 @@
-export { categoriasQuery, useCategorias } from './api/use-categorias'
-export { gruposQuery, useGrupos } from './api/use-grupos'
-export { CategoriaIcone } from './components/categoria-icone'
-export { PontoGrupo } from './components/ponto-grupo'
-export { useAparencia } from './hooks/use-aparencia'
+export { categoriesQuery, useCategories } from './api/use-categorias'
+export { groupsQuery, useGroups } from './api/use-grupos'
+export { CategoryIcon } from './components/categoria-icone'
+export { GroupDot } from './components/ponto-grupo'
+export { useAppearance } from './hooks/use-aparencia'
 export {
-  aparenciaDaCor,
-  aparenciaDe,
-  coresGrupo,
-  grupoDe,
-  gruposDoTipo,
-  ICONE_PADRAO,
-  iconeDe,
-  nomeDaCor,
-  type AparenciaCategoria,
-  type AparenciaDaCor,
-  type Categoria,
-  type CategoriaResumo,
-  type CorGrupo,
-  type Grupo,
-  type TipoGrupo,
+  colorAppearance,
+  appearanceOf,
+  groupColors,
+  groupOf,
+  groupsOfType,
+  DEFAULT_ICON,
+  iconOf,
+  colorName,
+  type CategoryAppearance,
+  type ColorAppearance,
+  type Category,
+  type CategorySummary,
+  type GroupColor,
+  type Group,
+  type GroupType,
 } from './models/categoria'

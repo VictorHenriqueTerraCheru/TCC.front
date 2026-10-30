@@ -1,27 +1,27 @@
 import { useMemo } from 'react'
 
-import { useGrupos } from '../api/use-grupos'
+import { useGroups } from '../api/use-grupos'
 import {
-  aparenciaDe,
-  grupoDe,
-  type AparenciaCategoria,
-  type CategoriaResumo,
-  type Grupo,
+  appearanceOf,
+  groupOf,
+  type CategoryAppearance,
+  type CategorySummary,
+  type Group,
 } from '../models/categoria'
 
-const SEM_GRUPOS: Grupo[] = []
+const NO_GROUPS: Group[] = []
 
-export function useAparencia() {
-  const { data } = useGrupos()
-  const grupos = data ?? SEM_GRUPOS
+export function useAppearance() {
+  const { data } = useGroups()
+  const groups = data ?? NO_GROUPS
   return useMemo(
     () => ({
-      grupos,
-      carregado: data !== undefined,
-      grupoDe: (categoria: Pick<CategoriaResumo, 'group'>) => grupoDe(grupos, categoria),
-      aparenciaDe: (categoria: Pick<CategoriaResumo, 'group'>): AparenciaCategoria =>
-        aparenciaDe(grupos, categoria),
+      groups,
+      loaded: data !== undefined,
+      groupOf: (category: Pick<CategorySummary, 'group'>) => groupOf(groups, category),
+      appearanceOf: (category: Pick<CategorySummary, 'group'>): CategoryAppearance =>
+        appearanceOf(groups, category),
     }),
-    [grupos, data],
+    [groups, data],
   )
 }

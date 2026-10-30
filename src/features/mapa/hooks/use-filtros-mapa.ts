@@ -1,61 +1,61 @@
 import { useSearchParams } from 'react-router'
 
-import { useAparencia } from '@/features/categorias'
+import { useAppearance } from '@/features/categorias'
 
-import { gruposDoModo, mostraProblemas, type FiltrosMapa, type ModoMapa } from '../models/filtros'
+import { modeGroups, showsIssues, type MapFilters, type MapMode } from '../models/filtros'
 
-function lerModo(valor: string | null): ModoMapa {
-  return valor === 'incidentes' || valor === 'ambos' ? valor : 'problemas'
+function readMode(value: string | null): MapMode {
+  return value === 'incidents' || value === 'both' ? value : 'issues'
 }
 
-export function useFiltrosMapa() {
+export function useMapFilters() {
   const [params, setParams] = useSearchParams()
-  const { grupos: todos, carregado } = useAparencia()
+  const { groups: all, loaded } = useAppearance()
 
-  const modo = lerModo(params.get('modo'))
-  const disponiveis = gruposDoModo(todos, modo).map((g) => g.key)
-  const filtros: FiltrosMapa = {
-    modo,
-    grupos: (params.get('grupos') ?? '')
+  const mode = readMode(params.get('mode'))
+  const available = modeGroups(all, mode).map((g) => g.key)
+  const filters: MapFilters = {
+    mode,
+    groups: (params.get('groups') ?? '')
       .split(',')
-      .filter((g) => g !== '' && (!carregado || disponiveis.includes(g))),
-    somenteNovas: params.get('nova') === '1',
+      .filter((g) => g !== '' && (!loaded || available.includes(g))),
+    onlyNew: params.get('new') === '1',
   }
 
-  function gravar({ modo, grupos, somenteNovas }: FiltrosMapa) {
+  function save({ mode, groups, onlyNew }: MapFilters) {
     setParams(
-      (anteriores) => {
-        const proximos = new URLSearchParams(anteriores)
-        if (modo === 'problemas') proximos.delete('modo')
-        else proximos.set('modo', modo)
-        if (grupos.length) proximos.set('grupos', grupos.join(','))
-        else proximos.delete('grupos')
-        if (somenteNovas) proximos.set('nova', '1')
-        else proximos.delete('nova')
-        return proximos
+      (earlier) => {
+        const upcoming = new URLSearchParams(earlier)
+        if (mode === 'issues') upcoming.delete('mode')
+        else upcoming.set('mode', mode)
+        if (groups.length) upcoming.set('groups', groups.join(','))
+        else upcoming.delete('groups')
+        if (onlyNew) upcoming.set('new', '1')
+        else upcoming.delete('new')
+        return upcoming
       },
       { replace: true },
     )
   }
 
   return {
-    ...filtros,
-    alterarModo(modo: ModoMapa) {
-      const disponiveis = gruposDoModo(todos, modo).map((g) => g.key)
-      gravar({
-        modo,
-        grupos: carregado ? filtros.grupos.filter((g) => disponiveis.includes(g)) : filtros.grupos,
-        somenteNovas: filtros.somenteNovas && mostraProblemas(modo),
+    ...filters,
+    setMode(mode: MapMode) {
+      const available = modeGroups(all, mode).map((g) => g.key)
+      save({
+        mode,
+        groups: loaded ? filters.groups.filter((g) => available.includes(g)) : filters.groups,
+        onlyNew: filters.onlyNew && showsIssues(mode),
       })
     },
-    alternarGrupo(grupo: string) {
-      const grupos = filtros.grupos.includes(grupo)
-        ? filtros.grupos.filter((g) => g !== grupo)
-        : [...filtros.grupos, grupo]
-      gravar({ ...filtros, grupos })
+    toggleGroup(group: string) {
+      const groups = filters.groups.includes(group)
+        ? filters.groups.filter((g) => g !== group)
+        : [...filters.groups, group]
+      save({ ...filters, groups })
     },
-    alternarNovas() {
-      gravar({ ...filtros, somenteNovas: !filtros.somenteNovas })
+    toggleNew() {
+      save({ ...filters, onlyNew: !filters.onlyNew })
     },
   }
 }

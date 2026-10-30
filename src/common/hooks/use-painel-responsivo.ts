@@ -1,17 +1,17 @@
 import { createContext, useContext } from 'react'
 
-interface ValorPainel {
-  recolhido: boolean
-  expandir(): void
-  medirResumo(elemento: HTMLElement | null): void
+interface PanelValue {
+  collapsed: boolean
+  expand(): void
+  measureSummary(element: HTMLElement | null): void
 }
 
-export const ContextoPainel = createContext<ValorPainel>({
-  recolhido: false,
-  expandir: () => {},
-  medirResumo: () => {},
+export const PanelContext = createContext<PanelValue>({
+  collapsed: false,
+  expand: () => {},
+  measureSummary: () => {},
 })
 
-export function usePainelResponsivo() {
-  return useContext(ContextoPainel)
+export function useResponsivePanel() {
+  return useContext(PanelContext)
 }

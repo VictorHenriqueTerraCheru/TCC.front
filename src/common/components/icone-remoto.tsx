@@ -2,89 +2,84 @@ import type { MaterialSymbol } from 'material-symbols'
 import { useEffect, useState, type CSSProperties } from 'react'
 
 import { cn } from '@/common/lib/utils'
-import { carregarIcone, type IconeRemotoDados } from '@/common/lib/iconify'
-import iconesDoPacote from '@/assets/material-symbols/icones.json'
+import { loadIcon, type RemoteIconData } from '@/common/lib/iconify'
+import bundledIcons from '@/assets/material-symbols/icones.json'
 
-import { Icone } from './icone'
+import { Icon } from './icone'
 
-const NO_PACOTE = new Set<string>(iconesDoPacote)
+const BUNDLED_ICONS = new Set<string>(bundledIcons)
 
-interface IconeDinamicoProps {
+interface DynamicIconProps {
   name: string
-  alternativo?: MaterialSymbol
-  preenchido?: boolean
+  alternative?: MaterialSymbol
+  filled?: boolean
   className?: string
   style?: CSSProperties
 }
 
-export function IconeDinamico({
-  name: nome,
-  alternativo = 'category',
-  preenchido,
+export function DynamicIcon({
+  name,
+  alternative = 'category',
+  filled,
   className,
   style,
-}: IconeDinamicoProps) {
-  if (NO_PACOTE.has(nome)) {
+}: DynamicIconProps) {
+  if (BUNDLED_ICONS.has(name)) {
     return (
-      <Icone
-        name={nome as MaterialSymbol}
-        preenchido={preenchido}
-        className={className}
-        style={style}
-      />
+      <Icon name={name as MaterialSymbol} filled={filled} className={className} style={style} />
     )
   }
   return (
-    <IconeRemoto
-      key={nome}
-      name={nome}
-      alternativo={alternativo}
-      preenchido={preenchido}
+    <RemoteIcon
+      key={name}
+      name={name}
+      alternative={alternative}
+      filled={filled}
       className={className}
       style={style}
     />
   )
 }
 
-function IconeRemoto({
-  name: nome,
-  alternativo,
-  preenchido,
+function RemoteIcon({
+  name,
+  alternative,
+  filled,
   className,
   style,
 }: {
   name: string
-  alternativo: MaterialSymbol
-  preenchido?: boolean
+  alternative: MaterialSymbol
+  filled?: boolean
   className?: string
   style?: CSSProperties
 }) {
-  const [dados, setDados] = useState<IconeRemotoDados | null>(null)
+  const [unwrapData, setDados] = useState<RemoteIconData | null>(null)
 
   useEffect(() => {
-    let ativo = true
-    void carregarIcone(nome).then((resultado) => {
-      if (ativo) setDados(resultado)
+    let active = true
+    void loadIcon(name).then((result) => {
+      if (active) setDados(result)
     })
     return () => {
-      ativo = false
+      active = false
     }
-  }, [nome])
+  }, [name])
 
-  if (!dados) {
-    return <Icone name={alternativo} preenchido={preenchido} className={className} style={style} />
+  if (!unwrapData) {
+    return <Icon name={alternative} filled={filled} className={className} style={style} />
   }
   return (
     <svg
       aria-hidden="true"
-      viewBox={`0 0 ${dados.pageSize} ${dados.pageSize}`}
+      viewBox={`0 0 ${unwrapData.pageSize} ${unwrapData.pageSize}`}
       fill="currentColor"
       width="1em"
       height="1em"
       className={cn('shrink-0 select-none', className)}
       style={{ fontSize: undefined, ...style }}
     >
-      {dados.caminhos.map((d, i) => (
+      {unwrapData.paths.map((d, i) => (
         <path key={i} d={d} />
       ))}
     </svg>

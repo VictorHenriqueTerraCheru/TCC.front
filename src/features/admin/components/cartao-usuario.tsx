@@ -2,106 +2,102 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { useState } from 'react'
 
-import { FolhaResponsiva } from '@/common/components/folha-responsiva'
-import { Icone } from '@/common/components/icone'
+import { ResponsiveSheet } from '@/common/components/folha-responsiva'
+import { Icon } from '@/common/components/icone'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
-import { aparenciaPerfil, Avatar, type Perfil } from '@/features/usuarios'
+import { roleAppearance, Avatar, type Role } from '@/features/usuarios'
 
-import { useAlterarPerfilUsuario, type UsuarioAdmin } from '../api/use-usuarios-admin'
-import { mensagemErroUsuarios } from '../errors'
+import { useSetUserRole, type AdminUser } from '../api/use-usuarios-admin'
+import { userErrorMessage } from '../errors'
 
-const ordemPerfis: Perfil[] = ['citizen', 'verifiedCitizen', 'administrator']
+const roleOrder: Role[] = ['citizen', 'verifiedCitizen', 'administrator']
 
-const descricaoPerfil: Record<Perfil, string> = {
+const roleDescription: Record<Role, string> = {
   citizen: 'Registra e vota com o peso padrão.',
   verifiedCitizen: 'O voto passa a valer mais no cálculo de confiança.',
   administrator: 'Acesso total ao painel: fila, categorias e usuários.',
 }
 
-interface CartaoUsuarioProps {
-  user: UsuarioAdmin
-  ehVoce: boolean
+interface UserCardProps {
+  user: AdminUser
+  isSelf: boolean
 }
 
-export function CartaoUsuario({ user: usuario, ehVoce }: CartaoUsuarioProps) {
-  const [aberta, setAberta] = useState(false)
-  const { label: rotulo, icon: icone } = aparenciaPerfil[usuario.role]
+export function UserCard({ user, isSelf }: UserCardProps) {
+  const [open, setOpen] = useState(false)
+  const { label, icon } = roleAppearance[user.role]
 
   return (
     <article
-      aria-label={`Usuário ${usuario.name}`}
+      aria-label={`Usuário ${user.name}`}
       className="rounded-2xl border border-border/60 bg-card p-4 shadow-1"
     >
       <header className="flex items-center gap-3">
-        <Avatar name={usuario.name} verificado={usuario.role !== 'citizen'} />
+        <Avatar name={user.name} verified={user.role !== 'citizen'} />
         <div className="min-w-0 flex-1">
           <h2 className="truncate font-medium">
-            {usuario.name}
-            {ehVoce && (
+            {user.name}
+            {isSelf && (
               <span className="ml-2 rounded-full bg-primario-suave px-2 py-0.5 text-xs font-semibold text-primario">
                 Você
               </span>
             )}
           </h2>
-          <p className="truncate text-sm text-muted-foreground">{usuario.email}</p>
+          <p className="truncate text-sm text-muted-foreground">{user.email}</p>
         </div>
       </header>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <p className="flex items-center gap-1.5 text-sm">
-          <Icone name={icone} className="text-[18px] text-primario" />
-          <span>{rotulo}</span>
+          <Icon name={icon} className="text-[18px] text-primario" />
+          <span>{label}</span>
           <span className="text-xs text-muted-foreground">
-            · desde {format(new Date(usuario.createdAt), 'd MMM yyyy', { locale: ptBR })}
+            · desde {format(new Date(user.createdAt), 'd MMM yyyy', { locale: ptBR })}
           </span>
         </p>
-        {!ehVoce && (
-          <Button variant="outline" size="sm" onClick={() => setAberta(true)}>
+        {!isSelf && (
+          <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
             Alterar perfil
           </Button>
         )}
       </div>
-      {aberta && <FolhaPerfil user={usuario} aoFechar={() => setAberta(false)} />}
+      {open && <ProfileSheet user={user} onClose={() => setOpen(false)} />}
     </article>
   )
 }
 
-function FolhaPerfil({ user: usuario, aoFechar }: { user: UsuarioAdmin; aoFechar(): void }) {
-  const alterar = useAlterarPerfilUsuario()
-  const [escolhido, setEscolhido] = useState<Perfil>(usuario.role)
-  const rebaixandoAdmin = usuario.role === 'administrator' && escolhido !== 'administrator'
+function ProfileSheet({ user, onClose }: { user: AdminUser; onClose(): void }) {
+  const change = useSetUserRole()
+  const [chosen, setChosen] = useState<Role>(user.role)
+  const demotingAdmin = user.role === 'administrator' && chosen !== 'administrator'
 
-  function salvar() {
-    if (escolhido === usuario.role) return aoFechar()
-    alterar.mutate({ id: usuario.id, role: escolhido }, { onSuccess: aoFechar })
+  function save() {
+    if (chosen === user.role) return onClose()
+    change.mutate({ id: user.id, role: chosen }, { onSuccess: onClose })
   }
 
   return (
-    <FolhaResponsiva
-      aberto
-      aoMudarAberto={(aberto) => !aberto && aoFechar()}
-      titulo="Alterar perfil"
-    >
-      <p className="mb-4 text-sm text-muted-foreground">{usuario.name}</p>
+    <ResponsiveSheet open onOpenChange={(open) => !open && onClose()} title="Alterar perfil">
+      <p className="mb-4 text-sm text-muted-foreground">{user.name}</p>
       <div role="radiogroup" aria-label="Perfil" className="space-y-2">
-        {ordemPerfis.map((perfil) => {
-          const selecionado = perfil === escolhido
+        {roleOrder.map((role) => {
+          const selected = role === chosen
           return (
             <button
-              key={perfil}
+              key={role}
               type="button"
               role="radio"
-              aria-checked={selecionado}
-              onClick={() => setEscolhido(perfil)}
+              aria-checked={selected}
+              onClick={() => setChosen(role)}
               className={cn(
                 'flex w-full items-center gap-3 rounded-2xl border p-3 text-left focus-visible:outline-2',
-                selecionado ? 'border-primario bg-primario-suave' : 'border-border',
+                selected ? 'border-primario bg-primario-suave' : 'border-border',
               )}
             >
-              <Icone name={aparenciaPerfil[perfil].icon} className="text-primario" />
+              <Icon name={roleAppearance[role].icon} className="text-primario" />
               <span className="flex-1">
-                <span className="block font-medium">{aparenciaPerfil[perfil].label}</span>
-                <span className="text-xs text-muted-foreground">{descricaoPerfil[perfil]}</span>
+                <span className="block font-medium">{roleAppearance[role].label}</span>
+                <span className="text-xs text-muted-foreground">{roleDescription[role]}</span>
               </span>
             </button>
           )
@@ -110,25 +106,25 @@ function FolhaPerfil({ user: usuario, aoFechar }: { user: UsuarioAdmin; aoFechar
       <p className="mt-3 text-xs text-muted-foreground">
         A mudança vale para os votos seguintes; os votos já dados mantêm o peso que tinham.
       </p>
-      {rebaixandoAdmin && (
+      {demotingAdmin && (
         <p className="mt-2 text-xs text-muted-foreground">
           Quem já está com a sessão aberta pode manter o acesso de administrador até ela expirar
           (até 7 dias).
         </p>
       )}
-      {alterar.error && (
+      {change.error && (
         <p role="alert" className="mt-3 text-sm text-destructive">
-          {mensagemErroUsuarios(alterar.error)}
+          {userErrorMessage(change.error)}
         </p>
       )}
       <div className="mt-5 flex justify-end gap-2">
-        <Button variant="ghost" onClick={aoFechar}>
+        <Button variant="ghost" onClick={onClose}>
           Cancelar
         </Button>
-        <Button carregando={alterar.isPending} onClick={salvar}>
+        <Button loading={change.isPending} onClick={save}>
           Salvar
         </Button>
       </div>
-    </FolhaResponsiva>
+    </ResponsiveSheet>
   )
 }

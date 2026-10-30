@@ -1,29 +1,29 @@
 import { useEffect } from 'react'
 import { useOutletContext, useSearchParams } from 'react-router'
 
-import { PainelResponsivo } from '@/common/components/painel-responsivo'
-import { AreaIncidentes } from '@/features/incidentes'
+import { ResponsivePanel } from '@/common/components/painel-responsivo'
+import { IncidentArea } from '@/features/incidentes'
 
-import { useNavegacaoMapa } from '../hooks/use-navegacao-mapa'
-import type { ContextoMapa } from '../models/contexto'
-import { pontoDaUrl } from '../models/ponto'
+import { useMapNavigation } from '../hooks/use-navegacao-mapa'
+import type { MapContext } from '../models/contexto'
+import { pointFromUrl } from '../models/ponto'
 
-export function AreaIncidentesPage() {
+export function IncidentAreaPage() {
   const [params] = useSearchParams()
-  const { focar } = useOutletContext<ContextoMapa>()
-  const { fechar } = useNavegacaoMapa()
-  const ponto = pontoDaUrl(params)
-  const lat = ponto?.lat
-  const lng = ponto?.lng
+  const { focus } = useOutletContext<MapContext>()
+  const { close } = useMapNavigation()
+  const point = pointFromUrl(params)
+  const lat = point?.lat
+  const lng = point?.lng
 
   useEffect(() => {
-    if (lat !== undefined && lng !== undefined) focar({ lat, lng })
-  }, [lat, lng, focar])
+    if (lat !== undefined && lng !== undefined) focus({ lat, lng })
+  }, [lat, lng, focus])
 
   if (lat === undefined || lng === undefined) return null
   return (
-    <PainelResponsivo titulo="Área de incidentes" aoFechar={fechar}>
-      <AreaIncidentes lat={lat} lng={lng} />
-    </PainelResponsivo>
+    <ResponsivePanel title="Área de incidentes" onClose={close}>
+      <IncidentArea lat={lat} lng={lng} />
+    </ResponsivePanel>
   )
 }

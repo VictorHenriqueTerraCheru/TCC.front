@@ -1,31 +1,33 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-import { api, dados, isApiError } from '@/infrastructure/api'
+import { api, unwrapData, isApiError } from '@/infrastructure/api'
 
-import { enderecoIndisponivel } from '../models/endereco'
+import { addressUnavailable } from '../models/endereco'
 
-const arredondar = (valor: number) => Math.round(valor * 10_000) / 10_000
+const round = (value: number) => Math.round(value * 10_000) / 10_000
 
-export function enderecoReversoQuery(lat: number, lng: number) {
-  const ponto = { lat: arredondar(lat), lng: arredondar(lng) }
+export function reverseGeocodeQuery(lat: number, lng: number) {
+  const point = { lat: round(lat), lng: round(lng) }
   return queryOptions({
-    queryKey: ['geocoding', 'reversa', ponto],
+    queryKey: ['geocoding', 'reverse', point],
     queryFn: async ({ signal }) => {
       try {
-        return await api.GET('/geocoding/reverse', { params: { query: ponto }, signal }).then(dados)
-      } catch (erro) {
-        if (isApiError(erro) && erro.status === 429)
-          return enderecoIndisponivel(ponto.lat, ponto.lng)
-        throw erro
+        return await api
+          .GET('/geocoding/reverse', { params: { query: point }, signal })
+          .then(unwrapData)
+      } catch (error) {
+        if (isApiError(error) && error.status === 429)
+          return addressUnavailable(point.lat, point.lng)
+        throw error
       }
     },
     staleTime: Infinity,
   })
 }
 
-export function useEnderecoReverso(ponto: { lat: number; lng: number } | null) {
+export function useReverseGeocode(point: { lat: number; lng: number } | null) {
   return useQuery({
-    ...enderecoReversoQuery(ponto?.lat ?? 0, ponto?.lng ?? 0),
-    enabled: ponto !== null,
+    ...reverseGeocodeQuery(point?.lat ?? 0, point?.lng ?? 0),
+    enabled: point !== null,
   })
 }

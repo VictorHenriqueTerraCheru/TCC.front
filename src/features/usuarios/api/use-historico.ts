@@ -1,38 +1,38 @@
 import { infiniteQueryOptions, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 
-import { api, dados } from '@/infrastructure/api'
+import { api, unwrapData } from '@/infrastructure/api'
 
-import type { FiltroHistorico } from '../models/historico'
+import type { HistoryFilter } from '../models/historico'
 
-const TAMANHO_PAGINA = 20
+const PAGE_SIZE = 20
 
-export function historicoQuery(filtro: FiltroHistorico) {
+export function historyQuery(filter: HistoryFilter) {
   return infiniteQueryOptions({
-    queryKey: ['me', 'historico', filtro],
+    queryKey: ['me', 'history', filter],
     queryFn: ({ pageParam, signal }) =>
       api
         .GET('/me/history', {
-          params: { query: { filter: filtro, page: pageParam, pageSize: TAMANHO_PAGINA } },
+          params: { query: { filter, page: pageParam, pageSize: PAGE_SIZE } },
           signal,
         })
-        .then(dados),
+        .then(unwrapData),
     initialPageParam: 1,
-    getNextPageParam: ({ page: pagina, pageSize: tamanho, total }) =>
-      pagina * tamanho < total ? pagina + 1 : undefined,
+    getNextPageParam: ({ page, pageSize: size, total }) =>
+      page * size < total ? page + 1 : undefined,
   })
 }
 
-export function useHistorico(filtro: FiltroHistorico) {
-  return useInfiniteQuery(historicoQuery(filtro))
+export function useHistory(filter: HistoryFilter) {
+  return useInfiniteQuery(historyQuery(filter))
 }
 
-export function useHistoricoResumo() {
+export function useHistorySummary() {
   return useQuery({
-    queryKey: ['me', 'historico', 'resumo'],
+    queryKey: ['me', 'history', 'summary'],
     queryFn: ({ signal }) =>
       api
         .GET('/me/history', { params: { query: { pageSize: 3 } }, signal })
-        .then(dados)
-        .then(({ items: itens }) => itens),
+        .then(unwrapData)
+        .then(({ items }) => items),
   })
 }

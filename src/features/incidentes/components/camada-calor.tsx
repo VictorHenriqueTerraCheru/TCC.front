@@ -1,24 +1,24 @@
 import { Layer, Source } from '@vis.gl/react-maplibre'
 import { useMemo } from 'react'
 
-import { expressaoGradienteCalor, pesosCalor } from '../models/calor'
-import type { CelulaCalor } from '../models/incidente'
+import { heatmapGradientExpression, heatmapWeights } from '../models/calor'
+import type { HeatmapCell } from '../models/incidente'
 
-const GRADIENTE = expressaoGradienteCalor()
+const GRADIENT = heatmapGradientExpression()
 
-export function CamadaCalor({ celulas }: { celulas: CelulaCalor[] }) {
-  const dados = useMemo(() => pesosCalor(celulas), [celulas])
+export function HeatmapLayer({ cells }: { cells: HeatmapCell[] }) {
+  const unwrapData = useMemo(() => heatmapWeights(cells), [cells])
   return (
-    <Source id="calor" type="geojson" data={dados}>
+    <Source id="calor" type="geojson" data={unwrapData}>
       <Layer
         id="calor"
         type="heatmap"
         paint={{
-          'heatmap-weight': ['get', 'peso'],
+          'heatmap-weight': ['get', 'weight'],
           'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 9, 20, 13, 40, 16, 90],
           'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 9, 1, 14, 2.5],
           'heatmap-opacity': 0.75,
-          'heatmap-color': GRADIENTE,
+          'heatmap-color': GRADIENT,
         }}
       />
     </Source>

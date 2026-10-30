@@ -2,14 +2,14 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@/common/lib/utils'
 
-interface PaginaProps {
-  titulo: string
-  acoes?: ReactNode
+interface PageProps {
+  title: string
+  actions?: ReactNode
   children: ReactNode
   className?: string
 }
 
-export function Pagina({ titulo, acoes, children, className }: PaginaProps) {
+export function Page({ title, actions, children, className }: PageProps) {
   return (
     <div
       className={cn(
@@ -18,8 +18,8 @@ export function Pagina({ titulo, acoes, children, className }: PaginaProps) {
       )}
     >
       <header className="flex h-16 items-center justify-between">
-        <h1 className="text-[28px] leading-9 font-bold tracking-tight">{titulo}</h1>
-        {acoes}
+        <h1 className="text-[28px] leading-9 font-bold tracking-tight">{title}</h1>
+        {actions}
       </header>
       {children}
     </div>

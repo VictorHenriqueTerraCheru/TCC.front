@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { RouterProvider } from 'react-router/dom'
 
 import { Providers } from './providers'
-import { criarRouter } from './router'
+import { createAppRouter } from './router'
 
 export function App() {
-  const [router] = useState(criarRouter)
+  const [router] = useState(createAppRouter)
   return (
     <Providers>
       <RouterProvider router={router} />

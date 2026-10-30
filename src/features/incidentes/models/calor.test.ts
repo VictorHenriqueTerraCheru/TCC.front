@@ -1,28 +1,28 @@
-import { expressaoGradienteCalor, gradienteCalorCss, pesosCalor } from './calor'
-import type { CelulaCalor } from './incidente'
+import { heatmapGradientExpression, heatmapGradientCss, heatmapWeights } from './calor'
+import type { HeatmapCell } from './incidente'
 
-test('a legenda do calor vai do roxo (menos) ao amarelo (mais)', () => {
-  expect(gradienteCalorCss).toBe(
+test('the heatmap legend goes from purple (less) to yellow (more)', () => {
+  expect(heatmapGradientCss).toBe(
     'linear-gradient(to right, #5b2bff 20%, #c026d3 45%, #ff3b30 70%, #ffd60a 100%)',
   )
 })
 
-test('pesosCalor normaliza pela maior célula com piso 4', () => {
-  const celula = (quantidade: number) => ({ lat: 0, lng: 0, count: quantidade }) as CelulaCalor
+test('heatmapWeights normalizes by the largest cell with a floor of 4', () => {
+  const cell = (amount: number) => ({ lat: 0, lng: 0, count: amount }) as HeatmapCell
   expect(
-    pesosCalor([celula(2), celula(8)]).features.map(
-      (f: { properties: { peso: number } }) => f.properties.peso,
+    heatmapWeights([cell(2), cell(8)]).features.map(
+      (f: { properties: { weight: number } }) => f.properties.weight,
     ),
   ).toEqual([0.25, 1])
-  expect(pesosCalor([celula(1)]).features[0]!.properties.peso).toBe(0.25)
+  expect(heatmapWeights([cell(1)]).features[0]!.properties.weight).toBe(0.25)
   expect(
-    pesosCalor([{ lat: -22.9, lng: -43.1, count: 4 } as CelulaCalor]).features[0]!.geometry
+    heatmapWeights([{ lat: -22.9, lng: -43.1, count: 4 } as HeatmapCell]).features[0]!.geometry
       .coordinates,
   ).toEqual([-43.1, -22.9])
 })
 
-test('expressaoGradienteCalor começa transparente e segue as paradas em ordem', () => {
-  const e = expressaoGradienteCalor()
+test('heatmapGradientExpression starts transparent and follows the stops in order', () => {
+  const e = heatmapGradientExpression()
   expect(e.slice(0, 5)).toEqual([
     'interpolate',
     ['linear'],

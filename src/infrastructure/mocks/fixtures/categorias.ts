@@ -1,6 +1,6 @@
 import type { Schema } from '../../api'
 
-export const categorias: Schema<'ListCategoriesResponse'>[] = [
+export const categories: Schema<'ListCategoriesResponse'>[] = [
   { id: 1, name: 'Buraco na via', group: 'viaPublica', type: 'issue', icon: 'buraco' },
   { id: 2, name: 'Calçada danificada', group: 'viaPublica', type: 'issue', icon: 'calcada' },
   { id: 3, name: 'Poste apagado', group: 'eletrica', type: 'issue', icon: 'poste' },
