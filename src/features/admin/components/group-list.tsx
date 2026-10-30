@@ -5,6 +5,7 @@ import { ResponsiveSheet } from '@/common/components/responsive-sheet'
 import { withoutAccents } from '@/common/lib/text'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { LoadError } from '@/common/components/load-error'
 import { colorAppearance, GroupDot, useGroups, type Group } from '@/features/categories'
 
 import { useAdminCategories } from '../api/use-admin-categories'
@@ -28,23 +29,17 @@ export function GroupList() {
   }
   if (groups.isError || categories.isError) {
     return (
-      <div role="alert" className="space-y-3 py-6">
-        <p>
-          {groups.isError
+      <LoadError
+        message={
+          groups.isError
             ? 'Não foi possível carregar os grupos.'
-            : 'Não foi possível carregar as categorias.'}
-        </p>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            if (groups.isError) void groups.refetch()
-            if (categories.isError) void categories.refetch()
-          }}
-        >
-          Tentar novamente
-        </Button>
-      </div>
+            : 'Não foi possível carregar as categorias.'
+        }
+        onRetry={() => {
+          if (groups.isError) void groups.refetch()
+          if (categories.isError) void categories.refetch()
+        }}
+      />
     )
   }
 

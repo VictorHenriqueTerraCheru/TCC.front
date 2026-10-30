@@ -4,8 +4,8 @@ import { SearchField } from '@/common/components/search-field'
 import { InfiniteList } from '@/common/components/infinite-list'
 import { SegmentedControl } from '@/common/components/segmented-control'
 import { useDebouncedValue } from '@/common/hooks/use-debounced-value'
-import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { LoadError } from '@/common/components/load-error'
 import { useMe, type Role } from '@/features/users'
 
 import { useAdminUsers } from '../api/use-admin-users'
@@ -59,12 +59,10 @@ function UserList() {
       {users.isPending ? (
         <Skeleton className="h-40 rounded-2xl bg-muted" />
       ) : users.isError ? (
-        <div role="alert" className="space-y-3 py-6">
-          <p>Não foi possível carregar os usuários.</p>
-          <Button variant="outline" size="sm" onClick={() => void users.refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
+        <LoadError
+          message="Não foi possível carregar os usuários."
+          onRetry={() => void users.refetch()}
+        />
       ) : items.length === 0 ? (
         <p className="py-10 text-center text-sm text-muted-foreground">
           Nenhum usuário encontrado.

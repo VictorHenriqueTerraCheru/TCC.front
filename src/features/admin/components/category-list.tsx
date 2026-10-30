@@ -8,6 +8,7 @@ import { withoutAccents } from '@/common/lib/text'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { LoadError } from '@/common/components/load-error'
 import {
   colorAppearance,
   CategoryIcon,
@@ -50,23 +51,17 @@ export function CategoryList() {
   }
   if (categories.isError || groupsQuery.isError) {
     return (
-      <div role="alert" className="space-y-3 py-6">
-        <p>
-          {categories.isError
+      <LoadError
+        message={
+          categories.isError
             ? 'Não foi possível carregar as categorias.'
-            : 'Não foi possível carregar os grupos.'}
-        </p>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            if (categories.isError) void categories.refetch()
-            if (groupsQuery.isError) void groupsQuery.refetch()
-          }}
-        >
-          Tentar novamente
-        </Button>
-      </div>
+            : 'Não foi possível carregar os grupos.'
+        }
+        onRetry={() => {
+          if (categories.isError) void categories.refetch()
+          if (groupsQuery.isError) void groupsQuery.refetch()
+        }}
+      />
     )
   }
 

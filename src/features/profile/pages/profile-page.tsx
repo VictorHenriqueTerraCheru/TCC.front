@@ -8,6 +8,7 @@ import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
 import { AnimatedItem } from '@/common/components/animated-item'
+import { LoadError } from '@/common/components/load-error'
 import { useAuthenticated } from '@/features/auth'
 import {
   roleAppearance,
@@ -118,12 +119,11 @@ export function ProfilePage() {
       ) : isPending ? (
         <Skeleton aria-label="Carregando perfil" className="h-60 rounded-2xl bg-muted" />
       ) : isError ? (
-        <div role="alert" className="space-y-3">
-          <p>Não foi possível carregar seu perfil.</p>
-          <Button variant="outline" size="sm" onClick={() => void refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
+        <LoadError
+          message="Não foi possível carregar seu perfil."
+          onRetry={() => void refetch()}
+          className="py-0"
+        />
       ) : (
         <>
           <Header me={me} />

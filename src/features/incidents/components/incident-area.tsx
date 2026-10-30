@@ -1,8 +1,8 @@
 import { Icon } from '@/common/components/icon'
 import { DynamicIcon } from '@/common/components/remote-icon'
 import { shortTime } from '@/common/lib/formatting'
-import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { LoadError } from '@/common/components/load-error'
 import { iconOf, useCategories } from '@/features/categories'
 import { useReverseGeocode } from '@/features/geocoding'
 
@@ -29,12 +29,11 @@ export function IncidentArea({ lat, lng }: { lat: number; lng: number }) {
 
   if (area.isError) {
     return (
-      <div role="alert" className="space-y-3 py-6 pr-10">
-        <p>Não foi possível carregar os incidentes desta área.</p>
-        <Button variant="outline" size="sm" onClick={() => void area.refetch()}>
-          Tentar novamente
-        </Button>
-      </div>
+      <LoadError
+        message="Não foi possível carregar os incidentes desta área."
+        onRetry={() => void area.refetch()}
+        className="pr-10"
+      />
     )
   }
 
