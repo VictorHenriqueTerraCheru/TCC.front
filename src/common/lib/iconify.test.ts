@@ -144,15 +144,16 @@ describe('loadIcon: hostile inputs', () => {
     },
   )
 
-  it.each(['function Object() { [native code] }', '[object Object]', 'function toString() { [native code] }'])(
-    'object property name (%s) does not return the prototype as a response',
-    async (name) => {
-      server.use(iconifyIcons({}))
+  it.each([
+    'function Object() { [native code] }',
+    '[object Object]',
+    'function toString() { [native code] }',
+  ])('object property name (%s) does not return the prototype as a response', async (name) => {
+    server.use(iconifyIcons({}))
 
-      expect(await loadIcon(name)).toBeNull()
-      expect(localStorage.getItem('urbanReports.remoteIcons') ?? '').not.toContain(`"${name}"`)
-    },
-  )
+    expect(await loadIcon(name)).toBeNull()
+    expect(localStorage.getItem('urbanReports.remoteIcons') ?? '').not.toContain(`"${name}"`)
+  })
 
   it('absurd width from the network discards the icon', async () => {
     server.use(
