@@ -9,7 +9,6 @@ import { SubmissionFailedDialog } from '../components/submission-failed-dialog'
 import { ReportStep } from '../components/report-step'
 import { SummaryRow, Summary } from '../components/summary'
 import { useSubmission } from '../hooks/use-submission'
-import { useResumeReport } from '../hooks/use-resume-report'
 import { useDraftAddress, useRequireCategory, useRequireStep, useDraft } from '../hooks/use-draft'
 import { describeTime, occurredAt } from '../models/time'
 import { categoryPath } from '../models/routes'
@@ -42,7 +41,6 @@ export function IncidentReviewPage() {
     if (categoryId === null || !location) return
     submission.send({ categoryId, ...location, occurredAt: occurredAt(time) })
   }
-  useResumeReport('submit', send)
 
   return (
     <ReportStep

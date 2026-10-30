@@ -21,7 +21,7 @@ export function DesktopLayout() {
           to="/report"
           onClick={(event) => {
             event.preventDefault()
-            requireAccount('report', () => navigate('/report'), { returnTo: '/report' })
+            requireAccount('report', () => navigate('/report'), '/report')
           }}
           aria-label="Registrar ocorrência"
           className="mb-4 flex size-14 pressable items-center justify-center rounded-2xl bg-primary bg-linear-to-b from-black/0 to-black/12 text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2"

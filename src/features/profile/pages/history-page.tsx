@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { InfiniteList } from '@/common/components/infinite-list'
 import { SegmentedControl } from '@/common/components/segmented-control'
 import { ScreenWithBack } from '@/common/components/screen-with-back'
-import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
 import { AnimatedItem } from '@/common/components/animated-item'
+import { LoadError } from '@/common/components/load-error'
 import { useAuthenticated } from '@/features/auth'
 import {
   groupByPeriod,
@@ -27,12 +27,10 @@ function List({ filter }: { filter: HistoryFilter }) {
   if (history.isPending) return <Skeleton className="h-60 rounded-2xl bg-muted" />
   if (history.isError) {
     return (
-      <div role="alert" className="space-y-3 py-6">
-        <p>Não foi possível carregar o histórico.</p>
-        <Button variant="outline" size="sm" onClick={() => void history.refetch()}>
-          Tentar novamente
-        </Button>
-      </div>
+      <LoadError
+        message="Não foi possível carregar o histórico."
+        onRetry={() => void history.refetch()}
+      />
     )
   }
   const items = history.data.pages.flatMap((p) => p.items)

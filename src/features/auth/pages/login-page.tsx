@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 
 import { PasswordField, TextField } from '@/common/components/text-field'
 import { ScreenWithBack } from '@/common/components/screen-with-back'
@@ -17,6 +17,7 @@ import { loginSchema, type LoginFormValues } from '../validators/auth'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const afterLogin = useAfterLogin()
   const login = useLogin()
   const expired = useGuardStore((s) => s.expired)
@@ -89,6 +90,7 @@ export function LoginPage() {
           Ainda não tem conta?
           <Link
             to="/register"
+            state={location.state}
             replace
             className="inline-flex min-h-11 items-center font-medium text-brand hover:underline"
           >

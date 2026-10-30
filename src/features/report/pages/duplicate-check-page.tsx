@@ -7,6 +7,7 @@ import { distanceText, relativeTime } from '@/common/lib/formatting'
 import { cn } from '@/common/lib/utils'
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { useRequireAccount } from '@/features/auth'
 import { CategoryIcon } from '@/features/categories'
 import { issueDetailQuery, useVote } from '@/features/issues'
 import type { Schema } from '@/infrastructure/api'
@@ -73,7 +74,8 @@ export function DuplicateCheckPage() {
   })
   const [chosenId, setChosenId] = useState<string | null>(null)
   const chosen = duplicates?.find((d) => d.id === chosenId) ?? duplicates?.[0]
-  const confirm = useVote(chosen?.id ?? '')
+  const requireAccount = useRequireAccount()
+  const confirm = useVote(chosen?.id ?? '', () => requireAccount('report', () => {}))
   const { data: neighbor } = useQuery({
     ...issueDetailQuery(chosen?.id ?? ''),
     enabled: chosen !== undefined,

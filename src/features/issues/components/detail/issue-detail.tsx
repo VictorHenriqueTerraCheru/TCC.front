@@ -4,8 +4,8 @@ import { Icon } from '@/common/components/icon'
 import { useResponsivePanel } from '@/common/hooks/use-responsive-panel'
 import { shortTime, relativeTime } from '@/common/lib/formatting'
 import { cn } from '@/common/lib/utils'
-import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { LoadError } from '@/common/components/load-error'
 import { isApiError } from '@/infrastructure/api'
 
 import { useIssueDetail } from '../../api/use-issue-detail'
@@ -142,18 +142,15 @@ export function IssueDetail({ id }: { id: string }) {
   if (isError) {
     const nonexistent = isApiError(error) && error.status === 404
     return (
-      <div role="alert" className="space-y-3 py-6 pr-10">
-        <p>
-          {nonexistent
+      <LoadError
+        message={
+          nonexistent
             ? 'Este problema não está mais no mapa.'
-            : 'Não foi possível carregar o problema.'}
-        </p>
-        {!nonexistent && (
-          <Button variant="outline" size="sm" onClick={() => void refetch()}>
-            Tentar novamente
-          </Button>
-        )}
-      </div>
+            : 'Não foi possível carregar o problema.'
+        }
+        onRetry={nonexistent ? undefined : () => void refetch()}
+        className="pr-10"
+      />
     )
   }
 

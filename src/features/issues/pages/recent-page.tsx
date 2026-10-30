@@ -9,9 +9,9 @@ import { Page } from '@/common/components/page'
 import { relativeTime } from '@/common/lib/formatting'
 import { DEFAULT_CENTER } from '@/common/lib/map'
 import { cn } from '@/common/lib/utils'
-import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
 import { AnimatedItem } from '@/common/components/animated-item'
+import { LoadError } from '@/common/components/load-error'
 import {
   colorAppearance,
   CategoryIcon,
@@ -107,12 +107,10 @@ export function RecentPage() {
   if (groupsQuery.isError) {
     return (
       <Page title="Recentes">
-        <div role="alert" className="space-y-3 py-6">
-          <p>Não foi possível carregar os filtros.</p>
-          <Button variant="outline" size="sm" onClick={() => void groupsQuery.refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
+        <LoadError
+          message="Não foi possível carregar os filtros."
+          onRetry={() => void groupsQuery.refetch()}
+        />
       </Page>
     )
   }
@@ -150,12 +148,10 @@ export function RecentPage() {
           ))}
         </div>
       ) : recent.isError ? (
-        <div role="alert" className="space-y-3 py-6">
-          <p>Não foi possível carregar os recentes.</p>
-          <Button variant="outline" size="sm" onClick={() => void recent.refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
+        <LoadError
+          message="Não foi possível carregar os recentes."
+          onRetry={() => void recent.refetch()}
+        />
       ) : items.length === 0 ? (
         <p className="py-10 text-center text-sm text-muted-foreground">
           Nenhum problema registrado nesta região.

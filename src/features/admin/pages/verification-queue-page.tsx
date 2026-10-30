@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { InfiniteList } from '@/common/components/infinite-list'
 import { cn } from '@/common/lib/utils'
-import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { LoadError } from '@/common/components/load-error'
 import type { VerificationStatus } from '@/features/verification'
 
 import { useQueue } from '../api/use-queue'
@@ -20,12 +20,7 @@ function Queue({ status }: { status: VerificationStatus }) {
   if (queue.isPending) return <Skeleton className="h-40 rounded-2xl bg-muted" />
   if (queue.isError) {
     return (
-      <div role="alert" className="space-y-3 py-6">
-        <p>Não foi possível carregar a fila.</p>
-        <Button variant="outline" size="sm" onClick={() => void queue.refetch()}>
-          Tentar novamente
-        </Button>
-      </div>
+      <LoadError message="Não foi possível carregar a fila." onRetry={() => void queue.refetch()} />
     )
   }
   const items = queue.data.pages.flatMap((p) => p.items)

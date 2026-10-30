@@ -2,6 +2,7 @@ import { Navigate, useNavigate, useSearchParams } from 'react-router'
 
 import { Button } from '@/common/ui/button'
 import { Skeleton } from '@/common/ui/skeleton'
+import { LoadError } from '@/common/components/load-error'
 import { groupsOfType, useCategories, useGroups } from '@/features/categories'
 
 import { ReportStep } from '../components/report-step'
@@ -56,19 +57,13 @@ function TypeCategory({ type }: { type: NonNullable<ReturnType<typeof readType>>
       {categories.isPending || groups.isPending ? (
         <Skeleton className="h-60 rounded-2xl bg-muted" />
       ) : categories.isError || groups.isError ? (
-        <div role="alert" className="space-y-3 py-6">
-          <p>Não foi possível carregar as categorias.</p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              void categories.refetch()
-              void groups.refetch()
-            }}
-          >
-            Tentar novamente
-          </Button>
-        </div>
+        <LoadError
+          message="Não foi possível carregar as categorias."
+          onRetry={() => {
+            void categories.refetch()
+            void groups.refetch()
+          }}
+        />
       ) : (
         <CategoryPicker
           categories={ofType}

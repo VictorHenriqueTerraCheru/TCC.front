@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { useGeolocation } from '@/features/location'
-import { api, unwrapData } from '@/infrastructure/api'
+import { api, isApiError, unwrapData } from '@/infrastructure/api'
 
 import type { VoteValue } from '../models/issue'
 import { applyVote } from '../models/votes'
@@ -17,7 +17,7 @@ function useVoteCoordinates() {
 
 export const votesKey = (id: string) => ['votes', id] as const
 
-export function useVote(id: string) {
+export function useVote(id: string, onUnauthorized: () => void) {
   const queryClient = useQueryClient()
   const coordinates = useVoteCoordinates()
   const { queryKey } = issueDetailQuery(id)
@@ -37,7 +37,8 @@ export function useVote(id: string) {
       if (previous) queryClient.setQueryData(queryKey, applyVote(previous, value))
       return { previous }
     },
-    onError: (_error, _value, context) => {
+    onError: (error, _value, context) => {
+      if (isApiError(error) && error.status === 401) onUnauthorized()
       if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
       void queryClient.invalidateQueries({ queryKey })
     },

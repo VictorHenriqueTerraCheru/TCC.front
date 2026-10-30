@@ -41,6 +41,7 @@ const contents: Record<AccountReason, Content> = {
 export function LoginToContinue() {
   const reason = useGuardStore((s) => s.reason)
   const expired = useGuardStore((s) => s.expired)
+  const returnTo = useGuardStore((s) => s.returnTo)
   const closeSheet = useGuardStore((s) => s.closeSheet)
   const discard = useGuardStore((s) => s.discard)
   const navigate = useNavigate()
@@ -48,7 +49,7 @@ export function LoginToContinue() {
 
   function goTo(route: string) {
     closeSheet()
-    navigate(route)
+    navigate(route, { state: { de: returnTo } })
   }
 
   return (

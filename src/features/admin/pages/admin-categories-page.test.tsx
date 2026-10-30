@@ -2,7 +2,6 @@ import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 
-import { clearIconCache } from '@/common/lib/iconify'
 import { route } from '@/infrastructure/mocks/route'
 import { server } from '@/infrastructure/mocks/server'
 import { setWidth, renderRoutes } from '@/test/render'
@@ -39,9 +38,19 @@ function openAt() {
 describe('categories and groups administration', () => {
   beforeEach(() => {
     loginAsAdmin()
-    clearIconCache()
   })
   afterEach(logout)
+
+  it('on the Grupos tab, each group shows its category count in Portuguese', async () => {
+    const user = userEvent.setup()
+    openAt()
+
+    await user.click(await screen.findByRole('radio', { name: 'Grupos' }))
+
+    const row = async (label: string) => (await screen.findByText(label)).closest('li')!
+    expect(within(await row('Limpeza')).getByText('2 categorias')).toBeInTheDocument()
+    expect(within(await row('Trânsito')).getByText('1 categoria')).toBeInTheDocument()
+  })
 
   it('regular citizen cannot enter', async () => {
     logout()

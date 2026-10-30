@@ -1,34 +1,17 @@
 import { useIsMutating } from '@tanstack/react-query'
-import { useEffect } from 'react'
 
-import { useAuthenticated, useConsumePendingAction, useRequireAccount } from '@/features/auth'
-import { isApiError } from '@/infrastructure/api'
+import { useRequireAccount } from '@/features/auth'
 
 import { votesKey, useVote } from '../api/use-vote'
 import type { IssueDetail, VoteValue } from '../models/issue'
 
 export function useVotes(issue: IssueDetail) {
   const requireAccount = useRequireAccount()
-  const consumeAction = useConsumePendingAction()
-  const authenticated = useAuthenticated()
-  const mutation = useVote(issue.id)
+  const mutation = useVote(issue.id, () => requireAccount('vote', () => {}))
   const pendingVotes = useIsMutating({ mutationKey: votesKey(issue.id) })
 
-  const mutate = mutation.mutate
-  useEffect(() => {
-    if (!authenticated) return
-    const action = consumeAction((a) => 'issueId' in a && a.issueId === issue.id)
-    if (action?.type === 'vote') mutate(action.value)
-  }, [authenticated, consumeAction, issue.id, mutate])
-
   function vote(value: VoteValue) {
-    const pending = { type: 'vote', issueId: issue.id, value } as const
-    const reopenGuardIfExpired = (error: unknown) => {
-      if (isApiError(error) && error.status === 401) requireAccount('vote', () => {}, { pending })
-    }
-    requireAccount('vote', () => mutation.mutate(value, { onError: reopenGuardIfExpired }), {
-      pending,
-    })
+    requireAccount('vote', () => mutation.mutate(value))
   }
 
   return {
