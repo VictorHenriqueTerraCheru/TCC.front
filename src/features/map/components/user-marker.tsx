@@ -28,7 +28,7 @@ export function UserMarker({ position }: { position: Position }) {
       <Marker latitude={position.lat} longitude={position.lng} anchor="center">
         <span
           aria-hidden="true"
-          className="block size-[18px] rounded-full border-[3px] border-white bg-primario shadow-[0_0_0_6px_rgba(59,158,255,.18)]"
+          className="block size-[18px] rounded-full border-[3px] border-white bg-brand shadow-[0_0_0_6px_rgba(59,158,255,.18)]"
         />
       </Marker>
     </>

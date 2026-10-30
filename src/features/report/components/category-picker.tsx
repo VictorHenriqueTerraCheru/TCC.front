@@ -109,10 +109,10 @@ export function CategoryPicker({
                 aria-pressed={category.id === selectedId}
                 onClick={() => onChoose(category.id)}
                 className={cn(
-                  'flex min-h-11 pressionavel items-center gap-2 rounded-full border py-1 pr-3 pl-1.5 text-sm font-medium focus-visible:outline-2',
+                  'flex min-h-11 pressable items-center gap-2 rounded-full border py-1 pr-3 pl-1.5 text-sm font-medium focus-visible:outline-2',
                   category.id === selectedId
-                    ? 'border-primario bg-primario-suave'
-                    : 'border-border bg-card hover:bg-superficie-2',
+                    ? 'border-brand bg-brand-soft'
+                    : 'border-border bg-card hover:bg-surface-2',
                 )}
               >
                 <CategoryIcon category={category} pageSize="sm" />
@@ -141,8 +141,8 @@ export function CategoryPicker({
                     aria-pressed={active}
                     onClick={() => onChoose(category.id)}
                     className={cn(
-                      'flex min-h-24 pressionavel flex-col items-center gap-1.5 rounded-2xl border-2 p-2 text-center text-[13px] leading-tight font-medium focus-visible:outline-2',
-                      active ? color.light : 'border-border bg-card shadow-1 hover:bg-superficie-2',
+                      'flex min-h-24 pressable flex-col items-center gap-1.5 rounded-2xl border-2 p-2 text-center text-[13px] leading-tight font-medium focus-visible:outline-2',
+                      active ? color.light : 'border-border bg-card shadow-1 hover:bg-surface-2',
                     )}
                     style={active ? { borderColor: color.strongColor } : undefined}
                   >

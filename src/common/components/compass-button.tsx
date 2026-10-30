@@ -36,12 +36,12 @@ export function CompassButton({ className }: { className?: string }) {
       aria-label="Apontar para o norte"
       onClick={() => map?.resetNorthPitch()}
       className={cn(
-        'absolute z-[1000] flex size-11 pressionavel animate-in items-center justify-center rounded-full shadow-2 vidro duration-200 fade-in-0 zoom-in-75 focus-visible:outline-2 motion-reduce:animate-none',
+        'absolute z-[1000] flex size-11 pressable animate-in items-center justify-center rounded-full shadow-2 glass duration-200 fade-in-0 zoom-in-75 focus-visible:outline-2 motion-reduce:animate-none',
         className,
       )}
     >
       <svg
-        data-mostrador
+        data-display
         aria-hidden="true"
         viewBox="0 0 44 44"
         className="absolute inset-0 size-full"

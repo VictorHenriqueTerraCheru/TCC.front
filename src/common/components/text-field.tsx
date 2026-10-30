@@ -6,7 +6,7 @@ import { APPEAR } from '@/common/lib/motion'
 import { cn } from '@/common/lib/utils'
 
 const box = cn(
-  'peer w-full rounded-2xl border border-input bg-superficie-2 text-base outline-none',
+  'peer w-full rounded-2xl border border-input bg-surface-2 text-base outline-none',
   'transition-[border-color,box-shadow,background-color] duration-200 ease-out',
   'hover:border-muted-foreground/40 focus:border-ring focus:bg-card focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_18%,transparent)]',
   'aria-invalid:border-destructive aria-invalid:focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--destructive)_18%,transparent)]',
@@ -15,7 +15,7 @@ const box = cn(
 const floatingLabel = cn(
   'pointer-events-none absolute left-4 origin-left text-[11px] font-medium text-muted-foreground',
   'transition-[top,font-size,color] duration-200 ease-out',
-  'peer-focus:text-primario peer-aria-invalid:text-destructive',
+  'peer-focus:text-brand peer-aria-invalid:text-destructive',
 )
 
 function Description({
@@ -107,7 +107,7 @@ export function PasswordField(props: Omit<TextFieldProps, 'type'>) {
         onClick={() => setVisible((v) => !v)}
         aria-label={visible ? 'Ocultar senha' : 'Mostrar senha'}
         aria-pressed={visible}
-        className="absolute top-2 right-2 flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+        className="absolute top-2 right-2 flex size-10 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
       >
         <AnimatePresence mode="popLayout" initial={false}>
           <m.span

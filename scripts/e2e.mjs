@@ -52,8 +52,8 @@ try {
         'Automático não veio marcado',
       )
       await p.getByRole('radio', { name: /Escuro/ }).click()
-      const tema = await p.evaluate(() => document.documentElement.dataset.tema)
-      confere(tema === 'escuro', `o tema não mudou na hora (data-tema=${tema})`)
+      const tema = await p.evaluate(() => document.documentElement.dataset.theme)
+      confere(tema === 'escuro', `o tema não mudou na hora (data-theme=${tema})`)
       await p.getByRole('button', { name: 'Continuar' }).click()
       await p.waitForURL(/permissao|mapa/)
       if (p.url().includes('permissao')) {
@@ -67,14 +67,14 @@ try {
     const resposta = await p.waitForResponse((r) => /\/api\/v1\/problemas\?/.test(r.url()))
     confere(resposta.status() === 200, `GET /problemas respondeu ${resposta.status()}`)
     const corpo = await resposta.json()
-    await p.locator('[data-problema]').first().waitFor()
-    const marcadores = await p.locator('[data-problema]').count()
+    await p.locator('[data-issue]').first().waitFor()
+    const marcadores = await p.locator('[data-issue]').count()
     confere(marcadores > 0, 'nenhum marcador na tela')
     return `${corpo.length} da API, ${marcadores} na tela`
   })
 
   await passo('Visitante toca num alerta e vê o card rápido com dados da API', p, async () => {
-    await p.locator('[data-problema]').first().click({ force: true })
+    await p.locator('[data-issue]').first().click({ force: true })
     await p.waitForURL(/\/mapa\/problema\//)
     estado.problemaSeed = p.url().split('/mapa/problema/')[1].split('?')[0]
     const card = p.getByRole('region', { name: 'Resumo do alerta' })
@@ -379,7 +379,7 @@ try {
     await q.goto(BASE + `/mapa/problema/${estado.problemaNovo}`)
     if (q.url().includes('permissao')) await q.getByRole('button', { name: 'Continuar' }).click()
     await q.getByRole('region', { name: 'Resumo do alerta' }).getByText('Buraco na via').waitFor()
-    await q.locator(`[data-problema="${estado.problemaNovo}"]`).waitFor()
+    await q.locator(`[data-issue="${estado.problemaNovo}"]`).waitFor()
     await q.waitForLoadState('networkidle')
     await q.screenshot({ path: `${SAIDA}/desktop-painel.png` })
   })

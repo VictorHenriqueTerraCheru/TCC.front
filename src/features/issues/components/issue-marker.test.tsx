@@ -15,7 +15,7 @@ const variations: [IssueStatus, TrustBand | null][] = [
 describe('IssueMarker', () => {
   it.each(variations)('%s / %s', (status, band) => {
     const html = renderToStaticMarkup(
-      <IssueMarker color="var(--cat-ocre)" icon="bolt" status={status} band={band} />,
+      <IssueMarker color="var(--group-ochre)" icon="bolt" status={status} band={band} />,
     )
     expect(html).toMatchSnapshot()
   })
@@ -37,9 +37,9 @@ describe('IssueMarker', () => {
   it('high pulses; new and low do not', () => {
     const html = (status: IssueStatus, band: TrustBand | null) =>
       renderToStaticMarkup(<IssueMarker color="red" icon="bolt" status={status} band={band} />)
-    expect(html('active', 'high')).toContain('pulso-alerta')
-    expect(html('active', 'low')).not.toContain('pulso-alerta')
-    expect(html('new', null)).not.toContain('pulso-alerta')
+    expect(html('active', 'high')).toContain('alert-pulse')
+    expect(html('active', 'low')).not.toContain('alert-pulse')
+    expect(html('new', null)).not.toContain('alert-pulse')
   })
 
   it('New gets the badge and possibly resolved gets a dashed border with check', () => {

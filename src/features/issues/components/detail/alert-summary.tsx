@@ -33,7 +33,7 @@ function ThumbButton({ thumb, disabled }: { thumb: Thumb; disabled: boolean }) {
       disabled={disabled}
       onClick={thumb.vote}
       className={cn(
-        'flex size-11 pressionavel items-center justify-center rounded-full bg-foreground/8 hover:bg-foreground/12 focus-visible:outline-2 disabled:opacity-40',
+        'flex size-11 pressable items-center justify-center rounded-full bg-foreground/8 hover:bg-foreground/12 focus-visible:outline-2 disabled:opacity-40',
         thumb.checked && 'ring-2 ring-current',
       )}
       style={{ color: thumb.color }}
@@ -61,14 +61,14 @@ export function AlertSummary({ issue }: { issue: IssueDetail }) {
     {
       label: 'Sim, está lá',
       icon: 'thumb_up',
-      color: 'var(--voto-sim)',
+      color: 'var(--vote-yes)',
       checked: myVote === 'yes',
       vote: () => vote('yes'),
     },
     {
       label: 'Não está lá',
       icon: 'thumb_down',
-      color: 'var(--voto-nao)',
+      color: 'var(--vote-no)',
       checked: myVote === 'no',
       vote: () => vote('no'),
     },

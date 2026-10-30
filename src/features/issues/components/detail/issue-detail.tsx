@@ -20,18 +20,18 @@ const statusChip: Record<
   { label: string; icon: MaterialSymbol; cssClass: string }
 > = {
   active: { label: 'Ativa', icon: 'radio_button_checked', cssClass: 'bg-muted text-foreground' },
-  new: { label: 'Em avaliação', icon: 'hourglass_top', cssClass: 'bg-nova/15 text-nova' },
+  new: { label: 'Em avaliação', icon: 'hourglass_top', cssClass: 'bg-new-badge/15 text-new-badge' },
   possiblyResolved: {
     label: 'Possivelmente resolvida',
     icon: 'help',
-    cssClass: 'bg-primario-suave text-primario',
+    cssClass: 'bg-brand-soft text-brand',
   },
 }
 
 function StatusChip({ status }: { status: IssueStatus }) {
   if (status === 'resolved') {
     return (
-      <span className="rounded-lg bg-primario-suave px-2 py-1 text-xs font-medium text-primario">
+      <span className="rounded-lg bg-brand-soft px-2 py-1 text-xs font-medium text-brand">
         Resolvida
       </span>
     )
@@ -74,8 +74,8 @@ function Body({ issue }: { issue: Detail }) {
   if (issue.status === 'resolved') {
     const { no: resolved } = issue.votes
     return (
-      <p className="flex items-start gap-3 rounded-2xl bg-primario-suave p-4 text-sm">
-        <Icon name="check_circle" filled className="text-[20px] text-primario" />
+      <p className="flex items-start gap-3 rounded-2xl bg-brand-soft p-4 text-sm">
+        <Icon name="check_circle" filled className="text-[20px] text-brand" />
         <span>
           A comunidade confirmou que este problema foi resolvido
           {resolved > 0 && ` (${resolved} ${resolved === 1 ? 'voto' : 'votos'})`}. Ele não aparece

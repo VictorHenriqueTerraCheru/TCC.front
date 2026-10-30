@@ -13,7 +13,7 @@ function systemDark(dark: boolean) {
 describe('theme', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
-    delete document.documentElement.dataset.tema
+    delete document.documentElement.dataset.theme
   })
 
   it('on first run it is system and not chosen yet', () => {
@@ -44,11 +44,11 @@ describe('theme', () => {
       return null
     }
     render(<Root />)
-    expect(document.documentElement.dataset.tema).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('dark')
     expect(meta.content).toBe('#121a24')
 
     act(() => useThemeStore.getState().setPreference('light'))
-    expect(document.documentElement.dataset.tema).toBe('light')
+    expect(document.documentElement.dataset.theme).toBe('light')
     expect(meta.content).toBe('#f2f2f7')
     meta.remove()
   })

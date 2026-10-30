@@ -27,9 +27,9 @@ const options: OptionItem[] = [
     consequence: 'Vira um ponto no mapa até alguém confirmar que foi resolvido.',
     consequenceIcon: 'location_on',
     icons: [
-      { name: 'edit_road', background: 'bg-cat-laranja-claro', color: 'text-cat-laranja' },
-      { name: 'light_off', background: 'bg-cat-ocre-claro', color: 'text-cat-ocre' },
-      { name: 'delete_sweep', background: 'bg-cat-marrom-claro', color: 'text-cat-marrom' },
+      { name: 'edit_road', background: 'bg-group-orange-light', color: 'text-group-orange' },
+      { name: 'light_off', background: 'bg-group-ochre-light', color: 'text-group-ochre' },
+      { name: 'delete_sweep', background: 'bg-group-brown-light', color: 'text-group-brown' },
     ],
   },
   {
@@ -40,9 +40,13 @@ const options: OptionItem[] = [
     consequence: 'Anônimo. Entra no mapa de calor da região, sem ponto exato.',
     consequenceIcon: 'visibility_off',
     icons: [
-      { name: 'error', background: 'bg-cat-vermelho-claro', color: 'text-cat-vermelho' },
-      { name: 'car_crash', background: 'bg-cat-terracota-claro', color: 'text-cat-terracota' },
-      { name: 'flood', background: 'bg-cat-azul-claro', color: 'text-cat-azul' },
+      { name: 'error', background: 'bg-group-red-light', color: 'text-group-red' },
+      {
+        name: 'car_crash',
+        background: 'bg-group-terracotta-light',
+        color: 'text-group-terracotta',
+      },
+      { name: 'flood', background: 'bg-group-blue-light', color: 'text-group-blue' },
     ],
   },
 ]
@@ -78,7 +82,7 @@ export function TypePage() {
           <Link
             key={option.type}
             to={categoryPath(option.type)}
-            className="block pressionavel space-y-3.5 rounded-[20px] border border-border bg-card p-5 shadow-1 hover:border-primario focus-visible:outline-2"
+            className="block pressable space-y-3.5 rounded-[20px] border border-border bg-card p-5 shadow-1 hover:border-brand focus-visible:outline-2"
           >
             <div className="flex items-center">
               <div className="flex">
@@ -101,7 +105,7 @@ export function TypePage() {
               </p>
             </div>
             <p className="flex items-center gap-2 border-t border-border pt-3 text-[13px] text-muted-foreground">
-              <Icon name={option.consequenceIcon} className="text-[18px] text-primario" />
+              <Icon name={option.consequenceIcon} className="text-[18px] text-brand" />
               {option.consequence}
             </p>
           </Link>

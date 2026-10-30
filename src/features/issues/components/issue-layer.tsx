@@ -41,7 +41,7 @@ export function IssueLayer({ issues, categories, selectedId, onSelect }: IssueLa
         <button
           type="button"
           aria-label={category?.name ?? 'Problema'}
-          data-problema={issue.id}
+          data-issue={issue.id}
           className="block cursor-pointer focus-visible:outline-2"
         >
           <IssueMarker

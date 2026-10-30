@@ -71,7 +71,7 @@ export function VerificationQueuePage() {
             className={cn(
               '-mb-px flex-1 border-b-2 py-3 text-sm font-medium focus-visible:outline-2',
               aba === status
-                ? 'border-primario text-primario'
+                ? 'border-brand text-brand'
                 : 'border-transparent text-muted-foreground',
             )}
           >

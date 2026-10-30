@@ -66,7 +66,7 @@ function GpsButton() {
         type="button"
         onClick={() => void recenter()}
         aria-label="Usar minha localização"
-        className="absolute right-3 bottom-10 z-[1000] flex size-11 pressionavel items-center justify-center rounded-xl bg-superficie-2 shadow-2 focus-visible:outline-2"
+        className="absolute right-3 bottom-10 z-[1000] flex size-11 pressable items-center justify-center rounded-xl bg-surface-2 shadow-2 focus-visible:outline-2"
       >
         <Icon name="my_location" />
       </button>
@@ -222,7 +222,7 @@ export function ReportMap(props: ReportMapProps) {
       <VectorMap center={[point.lat, point.lng]} interactive={false}>
         {location && (
           <Marker latitude={location.lat} longitude={location.lng} anchor="center">
-            <CenterPoint color="var(--primario)" pageSize={14} />
+            <CenterPoint color="var(--brand)" pageSize={14} />
           </Marker>
         )}
       </VectorMap>

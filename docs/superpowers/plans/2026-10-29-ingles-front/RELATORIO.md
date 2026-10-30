@@ -72,3 +72,13 @@ A partir daqui a execução passou do Codex para o Claude. O inventário do Code
 - `eslint.config.js` e `components.json` não citam nomes de pasta de feature: nada a mudar.
 - Fica para a Task 6: `src/assets/mapa/estilo-{claro,escuro}.json`, gerados por `scripts/gen-estilo-mapa.mjs` (regra 8: `src/assets/` só muda pelo gerador).
 - Gate: typecheck ok; lint ok; format ok; `Tests 340 passed`; textos idênticos; prints idênticos.
+
+### Commit 3 — tokens e classes CSS
+
+- `src/index.css` com `postcss` (nome e valor de declarações, seletores, parâmetros de `@utility`/`@keyframes`/`@media`); `.ts/.tsx/.mjs` só dentro de literais, partes de template, nomes de atributo JSX e `element.dataset.*` (AST). Tabela da seção 4: `--primario* → --brand*`, `--superficie-* → --surface-*`, `--sombra-* → --elevation-*`, `vidro → glass`, `pressionavel → pressable`, `--nova → --new-badge`, `--voto-sim/nao → --vote-yes/no`, `--calor → --heatmap`, `--realce → --highlight`, `--cat-<cor>[-claro] → --group-<color>[-light]`, `brilho → shimmer`, `pulso-alerta → alert-pulse`, `mapa-principal → main-map` e os dez `data-*`.
+- O teste "every API slot has literal Tailwind classes and the CSS token of the same name" tinha uma tabela inglês → português para achar o token; como o token agora tem o nome da cor do contrato, a tabela saiu e o teste compara direto com a cor. Mesmas três asserções por cor.
+- Decisão: `ui-strings.txt` inclui as strings de `className`; as 97 linhas de classe foram reescritas passando a referência antiga pela mesma função de rename (nenhuma linha de texto mudou; a única feita à mão foi `[&_.pulso-alerta]:hidden`, que o padrão não pegava por causa do `_.`). Custo se estiver errado: nenhum; os prints confirmam.
+- Snapshot de `IssueMarker` regravado: só `pulso-alerta → alert-pulse`, `var(--cat-ocre) → var(--group-ochre)` e `var(--primario-cheio) → var(--brand-solid)`.
+- `index.html` (`dataset.theme`) e `scripts/contraste.test.mjs` (lê o bloco `:root[data-theme='dark']`) acompanham.
+- A busca da seção 5 da Task 4 (`rg ... src scripts`) volta vazia fora de `src/assets`.
+- Gate: typecheck ok; lint ok; format ok; `Tests 340 passed`; textos idênticos; prints idênticos (claro e escuro).

@@ -32,22 +32,10 @@ describe('category model', () => {
   it('every API slot has literal Tailwind classes and the CSS token of the same name', () => {
     for (const color of groupColors) {
       const { strong, light, strongColor } = colorAppearance[color]
-      const token = {
-        orange: 'laranja',
-        ochre: 'ocre',
-        brown: 'marrom',
-        red: 'vermelho',
-        terracotta: 'terracota',
-        blue: 'azul',
-        teal: 'verde-agua',
-        purple: 'roxo',
-        pink: 'rosa',
-        gray: 'cinza',
-      }[color]
       expect([strong, light, strongColor]).toEqual([
-        `text-cat-${token}`,
-        `bg-cat-${token}-claro`,
-        `var(--cat-${token})`,
+        `text-group-${color}`,
+        `bg-group-${color}-light`,
+        `var(--group-${color})`,
       ])
     }
   })

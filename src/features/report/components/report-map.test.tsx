@@ -39,7 +39,7 @@ describe('ReportMap', () => {
   it('area mode draws the 150 m radius', () => {
     renderWithProviders(<ReportMap mode="area" />)
 
-    expect(screen.getByTestId('source-report-area')).toHaveAttribute('data-pontos', '1')
+    expect(screen.getByTestId('source-report-area')).toHaveAttribute('data-points', '1')
   })
 
   it('duplicate check shows the distance between the pins', () => {

@@ -78,10 +78,10 @@ export function IconPicker({ value, onChange, error }: IconPickerProps) {
               title={name}
               onClick={() => onChange(name)}
               className={cn(
-                'flex aspect-square pressionavel items-center justify-center rounded-xl border-2 text-[26px] focus-visible:outline-2',
+                'flex aspect-square pressable items-center justify-center rounded-xl border-2 text-[26px] focus-visible:outline-2',
                 name === value
-                  ? 'border-primario bg-primario-suave text-primario'
-                  : 'border-border bg-card hover:bg-superficie-2',
+                  ? 'border-brand bg-brand-soft text-brand'
+                  : 'border-border bg-card hover:bg-surface-2',
               )}
             >
               <DynamicIcon name={name} />

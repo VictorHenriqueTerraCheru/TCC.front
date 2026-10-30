@@ -58,7 +58,7 @@ export function VoteCard({ issue }: { issue: IssueDetail }) {
     <section
       className={cn(
         'rounded-2xl p-4',
-        highlight ? 'bg-primario-suave text-primario' : 'border border-border/60 bg-card',
+        highlight ? 'bg-brand-soft text-brand' : 'border border-border/60 bg-card',
       )}
     >
       <Invite issue={issue} />
@@ -83,7 +83,7 @@ export function VoteCard({ issue }: { issue: IssueDetail }) {
             Sim, está lá
           </VoteButton>
           <VoteButton
-            className={cn('flex-1', highlight && 'border-primario/40 text-primario')}
+            className={cn('flex-1', highlight && 'border-brand/40 text-brand')}
             variant="outline"
             selected={myVote === 'no'}
             disabled={voting}

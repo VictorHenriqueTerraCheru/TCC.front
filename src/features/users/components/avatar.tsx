@@ -16,7 +16,7 @@ export function Avatar({
     <span
       aria-hidden="true"
       className={cn(
-        'relative flex shrink-0 items-center justify-center rounded-full bg-primario-suave font-medium text-primario',
+        'relative flex shrink-0 items-center justify-center rounded-full bg-brand-soft font-medium text-brand',
         size === 'lg' ? 'size-16 text-xl' : 'size-10 text-sm',
       )}
     >

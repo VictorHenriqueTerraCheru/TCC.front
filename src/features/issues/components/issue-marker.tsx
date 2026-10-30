@@ -21,7 +21,7 @@ export function IssueMarker({ color, icon, status, band, selected = false }: Iss
     <div
       className="issue-marker"
       data-status={status}
-      data-faixa={band ?? 'none'}
+      data-band={band ?? 'none'}
       style={{
         position: 'relative',
         width: d,
@@ -46,7 +46,7 @@ export function IssueMarker({ color, icon, status, band, selected = false }: Iss
       )}
       {pulses && (
         <span
-          className="pulso-alerta"
+          className="alert-pulse"
           aria-hidden="true"
           style={{ position: 'absolute', left: 0, top: 0, width: d, height: d, background: color }}
         />
@@ -101,7 +101,7 @@ export function IssueMarker({ color, icon, status, band, selected = false }: Iss
             width: 16,
             height: 16,
             borderRadius: 999,
-            background: 'var(--primario-cheio)',
+            background: 'var(--brand-solid)',
             color: '#ffffff',
             border: '1.5px solid #fff',
             fontSize: 12,
@@ -120,7 +120,7 @@ export function IssueMarker({ color, icon, status, band, selected = false }: Iss
             left: d * 0.6,
             padding: '1px 5px',
             borderRadius: 6,
-            background: 'var(--primario-cheio)',
+            background: 'var(--brand-solid)',
             color: '#ffffff',
             border: '1.5px solid #ffffff',
             fontSize: 10,

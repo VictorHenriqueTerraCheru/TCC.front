@@ -90,7 +90,7 @@ export function LoginPage() {
           <Link
             to="/cadastro"
             replace
-            className="inline-flex min-h-11 items-center font-medium text-primario hover:underline"
+            className="inline-flex min-h-11 items-center font-medium text-brand hover:underline"
           >
             Criar conta
           </Link>

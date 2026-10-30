@@ -20,35 +20,55 @@ export interface CategoryAppearance extends ColorAppearance {
 
 export const colorAppearance: Record<GroupColor, ColorAppearance> = {
   orange: {
-    strong: 'text-cat-laranja',
-    light: 'bg-cat-laranja-claro',
-    strongColor: 'var(--cat-laranja)',
+    strong: 'text-group-orange',
+    light: 'bg-group-orange-light',
+    strongColor: 'var(--group-orange)',
   },
-  ochre: { strong: 'text-cat-ocre', light: 'bg-cat-ocre-claro', strongColor: 'var(--cat-ocre)' },
+  ochre: {
+    strong: 'text-group-ochre',
+    light: 'bg-group-ochre-light',
+    strongColor: 'var(--group-ochre)',
+  },
   brown: {
-    strong: 'text-cat-marrom',
-    light: 'bg-cat-marrom-claro',
-    strongColor: 'var(--cat-marrom)',
+    strong: 'text-group-brown',
+    light: 'bg-group-brown-light',
+    strongColor: 'var(--group-brown)',
   },
   red: {
-    strong: 'text-cat-vermelho',
-    light: 'bg-cat-vermelho-claro',
-    strongColor: 'var(--cat-vermelho)',
+    strong: 'text-group-red',
+    light: 'bg-group-red-light',
+    strongColor: 'var(--group-red)',
   },
   terracotta: {
-    strong: 'text-cat-terracota',
-    light: 'bg-cat-terracota-claro',
-    strongColor: 'var(--cat-terracota)',
+    strong: 'text-group-terracotta',
+    light: 'bg-group-terracotta-light',
+    strongColor: 'var(--group-terracotta)',
   },
-  blue: { strong: 'text-cat-azul', light: 'bg-cat-azul-claro', strongColor: 'var(--cat-azul)' },
+  blue: {
+    strong: 'text-group-blue',
+    light: 'bg-group-blue-light',
+    strongColor: 'var(--group-blue)',
+  },
   teal: {
-    strong: 'text-cat-verde-agua',
-    light: 'bg-cat-verde-agua-claro',
-    strongColor: 'var(--cat-verde-agua)',
+    strong: 'text-group-teal',
+    light: 'bg-group-teal-light',
+    strongColor: 'var(--group-teal)',
   },
-  purple: { strong: 'text-cat-roxo', light: 'bg-cat-roxo-claro', strongColor: 'var(--cat-roxo)' },
-  pink: { strong: 'text-cat-rosa', light: 'bg-cat-rosa-claro', strongColor: 'var(--cat-rosa)' },
-  gray: { strong: 'text-cat-cinza', light: 'bg-cat-cinza-claro', strongColor: 'var(--cat-cinza)' },
+  purple: {
+    strong: 'text-group-purple',
+    light: 'bg-group-purple-light',
+    strongColor: 'var(--group-purple)',
+  },
+  pink: {
+    strong: 'text-group-pink',
+    light: 'bg-group-pink-light',
+    strongColor: 'var(--group-pink)',
+  },
+  gray: {
+    strong: 'text-group-gray',
+    light: 'bg-group-gray-light',
+    strongColor: 'var(--group-gray)',
+  },
 }
 
 export const groupColors = Object.keys(colorAppearance) as GroupColor[]

@@ -48,7 +48,7 @@ function DrawerContent({
       <DrawerPrimitive.Content
         data-slot="drawer-content"
         className={cn(
-          'group/drawer-content fixed z-50 flex h-auto flex-col border-t border-border bg-card shadow-[inset_0_1px_0_var(--realce),0_-2px_8px_rgb(0_0_0/0.08),0_-16px_44px_rgb(0_0_0/0.22)] outline-none',
+          'group/drawer-content fixed z-50 flex h-auto flex-col border-t border-border bg-card shadow-[inset_0_1px_0_var(--highlight),0_-2px_8px_rgb(0_0_0/0.08),0_-16px_44px_rgb(0_0_0/0.22)] outline-none',
           'data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-lg data-[vaul-drawer-direction=top]:border-b',
           'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[85dvh] data-[vaul-drawer-direction=bottom]:rounded-t-[28px]',
           'data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:border-l data-[vaul-drawer-direction=right]:sm:max-w-sm',

@@ -38,7 +38,7 @@ function DuplicateCard({
       disabled={!onChoose}
       className={cn(
         'flex w-full gap-3 rounded-2xl border bg-card p-3 text-left shadow-1 disabled:opacity-100',
-        selected ? 'border-primario' : 'border-border/60',
+        selected ? 'border-brand' : 'border-border/60',
       )}
     >
       <CategoryIcon category={duplicate.category} pageSize="sm" />
@@ -47,7 +47,7 @@ function DuplicateCard({
         <p className="text-xs text-muted-foreground">
           {duplicate.address} · {relativeTime(duplicate.createdAt)}
         </p>
-        <p className="mt-1 flex items-center gap-1 text-xs font-medium text-primario">
+        <p className="mt-1 flex items-center gap-1 text-xs font-medium text-brand">
           <Icon
             name={duplicate.band ? 'check_circle' : 'hourglass_top'}
             filled
@@ -126,7 +126,7 @@ export function DuplicateCheckPage() {
         <Skeleton className="h-40 rounded-2xl bg-muted" />
       ) : (
         <div className="space-y-3">
-          <span className="flex size-10 items-center justify-center rounded-full bg-primario-suave text-primario">
+          <span className="flex size-10 items-center justify-center rounded-full bg-brand-soft text-brand">
             <Icon name="content_copy" className="text-[20px]" />
           </span>
           <h2 className="text-[22px] leading-7">

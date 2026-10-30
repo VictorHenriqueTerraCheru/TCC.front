@@ -23,7 +23,7 @@ function Checkbox({
         onCheckedChange?.(value)
       }}
       className={cn(
-        'flex size-5 shrink-0 pressionavel items-center justify-center rounded-[6px] border-2 border-input bg-card text-primary-foreground outline-none',
+        'flex size-5 shrink-0 pressable items-center justify-center rounded-[6px] border-2 border-input bg-card text-primary-foreground outline-none',
         'focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive',
         'disabled:opacity-40 data-[state=checked]:border-primary data-[state=checked]:bg-primary',
         className,

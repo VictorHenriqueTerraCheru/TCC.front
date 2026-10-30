@@ -41,7 +41,7 @@ export function useTheme(): Theme {
 export function useApplyTheme() {
   const theme = useTheme()
   useEffect(() => {
-    document.documentElement.dataset.tema = theme
+    document.documentElement.dataset.theme = theme
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', BAR_COLOR[theme])
   }, [theme])
 }

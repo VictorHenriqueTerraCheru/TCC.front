@@ -20,7 +20,7 @@ function DocumentLink({ title, children }: { title: string; children: ReactNode 
     <NoticeDialog
       title={title}
       trigger={
-        <button type="button" className="text-primario underline underline-offset-2">
+        <button type="button" className="text-brand underline underline-offset-2">
           {title}
         </button>
       }
@@ -147,7 +147,7 @@ export function RegisterPage() {
             <Link
               to="/login"
               replace
-              className="inline-flex min-h-11 items-center font-medium text-primario hover:underline"
+              className="inline-flex min-h-11 items-center font-medium text-brand hover:underline"
             >
               Entrar
             </Link>

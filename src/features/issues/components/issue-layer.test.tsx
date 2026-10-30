@@ -43,7 +43,7 @@ describe('IssueLayer', () => {
     mount(low.id)
 
     const zIndexOf = (id: string) =>
-      screen.getAllByTestId('marker').find((m) => m.querySelector(`[data-problema="${id}"]`))!.style
+      screen.getAllByTestId('marker').find((m) => m.querySelector(`[data-issue="${id}"]`))!.style
         .zIndex
     expect(zIndexOf(low.id)).toBe('1000')
     expect(zIndexOf(high.id)).toBe('300')

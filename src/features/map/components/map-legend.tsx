@@ -23,7 +23,7 @@ function Bubble({
       style={{ width: width * scale, height: height * scale }}
     >
       <span
-        className="block origin-top-left [&_.pulso-alerta]:hidden"
+        className="block origin-top-left [&_.alert-pulse]:hidden"
         style={{ transform: `scale(${scale})` }}
       >
         <IssueMarker
@@ -56,7 +56,7 @@ export function MapLegend({ mode, onClose }: { mode: MapMode; onClose(): void })
   return (
     <section
       aria-label={title}
-      className="pointer-events-auto w-60 rounded-[22px] p-4 shadow-3 vidro"
+      className="pointer-events-auto w-60 rounded-[22px] p-4 shadow-3 glass"
     >
       <header className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-medium">{title}</h2>
@@ -64,7 +64,7 @@ export function MapLegend({ mode, onClose }: { mode: MapMode; onClose(): void })
           type="button"
           onClick={onClose}
           aria-label="Fechar legenda"
-          className="-m-2.5 flex size-11 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+          className="-m-2.5 flex size-11 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
           <Icon name="close" className="text-[18px]" />
         </button>
@@ -79,7 +79,7 @@ export function MapLegend({ mode, onClose }: { mode: MapMode; onClose(): void })
             />
           )}
           <Item
-            symbol={<span className="mt-0.5 size-4 rounded-full bg-calor blur-[1px]" />}
+            symbol={<span className="mt-0.5 size-4 rounded-full bg-heatmap blur-[1px]" />}
             title="Incidente · calor"
             text="Concentração nos últimos 7 dias"
           />
@@ -112,7 +112,7 @@ export function MapLegend({ mode, onClose }: { mode: MapMode; onClose(): void })
           />
           <Item
             symbol={
-              <span className="rounded bg-nova px-1 text-[9px] leading-4 text-nova-foreground">
+              <span className="rounded bg-new-badge px-1 text-[9px] leading-4 text-new-badge-foreground">
                 Nova
               </span>
             }

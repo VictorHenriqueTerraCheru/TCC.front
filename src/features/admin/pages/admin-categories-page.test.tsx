@@ -228,8 +228,8 @@ describe('categories and groups administration', () => {
       'Estado',
     )
     const event = within(screen.getByText('Roubo').closest('li')!).getByText('Evento')
-    expect(state.className).toContain('text-primario')
-    expect(event.className).toContain('text-cat-roxo')
+    expect(state.className).toContain('text-brand')
+    expect(event.className).toContain('text-group-purple')
   })
 
   describe('category search and filters', () => {

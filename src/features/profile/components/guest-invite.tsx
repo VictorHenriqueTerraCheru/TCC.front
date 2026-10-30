@@ -6,7 +6,7 @@ import { Button } from '@/common/ui/button'
 export function GuestInvite() {
   return (
     <section className="rounded-2xl bg-card p-6 shadow-1">
-      <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-primario-suave text-primario">
+      <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-brand-soft text-brand">
         <Icon name="person_add" className="text-[28px]" />
       </span>
       <h2 className="mb-2 text-2xl">Entre para acompanhar sua participação</h2>

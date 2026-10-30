@@ -38,7 +38,7 @@ export function FilterChips({
       })}
       {showsIssues(mode) && (
         <FilterChip selected={onlyNew} onClick={onToggleNew}>
-          <Icon name={onlyNew ? 'check' : 'hourglass'} className="text-[18px] text-nova" />
+          <Icon name={onlyNew ? 'check' : 'hourglass'} className="text-[18px] text-new-badge" />
           Em avaliação
         </FilterChip>
       )}

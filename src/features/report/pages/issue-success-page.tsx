@@ -28,7 +28,7 @@ export function SuccessScreen({ title, text, card, viewOnMap }: SuccessScreenPro
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={FAST_SPRING}
-        className="mb-8 flex size-16 items-center justify-center rounded-full bg-primario-suave text-primario"
+        className="mb-8 flex size-16 items-center justify-center rounded-full bg-brand-soft text-brand"
       >
         <svg viewBox="0 0 24 24" aria-hidden className="size-9">
           <circle cx="12" cy="12" r="10" fill="currentColor" />

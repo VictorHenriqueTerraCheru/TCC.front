@@ -18,7 +18,7 @@ export function ScreenWithBack({ title, onBack, children }: ScreenWithBackProps)
           type="button"
           onClick={onBack ?? (() => navigate(-1))}
           aria-label="Voltar"
-          className="flex size-12 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+          className="flex size-12 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
           <Icon name="arrow_back" />
         </button>

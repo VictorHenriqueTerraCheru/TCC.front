@@ -24,7 +24,7 @@ export function SegmentedControl<T extends string>({
     <div
       role="radiogroup"
       aria-label={label}
-      className={cn('grid h-10 gap-[3px] rounded-[14px] p-[3px] vidro', className)}
+      className={cn('grid h-10 gap-[3px] rounded-[14px] p-[3px] glass', className)}
       style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
     >
       {options.map((option) => {
@@ -37,15 +37,15 @@ export function SegmentedControl<T extends string>({
             aria-checked={selected}
             onClick={() => onChange(option.value)}
             className={cn(
-              'relative flex pressionavel items-center justify-center rounded-[11px] text-[13px] font-semibold focus-visible:outline-2 focus-visible:-outline-offset-2',
-              selected ? 'text-primario' : 'text-muted-foreground hover:text-foreground',
+              'relative flex pressable items-center justify-center rounded-[11px] text-[13px] font-semibold focus-visible:outline-2 focus-visible:-outline-offset-2',
+              selected ? 'text-brand' : 'text-muted-foreground hover:text-foreground',
             )}
           >
             {selected && (
               <m.span
                 layoutId={pillId}
                 transition={SOFT_SPRING}
-                className="absolute inset-0 rounded-[11px] bg-primario-suave shadow-1 ring-1 ring-primario/15"
+                className="absolute inset-0 rounded-[11px] bg-brand-soft shadow-1 ring-1 ring-brand/15"
               />
             )}
             <span className="relative">{option.label}</span>

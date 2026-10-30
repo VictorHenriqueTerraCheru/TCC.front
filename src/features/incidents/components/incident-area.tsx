@@ -105,7 +105,7 @@ export function IncidentArea({ lat, lng }: { lat: number; lng: number }) {
         </>
       )}
 
-      <p className="flex gap-3 rounded-2xl bg-superficie-2 p-3 text-xs text-muted-foreground">
+      <p className="flex gap-3 rounded-2xl bg-surface-2 p-3 text-xs text-muted-foreground">
         <Icon name="info" className="text-[18px]" />
         Eventos são pontuais: aparecem apenas agregados, sem local exato, e não recebem votos de
         "Ainda está lá?".

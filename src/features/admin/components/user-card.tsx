@@ -39,7 +39,7 @@ export function UserCard({ user, isSelf }: UserCardProps) {
           <h2 className="truncate font-medium">
             {user.name}
             {isSelf && (
-              <span className="ml-2 rounded-full bg-primario-suave px-2 py-0.5 text-xs font-semibold text-primario">
+              <span className="ml-2 rounded-full bg-brand-soft px-2 py-0.5 text-xs font-semibold text-brand">
                 Você
               </span>
             )}
@@ -49,7 +49,7 @@ export function UserCard({ user, isSelf }: UserCardProps) {
       </header>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <p className="flex items-center gap-1.5 text-sm">
-          <Icon name={icon} className="text-[18px] text-primario" />
+          <Icon name={icon} className="text-[18px] text-brand" />
           <span>{label}</span>
           <span className="text-xs text-muted-foreground">
             · desde {format(new Date(user.createdAt), 'd MMM yyyy', { locale: ptBR })}
@@ -91,10 +91,10 @@ function ProfileSheet({ user, onClose }: { user: AdminUser; onClose(): void }) {
               onClick={() => setChosen(role)}
               className={cn(
                 'flex w-full items-center gap-3 rounded-2xl border p-3 text-left focus-visible:outline-2',
-                selected ? 'border-primario bg-primario-suave' : 'border-border',
+                selected ? 'border-brand bg-brand-soft' : 'border-border',
               )}
             >
-              <Icon name={roleAppearance[role].icon} className="text-primario" />
+              <Icon name={roleAppearance[role].icon} className="text-brand" />
               <span className="flex-1">
                 <span className="block font-medium">{roleAppearance[role].label}</span>
                 <span className="text-xs text-muted-foreground">{roleDescription[role]}</span>

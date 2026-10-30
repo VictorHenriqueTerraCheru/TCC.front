@@ -27,7 +27,7 @@ describe('appearance (light, dark or system)', () => {
   })
   afterEach(() => {
     vi.unstubAllGlobals()
-    delete document.documentElement.dataset.tema
+    delete document.documentElement.dataset.theme
   })
 
   it('on first open asks for the theme, with Automático checked, and returns to where it was', async () => {
@@ -39,7 +39,7 @@ describe('appearance (light, dark or system)', () => {
 
     await user.click(option('Escuro'))
     expect(option('Escuro')).toHaveAttribute('aria-checked', 'true')
-    expect(document.documentElement.dataset.tema).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('dark')
 
     await user.click(screen.getByRole('button', { name: 'Continuar' }))
     expect(router.state.location.pathname).toBe('/mapa')
@@ -80,7 +80,7 @@ describe('appearance (light, dark or system)', () => {
     expect(option('Escuro')).toHaveAttribute('aria-checked', 'true')
 
     await user.click(option('Claro'))
-    expect(document.documentElement.dataset.tema).toBe('light')
+    expect(document.documentElement.dataset.theme).toBe('light')
     expect(useThemeStore.getState().preference).toBe('light')
     logout()
   })

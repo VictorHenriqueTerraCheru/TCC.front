@@ -25,10 +25,10 @@ describe('CompassButton', () => {
     act(() => fakeMap.rotate(45))
 
     const button = screen.getByRole('button', { name: 'Apontar para o norte' })
-    expect(button.querySelector('[data-mostrador]')).toHaveStyle({ transform: 'rotate(-45deg)' })
+    expect(button.querySelector('[data-display]')).toHaveStyle({ transform: 'rotate(-45deg)' })
 
     act(() => fakeMap.rotate(90))
-    expect(button.querySelector('[data-mostrador]')).toHaveStyle({ transform: 'rotate(-90deg)' })
+    expect(button.querySelector('[data-display]')).toHaveStyle({ transform: 'rotate(-90deg)' })
   })
 
   it.each([

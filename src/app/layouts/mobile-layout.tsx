@@ -12,7 +12,7 @@ export function MobileLayout() {
   const fullScreen = /^\/(registrar|admin)(\/|$)|^\/perfil\/.+/.test(pathname)
   const onMap = pathname.startsWith('/mapa')
   return (
-    <div data-layout-celular className="relative h-dvh">
+    <div data-layout-mobile className="relative h-dvh">
       <main className={cn('relative h-full overflow-y-auto', !fullScreen && !onMap && 'pb-24')}>
         <Outlet />
       </main>
@@ -25,13 +25,13 @@ function BottomBar() {
   return (
     <nav
       aria-label="Navegação principal"
-      className="absolute inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex h-[58px] items-stretch gap-1 rounded-[22px] p-1 shadow-2 vidro"
+      className="absolute inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex h-[58px] items-stretch gap-1 rounded-[22px] p-1 shadow-2 glass"
     >
       {navigationItems.map((item) => (
         <NavLink
           key={item.route}
           to={item.route}
-          className="relative flex flex-1 pressionavel flex-col items-center justify-center gap-0.5 rounded-[18px] text-[10px] font-semibold focus-visible:outline-2"
+          className="relative flex flex-1 pressable flex-col items-center justify-center gap-0.5 rounded-[18px] text-[10px] font-semibold focus-visible:outline-2"
         >
           {({ isActive }) => (
             <>
@@ -39,7 +39,7 @@ function BottomBar() {
                 <m.span
                   layoutId="active-tab-mobile"
                   transition={SOFT_SPRING}
-                  className="absolute inset-0 rounded-[18px] bg-primario-suave"
+                  className="absolute inset-0 rounded-[18px] bg-brand-soft"
                 />
               )}
               <m.span
@@ -53,14 +53,14 @@ function BottomBar() {
                   filled={isActive}
                   className={cn(
                     'text-[23px] transition-colors',
-                    isActive ? 'text-primario' : 'text-muted-foreground',
+                    isActive ? 'text-brand' : 'text-muted-foreground',
                   )}
                 />
               </m.span>
               <span
                 className={cn(
                   'relative transition-colors',
-                  isActive ? 'text-primario' : 'text-muted-foreground',
+                  isActive ? 'text-brand' : 'text-muted-foreground',
                 )}
               >
                 {item.label}

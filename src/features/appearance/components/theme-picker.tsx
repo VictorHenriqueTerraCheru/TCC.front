@@ -68,14 +68,14 @@ export function ThemePicker({ className }: { className?: string }) {
             role="radio"
             aria-checked={selected}
             onClick={() => setPreference(option.value)}
-            className="flex pressionavel flex-col items-center gap-2 rounded-2xl py-3 focus-visible:outline-2"
+            className="flex pressable flex-col items-center gap-2 rounded-2xl py-3 focus-visible:outline-2"
           >
             <span className="relative rounded-[14px] p-[3px]">
               {selected && (
                 <m.span
                   layoutId={ringId}
                   transition={SOFT_SPRING}
-                  className="absolute inset-0 rounded-[14px] ring-2 ring-primario"
+                  className="absolute inset-0 rounded-[14px] ring-2 ring-brand"
                 />
               )}
               <Thumbnail preference={option.value} />
@@ -87,7 +87,7 @@ export function ThemePicker({ className }: { className?: string }) {
             <Icon
               name={selected ? 'check_circle' : 'radio_button_unchecked'}
               filled={selected}
-              className={cn('text-[22px]', selected ? 'text-primario' : 'text-muted-foreground')}
+              className={cn('text-[22px]', selected ? 'text-brand' : 'text-muted-foreground')}
             />
           </button>
         )

@@ -57,7 +57,7 @@ export function LoginToContinue() {
       onOpenChange={(open) => !open && discard()}
       title={content.title}
       icon={
-        <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-primario-suave text-primario">
+        <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-brand-soft text-brand">
           <Icon name={content.icon} className="text-[28px]" />
         </span>
       }
@@ -67,7 +67,7 @@ export function LoginToContinue() {
       <ul className="mb-6 space-y-3">
         {content.items.map(([icon, text]) => (
           <li key={text} className="flex items-center gap-3 text-sm">
-            <Icon name={icon} className="text-[22px] text-primario" />
+            <Icon name={icon} className="text-[22px] text-brand" />
             {text}
           </li>
         ))}

@@ -106,7 +106,7 @@ export function ProfilePage() {
           <Link
             to="/perfil/configuracoes"
             aria-label="Configurações"
-            className="flex size-12 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+            className="flex size-12 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
           >
             <Icon name="settings" />
           </Link>
@@ -138,9 +138,9 @@ export function ProfilePage() {
             <div className="space-y-2">
               <Link
                 to="/admin/verificacoes"
-                className="flex pressionavel items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-superficie-2 focus-visible:outline-2"
+                className="flex pressable items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-surface-2 focus-visible:outline-2"
               >
-                <Icon name="admin_panel_settings" className="text-primario" />
+                <Icon name="admin_panel_settings" className="text-brand" />
                 <span className="flex-1">
                   <span className="block font-medium">Fila de verificação</span>
                   <span className="text-xs text-muted-foreground">
@@ -151,9 +151,9 @@ export function ProfilePage() {
               </Link>
               <Link
                 to="/admin/categorias"
-                className="flex pressionavel items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-superficie-2 focus-visible:outline-2"
+                className="flex pressable items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-surface-2 focus-visible:outline-2"
               >
-                <Icon name="category" className="text-primario" />
+                <Icon name="category" className="text-brand" />
                 <span className="flex-1">
                   <span className="block font-medium">Categorias</span>
                   <span className="text-xs text-muted-foreground">
@@ -164,9 +164,9 @@ export function ProfilePage() {
               </Link>
               <Link
                 to="/admin/usuarios"
-                className="flex pressionavel items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-superficie-2 focus-visible:outline-2"
+                className="flex pressable items-center gap-3 rounded-[20px] bg-card p-4 shadow-1 hover:bg-surface-2 focus-visible:outline-2"
               >
-                <Icon name="group" className="text-primario" />
+                <Icon name="group" className="text-brand" />
                 <span className="flex-1">
                   <span className="block font-medium">Usuários</span>
                   <span className="text-xs text-muted-foreground">

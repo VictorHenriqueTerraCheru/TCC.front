@@ -28,7 +28,7 @@ function Header({
           type="button"
           onClick={onTopAction}
           aria-label={topAction === 'close' ? 'Fechar registro' : 'Voltar'}
-          className="flex size-12 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+          className="flex size-12 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
           <Icon name={topAction === 'close' ? 'close' : 'arrow_back'} />
         </button>
@@ -41,7 +41,7 @@ function Header({
           aria-valuemax={step.total}
           aria-valuenow={step.current}
           aria-label={`Passo ${step.current} de ${step.total}`}
-          className="h-1 overflow-hidden rounded-full bg-primario-suave"
+          className="h-1 overflow-hidden rounded-full bg-brand-soft"
         >
           <div
             className="h-full rounded-full bg-primary"

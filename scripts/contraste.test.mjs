@@ -9,7 +9,7 @@ async function tokens(tema) {
     )
   }
   const claro = bloco(':root')
-  return tema === 'claro' ? claro : { ...claro, ...bloco(":root\\[data-tema='escuro'\\]") }
+  return tema === 'claro' ? claro : { ...claro, ...bloco(":root\\[data-theme='dark'\\]") }
 }
 
 function luminancia(hex) {
@@ -34,20 +34,20 @@ const PARES = [
   ['--muted-foreground', '--background'],
   ['--muted-foreground', '--card'],
   ['--primary-foreground', '--primary'],
-  ['--primario', '--background'],
-  ['--primario', '--card'],
+  ['--brand', '--background'],
+  ['--brand', '--card'],
   ['--destructive', '--background'],
-  ['--foreground', '--superficie-2'],
-  ['--cat-laranja', '--card'],
-  ['--cat-ocre', '--card'],
-  ['--cat-marrom', '--card'],
-  ['--cat-vermelho', '--card'],
-  ['--cat-terracota', '--card'],
-  ['--cat-azul', '--card'],
-  ['--cat-verde-agua', '--card'],
-  ['--cat-roxo', '--card'],
-  ['--cat-rosa', '--card'],
-  ['--cat-cinza', '--card'],
+  ['--foreground', '--surface-2'],
+  ['--group-orange', '--card'],
+  ['--group-ochre', '--card'],
+  ['--group-brown', '--card'],
+  ['--group-red', '--card'],
+  ['--group-terracotta', '--card'],
+  ['--group-blue', '--card'],
+  ['--group-teal', '--card'],
+  ['--group-purple', '--card'],
+  ['--group-pink', '--card'],
+  ['--group-gray', '--card'],
 ]
 
 describe.each(['claro', 'escuro'])('tema %s', (tema) => {

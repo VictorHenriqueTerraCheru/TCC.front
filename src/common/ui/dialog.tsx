@@ -62,7 +62,7 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="absolute top-4 right-4 flex size-9 pressionavel items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-superficie-2 hover:text-foreground focus-visible:outline-2 disabled:pointer-events-none"
+            className="absolute top-4 right-4 flex size-9 pressable items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-surface-2 hover:text-foreground focus-visible:outline-2 disabled:pointer-events-none"
           >
             <Icon name="close" className="text-[20px]" />
             <span className="sr-only">Fechar</span>

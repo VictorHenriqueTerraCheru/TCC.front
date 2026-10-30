@@ -8,16 +8,16 @@ const full =
   'bg-linear-to-b from-black/0 to-black/12 shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_1px_2px_rgb(0_0_0/0.18)]'
 
 const buttonVariants = cva(
-  "relative inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold whitespace-nowrap pressionavel outline-none select-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "relative inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold whitespace-nowrap pressable outline-none select-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         default: `bg-primary text-primary-foreground ${full} hover:brightness-110 hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_6px_18px_color-mix(in_srgb,var(--primary)_40%,transparent)]`,
-        tonal: 'bg-primario-suave text-primario hover:bg-primario/25',
-        outline: 'border border-input bg-card/40 text-primario hover:bg-primario-suave',
+        tonal: 'bg-brand-soft text-brand hover:bg-brand/25',
+        outline: 'border border-input bg-card/40 text-brand hover:bg-brand-soft',
         destructive: `bg-destructive text-destructive-foreground ${full} hover:brightness-105`,
-        ghost: 'text-primario hover:bg-primario-suave',
-        link: 'text-primario underline-offset-4 hover:underline',
+        ghost: 'text-brand hover:bg-brand-soft',
+        link: 'text-brand underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-11 px-6',

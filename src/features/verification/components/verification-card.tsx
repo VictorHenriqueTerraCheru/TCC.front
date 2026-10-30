@@ -13,7 +13,7 @@ const data = (iso: string) => format(new Date(iso), 'd MMM. yyyy', { locale: ptB
 export function VerificationCard({ me }: { me: Me }) {
   if (me.role === 'verifiedCitizen') {
     return (
-      <section className="rounded-2xl bg-primario-suave p-4 text-primario">
+      <section className="rounded-2xl bg-brand-soft p-4 text-brand">
         <h2 className="mb-1 flex items-center gap-2 font-medium">
           <Icon name="how_to_reg" className="text-[22px]" />
           Seu voto tem peso maior
@@ -22,7 +22,7 @@ export function VerificationCard({ me }: { me: Me }) {
           Suas confirmações e respostas de “Ainda está lá?” contam mais no cálculo de confiança das
           ocorrências — ainda mais perto de onde você mora.
         </p>
-        <p className="mt-3 border-t border-primario/15 pt-3 text-xs">
+        <p className="mt-3 border-t border-brand/15 pt-3 text-xs">
           {me.verifiedAt ? `Verificado em ${data(me.verifiedAt)}` : 'Perfil verificado'}
           {me.verification && ` · ${affiliationLabel[me.verification.affiliationType]}`}
         </p>
@@ -36,7 +36,7 @@ export function VerificationCard({ me }: { me: Me }) {
     return (
       <section className="rounded-[20px] border border-border bg-card p-4 shadow-1">
         <h2 className="mb-1 flex items-center gap-2 font-medium">
-          <Icon name="hourglass_top" className="text-[22px] text-nova" />
+          <Icon name="hourglass_top" className="text-[22px] text-new-badge" />
           Pedido em análise
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -50,7 +50,7 @@ export function VerificationCard({ me }: { me: Me }) {
   return (
     <section className="rounded-[20px] border border-border bg-card p-4 shadow-1">
       <h2 className="mb-1 flex items-center gap-2 font-medium">
-        <Icon name="verified_user" className="text-[22px] text-primario" />
+        <Icon name="verified_user" className="text-[22px] text-brand" />
         Verifique seu perfil
       </h2>
       <p className="mb-3 text-sm text-muted-foreground">

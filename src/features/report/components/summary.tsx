@@ -29,7 +29,7 @@ export function SummaryRow({ icon, label, value, onEdit }: SummaryRowProps) {
           type="button"
           onClick={onEdit}
           aria-label={`Editar ${label.toLowerCase()}`}
-          className="flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
+          className="flex size-10 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2"
         >
           <Icon name="edit" className="text-[20px]" />
         </button>

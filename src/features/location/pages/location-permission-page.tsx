@@ -33,7 +33,7 @@ export function LocationPermissionPage() {
 
   return (
     <div className="flex min-h-full flex-col px-6 pt-20 pb-6 lg:pt-12">
-      <span className="mb-8 flex size-[72px] items-center justify-center rounded-full bg-primario-suave text-primario">
+      <span className="mb-8 flex size-[72px] items-center justify-center rounded-full bg-brand-soft text-brand">
         <Icon name="my_location" className="text-[36px]" />
       </span>
       <h1 className="mb-6 text-[28px] leading-9">Permitir acesso à sua localização?</h1>
@@ -44,7 +44,7 @@ export function LocationPermissionPage() {
       <ul className="space-y-4 text-sm">
         {items.map(([icon, text]) => (
           <li key={text} className="flex gap-4">
-            <Icon name={icon} className="text-[22px] text-primario" />
+            <Icon name={icon} className="text-[22px] text-brand" />
             {text}
           </li>
         ))}

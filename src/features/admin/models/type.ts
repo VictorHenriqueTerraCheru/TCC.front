@@ -16,6 +16,6 @@ export const typeOptions: { value: GroupType; label: string }[] = [
 ]
 
 export const typeClass: Record<GroupType, string> = {
-  issue: 'bg-primario-suave text-primario',
-  incident: 'bg-cat-roxo-claro text-cat-roxo',
+  issue: 'bg-brand-soft text-brand',
+  incident: 'bg-group-purple-light text-group-purple',
 }

@@ -22,7 +22,7 @@ import { useMe } from '@/features/users'
 import { EditNameDialog } from '../components/edit-name-dialog'
 
 const permission: Record<LocationStatus, { label: string; cssClass: string }> = {
-  granted: { label: 'Permitida', cssClass: 'bg-primario-suave text-primario' },
+  granted: { label: 'Permitida', cssClass: 'bg-brand-soft text-brand' },
   denied: { label: 'Negada', cssClass: 'bg-destructive/15 text-destructive' },
   prompt: { label: 'Não definida', cssClass: 'bg-muted text-foreground' },
   checking: { label: 'Verificando', cssClass: 'bg-muted text-foreground' },
@@ -57,7 +57,7 @@ function Row({
 }) {
   const content = (
     <>
-      <Icon name={icon} className="text-primario" />
+      <Icon name={icon} className="text-brand" />
       <span className="min-w-0 flex-1 text-left">
         <span className="block">{title}</span>
         {subtitle && (
@@ -124,7 +124,7 @@ export function SettingsPage() {
 
         <Section title="Localização">
           <div className="flex gap-4 px-4 py-3">
-            <Icon name="my_location" className="text-primario" />
+            <Icon name="my_location" className="text-brand" />
             <div className="flex-1">
               <div className="flex items-center justify-between gap-2">
                 <span>Permissão de localização</span>

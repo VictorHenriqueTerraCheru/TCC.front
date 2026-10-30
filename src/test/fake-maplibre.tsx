@@ -221,7 +221,7 @@ export function Map({
       <div
         ref={divRef}
         data-testid="map"
-        data-estilo={(mapStyle as { name?: string } | undefined)?.name}
+        data-style={(mapStyle as { name?: string } | undefined)?.name}
         className="maplibregl-map"
         onClick={() => instance.emit('click', { lngLat: instance.getCenter() })}
       >
@@ -267,14 +267,14 @@ export function Source({ id, data, children }: SourceProps) {
   const sourceData = data as { features?: unknown[]; type?: string } | undefined
   const points = sourceData?.features?.length ?? (sourceData?.type === 'Feature' ? 1 : 0)
   return (
-    <div data-testid={`source-${id ?? 'no-id'}`} data-pontos={points}>
+    <div data-testid={`source-${id ?? 'no-id'}`} data-points={points}>
       {children}
     </div>
   )
 }
 
 export function Layer({ id, type }: { id?: string; type?: string; [prop: string]: unknown }) {
-  return <div data-testid={`layer-${id ?? 'no-id'}`} data-tipo={type} />
+  return <div data-testid={`layer-${id ?? 'no-id'}`} data-type={type} />
 }
 
 export function NavigationControl() {

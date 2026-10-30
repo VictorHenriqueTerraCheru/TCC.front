@@ -52,17 +52,15 @@ export function TimePicker({ time, onChange }: TimePickerProps) {
                 })
               }
               className={cn(
-                'relative flex h-11 pressionavel items-center gap-1.5 rounded-full border px-4 text-sm font-medium focus-visible:outline-2',
-                selected
-                  ? 'border-transparent text-primario'
-                  : 'border-input hover:bg-foreground/5',
+                'relative flex h-11 pressable items-center gap-1.5 rounded-full border px-4 text-sm font-medium focus-visible:outline-2',
+                selected ? 'border-transparent text-brand' : 'border-input hover:bg-foreground/5',
               )}
             >
               {selected && (
                 <m.span
                   layoutId={pillId}
                   transition={SOFT_SPRING}
-                  className="absolute inset-0 rounded-full bg-primario-suave"
+                  className="absolute inset-0 rounded-full bg-brand-soft"
                 />
               )}
               <AnimatePresence initial={false}>
@@ -92,7 +90,7 @@ export function TimePicker({ time, onChange }: TimePickerProps) {
           className="mt-4"
         >
           <div className="relative flex h-14 items-center rounded-2xl border border-ring bg-card pr-2 pl-4 shadow-[0_0_0_4px_color-mix(in_srgb,var(--ring)_14%,transparent)]">
-            <span className="absolute top-2 left-4 text-[11px] font-medium text-primario">
+            <span className="absolute top-2 left-4 text-[11px] font-medium text-brand">
               Hora aproximada
             </span>
             <output aria-live="polite" className="flex-1 pt-4 tabular-nums">
@@ -105,7 +103,7 @@ export function TimePicker({ time, onChange }: TimePickerProps) {
               onClick={() =>
                 previous && onChange({ mode: 'other', otherAt: previous.toISOString() })
               }
-              className="flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2 disabled:opacity-30"
+              className="flex size-10 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2 disabled:opacity-30"
             >
               <Icon name="remove" />
             </button>
@@ -114,7 +112,7 @@ export function TimePicker({ time, onChange }: TimePickerProps) {
               aria-label="15 minutos depois"
               disabled={!next}
               onClick={() => next && onChange({ mode: 'other', otherAt: next.toISOString() })}
-              className="flex size-10 pressionavel items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2 disabled:opacity-30"
+              className="flex size-10 pressable items-center justify-center rounded-full hover:bg-foreground/5 focus-visible:outline-2 disabled:opacity-30"
             >
               <Icon name="add" />
             </button>

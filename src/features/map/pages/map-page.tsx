@@ -182,7 +182,7 @@ export function MapPage() {
   )
 
   return (
-    <div className="mapa-principal relative isolate size-full">
+    <div className="main-map relative isolate size-full">
       <h1 className="sr-only">Mapa de ocorrências</h1>
       <BaseMap
         ref={setMap}
@@ -278,13 +278,13 @@ export function MapPage() {
       {aviso && (
         <div
           role="status"
-          className="pointer-events-none absolute inset-x-0 bottom-[168px] z-[1000] mx-auto w-fit max-w-[90%] rounded-2xl px-4 py-2.5 text-sm shadow-3 vidro lg:bottom-8"
+          className="pointer-events-none absolute inset-x-0 bottom-[168px] z-[1000] mx-auto w-fit max-w-[90%] rounded-2xl px-4 py-2.5 text-sm shadow-3 glass lg:bottom-8"
         >
           {aviso}
         </div>
       )}
 
-      <div className="pointer-events-auto absolute right-3 bottom-[168px] z-[1000] flex flex-col divide-y divide-vidro-borda overflow-hidden rounded-[14px] shadow-2 vidro lg:right-4 lg:bottom-14">
+      <div className="pointer-events-auto absolute right-3 bottom-[168px] z-[1000] flex flex-col divide-y divide-glass-border overflow-hidden rounded-[14px] shadow-2 glass lg:right-4 lg:bottom-14">
         <MapButton
           aria-label={legendOpen ? 'Fechar legenda' : 'Abrir legenda'}
           aria-pressed={legendOpen}
@@ -318,7 +318,7 @@ export function MapPage() {
             event.preventDefault()
             requireAccount('report', () => navigate('/registrar'), { returnTo: '/registrar' })
           }}
-          className="absolute bottom-[92px] left-1/2 z-[1000] flex h-12 -translate-x-1/2 pressionavel items-center gap-2 rounded-full bg-primary bg-linear-to-b from-black/0 to-black/12 px-5 font-semibold text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2"
+          className="absolute bottom-[92px] left-1/2 z-[1000] flex h-12 -translate-x-1/2 pressable items-center gap-2 rounded-full bg-primary bg-linear-to-b from-black/0 to-black/12 px-5 font-semibold text-primary-foreground shadow-[inset_0_1px_0_rgb(255_255_255/0.22),0_8px_22px_color-mix(in_srgb,var(--primary)_45%,transparent)] hover:brightness-110 focus-visible:outline-2"
         >
           <Icon name="add_location_alt" />
           Registrar

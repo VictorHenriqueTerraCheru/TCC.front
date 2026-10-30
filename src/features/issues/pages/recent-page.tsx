@@ -39,20 +39,20 @@ function RecentCard({ item }: { item: RecentItem }) {
   return (
     <Link
       to={`/mapa/problema/${item.id}`}
-      className="flex pressionavel gap-3 rounded-[20px] border border-border bg-card p-3 shadow-1 hover:bg-superficie-2 focus-visible:outline-2"
+      className="flex pressable gap-3 rounded-[20px] border border-border bg-card p-3 shadow-1 hover:bg-surface-2 focus-visible:outline-2"
     >
       <CategoryIcon category={item.category} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <p className="font-medium">{item.category.name}</p>
           {item.status === 'new' && (
-            <span className="rounded bg-nova px-1.5 text-[11px] leading-4 text-nova-foreground">
+            <span className="rounded bg-new-badge px-1.5 text-[11px] leading-4 text-new-badge-foreground">
               Nova
             </span>
           )}
           {item.band && (
             <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-              <Icon name={band[item.band].icon} className="text-[16px] text-primario" />
+              <Icon name={band[item.band].icon} className="text-[16px] text-brand" />
               {band[item.band].label}
             </span>
           )}
@@ -66,7 +66,7 @@ function RecentCard({ item }: { item: RecentItem }) {
           <span
             className={cn(
               'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-medium',
-              possible ? 'bg-primario-suave text-primario' : 'bg-muted',
+              possible ? 'bg-brand-soft text-brand' : 'bg-muted',
             )}
           >
             <Icon

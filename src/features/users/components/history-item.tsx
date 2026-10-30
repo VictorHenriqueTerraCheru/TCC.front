@@ -10,13 +10,13 @@ import { itemTitle, type HistoryItem } from '../models/history'
 const chips: Partial<
   Record<NonNullable<HistoryItem['issueStatus']>, { label: string; cssClass: string }>
 > = {
-  new: { label: 'Nova', cssClass: 'bg-primario-suave text-primario' },
+  new: { label: 'Nova', cssClass: 'bg-brand-soft text-brand' },
   active: { label: 'Ativa', cssClass: 'bg-muted text-foreground' },
   possiblyResolved: {
     label: 'Possivelmente resolvida',
-    cssClass: 'bg-primario-suave text-primario',
+    cssClass: 'bg-brand-soft text-brand',
   },
-  resolved: { label: 'Resolvida', cssClass: 'bg-primario-suave text-primario' },
+  resolved: { label: 'Resolvida', cssClass: 'bg-brand-soft text-brand' },
 }
 
 const isReport = (type: HistoryItem['type']) => type === 'issueReport' || type === 'incidentReport'

@@ -112,14 +112,14 @@ describe('AlertSummary', () => {
       },
     ])
     const stage = () =>
-      screen.getByRole('heading', { name: ACTIVE.category.name }).closest('[data-estagio]')
+      screen.getByRole('heading', { name: ACTIVE.category.name }).closest('[data-stage]')
 
-    expect(stage()).toHaveAttribute('data-estagio', 'summary')
+    expect(stage()).toHaveAttribute('data-stage', 'summary')
     await userEvent.click(screen.getByRole('button', { name: 'Voto rápido: Sim, está lá' }))
-    expect(stage()).toHaveAttribute('data-estagio', 'summary')
+    expect(stage()).toHaveAttribute('data-stage', 'summary')
 
     await userEvent.click(screen.getByRole('heading', { name: ACTIVE.category.name }))
-    expect(stage()).toHaveAttribute('data-estagio', 'open')
+    expect(stage()).toHaveAttribute('data-stage', 'open')
     expect(screen.queryByRole('button', { name: /^Voto rápido/ })).not.toBeInTheDocument()
   })
 })
