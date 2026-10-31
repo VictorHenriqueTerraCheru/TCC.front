@@ -1,4 +1,4 @@
-# Ocorrências urbanas — front web
+# Zela — front web
 
 Front em React + TypeScript do TCC "Sistema colaborativo de registro e validação de ocorrências urbanas" (Unilasalle-RJ). Consome a API do repositório `TCC.back`.
 

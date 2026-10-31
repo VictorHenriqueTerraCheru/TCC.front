@@ -1,4 +1,4 @@
-# CLAUDE.md — Front web de Ocorrências Urbanas (TCC)
+# CLAUDE.md — Front web do Zela (TCC)
 
 Aplicação web em **React + TypeScript** do TCC "Sistema colaborativo de registro e validação de ocorrências urbanas" (Gustavo Brandão e Victor Henrique Terra Cherú — Unilasalle-RJ). É **mobile-first e responsiva**: no celular segue o protótipo; no computador, o mapa ocupa a tela e os detalhes viram um painel lateral. Consome a API .NET do repositório `TCC.back` (`../TCC.back`), **já implementada** (etapas 0–7, padrão MedComite.Core, código e contrato em inglês).
 
