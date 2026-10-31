@@ -167,7 +167,7 @@ export function SettingsPage() {
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
         <DialogContent showCloseButton={false}>
           <DialogHeader>
-            <DialogTitle>Ocorrências urbanas</DialogTitle>
+            <DialogTitle>Zela</DialogTitle>
             <DialogDescription asChild>
               <div className="space-y-2 text-left">
                 <p>
