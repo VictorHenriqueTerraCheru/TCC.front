@@ -67,7 +67,7 @@ function IssueInfo({ issue }: { issue: Detail }) {
 
 function trustLegend({ votes: { yes, no } }: Detail) {
   const votes = yes + no
-  return `Calculada com ${votes} ${votes === 1 ? 'voto' : 'votos'}, ponderados por proximidade e histórico de quem votou.`
+  return `Calculada com ${votes} ${votes === 1 ? 'voto' : 'votos'}, ponderados por perfil, proximidade e tempo.`
 }
 
 function Body({ issue }: { issue: Detail }) {
